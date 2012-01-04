@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <title>[% title %]</title>
+    <link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/site.css') %]" />
+    <link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/gh-buttons.css') %]" />
+  </head>
+  <body>
+
+    <div id="header">
+      <h1>Judoon: Simplifying and automating the display of scientific data</h1>
+    </div>
+
+    <div id="middle">
+
+      <div id="sidebar">
+        <h4>Things to do:</h4>
+        <ul>
+          <li><a href="moo">One</a></li>
+          <li><a href="moo">Two</a></li>
+          <li><a href="moo">Three</a></li>
+        </ul>
+      </div>
+
+      <div id="content">
+        [% content %]
+      </div>
+
+    </div>
+
+    <div id="footer">
+      <p>&copy; 2012 Cell Migration Consortium</p>
+      <p>Have questions? Need help?  <a href="mailto:help@cellmigration.org">E-mail us</a>.</p>
+    </div>
+
+  </body>
+</html>

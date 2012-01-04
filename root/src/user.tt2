@@ -1,0 +1,43 @@
+[% WRAPPER inc/wrapper.tt2
+  title = 'Fitz Elliott | Judoon' 
+%]
+
+<p>Welcome, Fitz!</p>
+
+<p>Here are your data sets:</p>
+
+<table class="dataset_list">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Data Set</th>
+      <th>Webpage</th>
+      <th>Publish?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><a href="/user/fge7z/dataset/6">RNAi - 05/07/2011</a></td>
+      <td><a href="/user/fge7z/page/6">View</a></td>
+      <td><input type="checkbox" checked="checked" /></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><a href="/user/fge7z/dataset/7">Migration Screen</a></td>
+      <td> - </td>
+      <td><input type="checkbox"  disabled="disabled" /></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        <a class="button icon add" href="/user/fge7z/dataset">Add New Data Set</a>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+
+
+[% END %]

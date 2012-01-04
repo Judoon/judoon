@@ -1,0 +1,97 @@
+/*
+ Primary Color:
+ #00A876 #207E62 #006D4C #35D4A4 #5FD4B1
+
+ Secondary Color A:
+ #0D56A6 #274F7D #04356C #4186D3 #689AD3
+
+ Secondary Color B:
+ #4DDE00 #55A62A #329000 #7AEE3C #99EE6B
+
+ Complementary Color:
+ #FF5900 #BF6230 #A63A00 #FF8240 #FFA473
+*/
+
+body {
+    background-color: #eee;
+    padding: 20px;
+    font-family: verdana, sans-serif;
+}
+#header {
+    margin: 0 0 3px 0;
+    padding: 0.5em 3em;
+    background: #35D4A4;
+    color: #006D4C;
+}
+#footer {
+    margin: 0;
+    padding: 5px;
+    background: none repeat scroll 0% 0% rgb(104, 154, 211);
+    color: rgb(4, 53, 108);
+    border-color: rgb(13, 86, 166);
+}
+#footer p {
+    margin: 0;
+    padding: 2px;
+    font-size: 80%;
+}
+#middle {
+    margin: 0 0 3px 0;
+    padding: 2em 10em;
+    background-color: #fff;
+}
+#login_form {
+    width: 30%;
+    margin: 1em auto;
+}
+#sidebar {
+    float: right;
+    font: sans-serif;
+    border: thin solid #006D4C;
+    padding: 2px;
+}
+#sidebar h4 { margin: 0; font-size: 13px; }
+#sidebar ul {
+    list-style-type: square;
+    color: rgb(13, 86, 166);
+    font-size: 11px;
+    margin: 0;
+    padding-left: 2em;
+}
+#sidebar a {
+    color: rgb(0, 168, 118);
+}
+
+
+.dataset_list {
+    empty-cells: show;
+    border-spacing: 0;
+}
+
+.dataset_list a {
+    color: #006d4c;
+}
+
+.dataset_list thead th, tbody td { border-bottom: thin solid white; }
+.dataset_list thead th {
+    padding: 2px 1em;
+}
+.dataset_list tbody td {
+    padding: 2px 1em;
+}
+
+.dataset_list thead tr {
+    background-color: #329000;
+    color: #fefefe;
+}
+.dataset_list tbody tr:nth-child(odd) {
+    background: #DDFFAF; /* #99EE6B; */ 
+}
+.dataset_list tbody tr:nth-child(even) {
+    background: #99EE6B; /* #55A62A; */ 
+}
+.dataset_list tfoot {
+    text-align: right;
+    background-color: 
+}
+
