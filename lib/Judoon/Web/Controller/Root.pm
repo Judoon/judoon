@@ -2,7 +2,10 @@ package Judoon::Web::Controller::Root;
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Catalyst::Controller' }
+BEGIN { extends 'Catalyst::Controller::ActionRole' }
+
+
+use Data::Printer;
 
 #
 # Sets the actions in this controller to be registered with no prefix
@@ -46,11 +49,22 @@ sub default :Path {
 
 
 
-sub user :PathPart('user/fge7z') {
+sub user : Chained('/login/required') PathPart('user') Args(0) {
     my ($self, $c) = @_;
 
+    my $user = $c->user->id;
+    $c->res->redirect($c->uri_for_action('/user_page', [$user]));
 }
 
+sub user_id : Chained('/login/required') PathPart('user') CaptureArgs(1) {
+    my ($self, $c, $user) = @_;
+    $c->stash->{user_id} = $user;
+}
+
+sub user_page : Chained('user_id') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'user.tt2';
+}
 
 
 

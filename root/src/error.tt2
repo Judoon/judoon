@@ -1,0 +1,12 @@
+[% WRAPPER inc/wrapper.tt2
+  title = 'Oh dear | Judoon'
+%]
+
+
+<h2>Uh oh...</h2>
+
+<p>Something went terribly wrong.</p>
+
+<p>Lacking alternatives, why not try our <a href="[% c.uri_for_action('/index') %]">front page</a>?</p>
+
+[% END %]

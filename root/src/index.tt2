@@ -3,16 +3,13 @@
 %]
 
 
-<h2>Welcome to Judoon, please log in.</h2>
+<h2>Welcome to Judoon</h2>
 
-<form id="login_form" method="post" >
-  <fieldset class="main_fieldset">
-    <div><label class="label" for="username">Username: </label><input type="text" name="username" id="username" value="" tabindex="1" /></div>
-    <div><label class="label" for="password">Password: </label><input type="password" name="password" id="password" value="" tabindex="2" /></div>
-    <div><label class="label" for="remember">Remember: </label><input type="checkbox" name="remember" id="remember" value="1" tabindex="3" /></div>
-    <div><input type="submit" name="submit" id="submit" value="Login" tabindex="4" /></div>
-  </fieldset>
-</form>
+<p>
+  Judoon helps you to turn organized scientific data into searchable,
+  customizable, dynamic data tables.
+</p>
 
+<p><a href="[% c.uri_for('/user') %]">Get started</a></p>
 
 [% END %]

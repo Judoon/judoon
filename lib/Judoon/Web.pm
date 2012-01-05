@@ -77,6 +77,12 @@ __PACKAGE__->config(
             },
         },
     },
+    'Plugin::Session' => {
+        flash_to_stash => 1,
+    },
+    'Controller::Login' => {
+        traits => ['-RenderAsTTTemplate'],
+    },
 );
 
 
