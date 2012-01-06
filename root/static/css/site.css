@@ -46,7 +46,6 @@ body {
 }
 #sidebar {
     float: right;
-    font: sans-serif;
     border: thin solid #006D4C;
     padding: 2px;
 }
@@ -92,6 +91,45 @@ body {
 }
 .dataset_list tfoot {
     text-align: right;
-    background-color: 
+    background-color: #fff;
 }
+
+
+#data_upload_form {
+
+}
+label {
+    font-size: 13px;
+}
+.note {
+    font-size: 12px;
+    color: #04356C;
+}
+
+.note h6 { margin: 3px 0; }
+
+dl {
+    margin: 0 0 0 auto;
+    padding: 1;
+    width: 45%;
+    overflow:hidden;
+    background:#eee;
+}
+dt {
+    margin: 0 1px 1px 0;
+    padding: 0 1px 0 0;
+    float:left;
+    width:49%; /* adjust the width; make sure the total of both is 100% */
+}
+dd {
+    margin: 0 0 1px 0;
+    padding: 0 1px 0 0;
+    float:left;
+    width:49%; /* adjust the width; make sure the total of both is 100% */
+}
+
+dt:nth-of-type(odd)  { background-color: #FFF; /*#4186D3;*/ } 
+dd:nth-of-type(odd)  { background-color: #FFF; /*#4186D3;*/ } 
+dt:nth-of-type(even) { color: #fff; background-color: #4186D3; /*#274F7D;*/ } 
+dd:nth-of-type(even) { color: #fff; background-color: #4186D3; /*#274F7D;*/ } 
 

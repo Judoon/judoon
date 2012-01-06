@@ -2,6 +2,15 @@
   title = 'Fitz Elliott | Judoon' 
 %]
 
+<script type="text/javascript">
+
+  function toggle_add() {
+      $("#data_add_button").css("display", "none");
+      $("#data_upload_form").css("display", "block");
+  };
+
+</script>
+
 <p>Welcome, Fitz!</p>
 
 <p>Here are your data sets:</p>
@@ -32,7 +41,27 @@
   <tfoot>
     <tr>
       <td colspan="4">
-        <a class="button icon add" href="/user/fge7z/dataset">Add New Data Set</a>
+        <div id="data_add_button">
+          <a class="button icon add" id="add_data" onclick="toggle_add(); return false;" href="#">Add New Data Set</a>
+        </div>
+        <div id="data_upload_form" style="display: none;">
+          <form action="[% c.uri_for_action('/dataset_add') %]" method="post">
+            <fieldset>
+              <div>
+                <label>Dataset file: <input type="file" /></label>
+              <input class="button icon arrowdown" type="submit" value="Upload" />
+              </div>
+              <div class="note">
+              <h6>Accepted file types are:</h6>
+              <dl>
+                <dt>.xls</dt><dd>Excel 97</dd>
+                <dt>.xlsx</dt><dd>Excel XML</dd>
+                <dt>.csv</dt><dd><abbr title="comma-separated values">CSV</abbr></dd>
+              </dl>
+              </div>
+            </fieldset>
+          </form>
+        </div>
       </td>
     </tr>
   </tfoot>

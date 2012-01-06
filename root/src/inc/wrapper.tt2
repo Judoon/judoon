@@ -3,6 +3,11 @@
     <title>[% title %]</title>
     <link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/site.css') %]" />
     <link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/gh-buttons.css') %]" />
+
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("jquery", "1");
+    </script>    
   </head>
   <body>
 

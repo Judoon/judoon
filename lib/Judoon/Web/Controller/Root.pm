@@ -48,6 +48,10 @@ sub default :Path {
 }
 
 
+sub edit : Chained('/login/required') {
+
+}
+
 
 sub user : Chained('/login/required') PathPart('user') Args(0) {
     my ($self, $c) = @_;
@@ -65,6 +69,17 @@ sub user_page : Chained('user_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'user.tt2';
 }
+
+
+sub dataset : Chained('edit') PathPart('dataset') CaptureArgs(0) {
+
+}
+
+sub dataset_add : Chained('dataset') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'add_dataset.tt2';
+}
+
 
 
 
