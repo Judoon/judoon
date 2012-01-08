@@ -48,19 +48,17 @@ sub default :Path {
 }
 
 
-sub edit : Chained('/login/required') {
-
-}
+sub edit : Chained('/login/required') PathPart('') CaptureArgs(0) {}
 
 
-sub user : Chained('/login/required') PathPart('user') Args(0) {
+sub user : Chained('edit') PathPart('user') Args(0) {
     my ($self, $c) = @_;
 
     my $user = $c->user->id;
     $c->res->redirect($c->uri_for_action('/user_page', [$user]));
 }
 
-sub user_id : Chained('/login/required') PathPart('user') CaptureArgs(1) {
+sub user_id : Chained('edit') PathPart('user') CaptureArgs(1) {
     my ($self, $c, $user) = @_;
     $c->stash->{user_id} = $user;
 }
@@ -71,16 +69,30 @@ sub user_page : Chained('user_id') PathPart('') Args(0) {
 }
 
 
-sub dataset : Chained('edit') PathPart('dataset') CaptureArgs(0) {
-
-}
-
+sub dataset : Chained('user_id') PathPart('dataset') CaptureArgs(0) {}
 sub dataset_add : Chained('dataset') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'add_dataset.tt2';
 }
+sub dataset_id : Chained('dataset') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $dataset_id) = @_;
+}
+sub dataset_view : Chained('dataset_id') PathPart('') Args(0) {
 
+}
 
+# Pages
+sub page : Chained('user_id') PathPart('page') CaptureArgs(0) {}
+sub page_add : Chained('page') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'add_page.tt2';
+}
+sub page_id : Chained('page') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $page_id) = @_;
+}
+sub page_view : Chained('page_id') PathPart('') Args(0) {
+
+}
 
 
 

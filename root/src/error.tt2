@@ -7,6 +7,13 @@
 
 <p>Something went terribly wrong.</p>
 
+<p>Does this help?:</p>
+
+<pre>
+  Ctx: [% c %]
+  Error: [% error %]
+</pre>
+
 <p>Lacking alternatives, why not try our <a href="[% c.uri_for_action('/index') %]">front page</a>?</p>
 
 [% END %]

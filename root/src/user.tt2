@@ -27,8 +27,8 @@
   <tbody>
     <tr>
       <td></td>
-      <td><a href="/user/fge7z/dataset/6">RNAi - 05/07/2011</a></td>
-      <td><a href="/user/fge7z/page/6">View</a></td>
+      <td><a href="[% c.uri_for_action('/dataset_view', ['fge7z', '1']) %]">RNAi - 05/07/2011</a></td>
+      <td><a href="[% c.uri_for_action('/page_view', ['fge7z','1']) %]">View</a></td>
       <td><input type="checkbox" checked="checked" /></td>
     </tr>
     <tr>
@@ -45,7 +45,7 @@
           <a class="button icon add" id="add_data" onclick="toggle_add(); return false;" href="#">Add New Data Set</a>
         </div>
         <div id="data_upload_form" style="display: none;">
-          <form action="[% c.uri_for_action('/dataset_add') %]" method="post">
+          <form action="[% c.uri_for_action('/dataset_add', ['fge7z']) %]" method="post">
             <fieldset>
               <div>
                 <label>Dataset file: <input type="file" /></label>
