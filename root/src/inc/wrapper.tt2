@@ -1,14 +1,23 @@
 <html>
   <head>
-    <title>[% title %]</title>
+    <title>[% title %] | Judoon</title>
     <link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/site.css') %]" />
     <link rel="stylesheet" type="text/css" href="[% c.uri_for('/static/css/gh-buttons.css') %]" />
+
+<!--
+    <style type="text/css" title="currentStyle">
+      @import "/static/css/demo_page.css"; @import "/static/css/header.ccss";
+      @import "/static/css/demo_table.css";
+    </style>
+-->
 
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
       google.load("jquery", "1");
       google.load("jqueryui", "1");
     </script>    
+
+    <script type="text/javascript" language="javascript" src="[% c.uri_for('/static/js/jquery.dataTables.js') %]"></script>
   </head>
   <body>
 
@@ -21,9 +30,10 @@
       <div id="sidebar">
         <h4>Things to do:</h4>
         <ul>
-          <li><a href="moo">One</a></li>
-          <li><a href="moo">Two</a></li>
-          <li><a href="moo">Three</a></li>
+          [% IF user %]<li><a href="[% c.uri_for_action('user_view', [user.login]) %]">Your homepage</a></li>[% END %]
+          <li><a href="[% c.uri_for_action('public_page_addlist') %]">View Public Pages</a></li>
+          <li><a href="moo">Another Thing</a></li>
+          <li><a href="moo">Something Else</a></li>
           [% IF c.user_exists %]<li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>[% END %]
         </ul>
       </div>

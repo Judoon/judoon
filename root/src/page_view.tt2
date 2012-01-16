@@ -1,0 +1,46 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "View $dataset.name Page"
+%]
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#dataset').dataTable();
+  } );
+</script>
+
+<style type="text/css">
+  #middle {
+     padding-left: 1em;
+     padding-right: 1em;
+  }
+
+ table {
+   font-size: 20%;
+ }
+
+</style>
+
+
+<h3>[% dataset.name %] dataset</h3>
+
+<table id="dataset" cellpadding="0" cellspacing="0" border="0" class="display">
+  <thead>
+    <tr>
+      [% FOREACH header IN ds_headers %]
+      <th>[% header | html %]</th>
+      [% END %]
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH row IN ds_rows %]
+    <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
+      [% FOREACH col IN row %]
+      <td>[% col | html %]</td>
+      [% END %]
+    </tr>
+    [% END %]
+    </tbody>
+</table>
+
+
+[% END %]

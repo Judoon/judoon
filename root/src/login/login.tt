@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = 'Login | Judoon'
+  title = 'Login'
 %]
 
 

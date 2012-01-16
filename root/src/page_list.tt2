@@ -1,0 +1,13 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "$user.name's Pages" 
+%]
+
+[% IF pages %]
+<ul>
+  [% FOREACH page IN pages %]
+  <li><a href="[% c.uri_for_action('page_view', [user.login, page.id]) %]">[% page.name %]</a></li>
+  [% END %]
+</ul>
+[% END %]
+
+[% END %]

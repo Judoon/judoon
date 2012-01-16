@@ -142,3 +142,65 @@ dd:nth-of-type(even) { color: #fff; background-color: #4186D3; /*#274F7D;*/ }
 .loading {
     background: url(/static/images/spinner.gif) no-repeat center center;
 } 
+
+
+.action_list {
+    list-style-type: none;
+}
+.action_list li {
+/*
+    border: thin solid #04356C;
+    background: #35D4A4;
+*/
+    display: inline-block;
+    margin: 1em 0.5em;
+    padding: 2px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.action_list li a {
+/*
+    color: #006D4C;
+    text-decoration: none;
+*/
+}
+
+
+table.data_table {
+    margin: 0 auto;
+    clear: both;
+    width: 100%;
+}
+
+table.data_table thead th {
+	padding: 3px 18px 3px 10px;
+	border-bottom: 1px solid black;
+	font-weight: bold;
+	cursor: pointer;
+	* cursor: hand;
+}
+
+table.data_table tfoot th {
+	padding: 3px 18px 3px 10px;
+	border-top: 1px solid black;
+	font-weight: bold;
+}
+table.data_table td {
+    padding: 3px 10px;
+}
+
+table.data_table td.center {
+    text-align: center;
+}
+
+table.data_table tr.odd {
+    background-color: #99EE6B;
+}
+
+table.data_table tr.even {
+    background-color: white;
+}
+
+.sample_data .odd  { color: #4186D3; }
+.sample_data .even { color: #04356C; }
+.sample_data .none { color: #ddd; }

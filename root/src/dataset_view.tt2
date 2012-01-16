@@ -1,0 +1,53 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "View $dataset.name Dataset"
+%]
+
+<style type="text/css">
+  #middle {
+     padding-left: 10em;
+     padding-right: 10em;
+  }
+
+  table { font-size: 80%; }
+  td { border-right: 1px solid #eee; }
+  td.header { font-weight: bold; }
+
+  label { display: block; margin-bottom: 5px; }
+
+</style>
+
+<form action="[% c.uri_for_action('dataset_view', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
+  <fieldset>
+    <legend>Dataset</legend>
+
+    <label for="dataset.name">
+      Name:
+      <input id="dataset.name" style="width: 40em;" name="dataset.name" type="text" value="[% dataset.name %]" />
+    </label>
+
+    <label for="dataset.notes">
+      Notes:
+      <textarea class="tinymce" style="width: 34em;" id="dataset.notes" class="dataset.notes"></textarea>
+    </label>
+
+    <label><input type="submit" class="button" style="" name="submit" value="Update" /></label>
+  </fieldset>
+</form>
+
+<form>
+  <fieldset>
+    <legend>Actions</legend>
+
+    <ul class="action_list">
+      <li><a href="[% c.uri_for_action('column_addlist', [user.login, dataset.id]) %]" class="button">Edit Columns</a></li>
+      <li><a href="[% c.uri_for_action('dataset_addlist', [user.login, dataset.id]) %]" class="button">Edit Data</a></li>
+      [% IF dataset.has_page %]
+      <li><a href="[% c.uri_for_action('page_view', [user.login, dataset.id, dataset.page.id]) %]" class="button">Edit Page</a></li>
+      [% END %]
+      <li><a href="[% c.uri_for_action('page_addlist', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
+    </ul>
+
+  </fieldset>
+</form>
+
+[% END %]

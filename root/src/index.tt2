@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = 'Judoon'
+  title = 'Welcome'
 %]
 
 
@@ -10,6 +10,6 @@
   customizable, dynamic data tables.
 </p>
 
-<p><a href="[% c.uri_for('/user') %]">Get started</a></p>
+<p><a href="[% c.uri_for_action('user_addlist') %]">Get started</a></p>
 
 [% END %]

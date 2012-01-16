@@ -25,9 +25,14 @@
            .switchClass('inprocess', 'done')
            .delay(500)
            .animate({color: "#329000"}, 10, function () {
-              var next = $(todo).next('li.todo');
-              if (next) {
-                  pretend_process(next);
+              var next_todo = $(todo).next('li.todo');
+              if (next_todo) {
+                  console.log("judoon: go to next");
+                  pretend_process(next_todo);
+              }
+              else {
+                  console.log("judoon: be here");
+                  window.location.replace("[% c.uri_for_action('/dataset_view', ['fge7z',1]) %]");
               }
         });
     }

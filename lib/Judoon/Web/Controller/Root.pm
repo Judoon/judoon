@@ -48,50 +48,128 @@ sub default :Path {
 }
 
 
+sub base : Chained('') PathPart('') CaptureArgs(0) {}
+
+
+
+
 sub edit : Chained('/login/required') PathPart('') CaptureArgs(0) {}
 
 
-sub user : Chained('edit') PathPart('user') Args(0) {
+sub user_base    : Chained('edit')      PathPart('user') CaptureArgs(0) {}
+sub user_addlist : Chained('user_base') PathPart('')     Args(0) {
+    my ($self, $c) = @_;
+    $c->res->redirect($c->uri_for_action('user_view', [$c->user->id]));
+}
+sub user_id : Chained('user_base') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $user_login) = @_;
+    $c->stash->{user_login} = $user_login;
+    $c->stash->{user}       = $c->model('Users')->get_user($user_login);
+}
+sub user_view : Chained('user_id') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{datasets} = $c->model('Users')->get_datasets($c->stash->{user_login});
+    $c->stash->{template} = 'user_view.tt2';
+}
+
+
+sub dataset_base : Chained('user_id') PathPart('dataset') CaptureArgs(0) {}
+sub dataset_addlist : Chained('dataset_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
-    my $user = $c->user->id;
-    $c->res->redirect($c->uri_for_action('/user_page', [$user]));
-}
+    my $model      = $c->model('Users');
+    my $user_login = $c->stash->{user_login};
 
-sub user_id : Chained('edit') PathPart('user') CaptureArgs(1) {
-    my ($self, $c, $user) = @_;
-    $c->stash->{user_id} = $user;
-}
+    if (my $upload = $c->req->upload('dataset')) {
+        my $dataset_id = $model->import_data_for_user($user_login, $upload->fh);
+        $c->res->redirect($c->uri_for_action(
+            'dataset_view', [$user_login, $dataset_id]
+        ));
+        $c->detach();
+    }
 
-sub user_page : Chained('user_id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'user.tt2';
+    $c->stash->{datasets} = $model->get_datasets($user_login);
+    $c->stash->{template} = 'dataset_list.tt2';
 }
-
-
-sub dataset : Chained('user_id') PathPart('dataset') CaptureArgs(0) {}
-sub dataset_add : Chained('dataset') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'add_dataset.tt2';
-}
-sub dataset_id : Chained('dataset') PathPart('') CaptureArgs(1) {
+sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $dataset_id) = @_;
+    my $dataset             = $c->model('Users')->get_dataset($dataset_id);
+    $c->stash->{dataset}    = $dataset;
+    my $ds_data             = $dataset->{data};
+    $c->stash->{ds_headers} = shift @$ds_data;
+    $c->stash->{ds_rows}    = $ds_data;
 }
 sub dataset_view : Chained('dataset_id') PathPart('') Args(0) {
+    my ($self, $c) = @_;
 
+    my $params = $c->req->params;
+    if ($params->{'dataset.name'}) {
+        my $ds = $c->stash->{dataset};
+        $c->stash->{dataset} = $c->model('Users')->update_dataset(
+            $ds->{id}, {name => $params->{'dataset.name'}},
+        );
+    }
+    $c->stash->{template}   = 'dataset_view.tt2';
 }
+
+
+# /dataset/$id/column
+sub column_base : Chained('dataset_id')  PathPart('column') CaptureArgs(0) { }
+sub column_addlist : Chained('column_base') PathPart('')       Args(0)        {
+    my ($self, $c) = @_;
+
+    my $columns = [map {{header => $_}} @{$c->stash->{ds_headers}}];
+    my $rows    = $c->stash->{ds_rows};
+    for my $idx (0..scalar(@$columns)-1) {
+        my $sample_count = 3;
+        $columns->[$idx]{samples} = [];
+        for my $row (@$rows) {
+            last if ($sample_count <= 0);
+            if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
+                push @{$columns->[$idx]{samples}}, $row->[$idx];
+                $sample_count--;
+            }
+        }
+    }
+
+    $c->stash->{columns}  = $columns;
+    $c->stash->{template} = 'column_list.tt2';
+}
+sub column_id   : Chained('column_base') PathPart('')       CaptureArgs(1) { }
+sub column_view : Chained('column_id')   PathPart('')       Args(0)        { }
+
 
 # Pages
-sub page : Chained('user_id') PathPart('page') CaptureArgs(0) {}
-sub page_add : Chained('page') PathPart('') Args(0) {
+sub page_base : Chained('dataset_id') PathPart('page') CaptureArgs(0) {}
+sub page_addlist : Chained('page_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
-    $c->stash->{template} = 'add_page.tt2';
+    $c->stash->{template} = 'page_list.tt2';
 }
-sub page_id : Chained('page') PathPart('') CaptureArgs(1) {
+sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $page_id) = @_;
+    $c->stash->{page_id} = $page_id;
 }
 sub page_view : Chained('page_id') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'page_view.tt2';
+}
 
+
+
+
+# Public pages
+sub public_page_base : Chained('base') PathPart('page') CaptureArgs(0) {}
+sub public_page_addlist : Chained('public_page_base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'public_page_list.tt2';
+}
+sub public_page_id : Chained('public_page_base') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $page_id) = @_;
+    $c->stash->{page_id} = $page_id;
+}
+sub public_page_view : Chained('public_page_id') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'public_page_view.tt2';
 }
 
 

@@ -1,0 +1,64 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "View $dataset.name columns"
+%]
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#dataset2').dataTable();
+  } );
+</script>
+
+<style type="text/css">
+  #middle {
+     padding-left: 10em;
+     padding-right: 10em;
+  }
+
+  table {
+      font-size: 80%;
+  }
+
+  td { border-right: 1px solid #eee; }
+  td.header { font-weight: bold; }
+</style>
+
+
+<h4>[% dataset.name %] dataset</h4>
+
+<table id="dataset" cellpadding="0" cellspacing="0" border="0" class="data_table column_edit">
+  <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <th>Column</th>
+      <th>Sample Data</th>
+      <th>Accession</th>
+      <th>Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH column IN columns %]
+    <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
+      <td>[% loop.count %]</td>
+      <td class="header">[% column.header | html %]</td>
+      [% idx = loop.count - 1 %]
+      <td class="sample_data">
+        [% IF column.samples.size %]
+        [% FOREACH sample IN column.samples %]
+        <span class="[% loop.count % 2 ? 'odd' : 'even' %]">[% sample | html %][% UNLESS loop.last %], [% END %]</span>
+        [% END %]
+        [% ELSE %]
+        <span class="none">( none )</span>
+        [% END %]
+      </td>
+      <td class="accession center"><input type="checkbox" /></td>
+      <td class="delete center"><input type="checkbox" /></td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+
+<div style="margin-top: 1em;">
+  <input type="submit" class="button" name="submit" value="Update" />
+</div>
+
+[% END %]
