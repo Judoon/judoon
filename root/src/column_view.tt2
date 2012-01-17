@@ -1,0 +1,73 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "Annotate $column.name for dataset $dataset.name"
+%]
+
+
+<form action="[% c.uri_for_action('column_view', [user.login, dataset.id, column.id]) %]" method="post">
+  <fieldset>
+    <legend>Annotate column "[% column.name %]"</legend>
+
+    <fieldset class="sub_fieldset">
+      <legend>Accessions</legend>
+
+      <p class="question">Does this field contain accessions?</p>
+      <label for="column.is_acc_yes">
+        Yes: <input type="radio" name="column.is_accession" id="column.is_acc_yes" value="1" [% IF column.is_accession %]checked="checked"[% END %] />
+      </label>
+      <label for="column.is_acc_no">
+        No: <input type="radio" name="column.is_accession" id="column.is_acc_no" value="0" [% IF !column.is_accession %]checked="checked"[% END %] />
+      </label>
+
+      <label for="column.accession_type">
+        Accession type:
+        <select name="column.accession_type" id="column.accession_type">
+          <optgroup label="Entrez">
+            <option value="gene_id">Gene ID</option>
+            <option value="gene_name">Gene Name</option>
+            <option value="refseq_id">RefSeq ID</option>
+            <option value="protein_id">Protein ID</option>
+          </optgroup>
+          <optgroup label="Uniprot">
+            <option value="uniprot_id">Uniprot ID</option>
+          </optgroup>
+          <optgroup label="NCBI Pubmeds">
+            <option value="pubmed_id">PubMed ID</option>
+          </optgroup>
+        </select>
+      </label>
+
+      <p class="question">Can there be more than one accession per row in this column?</p>
+      <label for="column.multiple_ids_yes">
+        Yes: <input type="radio" name="column.multiple_ids" id="column.multiple_ids_yes" value="1" [% IF column.multiple_ids %]checked="checked"[% END %] />
+      </label>
+      <label for="column.multipl_ids_no">
+        No: <input type="radio" name="column.multiple_ids" id="column.multiple_ids_no" value="0" [% IF ! column.multiple_ids %]checked="checked"[% END %] />
+      </label>
+    </fieldset>
+
+
+    <fieldset>
+      <legend>URLs</legend>
+
+      <p class="questions">Does this column contain URLs?</p>
+      <label for="column.is_url_yes">
+        Yes: <input type="radio" name="column.is_url" id="column.is_url_yes" value="1" [% IF column.is_url %]checked="checked"[% END %] />
+      </label>
+      <label for="column.is_url_no">
+        No: <input type="radio" name="column.is_url" id="column.is_url_no" value="0" [% IF ! column.is_url %]checked="checked"[% END %] />
+      </label>
+
+      <p class="question">What is the URL base?</p>
+      <input type="text" name="column.url_root" value="[% column.url_root | html %]" />
+    </fieldset>
+
+
+    <input type="submit" class="button" value="Update" />
+
+  </fieldset>
+</form>
+
+<p><a href="[% c.uri_for_action('column_addlist', [user.login, dataset.id]) %]">Return to columns</a></p>
+
+
+[% END %]

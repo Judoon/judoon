@@ -44,7 +44,7 @@
       [% IF dataset.has_page %]
       <li><a href="[% c.uri_for_action('page_view', [user.login, dataset.id, dataset.page.id]) %]" class="button">Edit Page</a></li>
       [% END %]
-      <li><a href="[% c.uri_for_action('page_addlist', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
+      <li><a href="[% c.uri_for_action('page_add', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
     </ul>
 
   </fieldset>

@@ -99,6 +99,29 @@ sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     $c->stash->{ds_headers} = shift @$ds_data;
     $c->stash->{ds_rows}    = $ds_data;
 }
+sub dataset_postadd : Chained('dataset_id') PathPart('postadd') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'dataset_postadd.tt2';
+}
+sub dataset_postadd_do : Chained('dataset_id') PathPart('postadd_do') Args(0) {
+    my ($self, $c) = @_;
+
+    my $params = $c->req->params;
+    my $header_col = $params->{header} // 1;
+    $c->log->debug("Header is: $header_col");
+
+    my @row_dels = $params->{row_delete};
+    $c->log->debug("Row deletes are: " . p(@row_dels));
+    my @col_dels = $params->{col_delete};
+    $c->log->debug("Col deletes are: " . p(@col_dels));
+
+    my $dataset_id = $c->stash->{dataset}{id};
+    my $user_login = $c->stash->{user}{login};
+    $c->res->redirect($c->uri_for_action(
+        'dataset_view', [$user_login, $dataset_id]
+    ));
+}
+
 sub dataset_view : Chained('dataset_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
@@ -109,6 +132,7 @@ sub dataset_view : Chained('dataset_id') PathPart('') Args(0) {
             $ds->{id}, {name => $params->{'dataset.name'}},
         );
     }
+
     $c->stash->{template}   = 'dataset_view.tt2';
 }
 
@@ -118,7 +142,7 @@ sub column_base : Chained('dataset_id')  PathPart('column') CaptureArgs(0) { }
 sub column_addlist : Chained('column_base') PathPart('')       Args(0)        {
     my ($self, $c) = @_;
 
-    my $columns = [map {{header => $_}} @{$c->stash->{ds_headers}}];
+    my $columns = $c->model('Users')->get_columns_for_dataset($c->stash->{dataset}{id});
     my $rows    = $c->stash->{ds_rows};
     for my $idx (0..scalar(@$columns)-1) {
         my $sample_count = 3;
@@ -132,22 +156,63 @@ sub column_addlist : Chained('column_base') PathPart('')       Args(0)        {
         }
     }
 
+    for my $column (@$columns) {
+        my @meta;
+        if ($column->{is_accession}) {
+            push @meta, 'accession: ' . $column->{accession_type};
+        }
+        if ($column->{is_url}) {
+            push @meta, 'url: ' . $column->{url_root};
+        }
+        $column->{metadata} = @meta ? join(', ', @meta) : 'plain text';
+    }
+
+
     $c->stash->{columns}  = $columns;
     $c->stash->{template} = 'column_list.tt2';
 }
-sub column_id   : Chained('column_base') PathPart('')       CaptureArgs(1) { }
-sub column_view : Chained('column_id')   PathPart('')       Args(0)        { }
+sub column_id   : Chained('column_base') PathPart('')       CaptureArgs(1) {
+    my ($self, $c, $column_id) = @_;
+    $c->stash->{column} = $c->model('Users')->get_column($column_id);
+}
+sub column_view : Chained('column_id')   PathPart('')       Args(0)        {
+    my ($self, $c) = @_;
+
+    my $params = $c->req->params;
+    if (%$params) {
+        my %valid = map {s/^column\.//r => $params->{$_}} grep {m/^column\./} keys %$params;
+        $c->log->debug('Valid params are: ' . p(%valid));
+        $c->model('Users')->update_column_metadata($c->stash->{column}{id}, \%valid)
+    }
+
+    $c->stash->{template} = 'column_view.tt2';
+}
+
+
 
 
 # Pages
 sub page_base : Chained('dataset_id') PathPart('page') CaptureArgs(0) {}
-sub page_addlist : Chained('page_base') PathPart('') Args(0) {
+sub page_list : Chained('page_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'page_list.tt2';
 }
+sub page_add : Chained('page_base') PathPart('add') Args(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'page_add.tt2';
+}
+sub page_add_do : Chained('page_base') PathPart('add_do') Args(0) {
+    my ($self, $c) = @_;
+
+    my $params  = $c->req->params;
+    my $page_id = $c->model('Users')->new_page($params);
+    $c->res->redirect('page_view', [
+        $c->stash->{user}{login}, $c->stash->{dataset}{id}, $page_id
+    ]);
+}
 sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $page_id) = @_;
-    $c->stash->{page_id} = $page_id;
+    $c->stash->{page} = $c->model('Users')->get_page($page_id);
 }
 sub page_view : Chained('page_id') PathPart('') Args(0) {
     my ($self, $c) = @_;

@@ -1,13 +1,11 @@
 package Judoon::DB::Users;
 
 use version; our $VERSION = '0.0.1';
-use strict;
-use warnings;
 use autodie;
 use open qw( :encoding(UTF-8) :std );
-use feature ':5.14';
 
 use Moose;
+with 'Judoon::DB::Roles::Deployer';
 use namespace::autoclean;
 
 use Data::Printer;
@@ -76,7 +74,19 @@ sub add_dataset {
         'INSERT INTO datasets (user_id, name, notes, original, data) VALUES (?,?,?,?,?)'
     );
     $sth->execute($user_id, $args->{name}, '', $args->{original}, encode_json($args->{data}));
-    return $self->dbh->last_insert_id(undef,undef,'datasets','id');
+    my $ds_id = $self->dbh->last_insert_id(undef,undef,'datasets','id');
+
+    my $data = $args->{data};
+    my $headers = shift @$data;
+
+    my $sort = 1;
+    for my $header (@$headers) {
+        $self->add_header_for_dataset($ds_id, {
+            name => ($header // ''), sort => $sort++,
+        });
+    }
+
+    return $ds_id;
 }
 
 sub get_dataset {
@@ -113,13 +123,54 @@ sub update_dataset {
 }
 
 
+sub add_header_for_dataset {
+    my ($self, $ds_id, $args) = @_;
+    my $sth = $self->dbh->prepare_cached(
+        q{INSERT INTO columns (dataset_id, name, sort, accession_type, url_root) VALUES (?,?,?,?,?)}
+    );
+    $sth->execute($ds_id, $args->{name}, $args->{sort}, '', '');
+    return;
+}
 
-sub reinit { return $_[0]->clear->init; }
-sub init   { return $_[0]->load_schema->load_data; }
+
+sub get_columns_for_dataset {
+    my ($self, $ds_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM columns WHERE dataset_id=?');
+    $sth->execute($ds_id);
+    return $sth->fetchall_arrayref({});
+}
+
+sub get_column {
+    my ($self, $column_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM columns WHERE id=?');
+    $sth->execute($column_id);
+    my $hr = $sth->fetchrow_hashref();
+    $sth->finish();
+    return $hr;
+}
+
+
+sub update_column_metadata {
+    my ($self, $column_id, $args) = @_;
+
+    my $sth = $self->dbh->prepare_cached(q{
+        UPDATE columns
+        SET is_accession=?, accession_type=?, is_url=?, url_root=?
+        WHERE id=?
+    });
+    $sth->execute(
+        ($args->{is_accession} // 0), ($args->{accession_type} // ''),
+        ($args->{is_url} // 0), ($args->{url_root} // ''), $column_id
+    );
+    return;
+}
+
+
 sub clear {
     my ($self) = @_;
     $self->dbh->do('DROP TABLE users;');
     $self->dbh->do('DROP TABLE datasets;');
+    $self->dbh->do('DROP TABLE columns');
     return $self;
 }
 sub load_schema {
@@ -142,6 +193,22 @@ CREATE TABLE datasets (
   data     text NOT NULL
 );
 DATASET
+
+    $self->dbh->do(<<'COLUMNS');
+CREATE TABLE columns (
+  id             integer PRIMARY KEY AUTOINCREMENT,
+  dataset_id     integer NOT NULL REFERENCES datasets (id),
+  name           text NOT NULL,
+  sort           integer NOT NULL,
+  is_accession   integer NOT NULL DEFAULT 0,
+  accession_type text NOT NULL,
+  is_url         integer NOT NULL DEFAULT 0,
+  url_root       text NOT NULL
+);
+COLUMNS
+
+
+
     return $self;
 }
 sub load_data {

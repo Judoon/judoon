@@ -2,11 +2,6 @@
   title = "View $dataset.name columns"
 %]
 
-<script type="text/javascript">
-  $(document).ready(function() {
-      $('#dataset2').dataTable();
-  } );
-</script>
 
 <style type="text/css">
   #middle {
@@ -31,7 +26,8 @@
       <th>&nbsp;</th>
       <th>Column</th>
       <th>Sample Data</th>
-      <th>Accession</th>
+      <th>Column Type</th>
+      <th>Annotate</th>
       <th>Delete</th>
     </tr>
   </thead>
@@ -39,8 +35,7 @@
     [% FOREACH column IN columns %]
     <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
       <td>[% loop.count %]</td>
-      <td class="header">[% column.header | html %]</td>
-      [% idx = loop.count - 1 %]
+      <td class="header">[% column.name | html %]</td>
       <td class="sample_data">
         [% IF column.samples.size %]
         [% FOREACH sample IN column.samples %]
@@ -50,7 +45,8 @@
         <span class="none">( none )</span>
         [% END %]
       </td>
-      <td class="accession center"><input type="checkbox" /></td>
+      <td class="metadata center">[% column.metadata | html %]</td>
+      <td class="annotate center"><a href="[% c.uri_for_action('column_view', [user.login, dataset.id, column.id]) %]">Annotate</a></td>
       <td class="delete center"><input type="checkbox" /></td>
     </tr>
     [% END %]
@@ -60,5 +56,7 @@
 <div style="margin-top: 1em;">
   <input type="submit" class="button" name="submit" value="Update" />
 </div>
+
+<p><a class="button icon arrowleft" href="[% c.uri_for_action('dataset_view', [user.login, dataset.id]) %]">Return to dataset</a></p>
 
 [% END %]

@@ -1,0 +1,66 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "Select columns $dataset.name Dataset"
+%]
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#dataset').dataTable({
+          "bFilter": false,
+          "bInfo" : false,
+          "bPaginate": false,
+          "bSort": false,
+          "sScrollX": "100%",
+          "sScrollY": 200
+      });
+  } );
+</script>
+
+
+
+<style type="text/css">
+  table { font-size: 80%; }
+  td { border-right: 1px solid #eee; }
+  td.header { font-weight: bold; }
+
+  table tr.first { font-weight: bold; }
+</style>
+
+<form action="[% c.uri_for_action('dataset_postadd_do', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
+
+
+  <div style="height: 6em;"></div>
+
+  <table id="dataset" cellpadding="0" cellspacing="0" border="0" style="width: 40em;" class="display data_table">
+    <thead>
+      <th>Header</th>
+      <th>Delete</th>
+      [% FOREACH header IN ds_headers %]
+      <th><input type="checkbox" name="col_delete" value="[% loop.count %]" /></th>
+      [% END %]
+    </thead>
+    <tbody>
+      <tr class="odd first">
+        <td><input type="radio" name="header" value="1" checked="checked" /></td>
+        <td><input type="checkbox" name="row_delete" value="1" /></td>
+        [% FOREACH header IN ds_headers %]
+        <td>[% header | html %]</td>
+        [% END %]
+      </tr>
+      [% FOREACH row IN dataset.data %]
+      <tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
+        <td><input type="radio" name="header" value="[% loop.count + 1 %]" /></td>
+        <td><input type="checkbox" name="row_delete" value="[% loop.count + 1 %]" /></td>
+        [% FOREACH column IN row %]
+        <td>[% column | html %] </td>
+        [% END %]
+      </tr>
+      [% END %]
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+
+  <label><input type="submit" class="button" style="" name="submit" value="Update" /></label>
+</form>
+
+[% END %]
