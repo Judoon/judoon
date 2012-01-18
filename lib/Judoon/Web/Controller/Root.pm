@@ -125,12 +125,17 @@ sub dataset_postadd_do : Chained('dataset_id') PathPart('postadd_do') Args(0) {
 sub dataset_view : Chained('dataset_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
+    my $ds_id = $c->stash->{dataset}{id};
     my $params = $c->req->params;
     if ($params->{'dataset.name'}) {
-        my $ds = $c->stash->{dataset};
         $c->stash->{dataset} = $c->model('Users')->update_dataset(
-            $ds->{id}, {name => $params->{'dataset.name'}},
+            $ds_id, {name => $params->{'dataset.name'}},
         );
+    }
+
+    if (my $page = $c->model('Users')->get_page_for_dataset($ds_id)) {
+        $c->stash->{dataset}{has_page} = 1;
+        $c->stash->{dataset}{page} = $page;
     }
 
     $c->stash->{template}   = 'dataset_view.tt2';
@@ -199,13 +204,18 @@ sub page_list : Chained('page_base') PathPart('') Args(0) {
 }
 sub page_add : Chained('page_base') PathPart('add') Args(0) {
     my ($self, $c) = @_;
-    $c->stash->{template} = 'page_add.tt2';
+    my $params  = $c->req->params;
+    my $page_id = $c->model('Users')->new_page($c->stash->{dataset}{id}, $params);
+    $c->res->redirect('page_view', [
+        $c->stash->{user}{login}, $c->stash->{dataset}{id}, $page_id
+    ]);
+    #$c->stash->{template} = 'page_add.tt2';
 }
 sub page_add_do : Chained('page_base') PathPart('add_do') Args(0) {
     my ($self, $c) = @_;
 
     my $params  = $c->req->params;
-    my $page_id = $c->model('Users')->new_page($params);
+    my $page_id = $c->model('Users')->new_page($c->stash->{dataset}{id}, $params);
     $c->res->redirect('page_view', [
         $c->stash->{user}{login}, $c->stash->{dataset}{id}, $page_id
     ]);
@@ -216,6 +226,15 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
 }
 sub page_view : Chained('page_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
+
+    my $page_id = $c->stash->{page}{id};
+
+    my $params = $c->req->params;
+    if (%$params) {
+        $c->model('Users')->update_page($page_id, $params);
+    }
+
+    $c->stash->{page_columns} = $c->model('Users')->get_page_columns($page_id);
     $c->stash->{template} = 'page_view.tt2';
 }
 

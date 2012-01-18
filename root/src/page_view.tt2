@@ -2,45 +2,81 @@
   title = "View $dataset.name Page"
 %]
 
-<script type="text/javascript">
-  $(document).ready(function() {
-      $('#dataset').dataTable();
-  } );
-</script>
-
 <style type="text/css">
-  #middle {
-     padding-left: 1em;
-     padding-right: 1em;
-  }
-
- table {
-   font-size: 20%;
- }
-
+  ul.paging { list-style-type: none; }
+  ul.paging li { display: inline-block; }
+  label { display: block; }
+  .right { float: right; }
+  .left { float: left; }
+  .something .right { border: thin solid #04356C; width: 30%;}
+  .something .left  { border: thin solid #04356C; min-height: 30em; width: 69%; }
+  .addbutton { padding: 3px; text-align: right; }
+  #columns_used_list { font-size: 11px; border-spacing: 0; border-collapse: collapse; }
+  .center { text-align: center; }
 </style>
 
 
-<h3>[% dataset.name %] dataset</h3>
+<form action="[% c.uri_for_action('page_view', [user.login, dataset.id, page.id]) %]" action="post">
+  <fieldset>
+    <legend>New Page</legend>
 
-<table id="dataset" cellpadding="0" cellspacing="0" border="0" class="display">
-  <thead>
-    <tr>
-      [% FOREACH header IN ds_headers %]
-      <th>[% header | html %]</th>
-      [% END %]
-    </tr>
-  </thead>
-  <tbody>
-    [% FOREACH row IN ds_rows %]
-    <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
-      [% FOREACH col IN row %]
-      <td>[% col | html %]</td>
-      [% END %]
-    </tr>
-    [% END %]
-    </tbody>
-</table>
+    <label for="page.title">Title: <input type="text" name="page.title" id="page.title" value="" /></label>
+
+    <label for="page.preamble">Preamble: <textarea class="tinymce"></textarea></label>
+    <label for="page.postamble">Postamble: <textarea class="tinymce"></textarea></label>
+    
+    <fieldset>
+      <legend>Table Layout</legend>
+
+      <div class="something">
+        <div class="right">
+          <h5 class="center">Columns</h5>
+          <table id="columns_used_list" class="data_table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Used in</th>
+              </tr>
+            </thead>
+            <tbody>
+              [% FOREACH header IN ds_headers %]
+              <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
+                <td>[% header | html %]</td>
+                <td>[% header.used_in | html %]</td>
+              </tr>
+              [% END %]
+            </tbody>
+          </table>
+        </div>
+
+        <div class="left">
+          <div class="addbutton"><a class="button icon add" href="javascript:;">Add page column</a></div>
+          [% IF page_columns.size %]
+          [% FOREACH column IN page_columns %]
+          <div class="column_container">
+            <ul class="paging"><li class="[% loop.first ? 'disabled' : 'enabled' %]">&laquo;</li><li></li><li class="[% loop.last ? 'disabled' : 'enabled' %]">&raquo;</li></ul>
+            <div class="view_widget">
+              <div class="column_title">[% column.title | html %]</div>
+              <div class="column_content">
+                [% column.content | html %]
+              </div>
+            </div>
+            <div class="edit_widget">
+              <input type="text" id="page_column.[% column.id %].title" name="page_column.[% column.id %].title" value="[% column.title | html %]" />
+              <textarea>
+                [% column.template %]
+              </textarea>
+            </div>
+            <div><a class="right" href="javascript:;">edit</a></div>
+            <div class="clearsep"></div>
+          </div>
+          [% END %]
+          [% END %]
+        </div>
+      </div>
+
+  </fieldset>
+</form>
 
 
 [% END %]

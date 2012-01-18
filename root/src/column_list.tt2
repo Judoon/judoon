@@ -15,6 +15,7 @@
 
   td { border-right: 1px solid #eee; }
   td.header { font-weight: bold; }
+  #dataset { empty-cells: show; }
 </style>
 
 

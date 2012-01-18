@@ -166,17 +166,55 @@ sub update_column_metadata {
 }
 
 
+sub new_page {
+    my ($self, $ds_id, $args) = @_;
+    my $sth = $self->dbh->prepare_cached(
+        q{INSERT INTO pages (dataset_id, title, preamble, postamble) VALUES (?,?,?,?)}
+    );
+    $sth->execute($ds_id, '', '', '');
+    return $self->dbh->last_insert_id(undef,undef,'pages','id');
+}
+
+
+sub get_page_columns {
+    my ($self, $page_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM page_columns WHERE page_id=?');
+    $sth->execute($page_id);
+    return $sth->fetchall_arrayref({});
+}
+
+sub get_page_for_dataset {
+    my ($self, $ds_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM pages WHERE dataset_id=?');
+    $sth->execute($ds_id);
+    my $hr = $sth->fetchrow_hashref();
+    $sth->finish();
+    return $hr;
+}
+
+sub get_page {
+    my ($self, $page_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM pages WHERE id=?');
+    $sth->execute($page_id);
+    my $hr = $sth->fetchrow_hashref();
+    $sth->finish();
+    return $hr;
+}
+
+
 sub clear {
     my ($self) = @_;
-    $self->dbh->do('DROP TABLE users;');
-    $self->dbh->do('DROP TABLE datasets;');
-    $self->dbh->do('DROP TABLE columns');
+    $self->dbh->do('DROP TABLE IF EXISTS users;');
+    $self->dbh->do('DROP TABLE IF EXISTS datasets;');
+    $self->dbh->do('DROP TABLE IF EXISTS columns;');
+    $self->dbh->do('DROP TABLE IF EXISTS pages;');
+    $self->dbh->do('DROP TABLE IF EXISTS page_columns;');
     return $self;
 }
 sub load_schema {
     my ($self) = @_;
     $self->dbh->do(<<'USERS');
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id    integer PRIMARY KEY AUTOINCREMENT,
   login text NOT NULL UNIQUE,
   name  text NOT NULL
@@ -184,7 +222,7 @@ CREATE TABLE users (
 USERS
 
     $self->dbh->do(<<'DATASET');
-CREATE TABLE datasets (
+CREATE TABLE IF NOT EXISTS datasets (
   id       integer PRIMARY KEY AUTOINCREMENT,
   user_id  integer NOT NULL REFERENCES users (id),
   name     text NOT NULL,
@@ -195,7 +233,7 @@ CREATE TABLE datasets (
 DATASET
 
     $self->dbh->do(<<'COLUMNS');
-CREATE TABLE columns (
+CREATE TABLE IF NOT EXISTS columns (
   id             integer PRIMARY KEY AUTOINCREMENT,
   dataset_id     integer NOT NULL REFERENCES datasets (id),
   name           text NOT NULL,
@@ -208,6 +246,24 @@ CREATE TABLE columns (
 COLUMNS
 
 
+    $self->dbh->do(<<'PAGES');
+CREATE TABLE IF NOT EXISTS pages (
+  id         integer PRIMARY KEY AUTOINCREMENT,
+  dataset_id integer NOT NULL REFERENCES datasets (id),
+  title      text NOT NULL,
+  preamble   text NOT NULL,
+  postamble  text NOT NULL
+);
+PAGES
+
+    $self->dbh->do(<<'PAGE_COLUMNS');
+CREATE TABLE IF NOT EXISTS page_columns (
+  id       integer PRIMARY KEY AUTOINCREMENT,
+  page_id  integer NOT NULL REFERENCES pages (id),
+  title    text NOT NULL,
+  template text NOT NULL
+);
+PAGE_COLUMNS
 
     return $self;
 }
