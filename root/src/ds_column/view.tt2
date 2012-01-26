@@ -1,21 +1,21 @@
 [% WRAPPER inc/wrapper.tt2
-  title = "Annotate $column.name for dataset &quot;$dataset.object.name&quot;"
+  title = "Annotate $ds_column.object.name for dataset &quot;$dataset.object.name&quot;"
 %]
 
 
-<form action="[% c.uri_for_action('column_view', [user.login, dataset.id, column.id]) %]" method="post">
+<form action="[% c.uri_for_action('/rpc/datasetcolumn/view', c.req.captures) %]" method="post">
   <fieldset>
-    <legend>Annotate column "[% column.name %]"</legend>
+    <legend>Annotate column "[% ds_column.object.name %]"</legend>
 
     <fieldset class="sub_fieldset">
       <legend>Accessions</legend>
 
       <p class="question">Does this field contain accessions?</p>
       <label for="column.is_acc_yes">
-        Yes: <input type="radio" name="column.is_accession" id="column.is_acc_yes" value="1" [% IF column.is_accession %]checked="checked"[% END %] />
+        Yes: <input type="radio" name="column.is_accession" id="column.is_acc_yes" value="1" [% IF ds_column.object.is_accession %]checked="checked"[% END %] />
       </label>
       <label for="column.is_acc_no">
-        No: <input type="radio" name="column.is_accession" id="column.is_acc_no" value="0" [% IF !column.is_accession %]checked="checked"[% END %] />
+        No: <input type="radio" name="column.is_accession" id="column.is_acc_no" value="0" [% IF !ds_column.object.is_accession %]checked="checked"[% END %] />
       </label>
 
       <label for="column.accession_type">
@@ -38,10 +38,10 @@
 
       <p class="question">Can there be more than one accession per row in this column?</p>
       <label for="column.multiple_ids_yes">
-        Yes: <input type="radio" name="column.multiple_ids" id="column.multiple_ids_yes" value="1" [% IF column.multiple_ids %]checked="checked"[% END %] />
+        Yes: <input type="radio" name="column.multiple_ids" id="column.multiple_ids_yes" value="1" [% IF ds_column.object.multiple_ids %]checked="checked"[% END %] />
       </label>
       <label for="column.multipl_ids_no">
-        No: <input type="radio" name="column.multiple_ids" id="column.multiple_ids_no" value="0" [% IF ! column.multiple_ids %]checked="checked"[% END %] />
+        No: <input type="radio" name="column.multiple_ids" id="column.multiple_ids_no" value="0" [% IF ! ds_column.object.multiple_ids %]checked="checked"[% END %] />
       </label>
     </fieldset>
 
@@ -51,14 +51,14 @@
 
       <p class="questions">Does this column contain URLs?</p>
       <label for="column.is_url_yes">
-        Yes: <input type="radio" name="column.is_url" id="column.is_url_yes" value="1" [% IF column.is_url %]checked="checked"[% END %] />
+        Yes: <input type="radio" name="column.is_url" id="column.is_url_yes" value="1" [% IF ds_column.object.is_url %]checked="checked"[% END %] />
       </label>
       <label for="column.is_url_no">
-        No: <input type="radio" name="column.is_url" id="column.is_url_no" value="0" [% IF ! column.is_url %]checked="checked"[% END %] />
+        No: <input type="radio" name="column.is_url" id="column.is_url_no" value="0" [% IF ! ds_column.object.is_url %]checked="checked"[% END %] />
       </label>
 
       <p class="question">What is the URL base?</p>
-      <input type="text" name="column.url_root" value="[% column.url_root | html %]" />
+      <input type="text" name="column.url_root" value="[% ds_column.object.url_root | html %]" />
     </fieldset>
 
 
@@ -67,7 +67,7 @@
   </fieldset>
 </form>
 
-<p><a href="[% c.uri_for_action('column_addlist', [user.login, dataset.id]) %]">Return to columns</a></p>
+<p><a class="button icon arrowleft" href="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures.slice(0,-2)) %]">Return to columns</a></p>
 
 
 [% END %]

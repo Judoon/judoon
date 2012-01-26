@@ -73,61 +73,6 @@ sub user_view : Chained('user_id') PathPart('') Args(0) {
 }
 
 
-# /dataset/$id/column
-sub column_base : Chained('/rpc/dataset/id')  PathPart('column') CaptureArgs(0) { }
-sub column_addlist : Chained('column_base') PathPart('')       Args(0)        {
-    my ($self, $c) = @_;
-
-    my $columns = $c->model('Users')->get_columns_for_dataset($c->stash->{dataset}{id});
-    my $rows    = $c->stash->{dataset}{object}{rows};
-    for my $idx (0..scalar(@$columns)-1) {
-        my $sample_count = 3;
-        $columns->[$idx]{samples} = [];
-        for my $row (@$rows) {
-            last if ($sample_count <= 0);
-            if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
-                push @{$columns->[$idx]{samples}}, $row->[$idx];
-                $sample_count--;
-            }
-        }
-    }
-
-    for my $column (@$columns) {
-        my @meta;
-        if ($column->{is_accession}) {
-            push @meta, 'accession: ' . $column->{accession_type};
-        }
-        if ($column->{is_url}) {
-            push @meta, 'url: ' . $column->{url_root};
-        }
-        $column->{metadata} = @meta ? join(', ', @meta) : 'plain text';
-    }
-
-
-    $c->stash->{columns}  = $columns;
-    $c->stash->{template} = 'column_list.tt2';
-}
-sub column_id   : Chained('column_base') PathPart('')       CaptureArgs(1) {
-    my ($self, $c, $column_id) = @_;
-    $c->stash->{column} = $c->model('Users')->get_column($column_id);
-}
-sub column_view : Chained('column_id')   PathPart('')       Args(0)        {
-    my ($self, $c) = @_;
-
-    my $params = $c->req->params;
-    if (%$params) {
-        my %valid = map {s/^column\.//r => $params->{$_}} grep {m/^column\./} keys %$params;
-        $c->log->debug('Valid params are: ' . p(%valid));
-        $c->model('Users')->update_column_metadata($c->stash->{column}{id}, \%valid)
-    }
-
-    $c->stash->{template} = 'column_view.tt2';
-}
-
-
-
-
-
 
 # Public pages
 sub public_page_base : Chained('base') PathPart('page') CaptureArgs(0) {}

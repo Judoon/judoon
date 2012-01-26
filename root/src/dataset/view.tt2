@@ -39,7 +39,7 @@
     <legend>Actions</legend>
 
     <ul class="action_list">
-      <li><a href="[% c.uri_for_action('column_addlist', [user.login, dataset.id]) %]" class="button">Edit Columns</a></li>
+      <li><a href="[% c.uri_for_action('/rpc/datasetcolumn/list', [user.login, dataset.id]) %]" class="button">Edit Columns</a></li>
       <li><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.login, dataset.id]) %]" class="button">Edit Data</a></li>
       [% IF dataset.object.has_page %]
       <li><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, dataset.object.page.id]) %]" class="button">Edit Page</a></li>
