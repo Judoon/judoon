@@ -7,7 +7,7 @@ BEGIN { extends 'Judoon::Web::Controller::RPC'; }
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/dataset_id', PathPart => 'page', },
+        base => { Chained => '/rpc/dataset/id', PathPart => 'page', },
     },
     rpc => {
         template_dir => 'page',

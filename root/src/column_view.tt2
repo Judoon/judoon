@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = "Annotate $column.name for dataset $dataset.name"
+  title = "Annotate $column.name for dataset &quot;$dataset.object.name&quot;"
 %]
 
 

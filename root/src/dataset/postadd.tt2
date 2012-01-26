@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = "Select columns $dataset.name Dataset"
+  title = "Select columns for &quot;$dataset.object.name&quot;"
 %]
 
 <script type="text/javascript">
@@ -25,7 +25,7 @@
   table tr.first { font-weight: bold; }
 </style>
 
-<form action="[% c.uri_for_action('dataset_postadd_do', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
+<form action="[% c.uri_for_action('/rpc/dataset/postadd_do', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
 
 
   <div style="height: 6em;"></div>
@@ -34,7 +34,7 @@
     <thead>
       <th>Header</th>
       <th>Delete</th>
-      [% FOREACH header IN ds_headers %]
+      [% FOREACH header IN dataset.object.headers %]
       <th><input type="checkbox" name="col_delete" value="[% loop.count %]" /></th>
       [% END %]
     </thead>
@@ -42,11 +42,11 @@
       <tr class="odd first">
         <td><input type="radio" name="header" value="1" checked="checked" /></td>
         <td><input type="checkbox" name="row_delete" value="1" /></td>
-        [% FOREACH header IN ds_headers %]
+        [% FOREACH header IN dataset.object.headers %]
         <td>[% header | html %]</td>
         [% END %]
       </tr>
-      [% FOREACH row IN dataset.data %]
+      [% FOREACH row IN dataset.object.data %]
       <tr class="[% loop.count % 2 ? 'even' : 'odd' %]">
         <td><input type="radio" name="header" value="[% loop.count + 1 %]" /></td>
         <td><input type="checkbox" name="row_delete" value="[% loop.count + 1 %]" /></td>

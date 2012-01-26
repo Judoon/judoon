@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = "View $dataset.name Dataset"
+  title = "View the &quot;$dataset.object.name&quot; Dataset"
 %]
 
 <style type="text/css">
@@ -16,18 +16,18 @@
 
 </style>
 
-<form action="[% c.uri_for_action('dataset_view', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
+<form action="[% c.uri_for_action('/rpc/dataset/view', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
   <fieldset>
     <legend>Dataset</legend>
 
     <label for="dataset.name">
       Name:
-      <input id="dataset.name" style="width: 40em;" name="dataset.name" type="text" value="[% dataset.name %]" />
+      <input id="dataset.name" style="width: 40em;" name="dataset.name" type="text" value="[% dataset.object.name %]" />
     </label>
 
     <label for="dataset.notes">
       Notes:
-      <textarea class="tinymce" style="width: 34em;" id="dataset.notes" class="dataset.notes"></textarea>
+      <textarea class="tinymce" style="width: 34em;" id="dataset.notes" class="dataset.object.notes"></textarea>
     </label>
 
     <label><input type="submit" class="button" style="" name="submit" value="Update" /></label>
@@ -40,9 +40,9 @@
 
     <ul class="action_list">
       <li><a href="[% c.uri_for_action('column_addlist', [user.login, dataset.id]) %]" class="button">Edit Columns</a></li>
-      <li><a href="[% c.uri_for_action('dataset_addlist', [user.login, dataset.id]) %]" class="button">Edit Data</a></li>
-      [% IF dataset.has_page %]
-      <li><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, dataset.page.id]) %]" class="button">Edit Page</a></li>
+      <li><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.login, dataset.id]) %]" class="button">Edit Data</a></li>
+      [% IF dataset.object.has_page %]
+      <li><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, dataset.object.page.id]) %]" class="button">Edit Page</a></li>
       [% ELSE %]
       <li><a href="[% c.uri_for_action('/rpc/page/add', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
       [% END %]

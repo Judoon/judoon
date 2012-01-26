@@ -1,0 +1,13 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "$user.name's Datasets"
+%]
+
+[% IF dataset.list.size %]
+<ul>
+  [% FOREACH dataset_obj IN dataset.list %]
+  <li><a href="[% c.uri_for_action('/rpc/dataset/view', [user.login, dataset_obj.id]) %]">[% dataset_obj.name %]</a></li>
+  [% END %]
+</ul>
+[% END %]
+
+[% END %]

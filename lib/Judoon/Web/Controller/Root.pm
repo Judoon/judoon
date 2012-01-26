@@ -73,82 +73,13 @@ sub user_view : Chained('user_id') PathPart('') Args(0) {
 }
 
 
-sub dataset_base : Chained('user_id') PathPart('dataset') CaptureArgs(0) {}
-sub dataset_addlist : Chained('dataset_base') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-
-    my $model      = $c->model('Users');
-    my $user_login = $c->stash->{user_login};
-
-    if (my $upload = $c->req->upload('dataset')) {
-        my $dataset_id = $model->import_data_for_user($user_login, $upload->fh);
-        $c->res->redirect($c->uri_for_action(
-            'dataset_view', [$user_login, $dataset_id]
-        ));
-        $c->detach();
-    }
-
-    $c->stash->{datasets} = $model->get_datasets($user_login);
-    $c->stash->{template} = 'dataset_list.tt2';
-}
-sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
-    my ($self, $c, $dataset_id) = @_;
-    my $dataset             = $c->model('Users')->get_dataset($dataset_id);
-    $c->stash->{dataset}    = $dataset;
-    my $ds_data             = $dataset->{data};
-    $c->stash->{ds_headers} = shift @$ds_data;
-    $c->stash->{ds_rows}    = $ds_data;
-}
-sub dataset_postadd : Chained('dataset_id') PathPart('postadd') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'dataset_postadd.tt2';
-}
-sub dataset_postadd_do : Chained('dataset_id') PathPart('postadd_do') Args(0) {
-    my ($self, $c) = @_;
-
-    my $params = $c->req->params;
-    my $header_col = $params->{header} // 1;
-    $c->log->debug("Header is: $header_col");
-
-    my @row_dels = $params->{row_delete};
-    $c->log->debug("Row deletes are: " . p(@row_dels));
-    my @col_dels = $params->{col_delete};
-    $c->log->debug("Col deletes are: " . p(@col_dels));
-
-    my $dataset_id = $c->stash->{dataset}{id};
-    my $user_login = $c->stash->{user}{login};
-    $c->res->redirect($c->uri_for_action(
-        'dataset_view', [$user_login, $dataset_id]
-    ));
-}
-
-sub dataset_view : Chained('dataset_id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-
-    my $ds_id = $c->stash->{dataset}{id};
-    my $params = $c->req->params;
-    if ($params->{'dataset.name'}) {
-        $c->stash->{dataset} = $c->model('Users')->update_dataset(
-            $ds_id, {name => $params->{'dataset.name'}},
-        );
-    }
-
-    if (my $page = $c->model('Users')->get_page_for_dataset($ds_id)) {
-        $c->stash->{dataset}{has_page} = 1;
-        $c->stash->{dataset}{page} = $page;
-    }
-
-    $c->stash->{template}   = 'dataset_view.tt2';
-}
-
-
 # /dataset/$id/column
-sub column_base : Chained('dataset_id')  PathPart('column') CaptureArgs(0) { }
+sub column_base : Chained('/rpc/dataset/id')  PathPart('column') CaptureArgs(0) { }
 sub column_addlist : Chained('column_base') PathPart('')       Args(0)        {
     my ($self, $c) = @_;
 
     my $columns = $c->model('Users')->get_columns_for_dataset($c->stash->{dataset}{id});
-    my $rows    = $c->stash->{ds_rows};
+    my $rows    = $c->stash->{dataset}{object}{rows};
     for my $idx (0..scalar(@$columns)-1) {
         my $sample_count = 3;
         $columns->[$idx]{samples} = [];

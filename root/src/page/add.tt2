@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = "Create Page for $dataset.name Dataset"
+  title = "Create Page for the &quot;$dataset.object.name&quot; Dataset"
 %]
 
 

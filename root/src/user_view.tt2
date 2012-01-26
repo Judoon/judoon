@@ -27,13 +27,13 @@
   <tbody>
     <tr>
       <td></td>
-      <td><a href="[% c.uri_for_action('dataset_view', [user.login, '1']) %]">RNAi - 05/07/2011</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/view', [user.login, '1']) %]">RNAi - 05/07/2011</a></td>
       <td><a href="[% c.uri_for_action('/rpc/page/view', [user.login,'l','1']) %]">View</a></td>
       <td><input type="checkbox" checked="checked" /></td>
     </tr>
     <tr>
       <td></td>
-      <td><a href="[% c.uri_for_action('dataset_view', [user.login, 7]) %]">Migration Screen</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/view', [user.login, 7]) %]">Migration Screen</a></td>
       <td> - </td>
       <td><input type="checkbox"  disabled="disabled" /></td>
     </tr>
@@ -41,7 +41,7 @@
     [% FOREACH dataset IN datasets %]
     <tr>
       <td></td>
-      <td><a href="[% c.uri_for_action('dataset_view', [user.login, dataset.id]) %]">[% dataset.name %]</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/view', [user.login, dataset.id]) %]">[% dataset.name %]</a></td>
       [% IF dataset.page %]
       [% page = dataset.page %]
       <td><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, 1]) %]">View</a></td>
@@ -61,7 +61,7 @@
           <a class="button icon add" id="add_data" onclick="toggle_add(); return false;" href="#">Add New Data Set</a>
         </div>
         <div id="data_upload_form" style="display: none;">
-          <form action="[% c.uri_for_action('dataset_addlist', ['fge7z']) %]" method="post" enctype="multipart/form-data">
+          <form action="[% c.uri_for_action('/rpc/dataset/add_do', ['fge7z']) %]" method="post" enctype="multipart/form-data">
             <fieldset>
               <div>
                 <label>Dataset file: <input type="file" id="dataset" name="dataset" /></label>

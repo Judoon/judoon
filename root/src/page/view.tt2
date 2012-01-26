@@ -1,5 +1,5 @@
 [% WRAPPER inc/wrapper.tt2
-  title = "View $dataset.name Page"
+  title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
 <style type="text/css">
@@ -20,10 +20,10 @@
   <fieldset>
     <legend>New Page</legend>
 
-    <label for="page.title">Title: <input type="text" name="page.title" id="page.title" value="" /></label>
+    <label for="page.title">Title: <input type="text" name="page.title" id="page.title" value="[% page.object.title %]" /></label>
 
-    <label for="page.preamble">Preamble: <textarea class="tinymce"></textarea></label>
-    <label for="page.postamble">Postamble: <textarea class="tinymce"></textarea></label>
+    <label for="page.preamble">Preamble: <textarea class="tinymce">[% page.object.preamble %]</textarea></label>
+    <label for="page.postamble">Postamble: <textarea class="tinymce">[% page.object.postamble %]</textarea></label>
     
     <fieldset>
       <legend>Table Layout</legend>
@@ -39,7 +39,7 @@
               </tr>
             </thead>
             <tbody>
-              [% FOREACH header IN ds_headers %]
+              [% FOREACH header IN dataset.object.headers %]
               <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
                 <td>[% header | html %]</td>
                 <td>[% header.used_in | html %]</td>
