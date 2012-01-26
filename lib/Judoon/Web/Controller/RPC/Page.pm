@@ -28,7 +28,7 @@ override get_object => sub {
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    $c->model('Users')->update_page($c->stash->{page}{id}, $params);
+    return $c->model('Users')->update_page($c->stash->{page}{id}, $params);
 };
 
 after 'private_view' => sub {
