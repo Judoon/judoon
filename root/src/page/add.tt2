@@ -1,0 +1,18 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "Create Page for $dataset.name Dataset"
+%]
+
+
+<form action="[% c.uri_for_action('page_add_do', [user.login, dataset.id]) %]" action="post">
+  <fieldset>
+    <legend>New Page</legend>
+
+    <label for="page.title">Title: <input type="text" name="page.title" id="page.title" value="" /></label>
+
+    <label for=""><input /></label>
+    
+    <input type="submit" class="button" value="Add" />
+  </fieldset>
+</form>
+
+[% END %]

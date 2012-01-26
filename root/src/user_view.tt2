@@ -28,7 +28,7 @@
     <tr>
       <td></td>
       <td><a href="[% c.uri_for_action('dataset_view', [user.login, '1']) %]">RNAi - 05/07/2011</a></td>
-      <td><a href="[% c.uri_for_action('page_view', [user.login,'l','1']) %]">View</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/page/view', [user.login,'l','1']) %]">View</a></td>
       <td><input type="checkbox" checked="checked" /></td>
     </tr>
     <tr>
@@ -44,7 +44,7 @@
       <td><a href="[% c.uri_for_action('dataset_view', [user.login, dataset.id]) %]">[% dataset.name %]</a></td>
       [% IF dataset.page %]
       [% page = dataset.page %]
-      <td><a href="[% c.uri_for_action('page_view', [user.login, dataset.id, 1]) %]">View</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, 1]) %]">View</a></td>
       <td><input type="checkbox" checked="[% page.public ? '1' : '0' %]" /></td>
       [% ELSE %]
       <td> - </td>

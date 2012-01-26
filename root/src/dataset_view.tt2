@@ -42,9 +42,9 @@
       <li><a href="[% c.uri_for_action('column_addlist', [user.login, dataset.id]) %]" class="button">Edit Columns</a></li>
       <li><a href="[% c.uri_for_action('dataset_addlist', [user.login, dataset.id]) %]" class="button">Edit Data</a></li>
       [% IF dataset.has_page %]
-      <li><a href="[% c.uri_for_action('page_view', [user.login, dataset.id, dataset.page.id]) %]" class="button">Edit Page</a></li>
+      <li><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, dataset.page.id]) %]" class="button">Edit Page</a></li>
       [% ELSE %]
-      <li><a href="[% c.uri_for_action('page_add', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
+      <li><a href="[% c.uri_for_action('/rpc/page/add', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
       [% END %]
     </ul>
 

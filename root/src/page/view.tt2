@@ -16,7 +16,7 @@
 </style>
 
 
-<form action="[% c.uri_for_action('page_view', [user.login, dataset.id, page.id]) %]" action="post">
+<form action="[% c.uri_for_action('/rpc/page/edit_do', [user.login, dataset.id, page.id]) %]" action="post">
   <fieldset>
     <legend>New Page</legend>
 

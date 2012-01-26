@@ -196,49 +196,6 @@ sub column_view : Chained('column_id')   PathPart('')       Args(0)        {
 
 
 
-# Pages
-sub page_base : Chained('dataset_id') PathPart('page') CaptureArgs(0) {}
-sub page_list : Chained('page_base') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'page_list.tt2';
-}
-sub page_add : Chained('page_base') PathPart('add') Args(0) {
-    my ($self, $c) = @_;
-    my $params  = $c->req->params;
-    my $page_id = $c->model('Users')->new_page($c->stash->{dataset}{id}, $params);
-    $c->res->redirect('page_view', [
-        $c->stash->{user}{login}, $c->stash->{dataset}{id}, $page_id
-    ]);
-    #$c->stash->{template} = 'page_add.tt2';
-}
-sub page_add_do : Chained('page_base') PathPart('add_do') Args(0) {
-    my ($self, $c) = @_;
-
-    my $params  = $c->req->params;
-    my $page_id = $c->model('Users')->new_page($c->stash->{dataset}{id}, $params);
-    $c->res->redirect('page_view', [
-        $c->stash->{user}{login}, $c->stash->{dataset}{id}, $page_id
-    ]);
-}
-sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
-    my ($self, $c, $page_id) = @_;
-    $c->stash->{page} = $c->model('Users')->get_page($page_id);
-}
-sub page_view : Chained('page_id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-
-    my $page_id = $c->stash->{page}{id};
-
-    my $params = $c->req->params;
-    if (%$params) {
-        $c->model('Users')->update_page($page_id, $params);
-    }
-
-    $c->stash->{page_columns} = $c->model('Users')->get_page_columns($page_id);
-    $c->stash->{template} = 'page_view.tt2';
-}
-
-
 
 
 # Public pages
