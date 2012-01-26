@@ -61,7 +61,7 @@
           <a class="button icon add" id="add_data" onclick="toggle_add(); return false;" href="#">Add New Data Set</a>
         </div>
         <div id="data_upload_form" style="display: none;">
-          <form action="[% c.uri_for_action('/rpc/dataset/add_do', ['fge7z']) %]" method="post" enctype="multipart/form-data">
+          <form action="[% c.uri_for_action('/rpc/dataset/add_do', [user.login]) %]" method="post" enctype="multipart/form-data">
             <fieldset>
               <div>
                 <label>Dataset file: <input type="file" id="dataset" name="dataset" /></label>
