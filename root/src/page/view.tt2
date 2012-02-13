@@ -50,7 +50,7 @@
         </div>
 
         <div class="left">
-          <div class="addbutton"><a class="button icon add" href="javascript:;">Add page column</a></div>
+          <div class="addbutton"><a class="button icon add" href="[% c.uri_for_action('/rpc/pagecolumn/add', c.req.captures) %]">Add page column</a></div>
           [% IF page_columns.size %]
           [% FOREACH column IN page_columns %]
           <div class="column_container">
