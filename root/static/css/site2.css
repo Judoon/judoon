@@ -1,0 +1,27 @@
+body {
+    background-color: #eee;
+    padding: 20px;
+}
+
+header {
+    padding: 0.5em 3em;
+    background: #35D4A4;
+    color: #006D4C;
+    margin-bottom: 3px;
+}
+footer {
+    padding: 5px;
+    background: none repeat scroll 0% 0% rgb(104, 154, 211);
+    color: rgb(4, 53, 108);
+    border-color: rgb(13, 86, 166);
+}
+footer p {
+    padding: 2px;
+}
+
+#middle {
+    margin: 0 0 3px 0;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    background-color: #fff;
+}

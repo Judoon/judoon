@@ -12,7 +12,7 @@
        More info: h5bp.com/i/378 -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>[% title %] | Judoon</title>
+  <title></title>
   <meta name="description" content="">
 
   <!-- Mobile viewport optimized: h5bp.com/viewport -->
@@ -20,17 +20,7 @@
 
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons -->
 
-  <link rel="stylesheet" href="[% c.uri_for('/static/css/h5bp.css') %]" />
-  <link rel="stylesheet" href="[% c.uri_for('/static/css/gh-buttons.css') %]" />
-  <link rel="stylesheet" href="[% c.uri_for('/static/css/bootstrap.css') %]" />
-  <link rel="stylesheet" href="[% c.uri_for('/static/css/site2.css') %]" />
-
-  <!--
-      <style type="text/css" title="currentStyle">
-        @import "/static/css/demo_page.css"; @import "/static/css/header.ccss";
-        @import "/static/css/demo_table.css";
-      </style>
-  -->
+  <link rel="stylesheet" href="css/style.css">
 
   <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
@@ -39,34 +29,18 @@
        Create your own custom Modernizr build: www.modernizr.com/download/ -->
   <script src="js/libs/modernizr-2.5.2.min.js"></script>
 </head>
-
 <body>
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
        chromium.org/developers/how-tos/chrome-frame-getting-started -->
   <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
   <header>
-    <h1>Judoon: Simplifying and automating the display of scientific data</h1>
+
   </header>
-  <div role="main" id="middle">
-    <div class="container-fluid">
-      <div class="span2">
-        <ul class="nav nav-list">
-          <li class="nav-header">Things to do:</li>
-          [% IF user %]<li><a href="[% c.uri_for_action('user_view', [user.login]) %]">Your homepage</a></li>[% END %]
-          <li><a href="[% c.uri_for_action('public_page_addlist') %]">View Public Pages</a></li>
-          <li><a href="moo">Another Thing</a></li>
-          <li><a href="moo">Something Else</a></li>
-          [% IF c.user_exists %]<li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>[% END %]
-        </ul>
-      </div>
-      <div class="span10" id="content">
-        [% content %]
-      </div>
-    </div>
+  <div role="main">
+
   </div>
   <footer>
-      <p>&copy; 2012 Cell Migration Consortium</p>
-      <p>Have questions? Need help?  <a href="mailto:help@cellmigration.org">E-mail us</a>.</p>
+
   </footer>
 
 
@@ -80,10 +54,6 @@
   <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
   <!-- end scripts -->
-
-  <script src="https://www.google.com/jsapi"></script>
-  <script>google.load("jqueryui", "1");</script>    
-  <script src="[% c.uri_for('/static/js/jquery.dataTables.js') %]"></script>
 
   <!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.
        mathiasbynens.be/notes/async-analytics-snippet -->
