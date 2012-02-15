@@ -85,6 +85,7 @@ __PACKAGE__->config(
     'Controller::Login' => {
         traits => ['-RenderAsTTTemplate'],
     },
+    static => { dirs => ['static',], },
 );
 
 
