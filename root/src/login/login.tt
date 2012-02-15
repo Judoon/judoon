@@ -7,24 +7,10 @@
 
 <div class="error">[% error_msg %]</div>
 
-<form id="login_form" method="post" class="form-horizontal" >
-  <fieldset>
-    <div class="control-group">
-      <label class="control-label" for="username">Username: </label>
-      <div class="controls"><input type="text" name="username" id="username" value="" tabindex="1" /></div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="password">Password: </label>
-      <div class="controls"><input type="password" name="password" id="password" value="" tabindex="2" /></div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="remember">Remember: </label>
-      <div class="controls"><input type="checkbox" name="remember" id="remember" value="1" tabindex="3" /></div>
-    </div>
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </fieldset>
+<form id="login_form" method="post" class="form-inline" >
+  <input type="text" name="username" id="username" class="input-small" placeholder="Username" tabindex="1" />
+  <input type="password" name="password" id="password" class="input-small" placeholder="Password" tabindex="2" />
+  <button type="submit" class="btn">Submit</button>
 </form>
 
 
