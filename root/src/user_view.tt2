@@ -2,20 +2,11 @@
   title = user.name
 %]
 
-<script type="text/javascript">
-
-  function toggle_add() {
-      $("#data_add_button").css("display", "none");
-      $("#data_upload_form").css("display", "block");
-  };
-
-</script>
-
 <p>Welcome, [% user.name %]!</p>
 
 <p>Here are your data sets:</p>
 
-<table class="dataset_list">
+<table class="table-striped table-condensed dataset_list">
   <thead>
     <tr>
       <th></th>
@@ -58,31 +49,42 @@
     <tr>
       <td colspan="4">
         <div id="data_add_button">
-          <a class="button icon add" id="add_data" onclick="toggle_add(); return false;" href="#">Add New Data Set</a>
+          <a class="btn" href="#" id="add_data" onclick="toggle_add(); return false;" href="#">
+            <i class="icon-plus"></i>
+            Add New Data Set
+          </a>
         </div>
         <div id="data_upload_form" style="display: none;">
-          <form action="[% c.uri_for_action('/rpc/dataset/add_do', [user.login]) %]" method="post" enctype="multipart/form-data">
-            <fieldset>
-              <div>
-                <label>Dataset file: <input type="file" id="dataset" name="dataset" /></label>
-              <input class="button icon arrowdown" type="submit" value="Upload" />
-              </div>
-              <div class="note">
+          <form action="[% c.uri_for_action('/rpc/dataset/add_do', [user.login]) %]" method="post" enctype="multipart/form-data" class="form-inline">
+            <input type="file" class="input-file" id="dataset" name="dataset" placeholder="Dataset file" />
+            <button class="btn" type="submit"><i class="icon-upload"></i> Upload</button>
+          </form>
+          <div class="note">
               <h6>Accepted file types are:</h6>
               <dl>
                 <dt>.xls</dt><dd>Excel 97</dd>
                 <dt>.xlsx</dt><dd>Excel XML</dd>
                 <dt>.csv</dt><dd><abbr title="comma-separated values">CSV</abbr></dd>
               </dl>
-              </div>
-            </fieldset>
-          </form>
+          </div>
         </div>
       </td>
     </tr>
   </tfoot>
 </table>
 
+<script type="text/javascript">
+
+  $(document).ready(function() {
+     $('#add_data').click('toggle_add');
+  });
+
+  function toggle_add() {
+      $("#data_add_button").css("display", "none");
+      $("#data_upload_form").css("display", "block");
+  };
+
+</script>
 
 
 [% END %]
