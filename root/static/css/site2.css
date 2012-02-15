@@ -27,7 +27,8 @@ footer p {
 }
 
 
-input.input-w-dropdown {
+input.w-dropdown,
+select.w-dropdown {
     float: left;
 }
 

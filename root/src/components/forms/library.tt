@@ -6,13 +6,31 @@
     <h6>Input With dropdown</h6>
     <div id="input_w_dropdown">
       <div class="btn-group widget-inline">
-      <input type="text" class="inner-small span2 input-w-dropdown" style="font-weight: bold;" placeholder="Type text here" /><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
-        <span class="caret"></span>
-      </a>
-      <ul class="dropdown-menu">
-        <li><a href="#"><i class="icon-bold"></i>Bold</a></li>
-        <li><a href="#"><i class="icon-italic"></i>Italicize</a></li>
-      </ul>
+        <input type="text" class="inner-small span2 w-dropdown" placeholder="Type text here" /><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="#"><i class="icon-bold"></i>Bold</a></li>
+          <li><a href="#"><i class="icon-italic"></i>Italicize</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h6>Data Field</h6>
+    <div id="data_field">
+      <div class="btn-group widget-inline">
+        <select class="w-dropdown">
+          [% FOREACH header IN dataset.object.headers %]
+          <option>{[% header | html %]}</option>
+          [% END %]
+        </select>
+        <a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="#">Bold</a></li>
+          <li><a href="#">Italicize</a></li>
+        </ul>
       </div>
     </div>
 

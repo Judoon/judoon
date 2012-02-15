@@ -9,8 +9,8 @@
     <div class="control-group">
       <label class="control-label" for="page_column.title">Column Title:</label>
       <div class="controls">
-        <input type="text" class="input-small" name="page_column.title" id="page_column.title" />
-        <p class="help-block">placeholder text</p>
+        <input type="text" class="input-small span2" name="page_column.title" id="page_column.title" />
+        <p class="help-block">This will be the header for the column</p>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
           <div id="canvas_cursor"></div>
         </div>
 
-        <p class="help-block">Click the buttons below to add formatting.</p>
+        <p class="help-block">Add formatting with the buttons or <a href="#">preview</a>.</p>
 
 
         <div id="actions" class="row">
@@ -52,10 +52,28 @@
                 </div>
               </div>
             </div>
+            <div class="row"><div class="span8"><h6>&nbsp;</h6></div></div>
+            <div class="row">
+              <div class="span4"><h6>Move Cursor</h6></div>
+              <div class="span2"><h6></h6></div>
+              <div class="span2"><h6></h6></div>
+            </div>
+            <div class="row">
+              <div class="span4">
+                <div class="btn-group">
+                  <a class="btn" id="btn_cursor_up"><i class="icon-arrow-up"></i>Up</a>
+                  <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i>Down</a>
+                  <a class="btn" id="btn_cursor_left"><i class="icon-arrow-left"></i>Left</a>
+                  <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i>Right</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    [% INCLUDE 'components/forms/form_submit.tt' %]
 
   </fieldset>
 </form>
@@ -64,38 +82,6 @@
 <div class="">
   [% INCLUDE 'components/forms/library.tt' %]
 </div>
-
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-
-
-      <div class="right">
-        <h5 class="center">Columns</h5>
-        <table id="columns_used_list" class="data_table">
-          <thead>
-            <tr>
-              <th>Field</th>
-              <th>Used in</th>
-            </tr>
-          </thead>
-          <tbody>
-            [% FOREACH header IN dataset.object.headers %]
-            <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
-              <td>[% header | html %]</td>
-              <td>[% header.used_in | html %]</td>
-            </tr>
-            [% END %]
-          </tbody>
-        </table>
-      </div>
-
-      <div class="clearsep"></div>
-    </div>
 
 <script>
   $(document).ready(function () {
