@@ -39,10 +39,6 @@ select.w-dropdown {
     display: inline-block;
 }
 
-.widget-inline {
-    display: inline-block;
-}
-
-.widget-newline {
-    display: block;
-}
+.widget-inline { display: inline-block; }
+.widget-newline { display: block; }
+.widget-newline-icon { display: inline-block; }

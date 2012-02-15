@@ -18,7 +18,7 @@
     <div class="control-group">
       <label class="control-label" for="page_column.template">Column Layout:</label>
       <div class="controls">
-        <div id="column_canvas" class="well" style="height: 8em; width: 40em;">
+        <div id="column_canvas" class="well" style="height: 8em; width: 50em;">
           <div id="canvas_cursor"></div>
         </div>
 
@@ -43,12 +43,12 @@
               </div>
               <div class="span2">
                 <div class="btn-group">
-                  <a class="btn">List</a>
+                  <a class="btn disabled">List</a>
                 </div>
               </div>
               <div class="span2">
                 <div class="btn-group">
-                  <a class="btn">If / Then / Else</a>
+                  <a class="btn disabled">If / Then / Else</a>
                 </div>
               </div>
             </div>
@@ -61,10 +61,10 @@
             <div class="row">
               <div class="span4">
                 <div class="btn-group">
-                  <a class="btn" id="btn_cursor_up"><i class="icon-arrow-up"></i>Up</a>
-                  <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i>Down</a>
-                  <a class="btn" id="btn_cursor_left"><i class="icon-arrow-left"></i>Left</a>
-                  <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i>Right</a>
+                  <a class="btn" id="btn_cursor_up"><i class="icon-arrow-up"></i> Up</a>
+                  <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i> Down</a>
+                  <a class="btn" id="btn_cursor_left"><i class="icon-arrow-left"></i> Left</a>
+                  <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i> Right</a>
                 </div>
               </div>
             </div>
@@ -91,6 +91,11 @@
     $('#btn_add_newline').on('click', function() {pbuild_add_newline_element();} );
     $('#btn_add_list').on(   'click', function() {pbuild_add_list_element();}    );
     $('#btn_add_if').on(     'click', function() {pbuild_add_if_element();}      );
+
+    $('#btn_cursor_up').on(    'click', function() {pbuild_cursor_up();}    );
+    $('#btn_cursor_down').on(  'click', function() {pbuild_cursor_down();}  );
+    $('#btn_cursor_left').on(  'click', function() {pbuild_cursor_left();}  );
+    $('#btn_cursor_right').on( 'click', function() {pbuild_cursor_right();} );
   });
 </script>
 
