@@ -3,61 +3,46 @@
 %]
 
 
-<style type="text/css">
-  #middle {
-     padding-left: 10em;
-     padding-right: 10em;
-  }
+<form action="[% c.uri_for_action('/rpc/datasetcolumn/edit_do', c.req.captures) %]" method="post" accept-charset="utf-8">
+  <fieldset>
+    <legend>[% dataset.object.name %] dataset columns</legend>
 
-  table {
-      font-size: 80%;
-  }
-
-  td { border-right: 1px solid #eee; }
-  td.header { font-weight: bold; }
-  #dataset { empty-cells: show; }
-</style>
-
-
-<h4>[% dataset.object.name %] dataset</h4>
-
-<table id="dataset" cellpadding="0" cellspacing="0" border="0" class="data_table column_edit">
-  <thead>
-    <tr>
-      <th>&nbsp;</th>
-      <th>Column</th>
-      <th>Sample Data</th>
-      <th>Column Type</th>
-      <th>Annotate</th>
-      <th>Delete</th>
-    </tr>
-  </thead>
-  <tbody>
-    [% FOREACH column IN ds_column.list %]
-    <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
-      <td>[% loop.count %]</td>
-      <td class="header">[% column.name | html %]</td>
-      <td class="sample_data">
-        [% IF column.samples.size %]
-        [% FOREACH sample IN column.samples %]
-        <span class="[% loop.count % 2 ? 'odd' : 'even' %]">[% sample | html %][% UNLESS loop.last %], [% END %]</span>
+    <table id="dataset" class="table table-striped table-condensed">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Column</th>
+          <th>Sample Data</th>
+          <th>Column Type</th>
+          <th>Annotate</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        [% FOREACH column IN ds_column.list %]
+        <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
+          <td>[% loop.count %]</td>
+          <td class="header">[% column.name | html %]</td>
+          <td class="sample_data">
+            [% IF column.samples.size %]
+            [% FOREACH sample IN column.samples %]
+            <span class="[% loop.count % 2 ? 'odd' : 'even' %]">[% sample | html %][% UNLESS loop.last %], [% END %]</span>
+            [% END %]
+            [% ELSE %]
+            <span class="none">( none )</span>
+            [% END %]
+          </td>
+          <td class="metadata center">[% column.metadata | html %]</td>
+          <td class="annotate center"><a href="[% c.uri_for_action('/rpc/datasetcolumn/view', c.req.captures.merge([column.id])) %]">Annotate</a></td>
+          <td class="delete center"><input type="checkbox" /></td>
+        </tr>
         [% END %]
-        [% ELSE %]
-        <span class="none">( none )</span>
-        [% END %]
-      </td>
-      <td class="metadata center">[% column.metadata | html %]</td>
-      <td class="annotate center"><a href="[% c.uri_for_action('/rpc/datasetcolumn/view', c.req.captures.merge([column.id])) %]">Annotate</a></td>
-      <td class="delete center"><input type="checkbox" /></td>
-    </tr>
-    [% END %]
-  </tbody>
-</table>
+      </tbody>
+    </table>
 
-<div style="margin-top: 1em;">
-  <input type="submit" class="button" name="submit" value="Update" />
-</div>
+    [% INCLUDE 'components/forms/form_submit.tt' %]
 
-<p><a class="button icon arrowleft" href="[% c.uri_for_action('/rpc/dataset/view', c.req.captures) %]">Return to dataset</a></p>
+  </fieldset>
+</form>
 
 [% END %]
