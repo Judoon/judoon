@@ -1,0 +1,27 @@
+<form>
+  <fieldset>
+    <legend>Widget Library</legend>
+
+
+    <h6>Input With dropdown</h6>
+    <div id="input_w_dropdown">
+      <div class="btn-group widget-inline">
+      <input type="text" class="inner-small span2 input-w-dropdown" style="font-weight: bold;" placeholder="Type text here" /><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu">
+        <li><a href="#"><i class="icon-bold"></i>Bold</a></li>
+        <li><a href="#"><i class="icon-italic"></i>Italicize</a></li>
+      </ul>
+      </div>
+    </div>
+
+
+    <h6>Newline</h6>
+    <div id="newline">
+      <i class="icon-arrow-down"></i><div class="widget-newline"></div>
+    </div>
+
+
+  </fieldset>
+</form>

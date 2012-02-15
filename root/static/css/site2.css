@@ -25,3 +25,23 @@ footer p {
     padding-bottom: 2em;
     background-color: #fff;
 }
+
+
+input.input-w-dropdown {
+    float: left;
+}
+
+#canvas_cursor {
+    border: thin #aaa solid;
+    height: 1em;
+    width: 0.5em;
+    display: inline-block;
+}
+
+.widget-inline {
+    display: inline-block;
+}
+
+.widget-newline {
+    display: block;
+}
