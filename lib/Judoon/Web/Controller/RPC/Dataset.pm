@@ -71,6 +71,12 @@ override edit_object => sub {
     );
 };
 
+after private_edit_do => sub {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'dataset/view.tt2';
+};
+
+
 after 'private_view' => sub {
     my ($self, $c) = @_;
 
