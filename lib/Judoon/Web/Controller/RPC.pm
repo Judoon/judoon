@@ -48,7 +48,10 @@ sub private_add_do :Private {
     my ($self, $c) = @_;
     my $params = $self->munge_add_params($c);
     my $id     = $self->add_object($c, $params);
-    $c->res->redirect($c->uri_for_action('view', [@{$c->req->captures}, $id]));
+    $c->res->redirect( $c->uri_for_action(
+        $c->controller->action_for('view'),
+        [@{$c->req->captures}, $id]
+    ));
 }
 
 sub private_id :Private {
