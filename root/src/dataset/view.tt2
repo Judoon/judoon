@@ -2,35 +2,26 @@
   title = "View the &quot;$dataset.object.name&quot; Dataset"
 %]
 
-<style type="text/css">
-  #middle {
-     padding-left: 10em;
-     padding-right: 10em;
-  }
 
-  table { font-size: 80%; }
-  td { border-right: 1px solid #eee; }
-  td.header { font-weight: bold; }
-
-  label { display: block; margin-bottom: 5px; }
-
-</style>
-
-<form action="[% c.uri_for_action('/rpc/dataset/view', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
+<form action="[% c.uri_for_action('/rpc/dataset/edit_do', c.req.captures) %]" method="post" accept-charset="utf-8" class="form-horizontal">
   <fieldset>
-    <legend>Dataset</legend>
+    <legend>Dataset Properties</legend>
 
-    <label for="dataset.name">
-      Name:
-      <input id="dataset.name" style="width: 40em;" name="dataset.name" type="text" value="[% dataset.object.name %]" />
-    </label>
+    <div class="control-group">
+      <label for="dataset.name">Name:</label>
+      <div class="controls">
+        <input id="dataset.name" class="span3" name="dataset.name" type="text" value="[% dataset.object.name %]" />
+      </div>
+    </div>
 
-    <label for="dataset.notes">
-      Notes:
-      <textarea class="tinymce" style="width: 34em;" id="dataset.notes" class="dataset.object.notes"></textarea>
-    </label>
+    <div class="control-group">
+      <label for="dataset.notes">Notes:</label>
+      <div class="controls">
+        <textarea class="tinymce" style="width: 34em;" id="dataset.notes" class="dataset.object.notes"></textarea>
+      </div>
+    </div>
 
-    <label><input type="submit" class="button" style="" name="submit" value="Update" /></label>
+    [% INCLUDE 'components/forms/form_submit.tt' %]
   </fieldset>
 </form>
 
@@ -38,15 +29,15 @@
   <fieldset>
     <legend>Actions</legend>
 
-    <ul class="action_list">
-      <li><a href="[% c.uri_for_action('/rpc/datasetcolumn/list', [user.login, dataset.id]) %]" class="button">Edit Columns</a></li>
-      <li><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.login, dataset.id]) %]" class="button">Edit Data</a></li>
+    <div class="btn-group">
+      <a href="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures) %]" class="btn"><i class="icon-pencil"></i> Annotate Columns</a>
+      <a href="[% c.uri_for_action('/rpc/dataset/edit', c.req.captures) %]" class="btn"><i class="icon-th"></i> Edit Data</a>
       [% IF dataset.object.has_page %]
-      <li><a href="[% c.uri_for_action('/rpc/page/view', [user.login, dataset.id, dataset.object.page.id]) %]" class="button">Edit Page</a></li>
+      <a href="[% c.uri_for_action('/rpc/page/view', c.req.captures.merge([dataset.object.page.id])) %]" class="btn"><i class="icon-pencil"></i> Edit Page</a>
       [% ELSE %]
-      <li><a href="[% c.uri_for_action('/rpc/page/add', [user.login, dataset.id]) %]" class="button icon add">Create Page</a></li>
+      <a href="[% c.uri_for_action('/rpc/page/add', c.req.captures) %]" class="btn"><i class="icon-plus"></i> Create Page</a>
       [% END %]
-    </ul>
+    </div>
 
   </fieldset>
 </form>
