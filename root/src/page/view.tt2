@@ -2,21 +2,8 @@
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
-<style type="text/css">
-  ul.paging { list-style-type: none; }
-  ul.paging li { display: inline-block; }
-  label { display: block; }
-  .right { float: right; }
-  .left { float: left; }
-  .something .right { border: thin solid #04356C; width: 30%;}
-  .something .left  { border: thin solid #04356C; min-height: 30em; width: 69%; }
-  .addbutton { padding: 3px; text-align: right; }
-  #columns_used_list { font-size: 11px; border-spacing: 0; border-collapse: collapse; }
-  .center { text-align: center; }
-</style>
 
-
-<form action="[% c.uri_for_action('/rpc/page/edit_do', [user.login, dataset.id, page.id]) %]" action="post">
+<form action="[% c.uri_for_action('/rpc/page/edit_do', c.req.captures) %]" action="post">
   <fieldset>
     <legend>New Page</legend>
 

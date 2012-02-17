@@ -202,6 +202,33 @@ sub get_page {
 }
 
 
+sub accession_types {
+    my ($self) = @_;
+    return [
+        { group_label => 'NCBI', types => [
+            map {{field => $_->[0], label => $_->[1],}} (
+                ['gene_id',    'Gene ID',   ],
+                ['gene_name',  'Gene Name', ],
+                ['refseq_id',  'RefSeq ID', ],
+                ['protein_id', 'Protein ID',],
+                ['unigene_id', 'UniGene ID',],
+                ['pubmed_id',  'PubMed ID', ],
+            )
+        ], },
+        { group_label => 'Uniprot', types => [
+            map {{field => $_->[0], label => $_->[1],}} (
+                ['uniprot_id', 'Uniprot ID'],
+            )
+        ], },
+        { group_label => 'CritterBases', types => [
+            map {{field => $_->[0], label => $_->[1],}} (
+                ['flybase_id',  'FlyBase ID',  ],
+                ['wormbase_id', 'WormBase ID', ],
+            )
+        ], },
+    ];
+}
+
 sub clear {
     my ($self) = @_;
     $self->dbh->do('DROP TABLE IF EXISTS users;');

@@ -66,7 +66,17 @@ override edit_object => sub {
     my %valid = map {s/^column\.//r => $params->{$_}} grep {m/^column\./} keys %$params;
     $c->log->debug('Valid params are: ' . p(%valid));
     return $c->model('Users')
-        ->update_column_metadata($c->stash->{ds_column}{id}, \%valid)
+        ->update_column_metadata($c->stash->{ds_column}{id}, \%valid);
+};
+
+after private_edit => sub {
+    my ($self, $c) = @_;
+    $c->stash->{accession_types} = $c->model('Users')->accession_types();
+};
+
+after private_edit_do => sub {
+    my ($self, $c) = @_;
+    $c->res->redirect($c->uri_for_action('/rpc/datasetcolumn/list', [@{$c->req->captures}[0,1]]));
 };
 
 __PACKAGE__->meta->make_immutable;

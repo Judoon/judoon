@@ -33,7 +33,7 @@
             [% END %]
           </td>
           <td class="metadata center">[% column.metadata | html %]</td>
-          <td class="annotate center"><a href="[% c.uri_for_action('/rpc/datasetcolumn/view', c.req.captures.merge([column.id])) %]">Annotate</a></td>
+          <td class="annotate center"><a href="[% c.uri_for_action('/rpc/datasetcolumn/edit', c.req.captures.merge([column.id])) %]">Annotate</a></td>
           <td class="delete center"><input type="checkbox" /></td>
         </tr>
         [% END %]
