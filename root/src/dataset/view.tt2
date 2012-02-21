@@ -8,14 +8,14 @@
     <legend>Dataset Properties</legend>
 
     <div class="control-group">
-      <label for="dataset.name">Name:</label>
+      <label class="control-label" for="dataset.name">Name:</label>
       <div class="controls">
         <input id="dataset.name" class="span3" name="dataset.name" type="text" value="[% dataset.object.name %]" />
       </div>
     </div>
 
     <div class="control-group">
-      <label for="dataset.notes">Notes:</label>
+      <label class="control-label" for="dataset.notes">Notes:</label>
       <div class="controls">
         <textarea class="tinymce" style="width: 34em;" id="dataset.notes" class="dataset.object.notes"></textarea>
       </div>
