@@ -3,7 +3,7 @@
 %]
 
 
-<form action="[% c.uri_for_action('page_add_do', [user.login, dataset.id]) %]" action="post">
+<form action="[% c.uri_for_action('/rpc/page/add_do', c.req.captures) %]" action="post">
   <fieldset>
     <legend>New Page</legend>
 
