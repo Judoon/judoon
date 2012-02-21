@@ -59,7 +59,7 @@ sub postadd_do : Chained('id') PathPart('postadd_do') Args(0) {
     $c->log->debug("Row deletes are: " . p(@row_dels));
     $c->log->debug("Col deletes are: " . p(@col_dels));
 
-    $c->res->redirect($c->uri_for_action('view', $c->req->captures,));
+    $self->go_here($c, 'edit', $c->req->captures);
 }
 
 
@@ -71,13 +71,8 @@ override edit_object => sub {
     );
 };
 
-after private_edit_do => sub {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'dataset/view.tt2';
-};
 
-
-after 'private_view' => sub {
+after private_edit => sub {
     my ($self, $c) = @_;
 
     if (my $page = $c->model('Users')->get_page_for_dataset($c->stash->{dataset}{id})) {

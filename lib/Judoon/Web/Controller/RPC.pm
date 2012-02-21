@@ -24,8 +24,7 @@ sub list_do   : Chained('base')  PathPart('list_do')    Args(0)        { shift->
 sub add       : Chained('base')  PathPart('add')        Args(0)        { shift->private_add(         @_); }
 sub add_do    : Chained('base')  PathPart('add_do')     Args(0)        { shift->private_add_do(      @_); }
 sub id        : Chained('base')  PathPart('')           CaptureArgs(1) { shift->private_id(          @_); }
-sub view      : Chained('id')    PathPart('')           Args(0)        { shift->private_view(        @_); }
-sub edit      : Chained('id')    PathPart('edit')       Args(0)        { shift->private_edit(        @_); }
+sub edit      : Chained('id')    PathPart('')           Args(0)        { shift->private_edit(        @_); }
 sub edit_do   : Chained('id')    PathPart('edit_do')    Args(0)        { shift->private_edit_do(     @_); }
 sub delete    : Chained('id')    PathPart('delete')     Args(0)        { shift->private_delete(      @_); }
 sub delete_do : Chained('id')    PathPart('delete_do')  Args(0)        { shift->private_delete_do(   @_); }
@@ -55,7 +54,7 @@ sub private_add_do :Private {
     my ($self, $c) = @_;
     my $params = $self->munge_add_params($c);
     my $id     = $self->add_object($c, $params);
-    $self->go_here($c, 'view', [@{$c->req->captures}, $id]);
+    $self->go_here($c, 'edit', [@{$c->req->captures}, $id]);
 }
 
 sub private_id :Private {
@@ -63,11 +62,6 @@ sub private_id :Private {
     my $key                   = $self->rpc->{stash_key};
     $c->stash->{$key}{id}     = $self->validate_id($c, $id);
     $c->stash->{$key}{object} = $self->get_object($c);
-}
-
-sub private_view :Private {
-    my ($self, $c) = @_;
-    $c->stash->{template}   = $self->rpc->{template_dir} . '/view.tt2';
 }
 
 sub private_edit :Private {

@@ -2,14 +2,14 @@
   title = "Add column to page for &quot;$dataset.object.name&quot;"
 %]
 
-<form action="[% c.uri_for_action('/rpc/pagecolumn/add_do', c.req.captures) %]" method="post" class="form-horizontal">
+<form action="[% c.uri_for_action('/rpc/pagecolumn/edit_do', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Page Column</legend>
 
     <div class="control-group">
       <label class="control-label" for="page_column.title">Column Title:</label>
       <div class="controls">
-        <input type="text" class="input-small span2" name="page_column.title" id="page_column.title" />
+        <input type="text" class="" name="page_column.title" id="page_column.title" value="[% page_column.object.title %]" />
         <p class="help-block">This will be the header for the column</p>
       </div>
     </div>
@@ -19,6 +19,7 @@
       <label class="control-label" for="page_column.template">Column Layout:</label>
       <div class="controls">
         <div id="column_canvas" class="well" style="height: 8em; width: 50em;">
+          [% page_column.object.template %]
           <div id="canvas_cursor"></div>
         </div>
 
@@ -75,7 +76,7 @@
 
     [% INCLUDE 'components/forms/form_submit.tt'
         allow_reset = 1
-        return_url = c.uri_for_action('/rpc/page/view', c.req.captures)
+        return_url = c.uri_for_action('/rpc/page/edit', c.req.captures.slice(0,-2))
         return_page = 'page'
     %]
 

@@ -183,13 +183,6 @@ sub new_page {
 }
 
 
-sub get_page_columns {
-    my ($self, $page_id) = @_;
-    my $sth = $self->dbh->prepare_cached('SELECT * FROM page_columns WHERE page_id=?');
-    $sth->execute($page_id);
-    return $sth->fetchall_arrayref({});
-}
-
 sub get_page_for_dataset {
     my ($self, $ds_id) = @_;
     my $sth = $self->dbh->prepare_cached('SELECT * FROM pages WHERE dataset_id=?');
@@ -214,6 +207,31 @@ sub update_page {
     my @args = map {$params->{'page.'.$_} // q{}} qw(title preamble postamble);
     $sth->execute(@args, $page_id);
     return $self->get_page($page_id);
+}
+
+
+sub get_page_columns {
+    my ($self, $page_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM page_columns WHERE page_id=?');
+    $sth->execute($page_id);
+    return $sth->fetchall_arrayref({});
+}
+
+sub add_page_column {
+    my ($self, $page_id, $params) = @_;
+    my $sth = $self->dbh->prepare_cached('INSERT INTO page_columns (page_id, title, template) VALUES (?,?,?)');
+    my @args = map {$params->{'page_column.'.$_} // q{}} qw(title template);
+    $sth->execute($page_id, @args);
+    return $self->dbh->last_insert_id(undef,undef,'page_columns','id');
+}
+
+sub get_page_column {
+    my ($self, $page_col_id) = @_;
+    my $sth = $self->dbh->prepare_cached('SELECT * FROM page_columns WHERE id=?');
+    $sth->execute($page_col_id);
+    my $hr = $sth->fetchrow_hashref();
+    $sth->finish();
+    return $hr;
 }
 
 

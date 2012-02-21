@@ -18,7 +18,7 @@ __PACKAGE__->config(
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
-    return $c->model('Users')->new_page_column($c->stash->{page}{id}, $params);
+    return $c->model('Users')->add_page_column($c->stash->{page}{id}, $params);
 };
 
 override get_object => sub {

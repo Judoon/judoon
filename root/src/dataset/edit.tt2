@@ -33,7 +33,7 @@
       <a href="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures) %]" class="btn"><i class="icon-pencil"></i> Annotate Columns</a>
       <a href="[% c.uri_for_action('/rpc/dataset/edit', c.req.captures) %]" class="btn"><i class="icon-th"></i> Edit Data</a>
       [% IF dataset.object.has_page %]
-      <a href="[% c.uri_for_action('/rpc/page/view', c.req.captures.merge([dataset.object.page.id])) %]" class="btn"><i class="icon-pencil"></i> Edit Page</a>
+      <a href="[% c.uri_for_action('/rpc/page/edit', c.req.captures.merge([dataset.object.page.id])) %]" class="btn"><i class="icon-pencil"></i> Edit Page</a>
       [% ELSE %]
       <a href="[% c.uri_for_action('/rpc/page/add_do', c.req.captures) %]" class="btn"><i class="icon-plus"></i> Create Page</a>
       [% END %]

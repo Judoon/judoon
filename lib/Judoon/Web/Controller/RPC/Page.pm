@@ -31,13 +31,7 @@ override edit_object => sub {
     return $c->model('Users')->update_page($c->stash->{page}{id}, $params);
 };
 
-after 'edit' => sub {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'page/view.tt2';
-};
-
-
-after 'private_view' => sub {
+after private_edit => sub {
     my ($self, $c) = @_;
     $c->stash->{page_columns} = $c->model('Users')
         ->get_page_columns($c->stash->{page}{id});
