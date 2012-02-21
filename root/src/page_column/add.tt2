@@ -73,7 +73,11 @@
       </div>
     </div>
 
-    [% INCLUDE 'components/forms/form_submit.tt' %]
+    [% INCLUDE 'components/forms/form_submit.tt'
+        allow_reset = 1
+        return_url = c.uri_for_action('/rpc/page/view', c.req.captures)
+        return_page = 'page'
+    %]
 
   </fieldset>
 </form>
