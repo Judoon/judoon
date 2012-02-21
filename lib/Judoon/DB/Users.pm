@@ -208,6 +208,14 @@ sub get_page {
     return $hr;
 }
 
+sub update_page {
+    my ($self, $page_id, $params) = @_;
+    my $sth = $self->dbh->prepare_cached('UPDATE pages SET title=?, preamble=?, postamble=? WHERE id=?');
+    my @args = map {$params->{'page.'.$_} // q{}} qw(title preamble postamble);
+    $sth->execute(@args, $page_id);
+    return $self->get_page($page_id);
+}
+
 
 sub accession_types {
     my ($self) = @_;
