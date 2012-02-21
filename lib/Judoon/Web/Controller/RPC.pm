@@ -80,7 +80,7 @@ sub private_edit_do :Private {
     my $params                = $self->munge_edit_params($c);
     my $key                   = $self->rpc->{stash_key};
     $c->stash->{$key}{object} = $self->edit_object($c, $params);
-    $c->stash->{template}     = $self->rpc->{template_dir} . '/edit.tt2';
+    $self->go_here($c, 'edit', $c->req->captures);
 }
 
 sub private_delete :Private {
