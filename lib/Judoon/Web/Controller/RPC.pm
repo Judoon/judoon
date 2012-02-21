@@ -20,6 +20,7 @@ __PACKAGE__->config(
 
 sub base      : Chained('fixme') PathPart('fixme')      CaptureArgs(0) { shift->private_base(        @_); }
 sub list      : Chained('base')  PathPart('')           Args(0)        { shift->private_list(        @_); }
+sub list_do   : Chained('base')  PathPart('list_do')    Args(0)        { shift->private_list_do(     @_); }
 sub add       : Chained('base')  PathPart('add')        Args(0)        { shift->private_add(         @_); }
 sub add_do    : Chained('base')  PathPart('add_do')     Args(0)        { shift->private_add_do(      @_); }
 sub id        : Chained('base')  PathPart('')           CaptureArgs(1) { shift->private_id(          @_); }
@@ -39,6 +40,12 @@ sub private_list :Private {
     $c->stash->{template}   = $self->rpc->{template_dir} . '/list.tt2';
 }
 
+sub private_list_do :Private {
+    my ($self, $c) = @_;
+    $self->manage_list($c);
+    $self->go_here($c, 'list', $c->req->captures);
+}
+
 sub private_add :Private {
     my ($self, $c) = @_;
     $c->stash->{template} = $self->rpc->{template_dir} . '/add.tt2';
@@ -48,10 +55,7 @@ sub private_add_do :Private {
     my ($self, $c) = @_;
     my $params = $self->munge_add_params($c);
     my $id     = $self->add_object($c, $params);
-    $c->res->redirect( $c->uri_for_action(
-        $c->controller->action_for('view'),
-        [@{$c->req->captures}, $id]
-    ));
+    $self->go_here($c, 'view', [@{$c->req->captures}, $id]);
 }
 
 sub private_id :Private {
@@ -89,11 +93,20 @@ sub private_delete_do :Private {
     $self->delete_object($c);
     my @captures = @{$c->req->captures};
     pop @captures;
-    $c->res->redirect($c->uri_for_action('list', \@captures));
+    $self->go_here($c, 'list', \@captures);
+}
+
+sub go_here {
+    my ($self, $c, $action, $captures) = @_;
+    $c->res->redirect( $c->uri_for_action(
+        $c->controller->action_for($action),
+        $captures,
+    ));
 }
 
 
 sub get_list          :Private { return [];    }
+sub manage_list       :Private { return; }
 sub munge_add_params  :Private { return $_[1]->req->params; }
 sub add_object        :Private { return undef; }
 sub validate_id       :Private { return $_[2]; }

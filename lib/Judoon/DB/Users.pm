@@ -150,6 +150,13 @@ sub get_column {
 }
 
 
+sub delete_column_for_dataset {
+    my ($self, $column_id, $dataset_id) = @_;
+    my $sth = $self->dbh->prepare_cached('DELETE FROM columns WHERE id=?');
+    $sth->execute($column_id);
+    return;
+}
+
 sub update_column_metadata {
     my ($self, $column_id, $args) = @_;
 

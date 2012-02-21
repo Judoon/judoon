@@ -3,7 +3,7 @@
 %]
 
 
-<form action="[% c.uri_for_action('/rpc/datasetcolumn/edit_do', c.req.captures) %]" method="post" accept-charset="utf-8">
+<form action="[% c.uri_for_action('/rpc/datasetcolumn/list_do', c.req.captures) %]" method="post" accept-charset="utf-8">
   <fieldset>
     <legend>[% dataset.object.name %] dataset columns</legend>
 
@@ -33,14 +33,17 @@
             [% END %]
           </td>
           <td class="metadata center">[% column.metadata | html %]</td>
-          <td class="annotate center"><a href="[% c.uri_for_action('/rpc/datasetcolumn/edit', c.req.captures.merge([column.id])) %]">Annotate</a></td>
-          <td class="delete center"><input type="checkbox" /></td>
+          <td class="annotate center"><a class="btn btn-small" href="[% c.uri_for_action('/rpc/datasetcolumn/edit', c.req.captures.merge([column.id])) %]">Annotate</a></td>
+          <td class="delete center"><input type="checkbox" name="columns.delete" value="[% column.id %]" /></td>
         </tr>
         [% END %]
       </tbody>
     </table>
 
-    [% INCLUDE 'components/forms/form_submit.tt' %]
+    [% INCLUDE 'components/forms/form_submit.tt'
+       return_url = c.uri_for_action('/rpc/dataset/view', c.req.captures),
+       return_page = 'dataset'
+    %]
 
   </fieldset>
 </form>

@@ -56,6 +56,31 @@ after private_list => sub {
     $c->stash->{ds_column}{list} = $columns;
 };
 
+
+override manage_list => sub {
+    my ($self, $c) = @_;
+
+    my $params = $c->req->params;
+    my $del_ids = $params->{'columns.delete'};
+    my @del_ids = !defined $del_ids       ? ()
+                : ref $del_ids eq 'ARRAY' ? @$del_ids
+                : ref $del_ids eq ''      ? ($del_ids)
+                :     die 'Unrecgonized type for "columns.delete"';
+
+    for my $id (@del_ids) {
+        $c->log->warn("Deleting column $id");
+        $c->model('Users')->delete_column_for_dataset(
+            $id, $c->stash->{dataset}{id},
+        );
+    }
+
+    if (@del_ids) {
+        $c->stash->{message} = "Columns " . join(', ', @del_ids)
+            . ' deleted.';
+    }
+
+};
+
 override get_object => sub {
     my ($self, $c) = @_;
     return $c->model('Users')->get_column($c->stash->{ds_column}{id});
