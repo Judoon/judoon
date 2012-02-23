@@ -37,6 +37,18 @@ after private_edit => sub {
         ->get_page_columns($c->stash->{page}{id});
 };
 
+
+sub preview : Chained('id') PathPart('preview') Args(0) {
+    my ($self, $c) = @_;
+
+    use Data::Printer;
+    my $page_columns = $c->model('Users')->get_page_columns($c->stash->{page}{id});
+    $c->stash->{page_column}{list} = $page_columns;
+
+    $c->stash->{template} = 'page/preview.tt2';
+}
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;

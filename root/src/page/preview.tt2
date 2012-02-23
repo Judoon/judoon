@@ -1,0 +1,56 @@
+[% WRAPPER inc/wrapper.tt2
+  title = "View Page for &quot;$dataset.object.name&quot;"
+%]
+
+[% FOREACH p_column IN page_column.list %]
+<script id="column_tmpl_[% p_column.id %]" type="text/x-jquery-tmpl">
+[% p_column.template %]
+</script>
+[% END %]
+
+<script>
+
+
+
+  $(document).ready(function() {
+      $('#demo_page').dataTable({
+          "sAjaxSource" : "[% c.uri_for_action('/api/dataset/object', [dataset.id]) %]",
+          "fnServerData" : function ( sSource, aoData, fnCallback ) {
+            var hello = "moo";
+            $.ajax( {
+                "dataType": "json",
+                "type": "GET",
+                "url": sSource,
+                "data": aoData,
+                "success": [
+                     function(data) {
+                        var new_data = [];
+                        for (var i = 0; i < data.tmplData.length; i++) {
+                            new_data[i] = [$('#column_tmpl_2').render(data.tmplData[i])];
+                        }
+                        data.aaData = new_data;
+                     },
+                     fnCallback
+                ],
+            } );
+          },
+          "bServerSide": true,
+          "bProcessing" : true
+      });
+  } );
+</script>
+
+
+
+<table id="demo_page" class="display data_table table table-striped table-condensed table-border">
+  <thead>
+    [% FOREACH p_column IN page_column.list %]
+    <th>[% p_column.title %]</th>
+    [% END %]
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+
+[% END %]
