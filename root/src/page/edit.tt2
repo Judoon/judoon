@@ -49,13 +49,12 @@
           <div class="well">
             [% IF page_columns.size %]
             [% FOREACH column IN page_columns %]
-            <div class="column_container well">
-              <ul class="paging" style="display: inline-block;"><li class="[% loop.first ? 'disabled' : 'enabled' %]">&laquo;</li><li></li><li class="[% loop.last ? 'disabled' : 'enabled' %]">&raquo;</li></ul>
+            <div class="column_container">
+              <button class="btn btn-mini" [% loop.first ? 'disabled' : '' %]><i class="icon-arrow-left"></i></button>
+              <span class="label">[% column.title | html %]</span>
+              <button class="btn btn-mini" [% loop.last ? 'disabled' : '' %]><i class="icon-arrow-right"></i></button>
               <div class="edit_widget">
-                <input type="text" id="page_column.[% column.id %].title" name="page_column.[% column.id %].title" value="[% column.title | html %]" />
-                <textarea>
-                  [% column.template %]
-                </textarea>
+                [% column.template %]
               </div>
               <div>
                 <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/edit', c.req.captures.merge([column.id])) %]"><i class="icon-plus"></i>Edit</a>
