@@ -78,7 +78,7 @@ method nodes_to_template(\@nodes) {
     my $template = q{};
     for my $node (@nodes) {
         my @pieces = $node->{type} eq 'text'    ? ($node->{value})
-                   : $node->{type} eq 'data'    ? ('{{' . $node->{value} . '}}')
+                   : $node->{type} eq 'data'    ? ('{{=' . $node->{value} . '}}')
                    : $node->{type} eq 'newline' ? ('<br>')
                    :     die 'unsupported node type';
 
