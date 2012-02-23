@@ -14,8 +14,8 @@
     <div id="data_widget">
       <div class="widget-object widget-type-data widget-inline btn-group">
         <select class="w-dropdown widget-format-target">
-          [% FOREACH header IN dataset.object.headers %]
-          <option value="[% header %]">{[% header | html %]}</option>
+          [% FOREACH column IN ds_column.list %]
+          <option value="[% column.shortname %]">{[% column.name | html %]}</option>
           [% END %]
         </select>[% INCLUDE format_dropdown %]
       </div>

@@ -126,9 +126,11 @@ sub update_dataset {
 sub add_header_for_dataset {
     my ($self, $ds_id, $args) = @_;
     my $sth = $self->dbh->prepare_cached(
-        q{INSERT INTO columns (dataset_id, name, sort, accession_type, url_root) VALUES (?,?,?,?,?)}
+        q{INSERT INTO columns (dataset_id, name, shortname, sort, accession_type, url_root) VALUES (?,?,?,?,?)}
     );
-    $sth->execute($ds_id, $args->{name}, $args->{sort}, '', '');
+
+    (my $shortname = lc $args->{name}) =~ s/[^0-9a-z_]/_/g;
+    $sth->execute($ds_id, $args->{name}, $shortname, $args->{sort}, '', '');
     return;
 }
 
@@ -306,6 +308,7 @@ CREATE TABLE IF NOT EXISTS columns (
   id             integer PRIMARY KEY AUTOINCREMENT,
   dataset_id     integer NOT NULL REFERENCES datasets (id),
   name           text NOT NULL,
+  shortname      text NOT NULL,
   sort           integer NOT NULL,
   is_accession   integer NOT NULL DEFAULT 0,
   accession_type text NOT NULL,

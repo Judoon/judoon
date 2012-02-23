@@ -12,6 +12,7 @@
         <tr>
           <th>#</th>
           <th>Column</th>
+          <th>Short Name <span class="" title="abbrev of name, only needed if editing templates manually">?</span></th>
           <th>Sample Data</th>
           <th>Column Type</th>
           <th>Annotate</th>
@@ -23,6 +24,7 @@
         <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
           <td>[% loop.count %]</td>
           <td class="header">[% column.name | html %]</td>
+          <td>[% column.shortname | html %]</td>
           <td class="sample_data">
             [% IF column.samples.size %]
             [% FOREACH sample IN column.samples %]
