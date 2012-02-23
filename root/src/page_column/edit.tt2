@@ -2,7 +2,7 @@
   title = "Add column to page for &quot;$dataset.object.name&quot;"
 %]
 
-<form action="[% c.uri_for_action('/rpc/pagecolumn/edit_do', c.req.captures) %]" method="post" class="form-horizontal">
+<form id="pagecol_form" action="[% c.uri_for_action('/rpc/pagecolumn/edit_do', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Page Column</legend>
 
@@ -22,6 +22,7 @@
           [% page_column.object.template %]
           <div id="canvas_cursor"></div>
         </div>
+        <input type="hidden" name="page_column.template" />
 
         <p class="help-block">Add formatting with the buttons or <a href="#">preview</a>.</p>
 
@@ -74,6 +75,7 @@
       </div>
     </div>
 
+    
     [% INCLUDE 'components/forms/form_submit.tt'
         allow_reset = 1
         return_url = c.uri_for_action('/rpc/page/edit', c.req.captures.slice(0,-2))
@@ -90,17 +92,19 @@
 
 <script>
   $(document).ready(function () {
-    $('#btn_add_text').on(   'click', function() {pbuild_add_text_element();}    );
-    $('#btn_add_data').on(   'click', function() {pbuild_add_data_element();}    );
-    $('#btn_add_link').on(   'click', function() {pbuild_add_link_element();}    );
-    $('#btn_add_newline').on('click', function() {pbuild_add_newline_element();} );
-    $('#btn_add_list').on(   'click', function() {pbuild_add_list_element();}    );
-    $('#btn_add_if').on(     'click', function() {pbuild_add_if_element();}      );
+    $('#btn_add_text').on(   'click', function() {pbuild_add_widget('text');}    );
+    $('#btn_add_data').on(   'click', function() {pbuild_add_widget('data');}    );
+    $('#btn_add_link').on(   'click', function() {pbuild_add_widget('link');}    );
+    $('#btn_add_newline').on('click', function() {pbuild_add_widget('newline');} );
+    $('#btn_add_list').on(   'click', function() {pbuild_add_widget('list');}    );
+    $('#btn_add_if').on(     'click', function() {pbuild_add_widget('if');}      );
 
     $('#btn_cursor_up').on(    'click', function() {pbuild_cursor_up();}    );
     $('#btn_cursor_down').on(  'click', function() {pbuild_cursor_down();}  );
     $('#btn_cursor_left').on(  'click', function() {pbuild_cursor_left();}  );
     $('#btn_cursor_right').on( 'click', function() {pbuild_cursor_right();} );
+
+    $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
   });
 </script>
 

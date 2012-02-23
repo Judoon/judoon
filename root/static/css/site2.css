@@ -39,6 +39,12 @@ select.w-dropdown {
     display: inline-block;
 }
 
-.widget-inline { display: inline-block; }
-.widget-newline { display: block; }
-.widget-newline-icon { display: inline-block; }
+.widget-type-text { display: inline-block; }
+.widget-type-data { display: inline-block; }
+.widget-type-link { display: inline-block; }
+.widget-type-newline { display: block; }
+.widget-type-newline-icon { display: inline-block; }
+
+
+.widget-formatting-bold { font-weight: bold; }
+.widget-formatting-italic { font-style: italic; }

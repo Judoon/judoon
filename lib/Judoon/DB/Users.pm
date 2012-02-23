@@ -234,6 +234,15 @@ sub get_page_column {
     return $hr;
 }
 
+sub update_page_column {
+    my ($self, $page_col_id, $params) = @_;
+    my $sth = $self->dbh->prepare_cached('UPDATE page_columns SET title=?, template=? WHERE id=?');
+    my @args = map {$params->{'page_column.'.$_} // q{}} qw(title template);
+    $sth->execute(@args, $page_col_id);
+    return $self->get_page_column($page_col_id);
+}
+
+
 
 sub accession_types {
     my ($self) = @_;
