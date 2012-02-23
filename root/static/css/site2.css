@@ -48,3 +48,8 @@ select.w-dropdown {
 
 .widget-formatting-bold { font-weight: bold; }
 .widget-formatting-italic { font-style: italic; }
+
+
+.column-container { }
+ul.paging { list-style-type: none; }
+ul.paging li { display: inline-block; }

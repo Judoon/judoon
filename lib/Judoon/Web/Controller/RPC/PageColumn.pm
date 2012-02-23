@@ -59,6 +59,15 @@ override munge_edit_params => sub {
     return $params;
 };
 
+override delete_object => sub {
+    my ($self, $c) = @_;
+    $c->model('Users')->delete_page_column($c->stash->{page_column}{id});
+};
+
+after delete_do => sub {
+    my ($self, $c) = @_;
+    $c->res->redirect($c->uri_for_action('/rpc/page/edit', [@{$c->req->captures}[0,-2]]));
+};
 
 __PACKAGE__->meta->make_immutable;
 

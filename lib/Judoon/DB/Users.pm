@@ -244,6 +244,13 @@ sub update_page_column {
     return $self->get_page_column($page_col_id);
 }
 
+sub delete_page_column {
+    my ($self, $page_col_id) = @_;
+    my $sth = $self->dbh->prepare_cached('DELETE FROM page_columns WHERE id=?');
+    $sth->execute($page_col_id);
+    return;
+}
+
 
 
 sub accession_types {

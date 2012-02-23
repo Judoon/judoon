@@ -43,25 +43,24 @@
           <button type="submit" class="btn"><i class="icon-plus"></i>Add page column</button>
         </div>
 
+        <br>
         <div class="row-fluid">
+          <h4>Current columns</h4>
           <div class="well">
             [% IF page_columns.size %]
             [% FOREACH column IN page_columns %]
             <div class="column_container well">
-              <ul class="paging"><li class="[% loop.first ? 'disabled' : 'enabled' %]">&laquo;</li><li></li><li class="[% loop.last ? 'disabled' : 'enabled' %]">&raquo;</li></ul>
-              <div class="view_widget">
-                <div class="column_title">[% column.title | html %]</div>
-                <div class="column_content">
-                  [% column.content | html %]
-                </div>
-              </div>
+              <ul class="paging" style="display: inline-block;"><li class="[% loop.first ? 'disabled' : 'enabled' %]">&laquo;</li><li></li><li class="[% loop.last ? 'disabled' : 'enabled' %]">&raquo;</li></ul>
               <div class="edit_widget">
                 <input type="text" id="page_column.[% column.id %].title" name="page_column.[% column.id %].title" value="[% column.title | html %]" />
                 <textarea>
                   [% column.template %]
                 </textarea>
               </div>
-              <div><a class="right" href="javascript:;">edit</a></div>
+              <div>
+                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/edit', c.req.captures.merge([column.id])) %]"><i class="icon-plus"></i>Edit</a>
+                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/delete_do', c.req.captures.merge([column.id])) %]"><i class="icon-trash"></i>Delete</a>
+              </div>
               <div class="clearsep"></div>
             </div>
             [% END %]
