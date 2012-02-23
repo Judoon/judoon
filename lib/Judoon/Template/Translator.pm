@@ -43,7 +43,7 @@ method munge_widgets(\@widgets) {
 
 method get_widget_type($widget) {
     my $classes = $widget->attr('class');
-    my ($type) = ($classes =~ m/widget-type-(\w+)/);
+    my ($type) = ($classes =~ m/widget-type-([\w\-]+)/);
     return $type;
 }
 
