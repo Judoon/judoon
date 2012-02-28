@@ -251,6 +251,37 @@ sub delete_page_column {
     return;
 }
 
+my %linkthings = (
+    gene_name  => {label => '', links => [
+        {value=>'cmkb', text => 'CMKB', example => 'http://cmckb.cellmigration.org/gene/?gene_name=ACTA4',},
+        {value=>'', text => 'CMKB', example => 'http://cmckb.cellmigration.org/gene/?gene_name=ACTA4',},
+    ],},
+    flybase_id => {label => '', links => [
+        {value => 'flybase', text => 'FlyBase', example => 'http://',},
+    ],},
+    unigene_id => [],
+);
+
+
+sub get_linkset_for_column {
+    my ($self, $col) = @_;
+
+    my @linksets;
+    if ($col->{is_accession}) {
+        if ($col->{accession_type} eq 'gene_name') {
+
+        }
+        elsfi
+
+    }
+    elsif ($col->{is_url}) {
+
+    }
+
+    my @col_links = $self->get_linkset
+
+}
+
 
 
 sub accession_types {

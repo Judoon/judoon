@@ -3,7 +3,7 @@
 %]
 
 [% FOREACH p_column IN page_column.list %]
-<script id="column_tmpl_[% p_column.id %]" type="text/x-jquery-tmpl">
+<script id="column_tmpl_[% loop.count %]" type="text/x-jquery-tmpl">
 [% p_column.template %]
 </script>
 [% END %]
@@ -122,7 +122,11 @@ $.extend( $.fn.dataTableExt.oPagination, {
                      function(data) {
                         var new_data = [];
                         for (var i = 0; i < data.tmplData.length; i++) {
-                            new_data[i] = [$('#column_tmpl_2').render(data.tmplData[i])];
+                            new_data[i] = [
+                                [% FOREACH p_column IN page_column.list %]
+                                $('#column_tmpl_[% loop.count %]').render(data.tmplData[i])[% UNLESS loop.last %],[% END%]
+                                [% END %]
+                            ];
                         }
                         data.aaData = new_data;
                      },
@@ -141,6 +145,8 @@ $.extend( $.fn.dataTableExt.oPagination, {
   } );
 </script>
 
+
+<a href="[% c.uri_for_action('/rpc/page/edit', c.req.captures) %]">Return to page</a>
 
 
 <table id="demo_page" class="display data_table table table-striped table-condensed table-border">
