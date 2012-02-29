@@ -1,12 +1,9 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::Column;
-
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
+package Judoon::DB::User::Schema::Result::DatasetColumn;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::Column
+Judoon::DB::User::Schema::Result::DatasetColumn
 
 =cut
 
@@ -22,7 +19,7 @@ extends 'DBIx::Class::Core';
 
 =cut
 
-__PACKAGE__->table("columns");
+__PACKAGE__->table("dataset_columns");
 
 =head1 ACCESSORS
 
@@ -128,10 +125,5 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07017 @ 2012-02-28 16:31:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:x0CXUw+Cv/ihLoLFY2RNGA
-
-
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
