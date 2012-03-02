@@ -254,20 +254,20 @@ sub delete_page_column {
 
 my %linkthings = (
     gene_name  => {label => '', links => [
-        {value=>'gene', text => 'Entrez Gene', example => 'http://www.ncbi.nlm.nih.gov/gene/7094',},
-        {value=>'uniprot', text=>'Uniprot', example=>''},
-        {value=>'cmkb', text => 'Cell Migration KnowledgeBase', example => 'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',},
-        {value=>'omim', text=>'OMIM', example=>''},
-        {value=>'pfam', text=>'PFAM', example=>''},
-        {value=>'addgene', text=>'AddGene', example => 'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',},
-        {value=>'kegg', text=>'KEGG', example=>'/www.genome.jp/dbget-bin/www_bget?hsa:7094'},
-        {value=>'', text=>'', example=>''},
-        {value=>'', text=>'', example=>''},
+        {value=>'gene',    text=>'Entrez Gene', example=>'http://www.ncbi.nlm.nih.gov/gene/7094',},
+        {value=>'uniprot', text=>'Uniprot',     example=>'http://www.uniprot.org/uniprot/Q9Y490'},
+        {value=>'cmkb',    text=>'Cell Migration KnowledgeBase', example => 'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',},
+        {value=>'omim',    text=>'OMIM',    example=>'http://www.ncbi.nlm.nih.gov/omim/186745'},
+        {value=>'pfam',    text=>'PFAM',    example=>'http://pfam.sanger.ac.uk/protein?acc=Q9Y490'},
+        {value=>'addgene', text=>'AddGene', example=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',},
+        {value=>'kegg',    text=>'KEGG',    example=>'http://www.genome.jp/dbget-bin/www_bget?hsa:7094'},
     ],},
     flybase_id => {label => '', links => [
         {value => 'flybase', text => 'FlyBase', example => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?FBgn0025725',},
     ],},
-    unigene_id => {label => '', links => [],},
+    unigene_id => {label => '', links => [
+        {value=>'unigene', text=>'UniGene', example=>'http://www.ncbi.nlm.nih.gov/unigene/686173',},
+    ],},
 );
 
 

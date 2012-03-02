@@ -168,8 +168,30 @@ function translate_column_template() {
 }
 
 
-function pbuild_select_link_site() {
+function pbuild_select_link_source() {
     var source = $('#link_source').val();
-    $("select.link_site").css('display', 'none');
-    $("#link_site_" + source).css('display', 'block');
+    $("#link_widget_url_source select.link_site_active").removeClass('link_site_active');
+    $("#link_site_" + source).addClass('link_site_active');
+    pbuild_select_link_site();
+}
+
+function pbuild_select_link_site() {
+    var new_site = $("#link_widget_url_source select.link_site_active option").filter("option:selected");
+    $('#link_widget_label_default_preview').html(new_site.text());
+    $('#link_widget_label_url_preview').html(new_site.attr('title'));
+    pbuild_link_widget_preview();
+}
+
+function pbuild_link_widget_preview() {
+    var link_site = $("#link_widget_url_source select.link_site_active option").filter(":selected");
+    var label_url = link_site.attr('title');
+
+    var label_type_val = $('#link_widget_label_form input[name="link.label_type"]:checked').val();
+    var label_preview = label_type_val === 'default' ? link_site.text()
+                      : label_type_val === 'url'     ? label_url
+                      : label_type_val === 'static'  ? $('#link_label_static').val()
+                      :                                'Something went wrong!';
+                     
+    $('#link_widget_label_preview').html('<a href="'+label_url+'" title="'+label_url+'">'+label_preview+'</a>');
+    $('#link_widget_url_preview').html(label_url);
 }

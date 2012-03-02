@@ -82,7 +82,7 @@
           </div>
         </div>
 
-        <form class="">
+        <form class="" id="link_widget_url_form">
           <fieldset>
             <div class="row-fluid">
               <div class="span12">
@@ -92,34 +92,53 @@
             <div class="row-fluid">
               <div class="span1">&nbsp;</div>
               <div class="span11">
-            <label class="radio">
-              <input type="radio" name="link.url_type" value="predefined" checked="checked">
-              Select a predefined link from the following list:
-            </label>
-
-            <p class="help-block">Which column should the link be based off of?</p>
-            <select name="link_source" id="link_source">
-              [% FOREACH acc_column IN linksets %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
-            </select>
-            <p class="help-block">What site do you want to link to?</p>
-            [% FOREACH acc_column IN linksets %]
-            <select id="link_site_[% acc_column.shortname %]" name="link_site" class="link_site" [% UNLESS loop.first %]style="display: none;"[% END %]>
-              [% FOREACH link IN acc_column.links %]
-              <option value="[% link.value %]">[% link.text %]</option>
-              [% END %]
-            </select>
-            [% END %]
-
-
-            <label class="radio">
-              <input type="radio" name="link.url_type" value="provided"> Use the following URL:
-            </label>
-              <input type="text" class="span3" placeholder="Type URL here...">
-            </div>
+                <div class="accordion" id="link_widget_url_accordion">
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <div class="accordion-inner">
+                      <label class="radio">
+                        <input type="radio" name="link.url_type" value="predefined" checked="checked" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_source">
+                        Select a predefined link from the following list:
+                      </label>
+                      </div>
+                    </div>
+                    <div id="link_widget_url_source" class="accordion-body collapse in">
+                      <div class="accordion-inner">
+                        <p class="help-block">Which column should the link be based off of?</p>
+                        <select name="link_source" id="link_source">
+                          [% FOREACH acc_column IN linksets %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
+                        </select>
+                        <p class="help-block">What site do you want to link to?</p>
+                        [% FOREACH acc_column IN linksets %]
+                        <select id="link_site_[% acc_column.shortname %]" name="link_site_[% acc_column.shortname %]" class="link_site [% IF loop.first %]link_site_active[% END %]">
+                          [% FOREACH link IN acc_column.links %]
+                          <option value="[% link.value %]" title="[% link.example %]">[% link.text %]</option>
+                          [% END %]
+                        </select>
+                        [% END %]
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <div class="accordion-inner">
+                      <label class="radio">
+                        <input type="radio" name="link.url_type" value="provided" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_provided"> Use the following URL:
+                      </label>
+                      </div>
+                    </div>
+                    <div id="link_widget_url_provided" class="accordion-body collapse" style="height: 0px;">
+                      <div class="accordion-inner">
+                        <input type="text" class="span3" placeholder="Type URL here...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </fieldset>
         </form>
-        <form class="">
+        <form class="" id="link_widget_label_form">
           <fieldset>
             <div class="row-fluid">
               <div class="span12">
@@ -131,16 +150,16 @@
               <div class="span11">
                 <label class="radio">
                   <input type="radio" name="link.label_type" value="default" checked="checked"> Use the default label text
-                  <span class="default-label-text"></span>
+                  <span class="label label-info" id="link_widget_label_default_preview" style="display: none;"></span>
                 </label>
                 <label class="radio">
                   <input type="radio" name="link.label_type" value="url"> Use the URL
-                  <span class="url-label-text"></span>
+                  <span class="label label-info" id="link_widget_label_url_preview"  style="display: none;"></span>
                 </label>
                 <label class="radio">
                   <input type="radio" name="link.label_type" value="static"> Use the following label:
-                  <input type="text" class="span3" name="user_provided">
                 </label>
+                <input type="text" class="span3" name="user_provided" id="link_label_static">
               </div>
             </div>
           </fieldset>
@@ -156,7 +175,7 @@
               <div class="span1">&nbsp;</div>
               <div class="span11">
                 <label class="radio">
-                  <p class="help-block">Your link will show:</p>
+                  <p class="help-block">Your link will look like:</p>
                   <div class="alert alert-info" id="link_widget_label_preview"></div>
                   <p class="help-block">...and link to:</p>
                   <div class="alert alert-info" id="link_widget_url_preview"></div>
