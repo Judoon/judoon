@@ -127,11 +127,14 @@ sub update_dataset {
 sub add_header_for_dataset {
     my ($self, $ds_id, $args) = @_;
     my $sth = $self->dbh->prepare_cached(
-        q{INSERT INTO columns (dataset_id, name, shortname, sort, accession_type, url_root) VALUES (?,?,?,?,?)}
+        q{INSERT INTO columns (dataset_id, name, shortname, sort, accession_type, url_root) VALUES (?,?,?,?,?,?)}
     );
 
-    (my $shortname = lc $args->{name}) =~ s/[^0-9a-z_]/_/g;
-    $sth->execute($ds_id, $args->{name}, $shortname, $args->{sort}, '', '');
+    (my $shortname = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
+    $shortname ||= 'empty';
+    my @args = ($ds_id, $args->{name}, $shortname, $args->{sort}, '', '');
+    warn "handleargs are: " . p(@args);
+    $sth->execute(@args);
     return;
 }
 
