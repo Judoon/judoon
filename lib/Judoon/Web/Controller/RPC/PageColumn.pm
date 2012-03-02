@@ -34,7 +34,7 @@ after private_edit => sub {
     $c->stash->{ds_column}{list} = $c->model('Users')
         ->get_columns_for_dataset($c->stash->{dataset}{id});
 
-    my @linksets = ;
+    my @linksets = 'derp';
     $c->stash->{linksets} = $c->model('Users')
         ->get_linksets_for_dataset($c->stash->{dataset}{id});;
 

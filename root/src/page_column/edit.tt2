@@ -105,6 +105,9 @@
     $('#btn_cursor_right').on( 'click', function() {pbuild_cursor_right();} );
 
     $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
+
+    $('#link_source').on('change', function() {pbuild_select_link_site();});
+
   });
 </script>
 

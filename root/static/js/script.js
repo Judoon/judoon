@@ -166,3 +166,10 @@ function pbuild_copy_canvas_to_input() {
 function translate_column_template() {
     $('#page_column.template').attr('value', 'new_template');
 }
+
+
+function pbuild_select_link_site() {
+    var source = $('#link_source').val();
+    $("select.link_site").css('display', 'none');
+    $("#link_site_" + source).css('display', 'block');
+}

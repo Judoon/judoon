@@ -3,6 +3,7 @@ package Judoon::DB::Users;
 use version; our $VERSION = '0.0.1';
 use autodie;
 use open qw( :encoding(UTF-8) :std );
+use feature ':5.10';
 
 use Moose;
 with 'Judoon::DB::Roles::Deployer';
@@ -253,33 +254,47 @@ sub delete_page_column {
 
 my %linkthings = (
     gene_name  => {label => '', links => [
-        {value=>'cmkb', text => 'CMKB', example => 'http://cmckb.cellmigration.org/gene/?gene_name=ACTA4',},
-        {value=>'', text => 'CMKB', example => 'http://cmckb.cellmigration.org/gene/?gene_name=ACTA4',},
+        {value=>'gene', text => 'Entrez Gene', example => 'http://www.ncbi.nlm.nih.gov/gene/7094',},
+        {value=>'uniprot', text=>'Uniprot', example=>''},
+        {value=>'cmkb', text => 'Cell Migration KnowledgeBase', example => 'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',},
+        {value=>'omim', text=>'OMIM', example=>''},
+        {value=>'pfam', text=>'PFAM', example=>''},
+        {value=>'addgene', text=>'AddGene', example => 'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',},
+        {value=>'kegg', text=>'KEGG', example=>'/www.genome.jp/dbget-bin/www_bget?hsa:7094'},
+        {value=>'', text=>'', example=>''},
+        {value=>'', text=>'', example=>''},
     ],},
     flybase_id => {label => '', links => [
-        {value => 'flybase', text => 'FlyBase', example => 'http://',},
+        {value => 'flybase', text => 'FlyBase', example => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?FBgn0025725',},
     ],},
-    unigene_id => [],
+    unigene_id => {label => '', links => [],},
 );
 
+
+sub get_linksets_for_dataset {
+    my ($self, $ds_id) = @_;
+
+    my @linksets;
+    for my $col (@{$self->get_columns_for_dataset($ds_id)}) {
+        next unless $col->{is_accession};
+        $col->{links} = $self->get_linkset_for_column($col);
+        push @linksets, $col;
+    }
+    return \@linksets;
+}
 
 sub get_linkset_for_column {
     my ($self, $col) = @_;
 
-    my @linksets;
+    my @links;
     if ($col->{is_accession}) {
-        if ($col->{accession_type} eq 'gene_name') {
-
-        }
-        elsfi
-
+        @links = @{$linkthings{$col->{accession_type}}->{links}}
     }
     elsif ($col->{is_url}) {
-
+        @links = 'something else?';
     }
 
-    my @col_links = $self->get_linkset
-
+    return \@links;
 }
 
 
