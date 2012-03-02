@@ -195,3 +195,17 @@ function pbuild_link_widget_preview() {
     $('#link_widget_label_preview').html('<a href="'+label_url+'" title="'+label_url+'">'+label_preview+'</a>');
     $('#link_widget_url_preview').html(label_url);
 }
+
+
+function pbuild_open_link_form(link_widget_button) {
+    var this_btn = link_widget_button;
+    $('#linkModal').modal();
+    alert('widget id is: ' + $(this_btn).html());
+    $('#linkModal').data('widget_id', $(this_btn).parent().attr('id'));
+}
+
+
+function pbuild_submit_link_form() {
+    alert("This is for widget: " + $('#linkModal').data('widget_id'));
+    $('#linkModal').modal('hide');
+}

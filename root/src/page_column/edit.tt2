@@ -106,12 +106,18 @@
 
     $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
 
+    $('#column_canvas').on('click', 'div.widget-type-link a.btn-edit-link',
+       function(event) {pbuild_open_link_form(event.currentTarget);}
+    );
+
     $('#link_source').on('change', function() {pbuild_select_link_source(); });
-    $('#link_site').on(  'change', function() {pbuild_select_link_site();   });
     $('#link_widget_url_source select.link_site').on(  'change', function() {pbuild_select_link_site();   });
+    $('#link_label_static').on( 'change', function() {pbuild_link_widget_preview();} );
     $('#link_widget_label_form input[name="link.label_type"]').on(
         'change', function() {pbuild_link_widget_preview();} 
     );
+
+    $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
   });
 </script>
 
