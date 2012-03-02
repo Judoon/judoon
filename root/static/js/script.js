@@ -200,12 +200,12 @@ function pbuild_link_widget_preview() {
 function pbuild_open_link_form(link_widget_button) {
     var this_btn = link_widget_button;
     $('#linkModal').modal();
-    alert('widget id is: ' + $(this_btn).html());
     $('#linkModal').data('widget_id', $(this_btn).parent().attr('id'));
+    pbuild_link_widget_preview();
 }
 
 
 function pbuild_submit_link_form() {
-    alert("This is for widget: " + $('#linkModal').data('widget_id'));
+    var widget_id = $('#linkModal').data('widget_id');
     $('#linkModal').modal('hide');
 }

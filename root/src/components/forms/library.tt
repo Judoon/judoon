@@ -26,8 +26,14 @@
     <div id="link_widget">
       <div class="widget-object widget-type-link widget-inline btn-group">
         <a class="btn btn-edit-link"><i class="icon-pencil"></i> Edit link</a>[% INCLUDE format_dropdown %]
-        <input type="hidden" class="widget-url-label" value="">
-        <input type="hidden" class="widget-url-link" value="">
+        <input type="hidden" class="widget-link-url-source widget-format-target" value="">
+        <input type="hidden" class="widget-link-url-site"      value="">
+        <input type="hidden" class="widget-link-url-prefix"    value="http://www.ncbi.nlm.nih.gov/gene/">
+        <input type="hidden" class="widget-link-url-postfix"   value="">
+        <input type="hidden" class="widget-link-url-datafield" value="protein_name">
+
+        <input type="hidden" class="widget-link-label-type"  value="static">
+        <input type="hidden" class="widget-link-label-value" value="Entrez">
       </div>
     </div>
 
