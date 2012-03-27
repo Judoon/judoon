@@ -22,6 +22,10 @@ Catalyst Controller.
 =cut
 
 sub base : Chained('/api/base') PathPart('dataset')  CaptureArgs(0) {}
+sub index :Chained('base')  PathPart('')    Args(0) {
+    my ($self, $c) = @_;
+    $c->res->body('got here');
+}
 sub id : Chained('base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $ds_id) = @_;
 

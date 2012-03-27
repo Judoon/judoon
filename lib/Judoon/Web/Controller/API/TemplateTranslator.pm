@@ -29,6 +29,10 @@ sub _build_template_translator {
 
 
 sub base      :Chained('/api/base') PathPart('template')  CaptureArgs(0) {}
+sub index     :Chained('base')      PathPart('')          Args(0) {
+    my ($self, $c) = @_;
+    $c->res->body('got here');
+}
 sub translate :Chained('base')     PathPart('translate') Args(0) ActionClass('REST') {}
 sub translate_POST : Private {
     my ($self, $c) = @_;

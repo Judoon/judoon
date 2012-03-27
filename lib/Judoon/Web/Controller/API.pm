@@ -21,8 +21,11 @@ Catalyst Controller.
 
 =cut
 
-sub base  :Chained('/base')    PathPart('api')       CaptureArgs(0) {}
-
+sub base  :Chained('/base') PathPart('api') CaptureArgs(0) {}
+sub index :Chained('base')  PathPart('')    Args(0) {
+    my ($self, $c) = @_;
+    $c->res->body('got here');
+}
 
 =head1 AUTHOR
 
