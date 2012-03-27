@@ -95,5 +95,74 @@ __PACKAGE__->has_many(
 
 
 
+
+use Spreadsheet::Read ();
+
+
+
+=head2 import_data( $filehandle )
+
+C<import_data()> takes in a filehandle arg and attempts to read it
+with L<Spreadsheet::Read>.  It will then munge the data and insert it
+into the database.
+
+=cut
+
+sub import_data {
+    my ($self, $fh) = @_;
+    die 'import_data() needs a filehandle' unless ($fh);
+
+    my $ref  = Spreadsheet::Read::ReadData($fh, parser => 'xls');
+
+    my $ds   = $ref->[1];
+    my $data = $self->pivot_data($ds->{cell}, $ds->{maxrow}, $ds->{maxcol});
+
+    my $dataset = $self->create_related('dataset', {
+        name => $ds->{label}, original => q{},
+        data => $data,
+    });
+
+    my $headers = shift @$data;
+    my $sort = 1;
+    for my $header (@$headers) {
+        $dataset->create_related('dataset_column', {
+            name => ($header // ''), sort => $sort++,
+        });
+    }
+
+    return;
+}
+
+
+=head2 pivot_data( $data, $maxrow, $maxcol )
+
+C<pivot_data()> takes an arrayref of arrayrefs as C<$data> and pivots
+it to be row-major instead of colulmn-major.  It also removes the
+empty leading entries L<Spreadsheet::Read> adds so that it is
+zero-indexed instead of one-indexed.
+
+C<$maxrow> and C<$maxcol> are the maximum number of rows and columns
+respectively.  While these could be calculated dynamically,
+L<Spreadsheet::Read> provides them, and requiring them simplifies the
+code.
+
+=cut
+
+sub pivot_data {
+    my ($self, $data, $maxrow, $maxcol) = @_;
+
+    shift @$data; # bye bye bogus row
+    my $pivoted = [];
+    for my $row_idx (0..$maxrow-1) {
+        for my $col_idx (0..$maxcol-1) {
+            $pivoted->[$row_idx][$col_idx] = $data->[$col_idx+1][$row_idx+1];
+        }
+    }
+
+    return $pivoted;
+}
+
+
+
 __PACKAGE__->meta->make_immutable;
 1;

@@ -57,6 +57,7 @@ __PACKAGE__->table("datasets");
 
 =cut
 
+__PACKAGE__->load_components('InflateColumn::Serializer');
 __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
@@ -69,7 +70,7 @@ __PACKAGE__->add_columns(
   "original",
   { data_type => "text", is_nullable => 0 },
   "data",
-  { data_type => "text", is_nullable => 0 },
+  { data_type => "text", is_nullable => 0, serializer_class => 'JSON', },
 );
 
 =head1 PRIMARY KEY
