@@ -16,9 +16,10 @@ subtest 'translate' => sub {
     my $html = <<'HTML1';
 
 HTML1
-    my $template = ;
+    my $template = "moo";
 
-
+    pass 'dummy test';
 };
+
 
 done_testing;
