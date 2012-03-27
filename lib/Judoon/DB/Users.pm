@@ -257,21 +257,90 @@ sub delete_page_column {
 
 my %linkthings = (
     gene_name  => {label => '', links => [
-        {value=>'gene',    text=>'Entrez Gene', example=>'http://www.ncbi.nlm.nih.gov/gene/7094',},
-        {value=>'uniprot', text=>'Uniprot',     example=>'http://www.uniprot.org/uniprot/Q9Y490'},
-        {value=>'cmkb',    text=>'Cell Migration KnowledgeBase', example => 'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',},
-        {value=>'omim',    text=>'OMIM',    example=>'http://www.ncbi.nlm.nih.gov/omim/186745'},
-        {value=>'pfam',    text=>'PFAM',    example=>'http://pfam.sanger.ac.uk/protein?acc=Q9Y490'},
-        {value=>'addgene', text=>'AddGene', example=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',},
-        {value=>'kegg',    text=>'KEGG',    example=>'http://www.genome.jp/dbget-bin/www_bget?hsa:7094'},
+        {
+            value=>'gene',
+            text=>'Entrez Gene',
+            example=>'http://www.ncbi.nlm.nih.gov/gene/7094',
+            prefix=>'http://www.ncbi.nlm.nih.gov/gene/',
+            postfix=>'',
+        },
+        {
+            value=>'uniprot',
+            text=>'Uniprot',
+            example=>'http://www.uniprot.org/uniprot/Q9Y490',
+            prefix=>'http://www.uniprot.org/uniprot/',
+            postfix=>'',
+        },
+        {
+            value=>'cmkb',
+            text=>'Cell Migration KnowledgeBase',
+            example=>'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',
+            prefix=>'http://cmckb.cellmigration.org/gene/?gene_name=',
+            postfix=>'',
+        },
+        {
+            value=>'omim',
+            text=>'OMIM',
+            example=>'http://www.ncbi.nlm.nih.gov/omim/186745',
+            prefix=>'http://www.ncbi.nlm.nih.gov/omim/',
+            postfix=>'',
+        },
+        {
+            value=>'pfam',
+            text=>'PFAM',
+            example=>'http://pfam.sanger.ac.uk/protein?acc=Q9Y490',
+            prefix=>'http://pfam.sanger.ac.uk/protein?acc=',
+            postfix=>'',
+        },
+        {
+            value=>'addgene',
+            text=>'AddGene',
+            example=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',
+            prefix=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=',
+            postfix=>'',
+        },
+        {
+            value=>'kegg',
+            text=>'KEGG',
+            example=>'http://www.genome.jp/dbget-bin/www_bget?hsa:7094',
+            prefix=>'http://www.genome.jp/dbget-bin/www_bget?hsa:',
+            postfix=>'',
+        },
     ],},
     flybase_id => {label => '', links => [
-        {value => 'flybase', text => 'FlyBase', example => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?FBgn0025725',},
+        {
+            value => 'flybase',
+            text => 'FlyBase',
+            example => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?FBgn0025725',
+            prefix => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?',
+            postfix=>'',
+        },
     ],},
-    unigene_id => {label => '', links => [
-        {value=>'unigene', text=>'UniGene', example=>'http://www.ncbi.nlm.nih.gov/unigene/686173',},
+    unigene_id => {
+        label => '',
+        links => [
+        {
+            value=>'unigene',
+            text=>'UniGene',
+            example=>'http://www.ncbi.nlm.nih.gov/unigene/686173',
+            prefix=>'http://www.ncbi.nlm.nih.gov/unigene/',
+            postfix=>'',
+        },
     ],},
 );
+
+sub get_linksites {
+    my ($self) = @_;
+
+    my %new_struct;
+    for my $t (values %linkthings) {
+        for my $l (@{$t->{links}}) {
+            $new_struct{$l->{value}} = $l;
+        }
+    }
+
+    return \%new_struct;
+}
 
 
 sub get_linksets_for_dataset {

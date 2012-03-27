@@ -195,3 +195,7 @@
         <a href="#" class="btn" data-dismiss="modal">Close</a>
       </div>
     </div>
+
+<script>
+  var pbuild_links = [% link_site_json %];
+</script>

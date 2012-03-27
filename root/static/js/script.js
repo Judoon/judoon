@@ -6,6 +6,12 @@
 
 var widget_count = 0;
 
+/*
+function pbuild_delete_before_cursor {
+    var del_tgt = $("#canvas_cursor").prev().attr
+    pbuild_delete_widget()
+}
+*/
 
 function pbuild_delete_widget(widget_id) {
     $(widget_id).remove();
@@ -206,6 +212,33 @@ function pbuild_open_link_form(link_widget_button) {
 
 
 function pbuild_submit_link_form() {
-    var widget_id = $('#linkModal').data('widget_id');
     $('#linkModal').modal('hide');
+    var widget_id = $('#linkModal').data('widget_id');
+    var widget = $('#'+widget_id);
+
+    // set link url properties
+    var link_source = $('#link_source').val();
+    widget.find('input[class*="widget-link-url-source"]').attr('value', link_source);
+    widget.find('input[class*="widget-link-url-datafield"]').attr('value', link_source);
+
+    var link_site = $("#link_widget_url_source select.link_site_active option").filter(":selected");
+    var link_site_val = link_site.val();
+    widget.find('input[class*="widget-link-url-site"]').attr('value', link_site_val);
+
+    widget.find('input[class*="widget-link-url-prefix"]').attr('value', pbuild_links[link_site_val].prefix);
+    widget.find('input[class*="widget-link-url-postfix"]').attr('value', pbuild_links[link_site_val].postfix);
+
+
+    // set label properties
+    var label_type_val = $('#link_widget_label_form input[name="link.label_type"]:checked').val();
+    var label_type = label_type_val === 'url' ? 'url' : 'static';
+    var label_value = label_type_val === 'default' ? link_site.text()
+                    : label_type_val === 'url'     ? ''
+                    : label_type_val === 'static'  ? $('#link_label_static').val()
+                    :                                'Something went wrong!';
+    widget.find('input[class*="widget-link-label-type"]').attr('value', label_type);
+    widget.find('input[class*="widget-link-label-value"]').attr('value', label_value);
+
+/*
+*/
 }
