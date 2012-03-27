@@ -25,9 +25,15 @@
     <h6>Link widget</h6>
     <div id="link_widget">
       <div class="widget-object widget-type-link widget-inline btn-group">
-        <a class="btn" data-toggle="modal" href="#linkModal"><i class="icon-pencil"></i> Edit link</a>[% INCLUDE format_dropdown %]
-        <input type="hidden" class="widget-url-label" value="">
-        <input type="hidden" class="widget-url-link" value="">
+        <a class="btn btn-edit-link"><i class="icon-pencil"></i> Edit link</a>[% INCLUDE format_dropdown %]
+        <input type="hidden" class="widget-link-url-source widget-format-target" value="">
+        <input type="hidden" class="widget-link-url-site"      value="">
+        <input type="hidden" class="widget-link-url-prefix"    value="http://www.ncbi.nlm.nih.gov/gene/">
+        <input type="hidden" class="widget-link-url-postfix"   value="">
+        <input type="hidden" class="widget-link-url-datafield" value="protein_name">
+
+        <input type="hidden" class="widget-link-label-type"  value="static">
+        <input type="hidden" class="widget-link-label-value" value="Entrez">
       </div>
     </div>
 
@@ -51,28 +57,38 @@
 </form>
 
     <h6>linkModal</h6>
-    <div class="modal" id="linkModal">
+    <div class="modal hide fade" id="linkModal" style="display: none;">
       <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
         <h3>Link Properties</h3>
       </div>
       <div class="modal-body">
-        <p>
-          A link is composed of two parts: a <strong>URL</strong> and
-          a <strong>label</strong>.  The <strong>URL</strong> is the
-          address of the website being linked to.
-          The <strong>label</strong> is the text the user sees on the page.
-        </p>
-        <p>
-          Example: <a href="http://www.google.com">Google</a>
-        </p>
-        <p>
-          Here, the <strong>URL</strong>
-          is <code>http://www.google.com/</code> and
-          the <strong>label</strong> is <code>Google</code>.
-        </p>
+        <div class="accordion" id="link_widget_help_accordion">
+          <div class="accordion-group">
+            <div class="accordion-heading">
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#link_widget_help_accordion" href="#link_widget_help">What is this?</a>
+            </div>
+            <div id="link_widget_help" class="accordion-body collapse" style="height: 0px;">
+              <div class="accordion-inner">
+              <p>
+                A link is composed of two parts: a <strong>URL</strong>
+                and a <strong>label</strong>.  The <strong>URL</strong> is
+                the address of the website being linked to.
+                The <strong>label</strong> is the text the user sees on
+                the page. Example:
+              </p>
+              <p class="alert alert-info"><a href="http://www.google.com" title="http://www.google.com">Google</a></p>
+              <p>
+                Here, the <strong>URL</strong>
+                is <code>http://www.google.com/</code> and
+                the <strong>label</strong> is <code>Google</code>.
+              </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <form class="">
+        <form class="" id="link_widget_url_form">
           <fieldset>
             <div class="row-fluid">
               <div class="span12">
@@ -82,40 +98,53 @@
             <div class="row-fluid">
               <div class="span1">&nbsp;</div>
               <div class="span11">
-            <label class="radio">
-              <input type="radio" name="link.url_type" value="predefined">
-              Select a predefined link from the following list:
-              <select name="predefined_url">
-                [% FOREACH linkset IN linksets %]
-                <optgroup label="[% linkset.label %]">
-                  [% FOREACH link IN linkset.links %]
-                  <option value="[% link.value %]">[% link.text %] ([% link.example %])</option>
-                  [% END %]
-                </optgroup>
-                [% END %]
-              </select>
-
-              <select name="link_field">
-                [% FOREACH link IN linkset.links %]
-                <option value="[% link.value %]">[% link.text %] ([% link.example %])</option>
-                [% END %]
-              </select>
-              <select name="link_type" class="disabled">
-                [% FOREACH link IN linkset.links %]
-                <option value="[% link.value %]">[% link.text %] ([% link.example %])</option>
-                [% END %]
-              </select>
-
-            </label>
-            <label class="radio">
-              <input type="radio" name="link.url_type" value="provided"> Use the following URL:
-              <input type="text" class="span3" placeholder="Type URL here...">
-            </label>
-            </div>
+                <div class="accordion" id="link_widget_url_accordion">
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <div class="accordion-inner">
+                      <label class="radio">
+                        <input type="radio" name="link.url_type" value="predefined" checked="checked" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_source">
+                        Select a predefined link from the following list:
+                      </label>
+                      </div>
+                    </div>
+                    <div id="link_widget_url_source" class="accordion-body collapse in">
+                      <div class="accordion-inner">
+                        <p class="help-block">Which column should the link be based off of?</p>
+                        <select name="link_source" id="link_source">
+                          [% FOREACH acc_column IN linksets %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
+                        </select>
+                        <p class="help-block">What site do you want to link to?</p>
+                        [% FOREACH acc_column IN linksets %]
+                        <select id="link_site_[% acc_column.shortname %]" name="link_site_[% acc_column.shortname %]" class="link_site [% IF loop.first %]link_site_active[% END %]">
+                          [% FOREACH link IN acc_column.links %]
+                          <option value="[% link.value %]" title="[% link.example %]">[% link.text %]</option>
+                          [% END %]
+                        </select>
+                        [% END %]
+                      </div>
+                    </div>
+                  </div>
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <div class="accordion-inner">
+                      <label class="radio">
+                        <input type="radio" name="link.url_type" value="provided" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_provided"> Use the following URL:
+                      </label>
+                      </div>
+                    </div>
+                    <div id="link_widget_url_provided" class="accordion-body collapse" style="height: 0px;">
+                      <div class="accordion-inner">
+                        <input type="text" class="span3" placeholder="Type URL here...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </fieldset>
         </form>
-        <form class="">
+        <form class="" id="link_widget_label_form">
           <fieldset>
             <div class="row-fluid">
               <div class="span12">
@@ -126,24 +155,47 @@
               <div class="span1">&nbsp;</div>
               <div class="span11">
                 <label class="radio">
-                  <input type="radio" name="link.label_type" value="default"> Use the default label text
-                  <span class="default-label-text"></span>
+                  <input type="radio" name="link.label_type" value="default" checked="checked"> Use the default label text
+                  <span class="label label-info" id="link_widget_label_default_preview" style="display: none;"></span>
                 </label>
                 <label class="radio">
                   <input type="radio" name="link.label_type" value="url"> Use the URL
-                  <span class="url-label-text"></span>
+                  <span class="label label-info" id="link_widget_label_url_preview"  style="display: none;"></span>
                 </label>
                 <label class="radio">
                   <input type="radio" name="link.label_type" value="static"> Use the following label:
-                  <input type="text" class="span3" name="user_provided">
                 </label>
+                <input type="text" class="span3" name="user_provided" id="link_label_static">
               </div>
             </div>
           </fieldset>
         </form>
+
+        <form class="">
+          <fieldset>
+            <div class="row-fluid">
+              <div class="span12">
+                <h4>Preview</h4>
+              </div>
+              <div class="row-fluid">
+              <div class="span1">&nbsp;</div>
+              <div class="span11">
+                <label class="radio">
+                  <p class="help-block">Your link will look like:</p>
+                  <div class="alert alert-info" id="link_widget_label_preview"></div>
+                  <p class="help-block">...and link to:</p>
+                  <div class="alert alert-info" id="link_widget_url_preview"></div>
+                </label>
+              </div>
+            </div>
+
       </div>
       <div class="modal-footer">
-        <a href="#" class="btn btn-primary">Save changes</a>
-        <a href="#" class="btn">Close</a>
+        <a href="#" class="btn btn-primary" id="linkModal_save_changes">Save changes</a>
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
       </div>
     </div>
+
+<script>
+  var pbuild_links = [% link_site_json %];
+</script>

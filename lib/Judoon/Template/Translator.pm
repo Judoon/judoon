@@ -68,10 +68,49 @@ method process_data($widget) {
     return {type => 'data', value => $field, formatting => [@formatting]};
 }
 
+method process_link($widget) {
+    my (@inputs) = $widget->look_down(qw(_tag input type hidden));
+
+    my (%link_props, @formatting);
+    for my $input (@inputs) {
+        my $input_classes = $input->attr('class');
+        my ($link_field_type) = $input_classes =~ m/widget-link-([a-z\-]+)/g;
+        $link_props{$link_field_type} = $input->attr('value');
+        if (my @formats = ($input_classes =~ m/widget-formatting-(\w+)/g)) {
+            @formatting = @formats;
+        }
+    }
+
+    return {type => 'link', link_props => \%link_props, formatting => [@formatting]};
+}
+
 method process_newline($widget) {
     return {type => 'newline'};
 }
 
+
+method link_node_to_simple_nodes(\%link_props) {
+
+    warn "LINK PROPS: " . p(%link_props);
+
+    my @url_nodes = (
+        {type => 'text', value => $link_props{'url-prefix'},    },
+        {type => 'data', value => $link_props{'url-datafield'}, },
+        {type => 'text', value => $link_props{'url-postfix'},   },
+    );
+
+    my @label_nodes = $link_props{'label-type'} eq 'url'     ? @url_nodes
+                    : $link_props{'label-type'} eq 'static'  ? {type => 'text', value => $link_props{'label-value'}}
+                    :    die 'unknown label-type';
+
+    return (
+        {type => 'text', value => '<a href="',},
+        @url_nodes,
+        {type => 'text', value => '">',},
+        @label_nodes,
+        {type => 'text', value => '</a>',},
+    );
+}
 
 method nodes_to_template(\@nodes) {
     warn "Nodes is: " . p(@nodes);
@@ -79,6 +118,7 @@ method nodes_to_template(\@nodes) {
     for my $node (@nodes) {
         my @pieces = $node->{type} eq 'text'    ? ($node->{value})
                    : $node->{type} eq 'data'    ? ('{{=' . $node->{value} . '}}')
+                   : $node->{type} eq 'link'    ? $self->nodes_to_template([$self->link_node_to_simple_nodes($node->{link_props})])
                    : $node->{type} eq 'newline' ? ('<br>')
                    :     die 'unsupported node type';
 

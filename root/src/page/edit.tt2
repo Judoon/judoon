@@ -91,6 +91,13 @@
       </div>
 
     </div>
+
+      <div class="row-fluid">
+        <div class="span12">
+          <a href="[% c.uri_for_action('/rpc/page/preview', c.req.captures) %]" class="btn">Preview</a>
+        </div>
+      </div>
+
   </fieldset>
 </form>
 

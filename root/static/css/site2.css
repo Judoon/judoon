@@ -100,3 +100,6 @@ table.table thead .sorting_desc_disabled { background: url('../images/sort_desc_
 table.dataTable th:active {
 	outline: none;
 }
+
+#link_widget_url_source select.link_site { display: none;  }
+#link_widget_url_source select.link_site.link_site_active  { display: block; }

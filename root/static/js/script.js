@@ -6,6 +6,12 @@
 
 var widget_count = 0;
 
+/*
+function pbuild_delete_before_cursor {
+    var del_tgt = $("#canvas_cursor").prev().attr
+    pbuild_delete_widget()
+}
+*/
 
 function pbuild_delete_widget(widget_id) {
     $(widget_id).remove();
@@ -165,4 +171,74 @@ function pbuild_copy_canvas_to_input() {
 
 function translate_column_template() {
     $('#page_column.template').attr('value', 'new_template');
+}
+
+
+function pbuild_select_link_source() {
+    var source = $('#link_source').val();
+    $("#link_widget_url_source select.link_site_active").removeClass('link_site_active');
+    $("#link_site_" + source).addClass('link_site_active');
+    pbuild_select_link_site();
+}
+
+function pbuild_select_link_site() {
+    var new_site = $("#link_widget_url_source select.link_site_active option").filter("option:selected");
+    $('#link_widget_label_default_preview').html(new_site.text());
+    $('#link_widget_label_url_preview').html(new_site.attr('title'));
+    pbuild_link_widget_preview();
+}
+
+function pbuild_link_widget_preview() {
+    var link_site = $("#link_widget_url_source select.link_site_active option").filter(":selected");
+    var label_url = link_site.attr('title');
+
+    var label_type_val = $('#link_widget_label_form input[name="link.label_type"]:checked').val();
+    var label_preview = label_type_val === 'default' ? link_site.text()
+                      : label_type_val === 'url'     ? label_url
+                      : label_type_val === 'static'  ? $('#link_label_static').val()
+                      :                                'Something went wrong!';
+                     
+    $('#link_widget_label_preview').html('<a href="'+label_url+'" title="'+label_url+'">'+label_preview+'</a>');
+    $('#link_widget_url_preview').html(label_url);
+}
+
+
+function pbuild_open_link_form(link_widget_button) {
+    var this_btn = link_widget_button;
+    $('#linkModal').modal();
+    $('#linkModal').data('widget_id', $(this_btn).parent().attr('id'));
+    pbuild_link_widget_preview();
+}
+
+
+function pbuild_submit_link_form() {
+    $('#linkModal').modal('hide');
+    var widget_id = $('#linkModal').data('widget_id');
+    var widget = $('#'+widget_id);
+
+    // set link url properties
+    var link_source = $('#link_source').val();
+    widget.find('input[class*="widget-link-url-source"]').attr('value', link_source);
+    widget.find('input[class*="widget-link-url-datafield"]').attr('value', link_source);
+
+    var link_site = $("#link_widget_url_source select.link_site_active option").filter(":selected");
+    var link_site_val = link_site.val();
+    widget.find('input[class*="widget-link-url-site"]').attr('value', link_site_val);
+
+    widget.find('input[class*="widget-link-url-prefix"]').attr('value', pbuild_links[link_site_val].prefix);
+    widget.find('input[class*="widget-link-url-postfix"]').attr('value', pbuild_links[link_site_val].postfix);
+
+
+    // set label properties
+    var label_type_val = $('#link_widget_label_form input[name="link.label_type"]:checked').val();
+    var label_type = label_type_val === 'url' ? 'url' : 'static';
+    var label_value = label_type_val === 'default' ? link_site.text()
+                    : label_type_val === 'url'     ? ''
+                    : label_type_val === 'static'  ? $('#link_label_static').val()
+                    :                                'Something went wrong!';
+    widget.find('input[class*="widget-link-label-type"]').attr('value', label_type);
+    widget.find('input[class*="widget-link-label-value"]').attr('value', label_value);
+
+/*
+*/
 }

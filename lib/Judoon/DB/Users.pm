@@ -3,6 +3,7 @@ package Judoon::DB::Users;
 use version; our $VERSION = '0.0.1';
 use autodie;
 use open qw( :encoding(UTF-8) :std );
+use feature ':5.10';
 
 use Moose;
 with 'Judoon::DB::Roles::Deployer';
@@ -126,11 +127,14 @@ sub update_dataset {
 sub add_header_for_dataset {
     my ($self, $ds_id, $args) = @_;
     my $sth = $self->dbh->prepare_cached(
-        q{INSERT INTO columns (dataset_id, name, shortname, sort, accession_type, url_root) VALUES (?,?,?,?,?)}
+        q{INSERT INTO columns (dataset_id, name, shortname, sort, accession_type, url_root) VALUES (?,?,?,?,?,?)}
     );
 
-    (my $shortname = lc $args->{name}) =~ s/[^0-9a-z_]/_/g;
-    $sth->execute($ds_id, $args->{name}, $shortname, $args->{sort}, '', '');
+    (my $shortname = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
+    $shortname ||= 'empty';
+    my @args = ($ds_id, $args->{name}, $shortname, $args->{sort}, '', '');
+    warn "handleargs are: " . p(@args);
+    $sth->execute(@args);
     return;
 }
 
@@ -253,33 +257,116 @@ sub delete_page_column {
 
 my %linkthings = (
     gene_name  => {label => '', links => [
-        {value=>'cmkb', text => 'CMKB', example => 'http://cmckb.cellmigration.org/gene/?gene_name=ACTA4',},
-        {value=>'', text => 'CMKB', example => 'http://cmckb.cellmigration.org/gene/?gene_name=ACTA4',},
+        {
+            value=>'gene',
+            text=>'Entrez Gene',
+            example=>'http://www.ncbi.nlm.nih.gov/gene/7094',
+            prefix=>'http://www.ncbi.nlm.nih.gov/gene/',
+            postfix=>'',
+        },
+        {
+            value=>'uniprot',
+            text=>'Uniprot',
+            example=>'http://www.uniprot.org/uniprot/Q9Y490',
+            prefix=>'http://www.uniprot.org/uniprot/',
+            postfix=>'',
+        },
+        {
+            value=>'cmkb',
+            text=>'Cell Migration KnowledgeBase',
+            example=>'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',
+            prefix=>'http://cmckb.cellmigration.org/gene/?gene_name=',
+            postfix=>'',
+        },
+        {
+            value=>'omim',
+            text=>'OMIM',
+            example=>'http://www.ncbi.nlm.nih.gov/omim/186745',
+            prefix=>'http://www.ncbi.nlm.nih.gov/omim/',
+            postfix=>'',
+        },
+        {
+            value=>'pfam',
+            text=>'PFAM',
+            example=>'http://pfam.sanger.ac.uk/protein?acc=Q9Y490',
+            prefix=>'http://pfam.sanger.ac.uk/protein?acc=',
+            postfix=>'',
+        },
+        {
+            value=>'addgene',
+            text=>'AddGene',
+            example=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',
+            prefix=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=',
+            postfix=>'',
+        },
+        {
+            value=>'kegg',
+            text=>'KEGG',
+            example=>'http://www.genome.jp/dbget-bin/www_bget?hsa:7094',
+            prefix=>'http://www.genome.jp/dbget-bin/www_bget?hsa:',
+            postfix=>'',
+        },
     ],},
     flybase_id => {label => '', links => [
-        {value => 'flybase', text => 'FlyBase', example => 'http://',},
+        {
+            value => 'flybase',
+            text => 'FlyBase',
+            example => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?FBgn0025725',
+            prefix => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?',
+            postfix=>'',
+        },
     ],},
-    unigene_id => [],
+    unigene_id => {
+        label => '',
+        links => [
+        {
+            value=>'unigene',
+            text=>'UniGene',
+            example=>'http://www.ncbi.nlm.nih.gov/unigene/686173',
+            prefix=>'http://www.ncbi.nlm.nih.gov/unigene/',
+            postfix=>'',
+        },
+    ],},
 );
 
+sub get_linksites {
+    my ($self) = @_;
+
+    my %new_struct;
+    for my $t (values %linkthings) {
+        for my $l (@{$t->{links}}) {
+            $new_struct{$l->{value}} = $l;
+        }
+    }
+
+    return \%new_struct;
+}
+
+
+sub get_linksets_for_dataset {
+    my ($self, $ds_id) = @_;
+
+    my @linksets;
+    for my $col (@{$self->get_columns_for_dataset($ds_id)}) {
+        next unless $col->{is_accession};
+        $col->{links} = $self->get_linkset_for_column($col);
+        push @linksets, $col;
+    }
+    return \@linksets;
+}
 
 sub get_linkset_for_column {
     my ($self, $col) = @_;
 
-    my @linksets;
+    my @links;
     if ($col->{is_accession}) {
-        if ($col->{accession_type} eq 'gene_name') {
-
-        }
-        elsfi
-
+        @links = @{$linkthings{$col->{accession_type}}->{links}}
     }
     elsif ($col->{is_url}) {
-
+        @links = 'something else?';
     }
 
-    my @col_links = $self->get_linkset
-
+    return \@links;
 }
 
 

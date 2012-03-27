@@ -34,9 +34,14 @@ after private_edit => sub {
     $c->stash->{ds_column}{list} = $c->model('Users')
         ->get_columns_for_dataset($c->stash->{dataset}{id});
 
-    my @linksets = ;
+    my @linksets = 'derp';
     $c->stash->{linksets} = $c->model('Users')
-        ->get_linksets_for_dataset($c->stash->{dataset}{id});;
+        ->get_linksets_for_dataset($c->stash->{dataset}{id});
+
+    use JSON qw(encode_json);
+    $c->stash->{link_site_json} = encode_json(
+        $c->model('Users')->get_linksites()
+    );
 
     my $translator = Judoon::Template::Translator->new();
     $c->stash->{page_column}{object}{template} =
