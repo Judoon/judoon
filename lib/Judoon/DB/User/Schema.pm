@@ -1,7 +1,7 @@
 use utf8;
 package Judoon::DB::User::Schema;
 
-our $VERSION = 2;
+our $VERSION = '2.001';
 
 use Moose;
 use MooseX::MarkAsMethods autoclean => 1;
