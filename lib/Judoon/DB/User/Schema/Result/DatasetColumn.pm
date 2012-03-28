@@ -230,19 +230,18 @@ sub _build_linkthings {
 }
 
 
-around 'BUILDARGS' => sub {
-    my $orig  = shift;
-    my $class = shift;
+# from MooseX::NonMoose, lets us preprocess the args to new()
+sub FOREIGNBUILDARGS {
+    my ($class, $args) = @_;
 
-    my $args = $_[0];
     if (not $args->{shortname}) {
         (my $shortname = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
         $shortname ||= 'empty';
         $args->{shortname} = $shortname;
     }
 
-    return $class->$orig(@_);
-};
+    return $args;
+}
 
 
 sub linkset {
