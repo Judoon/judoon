@@ -230,15 +230,18 @@ sub _build_linkthings {
 }
 
 
-before 'insert' => sub {
-    my ($self, $args) = @_;
+around 'BUILDARGS' => sub {
+    my $orig  = shift;
+    my $class = shift;
 
+    my $args = $_[0];
     if (not $args->{shortname}) {
         (my $shortname = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
         $shortname ||= 'empty';
         $args->{shortname} = $shortname;
     }
-    return;
+
+    return $class->$orig(@_);
 };
 
 
@@ -252,7 +255,7 @@ sub linkset {
     elsif ($self->is_url) {
         @links = 'something else?';
     }
-
+    return \@links;
 }
 
 
