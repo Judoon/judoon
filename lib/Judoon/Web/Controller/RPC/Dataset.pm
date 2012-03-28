@@ -20,24 +20,24 @@ __PACKAGE__->config(
 
 override get_list => sub {
     my ($self, $c) = @_;
-    return $c->model('Users')->get_datasets($c->stash->{user_login});
+    return [$c->stash->{user}->datasets];
 };
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
     my $upload = $c->req->upload('dataset');
-    return $c->model('Users')
-        ->import_data_for_user($c->stash->{user_login}, $upload->fh);
+    return $c->stash->{user}->import_data($upload->fh);
 };
 
 override get_object => sub {
     my ($self, $c) = @_;
-    return $c->model('Users')->get_dataset($c->stash->{dataset}{id});
+    return $c->stash->{user}->datasets_rs
+        ->find({id => $c->stash->{dataset}{id}});
 };
 
 after private_id => sub {
     my ($self, $c) = @_;
-    my $ds_data = $c->stash->{dataset}{object}{data};
+    my $ds_data = $c->stash->{dataset}{object}->data();
     $c->stash->{dataset}{object}{headers} = shift @$ds_data;
     $c->stash->{dataset}{object}{rows}    = $ds_data;
 };
@@ -66,16 +66,17 @@ sub postadd_do : Chained('id') PathPart('postadd_do') Args(0) {
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    return $c->model('Users')->update_dataset(
-        $c->stash->{dataset}{id}, {name => $params->{'dataset.name'}},
-    );
+    return $c->stash->{dataset}{object}->update({
+        name  => ($params->{'dataset.name'}  // ''),
+        notes => ($params->{'dataset.notes'} // ''),
+    });
 };
 
 
 after private_edit => sub {
     my ($self, $c) = @_;
 
-    if (my $page = $c->model('Users')->get_page_for_dataset($c->stash->{dataset}{id})) {
+    if (my ($page) = $c->stash->{dataset}{object}->pages) {
         $c->stash->{dataset}{object}{has_page} = 1;
         $c->stash->{dataset}{object}{page}     = $page;
     }

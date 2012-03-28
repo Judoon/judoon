@@ -20,40 +20,40 @@ __PACKAGE__->config(
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
-    return $c->model('Users')->add_page_column($c->stash->{page}{id}, $params);
+    my %valid = map {my $o = $_; s/^page_column\.//; $_ => ($params->{$o} // '')}
+        grep {m/^page_column\./} keys %$params;
+    $valid{template} = q{};
+    return $c->stash->{page}{object}->create_related('page_columns', \%valid);
 };
 
 override get_object => sub {
     my ($self, $c) = @_;
-    return $c->model('Users')->get_page_column($c->stash->{page_column}{id});
+    return $c->stash->{page}{object}->page_columns_rs
+        ->find({id => $c->stash->{page_column}{id}});
 };
 
 after private_edit => sub {
     my ($self, $c) = @_;
 
-    $c->stash->{ds_column}{list} = $c->model('Users')
-        ->get_columns_for_dataset($c->stash->{dataset}{id});
-
-    my @linksets = 'derp';
-    $c->stash->{linksets} = $c->model('Users')
-        ->get_linksets_for_dataset($c->stash->{dataset}{id});
+    my @ds_columns = $c->stash->{dataset}{object}->ds_columns;
+    $c->stash->{ds_column}{list} = \@ds_columns;
+    $c->stash->{linksets}        = \@ds_columns;
 
     use JSON qw(encode_json);
     $c->stash->{link_site_json} = encode_json(
-        $c->model('Users')->get_linksites()
+        $c->stash->{ds_column}{list}[0]->get_linksites()
     );
 
     my $translator = Judoon::Template::Translator->new();
     $c->stash->{page_column}{object}{template} =
-        $translator->to_widgets($c->stash->{page_column}{object}{template});
+        $translator->to_widgets($c->stash->{page_column}{object}->template);
 };
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
     use Data::Printer;
     $c->log->debug('Params are: ' . p($params));
-    return $c->model('Users')
-        ->update_page_column($c->stash->{page_column}{id}, $params);
+    return $c->stash->{page_column}{object}->update($params);
 };
 
 override munge_edit_params => sub {
@@ -70,7 +70,7 @@ override munge_edit_params => sub {
 
 override delete_object => sub {
     my ($self, $c) = @_;
-    $c->model('Users')->delete_page_column($c->stash->{page_column}{id});
+    $c->stash->{page_column}{object}->delete;
 };
 
 after delete_do => sub {

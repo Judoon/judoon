@@ -20,8 +20,7 @@ __PACKAGE__->config(
 
 override get_list => sub {
     my ($self, $c) = @_;
-    return $c->model('Users')
-        ->get_columns_for_dataset($c->stash->{dataset}{id});
+    return [$c->stash->{dataset}{object}->ds_columns];
 };
 
 after private_list => sub {
@@ -44,11 +43,11 @@ after private_list => sub {
     # this should be in the view
     for my $column (@$columns) {
         my @meta;
-        if ($column->{is_accession}) {
-            push @meta, 'accession: ' . $column->{accession_type};
+        if ($column->is_accession) {
+            push @meta, 'accession: ' . $column->accession_type;
         }
-        if ($column->{is_url}) {
-            push @meta, 'url: ' . $column->{url_root};
+        if ($column->is_url) {
+            push @meta, 'url: ' . $column->url_root;
         }
         $column->{metadata} = @meta ? join(', ', @meta) : 'plain text';
     }
@@ -69,9 +68,7 @@ override manage_list => sub {
 
     for my $id (@del_ids) {
         $c->log->warn("Deleting column $id");
-        $c->model('Users')->delete_column_for_dataset(
-            $id, $c->stash->{dataset}{id},
-        );
+        $c->stash->{dataset}{object}->ds_columns_rs->find({id => $id})->delete;
     }
 
     if (@del_ids) {
@@ -83,20 +80,23 @@ override manage_list => sub {
 
 override get_object => sub {
     my ($self, $c) = @_;
-    return $c->model('Users')->get_column($c->stash->{ds_column}{id});
+    return $c->stash->{dataset}{object}->ds_columns_rs
+        ->find({id => $c->stash->{ds_column}{id}});
 };
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    my %valid = map {s/^column\.//r => $params->{$_}} grep {m/^column\./} keys %$params;
+    my %valid = map {s/^column\.//r => ($params->{$_} // '')}
+        grep {m/^column\./} keys %$params;
     $c->log->debug('Valid params are: ' . p(%valid));
-    return $c->model('Users')
-        ->update_column_metadata($c->stash->{ds_column}{id}, \%valid);
+    delete $valid{multiple_ids}; # NYI
+    return $c->stash->{ds_column}{object}->update(\%valid);
 };
 
 after private_edit => sub {
     my ($self, $c) = @_;
-    $c->stash->{accession_types} = $c->model('Users')->accession_types();
+    $c->stash->{accession_types}
+        = $c->stash->{ds_column}{object}->accession_types();
 };
 
 after private_edit_do => sub {

@@ -53,8 +53,8 @@ sub private_add :Private {
 sub private_add_do :Private {
     my ($self, $c) = @_;
     my $params = $self->munge_add_params($c);
-    my $id     = $self->add_object($c, $params);
-    $self->go_here($c, 'edit', [@{$c->req->captures}, $id]);
+    my $object = $self->add_object($c, $params);
+    $self->go_here($c, 'edit', [@{$c->req->captures}, $object->id]);
 }
 
 sub private_id :Private {

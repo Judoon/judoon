@@ -64,11 +64,11 @@ sub user_addlist : Chained('user_base') PathPart('')     Args(0) {
 sub user_id : Chained('user_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $user_login) = @_;
     $c->stash->{user_login} = $user_login;
-    $c->stash->{user}       = $c->model('Users')->get_user($user_login);
+    $c->stash->{user}       = $c->model('User::User')->find({login => $user_login});
 }
 sub user_view : Chained('user_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
-    $c->stash->{datasets} = $c->model('Users')->get_datasets($c->stash->{user_login});
+    $c->stash->{datasets} = [$c->stash->{user}->datasets()];
     $c->stash->{template} = 'user_view.tt2';
 }
 

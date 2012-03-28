@@ -18,23 +18,26 @@ __PACKAGE__->config(
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
-    return $c->model('Users')->new_page($c->stash->{dataset}{id}, $params);
+    return $c->stash->{dataset}{object}->create_related('pages', {
+        title => '', preamble => '', postamble => '',
+    });
 };
 
 override get_object => sub {
     my ($self, $c) = @_;
-    return $c->model('Users')->get_page($c->stash->{page}{id});
+    return $c->stash->{dataset}{object}->pages_rs->find({id => $c->stash->{page}{id}});
 };
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    return $c->model('Users')->update_page($c->stash->{page}{id}, $params);
+    my %valid = map {my $o = $_; s/^page\.//; $_ => ($params->{$o} // '')}
+        grep {m/^page\./} keys %$params;
+    return $c->stash->{page}{object}->update(\%valid);
 };
 
 after private_edit => sub {
     my ($self, $c) = @_;
-    $c->stash->{page_columns} = $c->model('Users')
-        ->get_page_columns($c->stash->{page}{id});
+    $c->stash->{page_columns} = [$c->stash->{page}{object}->page_columns];
 };
 
 
@@ -42,9 +45,8 @@ sub preview : Chained('id') PathPart('preview') Args(0) {
     my ($self, $c) = @_;
 
     use Data::Printer;
-    my $page_columns = $c->model('Users')->get_page_columns($c->stash->{page}{id});
+    my $page_columns = [$c->stash->{page}{object}->page_columns];
     $c->stash->{page_column}{list} = $page_columns;
-
     $c->stash->{template} = 'page/preview.tt2';
 }
 
