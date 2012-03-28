@@ -117,20 +117,21 @@ sub import_data {
     my $ds   = $ref->[1];
     my $data = $self->pivot_data($ds->{cell}, $ds->{maxrow}, $ds->{maxcol});
 
-    my $dataset = $self->create_related('dataset', {
+    my $dataset = $self->create_related('datasets', {
         name => $ds->{label}, original => q{},
-        data => $data,
+        data => $data, notes => q{},
     });
 
     my $headers = shift @$data;
     my $sort = 1;
     for my $header (@$headers) {
-        $dataset->create_related('dataset_column', {
+        $dataset->create_related('ds_columns', {
             name => ($header // ''), sort => $sort++,
+            accession_type => q{},   url_root => q{},
         });
     }
 
-    return;
+    return $dataset;
 }
 
 
