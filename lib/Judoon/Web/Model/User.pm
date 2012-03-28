@@ -7,7 +7,7 @@ __PACKAGE__->config(
     schema_class => 'Judoon::DB::User::Schema',
     
     connect_info => {
-        dsn => 'dbi:SQLite:dbname=judoon-db-user-schema.db',
+        dsn => 'dbi:SQLite:dbname=share/judoon-db-user-schema.db',
         user => '',
         password => '',
     }
