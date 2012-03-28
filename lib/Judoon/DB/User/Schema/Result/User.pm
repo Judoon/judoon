@@ -152,7 +152,6 @@ code.
 sub pivot_data {
     my ($self, $data, $maxrow, $maxcol) = @_;
 
-    shift @$data; # bye bye bogus row
     my $pivoted = [];
     for my $row_idx (0..$maxrow-1) {
         for my $col_idx (0..$maxcol-1) {
