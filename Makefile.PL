@@ -9,25 +9,29 @@ use Module::Install::Catalyst; # Complain loudly if you don't have
 name 'Judoon-Web';
 all_from 'lib/Judoon/Web.pm';
 
-requires 'Catalyst::Runtime' => '5.90007';
+requires 'Catalyst::Action::RenderView';
+requires 'Catalyst::Model::DBIC::Schema';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
-requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Controller::REST';
+requires 'Catalyst::Runtime' => '5.90007';
 requires 'CatalystX::SimpleLogin';
 requires 'Catalyst::Plugin::Session::Store::File';
-requires 'Moose';
-requires 'namespace::autoclean';
-requires 'Config::General'; # This should reflect the config file format you've chosen
-                 # See Catalyst::Plugin::ConfigLoader for supported formats
-
+requires 'Config::General';
 requires 'Data::Printer';
 requires 'DBI';
+requires 'DBIx::Class';
+requires 'DBIX::Class::InflateColumn::Serializer';
 requires 'HTML::TreeBuilder';
 requires 'JSON';
 requires 'Method::Signatures';
+requires 'Moose';
+requires 'MooseX::MarkAsMethods';
+requries 'MooseX::NonMoose';
+requires 'namespace::autoclean';
 requires 'Spreadsheet::Read';
 
+test_requires 'Test::DBIx::Class';
 test_requires 'Test::More' => '0.88';
 catalyst;
 
