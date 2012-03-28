@@ -7,7 +7,6 @@ use Test::More;
 
 BEGIN {
     my @modules = qw(
-        Judoon::DB::Users
         Judoon::DB::User::Schema
         Judoon::Template::Translator
         Judoon::Web
