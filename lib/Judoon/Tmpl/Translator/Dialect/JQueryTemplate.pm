@@ -1,6 +1,5 @@
 package Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
 
-use autodie;
 use Moose;
 use namespace::autoclean;
 
@@ -10,34 +9,35 @@ use Data::Printer;
 use Method::Signatures;
 
 
-method parse($input) {
-
-}
+method parse($input) { ... };
 
 method produce(\@native_objects) {
-    warn "Nodes is: " . p(@native_objects);
-    my $template = q{};
-    for my $node (@native_objects) {
-        my @pieces = $node->{type} eq 'text'    ? ($node->{value})
-                   : $node->{type} eq 'data'    ? ('{{=' . $node->{value} . '}}')
-                   : $node->{type} eq 'link'    ? $self->nodes_to_template([$self->link_node_to_simple_nodes($node->{link_props})])
-                   : $node->{type} eq 'newline' ? ('<br>')
-                   :     die 'unsupported node type';
 
-        if (exists $node->{formatting} && @{$node->{formatting}}) {
-            if (grep {m/bold/} @{$node->{formatting}}) {
-                @pieces = ('<strong>',@pieces,'</strong>');
+    my $template = q{};
+    while (my $node = shift @native_objects) {
+
+        if ($node->meta->does_role('Judoon::Tmpl::Node::Role::Composite')) {
+            unshift @native_objects, $node->decompose();
+            next;
+        }
+
+        my @text = $node->type eq 'text'     ? $node->value
+                 : $node->type eq 'variable' ? '{{=' . $node->name . '}}'
+                 :     die "Unrecognized node type! " . $node->type;
+
+        if (my @formats = @{$node->formatting}) {
+            if (grep {m/bold/} @formats) {
+                @text = ('<strong>',@text,'</strong>');
             }
-            if (grep {m/italic/} @{$node->{formatting}}) {
-                @pieces = ('<em>',@pieces,'</em>');
+            if (grep {m/italic/} @formats) {
+                @text = ('<em>',@text,'</em>');
             }
         }
 
-        $template .= join '', @pieces;
-
+        $template .= join '', @text;
     }
-    return $template;
 
+    return $template;
 }
 
 

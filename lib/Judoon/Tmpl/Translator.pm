@@ -5,11 +5,11 @@ use Moose;
 use namespace::autoclean;
 
 use Data::Printer;
-use Method::Signatures;
-
 use Judoon::Tmpl::Translator::Dialect::Native;
 use Judoon::Tmpl::Translator::Dialect::WebWidgets;
 use Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
+use Method::Signatures;
+
 sub dialects { return qw(Native WebWidgets JQueryTemplate); }
 
 has dialect_objects => (
@@ -32,7 +32,7 @@ method translate(:$from!, :$to!, :$template!) {
     die "$from is not a valid dialect" if (not grep {$_ eq $from} dialects());
     die "$to is not a valid dialect"   if (not grep {$_ eq $to} dialects());
     my @native_objs = $self->dialect_objects->{$from}->parse($template);
-    return $self->dialect_objects->{$to}->produce(@native_objs);
+    return $self->dialect_objects->{$to}->produce(\@native_objs);
 }
 
 

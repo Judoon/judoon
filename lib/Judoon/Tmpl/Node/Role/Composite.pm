@@ -6,6 +6,7 @@ use namespace::autoclean;
 use Judoon::Tmpl::Factory;
 use Method::Signatures;
 
+sub composed { 1; }
 
 requires 'decompose';
 
@@ -26,7 +27,7 @@ method make_text_node($text) {
 
 method make_variable_node($var) {
     return $self->factory->build({
-        type => 'variable', value => $var,
+        type => 'variable', name => $var,
         formatting => $self->formatting,
     });
 }

@@ -10,9 +10,9 @@ with qw(
 
 use Method::Signatures;
 
-has value => (is => 'ro', isa => 'Str', default => "\n", );
+sub type { return 'newline'; }
 
-method decompose { return $self->make_text_node("\n"); }
+method decompose { return $self->make_text_node("<br>"); }
 
 __PACKAGE__->meta->make_immutable;
 

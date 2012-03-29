@@ -13,9 +13,9 @@ use Method::Signatures;
 method parse($input) {
     my $root = HTML::TreeBuilder->new_from_content($input);
     my @widgets = $root->look_down(qw(_tag div class), qr/widget-object/);
-    warn "Widgets is: " . p(@widgets);
+    # warn "Widgets is: " . p(@widgets);
     my @nodes = $self->munge_widgets(\@widgets);
-    warn "Nodes is: " . p(@nodes);
+    # warn "Nodes is: " . p(@nodes);
     return @nodes;
 }
 
@@ -55,14 +55,14 @@ method process_text($widget) {
 
 method process_data($widget) {
     my $select = $widget->look_down(qw(_tag select));
-    warn "Select is: " . p($select);
+    #warn "Select is: " . p($select);
     my $option = $select->look_down(qw(_tag option selected), qr/^\S/);
-    warn "Option is: " . p($option);
+    #warn "Option is: " . p($option);
     my $field  = $option->attr('value');
     my $field_classes = $select->attr('class');
     my @formatting = ($field_classes =~ m/widget-formatting-(\w+)/g);
     return $self->factory->build({
-        type => 'data', value => $field, formatting => [@formatting],
+        type => 'variable', name => $field, formatting => [@formatting],
     });
 }
 
@@ -79,8 +79,21 @@ method process_link($widget) {
         }
     }
 
+    my @fields = qw(url-site url-prefix url-postfix url-datafield label-type label-value);
+    my %link_args = (
+        uri_text_segments     => [$link_props{'url-prefix'}],
+        uri_variable_segments => [$link_props{'url-datafield'}],
+        label_type            => $link_props{'label-type'},
+    );
+    if ($link_props{'url-postfix'}) {
+        push @{$link_args{text_segments}}, $link_props{'url-postfix'};
+    }
+    if ($link_props{'label-value'}) {
+        $link_args{label_value} = $link_props{'label-value'};
+    }
+
     return $self->factory->build({
-        type => 'link', link_props => \%link_props, formatting => [@formatting]
+        type => 'link', formatting => [@formatting], %link_args,
     });
 }
 

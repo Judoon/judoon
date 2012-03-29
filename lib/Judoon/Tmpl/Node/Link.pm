@@ -15,6 +15,7 @@ use Moose::Util::TypeConstraints qw(enum);
 
 enum 'LabelType', [qw(url static)];
 
+sub type { return 'link'; }
 has uri_text_segments     => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
 has uri_variable_segments => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
 
@@ -38,7 +39,7 @@ method decompose {
     # build the nodes for the url, but save them since they might be
     # needed for the label
     my @url_nodes;
-    my $it = each_arrayref $self->text_segments, $self->variable_segments;
+    my $it = each_arrayref $self->uri_text_segments, $self->uri_variable_segments;
     while (my ($text, $var) = $it->()) {
         push @url_nodes, $self->make_text_node($text) if ($text);
         push @url_nodes, $self->make_variable_node($var) if ($var);
