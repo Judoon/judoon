@@ -89,14 +89,26 @@ my $webwidget_html = <<'EOWW';
 EOWW
 
 
-my $jq_tmpl = $translator->translate(
+my $native_1 = $translator->translate(
+    from => 'WebWidgets', to => 'Native',
+    template => $webwidget_html,
+);
+my $jq_tmpl_1 = $translator->translate(
     from => 'WebWidgets', to => 'JQueryTemplate',
     template => $webwidget_html,
+);
+my $jq_tmpl_2 = $translator->translate(
+    from => 'Native', to => 'JQueryTemplate',
+    template => $native_1,
 );
 
 
 
-diag "JQTMPL is: $jq_tmpl";
+diag "Native: $native_1";
+diag "";
+diag "JQueryTemplate1 is: $jq_tmpl_1";
+diag "";
+diag "JQueryTemplate2 is: $jq_tmpl_2";
 
 
 

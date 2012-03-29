@@ -3,6 +3,7 @@ package Judoon::Tmpl::Node::Newline;
 use Moose;
 use namespace::autoclean;
 
+extends 'Judoon::Tmpl::Node';
 with qw(
     Judoon::Tmpl::Node::Role::Composite
     Judoon::Tmpl::Node::Role::Formatting

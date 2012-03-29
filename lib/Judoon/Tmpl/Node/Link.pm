@@ -3,12 +3,13 @@ package Judoon::Tmpl::Node::Link;
 use Moose;
 use namespace::autoclean;
 
+extends 'Judoon::Tmpl::Node';
 with qw(
     Judoon::Tmpl::Node::Role::Composite
     Judoon::Tmpl::Node::Role::Formatting
 );
 
-
+use Judoon::Tmpl::Factory;
 use List::AllUtils qw(each_arrayref);
 use Method::Signatures;
 use Moose::Util::TypeConstraints qw(enum);

@@ -5,8 +5,10 @@ use namespace::autoclean;
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
+
 use Data::Printer;
 use HTML::TreeBuilder;
+use Judoon::Tmpl::Factory;
 use Method::Signatures;
 
 
@@ -19,9 +21,7 @@ method parse($input) {
     return @nodes;
 }
 
-method produce(\@nodes) {
-}
-
+method produce(\@nodes) { ... }
 
 method munge_widgets(\@widgets) {
     my @nodes;
@@ -47,9 +47,7 @@ method process_text($widget) {
     my $text = $input->attr('value');
     my $input_classes = $input->attr('class');
     my @formatting = ($input_classes =~ m/widget-formatting-(\w+)/g);
-    return Judoon::Tmpl::Factory->build({
-        type => 'text', value => $text, formatting => [@formatting]
-    });
+    return new_text_node({value => $text, formatting => [@formatting],});
 }
 
 
@@ -61,9 +59,7 @@ method process_data($widget) {
     my $field  = $option->attr('value');
     my $field_classes = $select->attr('class');
     my @formatting = ($field_classes =~ m/widget-formatting-(\w+)/g);
-    return $self->factory->build({
-        type => 'variable', name => $field, formatting => [@formatting],
-    });
+    return new_variable_node({name => $field, formatting => [@formatting],});
 }
 
 method process_link($widget) {
@@ -92,13 +88,11 @@ method process_link($widget) {
         $link_args{label_value} = $link_props{'label-value'};
     }
 
-    return $self->factory->build({
-        type => 'link', formatting => [@formatting], %link_args,
-    });
+    return new_link_node({formatting => [@formatting], %link_args,});
 }
 
 method process_newline($widget) {
-    return $self->factory->build({type => 'newline'});
+    return new_newline_node();
 }
 
 

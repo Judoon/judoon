@@ -3,6 +3,7 @@ package Judoon::Tmpl::Node::Text;
 use Moose;
 use namespace::autoclean;
 
+extends 'Judoon::Tmpl::Node';
 with 'Judoon::Tmpl::Node::Role::Formatting';
 
 use Method::Signatures;

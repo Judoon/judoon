@@ -5,6 +5,7 @@ use namespace::autoclean;
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
+use Judoon::Tmpl::Factory;
 use Data::Printer;
 use JSON qw(encode_json decode_json);
 use Method::Signatures;
@@ -12,16 +13,12 @@ use Method::Signatures;
 
 method parse($input) {
     my $native_struct = decode_json($input);
-
-    my @nodes;
-    for my $struct (@$native_struct) {
-        push @nodes, {};
-    }
-    return @nodes;
+    return map {build_node($_)} @$native_struct;
 }
 
 method produce(\@native_objects) {
-
+    my @output = map {$_->pack} @native_objects;
+    return encode_json(\@output);
 }
 
 
