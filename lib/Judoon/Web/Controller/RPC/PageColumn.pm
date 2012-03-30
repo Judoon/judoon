@@ -5,7 +5,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller::RPC'; }
 
-use Judoon::Template::Translator;
+use Judoon::Tmpl::Translator;
 
 __PACKAGE__->config(
     action => {
@@ -44,9 +44,12 @@ after private_edit => sub {
         $c->stash->{ds_column}{list}[0]->get_linksites()
     );
 
-    my $translator = Judoon::Template::Translator->new();
+    my $translator = Judoon::Tmpl::Translator->new();
     $c->stash->{page_column}{object}{template} =
-        $translator->to_widgets($c->stash->{page_column}{object}->template);
+        $translator->translate({
+            from => 'Native', to => 'WebWidgets',
+            template =>$c->stash->{page_column}{object}->template,
+        });
 };
 
 override edit_object => sub {
@@ -61,9 +64,11 @@ override munge_edit_params => sub {
 
     my $params        = $c->req->params;
     my $template_html = $params->{'page_column.template'};
-    my $trans         = Judoon::Template::Translator->new();
+    my $trans         = Judoon::Tmpl::Translator->new();
 
-    my $template      = $trans->translate($template_html);
+    my $template      = $trans->translate({
+        from => 'WebWidgets', to => 'Native', template => $template_html,
+    });
     $params->{'page_column.template'} = $template;
     return $params;
 };
