@@ -130,8 +130,8 @@ method produce_text($node, $count is alias) {
 #    </div>
 
     my $tmpl = <<'EOT';
-<div [% IF node %]id="widget_id_[% count %]"[% END %] class="widget-object widget-type-text widget-inline btn-group">
-  <input [% IF node %]id="widget_format_id_[% count %]"[% END %] type="text" class="inner-small span2 w-dropdown widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]" placeholder="Type text here" [% IF node %]value="[% node.value %]"[% END %] />
+<div class="widget-object widget-type-text widget-inline btn-group">
+  <input type="text" class="inner-small span2 w-dropdown widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]" placeholder="Type text here" [% IF node %]value="[% node.value %]"[% END %] />
 </div>
 EOT
 
@@ -141,7 +141,7 @@ EOT
 }
 
 
-method produce_data($node, $count is alias) {
+method produce_variable($node, $count is alias) {
 # empty
 #  <div class="widget-object widget-type-data widget-inline btn-group">
 #    <select class="w-dropdown widget-format-target">
@@ -165,8 +165,8 @@ method produce_data($node, $count is alias) {
 
 
     my $tmpl = <<'EOT';
-<div [% IF node %]id="widget_id_[% count %]"[% END %] class="widget-object widget-type-data widget-inline btn-group">
-  <select [% IF node %]id="widget_format_id_[% count %]"[% END %] class="w-dropdown widget-format-target widget-format-sibling">
+<div class="widget-object widget-type-data widget-inline btn-group">
+  <select class="w-dropdown widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]">
     <option [% IF node %]value="[% node.name %]" selected="selected"[% END %]></option>
   </select>
 </div>
@@ -205,9 +205,9 @@ method produce_link($node, $count is alias) {
 
 
     my $tmpl = <<'EOT';
-<div [% IF node %]id="widget_id_[% count %]"[% END %] class="widget-object widget-type-link widget-inline btn-group">
+<div class="widget-object widget-type-link widget-inline btn-group">
   <a class="btn btn-edit-link widget-format-sibling"><i class="icon-pencil"></i> Edit link</a>
-  <input [% IF node %]id="widget_format_id_[% count %]"[% END %] type="hidden" class="widget-link-url-source widget-format-target" value="">
+  <input type="hidden" class="widget-link-url-source widget-format-target" value="">
   <input type="hidden" class="widget-link-url-site"      value="">
   <input type="hidden" class="widget-link-url-prefix"    value="">
   <input type="hidden" class="widget-link-url-postfix"   value="">
@@ -232,8 +232,8 @@ method produce_newline($node, $count is alias) {
 #   <div id="widget_id_3" class="widget-object widget-type-newline"></div>
 
     my $tmpl = <<'EOT';
-<div [% IF node %]id="widget_id_[% count %]"[% END %] class="widget-object widget-type-newline-icon"><i class="icon-arrow-down"></i></div>
-<div [% IF node %]id="widget_id_[% count+1 %]"[% END %] class="widget-object widget-type-newline"></div>
+<div class="widget-object widget-type-newline-icon"><i class="icon-arrow-down"></i></div>
+<div class="widget-object widget-type-newline"></div>
 EOT
 
     my $output = $self->fill_production_template($tmpl, {node => $node, count => $count});

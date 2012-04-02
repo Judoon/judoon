@@ -119,8 +119,7 @@
 
     $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
 
-    $('.widget-object').not('.widget-type-newline').not('.widget-type-newline-icon')
-         .each( function() {pbuild_add_formatter(this);} );
+    $('#column_canvas .widget-object').each( function() {pbuild_init_widget($(this));} );
   });
 </script>
 

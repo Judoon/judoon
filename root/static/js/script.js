@@ -31,33 +31,7 @@ function pbuild_toggle_format_italic(widget_id) {
 function pbuild_add_widget(type) {
     $("#"+type+"_widget").children().each(function() {
         var widget = $(this).clone();
-        var widget_id = widget_count++;
-        var widget_id_str = 'widget_id_' + widget_id;
-        widget.attr('id', widget_id_str);
-
-        var widget_format_id = 'widget_format_id_' + widget_id;
-        var widget_format_target = widget.children('.widget-format-target')
-            .attr('id', widget_format_id);
-
-        var widget_dd = widget.children('ul.dropdown-menu');
-        if (widget_dd.length) {
-            widget_dd.find('.widget-action-bold').on(
-                'click', function() {
-                    pbuild_toggle_format_bold('#'+widget_format_id);
-                }
-            );
-            widget_dd.find('.widget-action-italic').on(
-                'click', function() {
-                    pbuild_toggle_format_italic('#'+widget_format_id);
-                }
-            );
-            widget_dd.find('.widget-action-delete').on(
-                'click', function() {
-                    pbuild_delete_widget('#'+widget_id_str);
-                }
-            );
-        }
-
+        pbuild_init_widget(widget);
         $('#canvas_cursor').before(widget);
     });
 }
@@ -244,6 +218,36 @@ function pbuild_submit_link_form() {
 }
 
 
+function pbuild_init_widget(widget) {
+        var widget_id = widget_count++;
+        var widget_id_str = 'widget_id_' + widget_id;
+        widget.attr('id', widget_id_str);
+
+        var widget_format_id = 'widget_format_id_' + widget_id;
+        var widget_format_target = widget.children('.widget-format-target')
+            .attr('id', widget_format_id);
+        pbuild_add_formatter(widget);
+}
+
 function pbuild_add_formatter(widget) {
-    $(widget).find('.widget-format-sibling').first().after($('#formatting_menu').html());
+    widget.find('.widget-format-sibling').first().after($('#formatting_menu').html());
+    var widget_format_id = widget.children('.widget-format-target').attr('id');
+    var widget_dd = widget.children('ul.dropdown-menu');
+    if (widget_dd.length) {
+        widget_dd.find('.widget-action-bold').on(
+            'click', function() {
+                pbuild_toggle_format_bold('#'+widget_format_id);
+            }
+        );
+        widget_dd.find('.widget-action-italic').on(
+            'click', function() {
+                pbuild_toggle_format_italic('#'+widget_format_id);
+            }
+        );
+        widget_dd.find('.widget-action-delete').on(
+            'click', function() {
+                pbuild_delete_widget('#'+widget_id_str);
+            }
+        );
+    }
 }
