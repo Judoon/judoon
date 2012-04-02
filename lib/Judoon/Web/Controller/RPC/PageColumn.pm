@@ -17,6 +17,9 @@ __PACKAGE__->config(
     },
 );
 
+has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 1,);
+sub _build_translator { return Judoon::Tmpl::Translator->new; }
+
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
@@ -45,9 +48,9 @@ after private_edit => sub {
     );
 
     if (my $template = $c->stash->{page_column}{object}->template) {
-        my $translator = Judoon::Tmpl::Translator->new();
-        $c->stash->{page_column}{object}->{webwidgets} =
-            $translator->translate(
+        $c->log->debug("Template is: $template");
+        $c->stash->{page_column}{object}->{webwidgets}
+            = $self->translator->translate(
                 from => 'Native', to => 'WebWidgets',
                 template => $template,
             );
@@ -66,13 +69,14 @@ override munge_edit_params => sub {
 
     my $params        = $c->req->params;
     my $template_html = $params->{'page_column.template'};
-    my $trans         = Judoon::Tmpl::Translator->new();
-
-    my $template      = $trans->translate({
+    my $template      = $self->translator->translate(
         from => 'WebWidgets', to => 'Native', template => $template_html,
-    });
+    );
     $params->{'page_column.template'} = $template;
-    return $params;
+
+    my %valid = map {my $o = $_; s/page_column\.//; $_ => $params->{$o}}
+        keys %$params;
+    return \%valid;;
 };
 
 override delete_object => sub {
