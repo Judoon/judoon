@@ -102,14 +102,14 @@ my $jq_tmpl_2 = $translator->translate(
     template => $native_1,
 );
 
+is $jq_tmpl_1, $jq_tmpl_2, 'equivalent transformation';
 
 
-diag "Native: $native_1";
-diag "";
-diag "JQueryTemplate1 is: $jq_tmpl_1";
-diag "";
-diag "JQueryTemplate2 is: $jq_tmpl_2";
-
+# diag "Native: $native_1";
+# diag "";
+# diag "JQueryTemplate1 is: $jq_tmpl_1";
+# diag "";
+# diag "JQueryTemplate2 is: $jq_tmpl_2";
 
 
 # my @dialects = qw(Native WebWidgets JQueryTemplate);
