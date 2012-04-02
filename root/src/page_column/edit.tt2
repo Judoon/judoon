@@ -19,7 +19,7 @@
       <label class="control-label" for="page_column.template">Column Layout:</label>
       <div class="controls">
         <div id="column_canvas" class="well" style="height: 8em; width: 50em;">
-          [% page_column.object.template %]
+          [% page_column.object.webwidgets %]
           <div id="canvas_cursor"></div>
         </div>
         <input type="hidden" name="page_column.template" />
