@@ -44,12 +44,14 @@ after private_edit => sub {
         $c->stash->{ds_column}{list}[0]->get_linksites()
     );
 
-    my $translator = Judoon::Tmpl::Translator->new();
-    $c->stash->{page_column}{object}{template} =
-        $translator->translate({
-            from => 'Native', to => 'WebWidgets',
-            template =>$c->stash->{page_column}{object}->template,
-        });
+    if (my $template = $c->stash->{page_column}{object}->template) {
+        my $translator = Judoon::Tmpl::Translator->new();
+        $c->stash->{page_column}{object}->{webwidgets} =
+            $translator->translate(
+                from => 'Native', to => 'WebWidgets',
+                template => $template,
+            );
+    }
 };
 
 override edit_object => sub {
