@@ -242,3 +242,8 @@ function pbuild_submit_link_form() {
 /*
 */
 }
+
+
+function pbuild_add_formatter(widget) {
+    $(widget).find('.widget-format-sibling').first().after($('#formatting_menu').html());
+}

@@ -6,14 +6,14 @@
     <h6>Text widget</h6>
     <div id="text_widget">
       <div class="widget-object widget-type-text widget-inline btn-group">
-        <input type="text" class="inner-small span2 w-dropdown widget-format-target" placeholder="Type text here" />[% INCLUDE format_dropdown %]
+        <input type="text" class="inner-small span2 w-dropdown widget-format-target widget-format-sibling" placeholder="Type text here" />[% INCLUDE format_dropdown %]
       </div>
     </div>
 
     <h6>Data widget</h6>
     <div id="data_widget">
       <div class="widget-object widget-type-data widget-inline btn-group">
-        <select class="w-dropdown widget-format-target">
+        <select class="w-dropdown widget-format-target widget-format-sibling">
           [% FOREACH column IN ds_column.list %]
           <option value="[% column.shortname %]">{[% column.name | html %]}</option>
           [% END %]
@@ -25,7 +25,7 @@
     <h6>Link widget</h6>
     <div id="link_widget">
       <div class="widget-object widget-type-link widget-inline btn-group">
-        <a class="btn btn-edit-link"><i class="icon-pencil"></i> Edit link</a>[% INCLUDE format_dropdown %]
+        <a class="btn btn-edit-link widget-format-sibling"><i class="icon-pencil"></i> Edit link</a>[% INCLUDE format_dropdown %]
         <input type="hidden" class="widget-link-url-source widget-format-target" value="">
         <input type="hidden" class="widget-link-url-site"      value="">
         <input type="hidden" class="widget-link-url-prefix"    value="http://www.ncbi.nlm.nih.gov/gene/">
@@ -52,6 +52,9 @@
           <li><a class="widget-action-delete"><i class="icon-trash"></i>Delete</a></li>
         </ul>[% END %]
 
+        <div id="formatting_menu">
+          [% INCLUDE format_dropdown %]
+        </div>
 
   </fieldset>
 </form>
