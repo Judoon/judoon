@@ -112,12 +112,12 @@
                       <div class="accordion-inner">
                         <p class="help-block">Which column should the link be based off of?</p>
                         <select name="link_source" id="link_source">
-                          [% FOREACH acc_column IN linksets %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
+                          [% FOREACH acc_column IN linksets %][% NEXT UNLESS acc_column.is_accession %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
                         </select>
                         <p class="help-block">What site do you want to link to?</p>
                         [% FOREACH acc_column IN linksets %]
                         <select id="link_site_[% acc_column.shortname %]" name="link_site_[% acc_column.shortname %]" class="link_site [% IF loop.first %]link_site_active[% END %]">
-                          [% FOREACH link IN acc_column.links %]
+                          [% FOREACH link IN acc_column.linkset %]
                           <option value="[% link.value %]" title="[% link.example %]">[% link.text %]</option>
                           [% END %]
                         </select>
