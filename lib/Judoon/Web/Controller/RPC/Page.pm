@@ -40,6 +40,18 @@ override edit_object => sub {
 after private_edit => sub {
     my ($self, $c) = @_;
     $c->stash->{page_columns} = [$c->stash->{page}{object}->page_columns];
+
+    my %used;
+    for my $page_col (@{$c->stash->{page_columns}}) {
+        for my $node (map {$_->decompose} $page_col->template_to_objects()) {
+            next unless ($node->type eq 'variable');
+            push @{$used{$node->name}}, $page_col->title;
+        }
+    }
+    my @headers_used = map {{
+        title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
+    }} $c->stash->{dataset}{object}->ds_columns;
+    $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 
 

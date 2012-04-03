@@ -79,9 +79,9 @@
               </tr>
             </thead>
             <tbody>
-              [% FOREACH header IN dataset.object.headers %]
+              [% FOREACH header IN dataset.headers_used %]
               <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
-                <td>[% header | html %]</td>
+                <td>[% header.title | html %]</td>
                 <td>[% header.used_in | html %]</td>
               </tr>
               [% END %]
