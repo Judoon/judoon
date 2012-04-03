@@ -100,7 +100,6 @@ sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 sub template_to_jquery {
     my ($self) = @_;
-    warn "Template is: " . $self->template;
     return $self->translator->translate(
         from => 'Native', to => 'JQueryTemplate', template => $self->template
     );

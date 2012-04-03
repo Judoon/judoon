@@ -50,20 +50,14 @@ after private_edit => sub {
         [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]
     );
 
-    if (my $template = $c->stash->{page_column}{object}->template) {
-        $c->log->debug("Template is: $template");
-        $c->stash->{page_column}{object}->{webwidgets}
-            = $self->translator->translate(
-                from => 'Native', to => 'WebWidgets',
-                template => $template,
-            );
+    my $page_column = $c->stash->{page_column}{object};
+    if (my $template = $page_column->template) {
+        $page_column->{webwidgets} = $page_column->template_to_webwidgets();
     }
 };
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    use Data::Printer;
-    $c->log->debug('Params are: ' . p($params));
     return $c->stash->{page_column}{object}->update($params);
 };
 

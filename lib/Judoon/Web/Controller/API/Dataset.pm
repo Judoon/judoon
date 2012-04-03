@@ -53,17 +53,8 @@ sub object_GET {
         push @tmpl_data, \%yep;
     }
 
-    use Data::Printer;
-    my %d = (entity => {
-            dataset  => $c->stash->{dataset}{object},
-            aaData   => \@real_data,
-            tmplData => \@tmpl_data,
-        });
-    $c->log->debug('Bup: ' . p(%d));
-
     $self->status_ok($c,
         entity => {
-            #dataset  => $c->stash->{dataset}{object},
             aaData   => \@real_data,
             tmplData => \@tmpl_data,
         },
