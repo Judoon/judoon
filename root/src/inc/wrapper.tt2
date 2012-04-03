@@ -55,7 +55,8 @@
   </header>
   <div role="main" id="middle">
     <div class="container-fluid">
-      <div class="span2" style="display: none;">
+      <div class="row-fluid">
+      <div class="span2">
         <ul class="nav nav-list">
           <li class="nav-header">Things to do:</li>
           [% IF user %]<li><a href="[% c.uri_for_action('user_view', [user.login]) %]">Your homepage</a></li>[% END %]
@@ -65,8 +66,9 @@
           [% IF c.user_exists %]<li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>[% END %]
         </ul>
       </div>
-      <div class="span12" id="content">
+      <div class="span10" id="content">
         [% content %]
+      </div>
       </div>
     </div>
   </div>
