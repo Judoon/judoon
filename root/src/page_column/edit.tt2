@@ -113,8 +113,8 @@
 
     $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
 
-    $('#column_canvas').on('click', 'div.widget-type-link a.btn-edit-link',
-       function(event) {pbuild_open_link_form(event.currentTarget);}
+    $('#column_canvas').on('click', 'div.widget-type-link .btn-edit-link',
+       function(event) {pbuild_open_link_form(event.currentTarget); }
     );
 
     $('#link_source').on('change', function() {pbuild_select_link_source();});

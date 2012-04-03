@@ -25,12 +25,12 @@
     <h6>Link widget</h6>
     <div id="link_widget">
       <div class="widget-object widget-type-link widget-inline btn-group">
-        <a class="btn btn-edit-link widget-format-sibling"><i class="icon-pencil"></i> Edit link</a>
-        <input type="hidden" class="widget-link-url-source widget-format-target" value="">
+        <input type="text" class="inner-small span3 w-dropdown disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="Click here to edit link"  />
+        <input type="hidden" class="widget-link-url-source"    value="">
         <input type="hidden" class="widget-link-url-site"      value="">
-        <input type="hidden" class="widget-link-url-prefix"    value="http://www.ncbi.nlm.nih.gov/gene/">
+        <input type="hidden" class="widget-link-url-prefix"    value="">
         <input type="hidden" class="widget-link-url-postfix"   value="">
-        <input type="hidden" class="widget-link-url-datafield" value="protein_name">
+        <input type="hidden" class="widget-link-url-datafield" value="">
 
         <input type="hidden" class="widget-link-label-type"  value="static">
         <input type="hidden" class="widget-link-label-value" value="Entrez">
@@ -189,6 +189,8 @@
                 </label>
               </div>
             </div>
+          </fieldset>
+        </form>
 
       </div>
       <div class="modal-footer">

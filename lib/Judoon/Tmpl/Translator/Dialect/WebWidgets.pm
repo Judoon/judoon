@@ -86,7 +86,7 @@ method process_link($widget) {
     for my $input (@inputs) {
         my $input_classes = $input->attr('class');
         my ($link_field_type) = $input_classes =~ m/widget-link-([a-z\-]+)/g;
-        $link_props{$link_field_type} = $input->attr('value');
+        $link_props{$link_field_type} = $input->attr('value') if ($link_field_type);
         if (my @formats = ($input_classes =~ m/widget-formatting-(\w+)/g)) {
             @formatting = @formats;
         }
@@ -161,9 +161,14 @@ EOT
 has produce_link_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
 sub _build_produce_link_tmpl {
     return <<'EOT';
+[% IF ! node %][% placeholder_text = 'Click here to edit link' %][% ELSE %]
+[% display_url = node.uri_text_segments.0 _ node.uri_variable_segments.0 %]
+[% display_label = node.label_type == 'url' ? display_url : node.label_value _ ' (' _ display_url _ ')' %]
+[% placeholder_text = "Link to: " _ display_label %]
+[% END %]
 <div class="widget-object widget-type-link widget-inline btn-group">
-  <a class="btn btn-edit-link widget-format-sibling"><i class="icon-pencil"></i> Edit link</a>
-  <input type="hidden" class="widget-link-url-source widget-format-target" value="">
+  <input type="text" class="inner-small span3 w-dropdown disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="[% placeholder_text %]" />
+  <input type="hidden" class="widget-link-url-source"    value="">
   <input type="hidden" class="widget-link-url-site"      value="">
   <input type="hidden" class="widget-link-url-prefix"    value="">
   <input type="hidden" class="widget-link-url-postfix"   value="">

@@ -220,8 +220,18 @@ function pbuild_submit_link_form() {
     widget.find('input[class*="widget-link-label-type"]').attr('value', label_type);
     widget.find('input[class*="widget-link-label-value"]').attr('value', label_value);
 
-/*
-*/
+    // Update display
+    var display_label = $('#link_widget_label_preview').text();
+    var display_url   = $('#link_widget_url_preview').text();
+    var link_display  = "Link to: ";
+    if (label_type === 'url') {
+        link_display += display_url;
+    }
+    else {
+        link_display += display_label + ' (' + display_url + ')';
+    }
+    widget.find('.btn-edit-link').first().attr('placeholder',link_display);
+
 }
 
 
