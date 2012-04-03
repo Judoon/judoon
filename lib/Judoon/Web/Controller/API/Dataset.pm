@@ -4,6 +4,8 @@ use namespace::autoclean;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
+use List::AllUtils qw();
+
 =head1 NAME
 
 Judoon::Web::Controller::API::Dataset - Catalyst Controller
@@ -42,9 +44,18 @@ sub object_GET {
     my @columns = @{$c->stash->{ds_column}{list}};
     my @real_data = @{$c->stash->{dataset}{object}->data};
     shift @real_data;
+    my $total = @real_data;
+    my $filtered = $total;
+
+    my $params = $c->req->params();
+    if (my $search = $params->{sSearch}) {
+        $c->log->debug("Searching for $search...");
+        @real_data = grep {List::AllUtils::any(sub {m/$search/i}, @$_)} @real_data;
+        $filtered = @real_data;
+    }
+
 
     my ($start, $end) = (0, $#real_data);
-    my $params = $c->req->params();
     my $len = $params->{iDisplayLength};
     if ($len && $len < $#real_data && $len > 0) {
         my $start_p = $params->{iDisplayStart};
@@ -52,7 +63,7 @@ sub object_GET {
             $start = $start_p;
         }
         if ($start + $len < $#real_data) {
-            $end = $start + $len;
+            $end = $start + $len - 1;
         }
     }
     @real_data = @real_data[$start..$end];
@@ -69,8 +80,10 @@ sub object_GET {
 
     $self->status_ok($c,
         entity => {
-            aaData   => \@real_data,
-            tmplData => \@tmpl_data,
+            aaData               => \@real_data,
+            tmplData             => \@tmpl_data,
+            iTotalRecords        => $total,
+            iTotalDisplayRecords => $filtered,
         },
     );
 }
