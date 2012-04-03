@@ -18,6 +18,7 @@ around 'pack' => sub {
 };
 
 sub type { ... }
+sub decompose { ... }
 
 __PACKAGE__->meta->make_immutable;
 

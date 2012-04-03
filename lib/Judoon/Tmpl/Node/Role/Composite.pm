@@ -7,8 +7,6 @@ use Judoon::Tmpl::Factory;
 use Method::Signatures;
 
 
-requires 'decompose';
-
 method make_text_node($text) {
     return Judoon::Tmpl::Factory::new_text_node({value => $text, formatting => $self->formatting,});
 }
