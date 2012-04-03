@@ -2,9 +2,9 @@
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
-[% FOREACH p_column IN page_column.list %]
+[% FOREACH template IN page_column.templates %]
 <script id="column_tmpl_[% loop.count %]" type="text/x-jquery-tmpl">
-[% p_column.template %]
+[% template %]
 </script>
 [% END %]
 
@@ -112,7 +112,6 @@ $.extend( $.fn.dataTableExt.oPagination, {
       $('#demo_page').dataTable({
           "sAjaxSource" : "[% c.uri_for_action('/api/dataset/object', [dataset.id]) %]",
           "fnServerData" : function ( sSource, aoData, fnCallback ) {
-            var hello = "moo";
             $.ajax( {
                 "dataType": "json",
                 "type": "GET",

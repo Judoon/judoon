@@ -30,9 +30,8 @@ sub id : Chained('base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $ds_id) = @_;
 
     $c->stash->{dataset}{id} = $ds_id;
-    $c->stash->{dataset}{object} = $c->model('Users')->get_dataset($ds_id);
-    $c->stash->{ds_column}{list} = $c->model('Users')->get_columns_for_dataset($ds_id);
-
+    $c->stash->{dataset}{object} = $c->model('User::Dataset')->find({id => $ds_id});
+    $c->stash->{ds_column}{list} = [$c->stash->{dataset}{object}->ds_columns];
 }
 
 sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
@@ -40,7 +39,7 @@ sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 sub object_GET {
     my ($self, $c) = @_;
 
-    my @real_data = @{$c->stash->{dataset}{object}{data}};
+    my @real_data = @{$c->stash->{dataset}{object}->data};
     shift @real_data;
 
     my @columns = @{$c->stash->{ds_column}{list}};
@@ -49,15 +48,22 @@ sub object_GET {
     for my $data (@real_data) {
         my %yep;
         for my $i (0..$#columns) {
-            $yep{$columns[$i]->{shortname}} = $data->[$i];
+            $yep{$columns[$i]->shortname()} = $data->[$i];
         }
         push @tmpl_data, \%yep;
     }
 
+    use Data::Printer;
+    my %d = (entity => {
+            dataset  => $c->stash->{dataset}{object},
+            aaData   => \@real_data,
+            tmplData => \@tmpl_data,
+        });
+    $c->log->debug('Bup: ' . p(%d));
 
     $self->status_ok($c,
         entity => {
-            dataset  => $c->stash->{dataset}{object},
+            #dataset  => $c->stash->{dataset}{object},
             aaData   => \@real_data,
             tmplData => \@tmpl_data,
         },

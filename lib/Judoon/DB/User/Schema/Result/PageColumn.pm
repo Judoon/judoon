@@ -94,6 +94,25 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07017 @ 2012-02-28 16:31:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:aX9vDbJcTpDsvGsCsgYoCg
 
+use Judoon::Tmpl::Translator;
+has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 1);
+sub _build_translator { return Judoon::Tmpl::Translator->new; }
+
+sub template_to_jquery {
+    my ($self) = @_;
+    warn "Template is: " . $self->template;
+    return $self->translator->translate(
+        from => 'Native', to => 'JQueryTemplate', template => $self->template
+    );
+}
+
+sub template_to_webwidgets {
+    my ($self) = @_;
+    return $self->translator->translate(
+        from => 'Native', to => 'WebWidgets', template => $self->template
+    );
+}
+
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;

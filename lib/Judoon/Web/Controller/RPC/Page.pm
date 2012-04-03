@@ -5,6 +5,8 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller::RPC'; }
 
+use Data::Printer;
+
 __PACKAGE__->config(
     action => {
         base => { Chained => '/rpc/dataset/id', PathPart => 'page', },
@@ -44,9 +46,10 @@ after private_edit => sub {
 sub preview : Chained('id') PathPart('preview') Args(0) {
     my ($self, $c) = @_;
 
-    use Data::Printer;
     my $page_columns = [$c->stash->{page}{object}->page_columns];
     $c->stash->{page_column}{list} = $page_columns;
+    $c->stash->{page_column}{templates}
+        = [map {$_->template_to_jquery} @$page_columns];
     $c->stash->{template} = 'page/preview.tt2';
 }
 
