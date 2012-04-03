@@ -49,7 +49,7 @@ select.w-dropdown {
 .widget-formatting-bold { font-weight: bold; }
 .widget-formatting-italic { font-style: italic; }
 
-.column_container { display: inline-block; border: thin black solid; text-align: center; }
+.column_container { display: inline-block; border: thin black solid; text-align: center; padding: 4px; }
 .column_container div input { display: block; }
 
 

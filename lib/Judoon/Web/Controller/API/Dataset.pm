@@ -39,10 +39,24 @@ sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 sub object_GET {
     my ($self, $c) = @_;
 
+    my @columns = @{$c->stash->{ds_column}{list}};
     my @real_data = @{$c->stash->{dataset}{object}->data};
     shift @real_data;
 
-    my @columns = @{$c->stash->{ds_column}{list}};
+    my ($start, $end) = (0, $#real_data);
+    my $params = $c->req->params();
+    my $len = $params->{iDisplayLength};
+    if ($len && $len < $#real_data && $len > 0) {
+        my $start_p = $params->{iDisplayStart};
+        if ($start_p > $start && $start_p < $end) {
+            $start = $start_p;
+        }
+        if ($start + $len < $#real_data) {
+            $end = $start + $len;
+        }
+    }
+    @real_data = @real_data[$start..$end];
+
 
     my @tmpl_data;
     for my $data (@real_data) {
