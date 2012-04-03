@@ -54,7 +54,7 @@
               <span class="label">[% column.title | html %]</span>
               <button class="btn btn-mini" [% loop.last ? 'disabled' : '' %]><i class="icon-arrow-right"></i></button>
               <div class="edit_widget">
-                [% column.template %]
+                [% column.template_to_jquery %]
               </div>
               <div>
                 <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/edit', c.req.captures.merge([column.id])) %]"><i class="icon-plus"></i>Edit</a>
