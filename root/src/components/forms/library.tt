@@ -198,5 +198,6 @@
     </div>
 
 <script>
-  var pbuild_links = [% link_site_json %];
+  var pbuild_links    = [% link_site_json %];
+  var ds_columns_dict = [% ds_column_json %];
 </script>

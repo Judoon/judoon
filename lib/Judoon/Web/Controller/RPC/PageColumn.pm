@@ -46,6 +46,9 @@ after private_edit => sub {
     $c->stash->{link_site_json} = encode_json(
         $c->stash->{ds_column}{list}[0]->get_linksites()
     );
+    $c->stash->{ds_column_json} = encode_json(
+        [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]
+    );
 
     if (my $template = $c->stash->{page_column}{object}->template) {
         $c->log->debug("Template is: $template");

@@ -136,8 +136,11 @@ function pbuild_copy_canvas_to_input() {
     canvas.find('input').each(function() {
         $(this).attr('value', $(this).val());
     });
-    canvas.find('select option:selected').each(function() {
+    canvas.find('select option').filter(':selected').each(function() {
         $(this).attr('selected', 1);
+    });
+    canvas.find('select option').not(':selected').each(function() {
+        $(this).removeAttr('selected');
     });
     $('input[name="page_column.template"]').attr('value', canvas.html());
 }
@@ -217,6 +220,21 @@ function pbuild_submit_link_form() {
 */
 }
 
+
+function pbuild_init_stored_widget(widget) {
+    pbuild_init_widget(widget);
+    if (widget.hasClass('widget-type-data')) {
+        var select = widget.find('select');
+        var selected_option =  select.find('option').filter(':selected').detach();
+
+        for (col in ds_columns_dict) {
+            select.append('<option value="'+ds_columns_dict[col]['shortname']+'">{'+ ds_columns_dict[col]['name'] + '}</option>');
+            if (ds_columns_dict[col]['shortname'] === selected_option.attr('value')) {
+                select.children().last().attr('selected', 1);
+            }
+        }
+    }
+}
 
 function pbuild_init_widget(widget) {
         var widget_id = widget_count++;
