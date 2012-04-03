@@ -57,7 +57,7 @@
             <div class="row"><div class="span8"><h6>&nbsp;</h6></div></div>
             <div class="row">
               <div class="span4"><h6>Move Cursor</h6></div>
-              <div class="span2"><h6></h6></div>
+              <div class="span2"><h6>Actions</h6></div>
               <div class="span2"><h6></h6></div>
             </div>
             <div class="row">
@@ -67,6 +67,11 @@
                   <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i> Down</a>
                   <a class="btn" id="btn_cursor_left"><i class="icon-arrow-left"></i> Left</a>
                   <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i> Right</a>
+                </div>
+              </div>
+              <div class="span4">
+                <div class="btn-group">
+                  <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Backspace</a>
                 </div>
               </div>
             </div>
@@ -103,6 +108,8 @@
     $('#btn_cursor_down').on(  'click', function() {pbuild_cursor_down();}  );
     $('#btn_cursor_left').on(  'click', function() {pbuild_cursor_left();}  );
     $('#btn_cursor_right').on( 'click', function() {pbuild_cursor_right();} );
+
+    $('#btn_backspace').on( 'click', function() {pbuild_backspace();} );
 
     $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
 

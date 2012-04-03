@@ -18,6 +18,10 @@ function pbuild_delete_widget(widget_id) {
     return false;
 }
 
+function pbuild_backspace() {
+    $('#canvas_cursor').prev('.widget-object').remove();
+}
+
 function pbuild_toggle_format_bold(widget_id) {
     $(widget_id).toggleClass('widget-formatting-bold');
     return false;
