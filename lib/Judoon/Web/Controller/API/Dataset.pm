@@ -41,20 +41,18 @@ sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 sub object_GET {
     my ($self, $c) = @_;
 
-    my @columns = @{$c->stash->{ds_column}{list}};
     my @real_data = @{$c->stash->{dataset}{object}->data};
     shift @real_data;
-    my $total = @real_data;
-    my $filtered = $total;
+    my $filtered = my $total = @real_data;
 
+    # filter data by search param
     my $params = $c->req->params();
     if (my $search = $params->{sSearch}) {
-        $c->log->debug("Searching for $search...");
         @real_data = grep {List::AllUtils::any(sub {m/$search/i}, @$_)} @real_data;
         $filtered = @real_data;
     }
 
-
+    # paginate data
     my ($start, $end) = (0, $#real_data);
     my $len = $params->{iDisplayLength};
     if ($len && $len < $#real_data && $len > 0) {
@@ -68,19 +66,12 @@ sub object_GET {
     }
     @real_data = @real_data[$start..$end];
 
-
-    my @tmpl_data;
-    for my $data (@real_data) {
-        my %yep;
-        for my $i (0..$#columns) {
-            $yep{$columns[$i]->shortname()} = $data->[$i];
-        }
-        push @tmpl_data, \%yep;
-    }
+    # turn 2D data array into list of hashrefs
+    my @column_names = map {$_->shortname} @{$c->stash->{ds_column}{list}};
+    my @tmpl_data = map {{ List::AllUtils::zip @column_names, @$_ }} @real_data;
 
     $self->status_ok($c,
         entity => {
-            aaData               => \@real_data,
             tmplData             => \@tmpl_data,
             iTotalRecords        => $total,
             iTotalDisplayRecords => $filtered,
