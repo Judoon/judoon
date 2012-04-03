@@ -29,12 +29,15 @@ sub _build_dialect_objects {
 
 
 method translate(:$from!, :$to!, :$template!) {
-    die "$from is not a valid dialect" if (not grep {$_ eq $from} dialects());
     die "$to is not a valid dialect"   if (not grep {$_ eq $to} dialects());
-    my @native_objs = $self->dialect_objects->{$from}->parse($template);
-    return $self->dialect_objects->{$to}->produce(\@native_objs);
+    my @native_objects = $self->to_objects(from => $from, template => $template);
+    return $self->dialect_objects->{$to}->produce(\@native_objects);
 }
 
+method to_objects(:$from!, :$template!) {
+    die "$from is not a valid dialect" if (not grep {$_ eq $from} dialects());
+    return $self->dialect_objects->{$from}->parse($template);
+}
 
 
 __PACKAGE__->meta->make_immutable;
