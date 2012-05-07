@@ -32,7 +32,7 @@ wierd paths:
    Dataset/postadd => not sure I'm still using this
 ** TODO Feature: upload excel spreadsheet, automatically create page
 No formatting, no annotation, dead simple.
-* Judoon::DB::Users
+* Judoon::DB::User::Schema
 ** DONE [#A] Convert DB::User to DBIC
 CLOSED: [2012-03-28 Wed 13:45]
 ** DONE [#A] Get rid of J::DB::Users / J::W::Model::Users / tests
@@ -50,16 +50,16 @@ Right now, User creates DSColumns.  That seems weird. That should be
 DS's responsibility.  Also, DSColumns create their own shortname.  I
 think that that's Dataset's job, since we don't want DSColumns in a
 dataset to have identical shortnames.
-** Later may need to create a wrapper class for code that doesn't live in any one result
+** TODO [#C] Later may need to create a wrapper class for code that doesn't live in any one result
 See http://www.perlmonks.org/?node_id=915657 for how to wrap this with a model.
 E.G. create Judoon::DB::User that has => schema
-* Judoon::TemplateTranslator
-** TODO Fill out TemplateTranslator
+* Judoon::Tmpl
+** TODO [#A] Fill out TemplateTranslator
 - Create J::Tmpl::Widget class
 J::Tmpl::Widget::Text, J::Tmpl::Widget::Data, etc.
 Can convert from class to html or template?
 ** Tmpl::Translator::Dialect::WebWidgets
-*** move widget-format-target into it's own hidden with name widget-link-null
+*** move widget-format-target into its own hidden with name widget-link-null
 need to update WebWidgets.pm && library.tt
 * judoon.js
 ** TODO Move JS into object
