@@ -13,6 +13,7 @@ They can build a webpage that displays their data
 <div class="input-prepend"><span class="add-on">&#x1f517;</span></div>
 
 * reboot db:
+alias dbicm="DBIC_MIGRATION_SCHEMA_CLASS=Judoon::DB::User::Schema dbic-migration -Ilib"
 dbicm drop_tables
 dbicm install --to_version 1
 dbicm upgrade
