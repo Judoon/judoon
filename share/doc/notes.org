@@ -1,0 +1,153 @@
+# org-mode config
+#+STARTUP: indent
+#+TODO: TODO | DONE WONT
+
+* GOAL
+
+Create a data page for non-tech user to upload excel spreadsheets.
+They can add structure to the data
+They can retrieve their data
+They can build a webpage that displays their data
+
+* Link HTML
+<div class="input-prepend"><span class="add-on">&#x1f517;</span></div>
+
+* reboot db:
+dbicm drop_tables
+dbicm install --to_version 1
+dbicm upgrade
+
+* Links
+- accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value: 
+- accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: url label_value: 
+- accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: static label_value: "See Entrez Gene" 
+   For these, easy:  [textseg],[varseg is {gene_id}]
+
+- accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value: 
+   Tougher:  [textseg], [varseg is convert_acc({gene_id})]
+
+- accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value:  url_postfix: '?filter=boo'
+  scheme: [textseg],[varseg is {gene_id}],[url-postfix]
+
+* Accessions
+** Judoon::Accession::Roles::IsCanonical
+for Entrez::GeneId, Uniprot::UniprotId, etc.
+** Judoon::Accession::Roles::IsntCanonical
+Entrez::GeneName, Uniprot::
+
+* Color Scheme
+Color Scheme: http://colorschemedesigner.com/#3861Tw0w0w0w0
+Primary Color:
+00A876	207E62	006D4C	35D4A4	5FD4B1
+Secondary Color A:
+0D56A6	274F7D	04356C	4186D3	689AD3
+Secondary Color B:
+4DDE00	55A62A	329000	7AEE3C	99EE6B
+Complementary Color:
+FF5900	BF6230	A63A00	FF8240	FFA473
+
+* cursor movement
+
+given:
+  i i i n
+b i i i n
+b i c i n
+b i i i
+
+  i i i i n
+b i i i i i i n
+b i i c i n
+b i i i i
+
+
+
+up: 
+down:
+left: c.prev.type != inline ? do_nothing() : c.prev.before(c.detach);
+right:  
+
+* url design
+| URL                           | Action                                                  |
+| \/                            | index page                                              |
+| /user                         | list of users (optional, maybe just redirect to prompt) |
+| /user/$user_id                | homepage of $user_id                                    |
+| /user/$user_id/dataset        | list of your datasets                                   |
+| /user/$user_id/dataset/$ds_id | view of $user's $dataset                                |
+| /user/$user_id/page           | list of your pages                                      |
+| /user/$user_id/page/$page_id  | view of $user's $page                                   |
+
+* existing data
+** Genetic Approaches
+*** Schwarzbauer DTC
+No Linked Data
+Category Search
+**** http://www.cellmigration.org/resource/discovery/schwarzbauer/schwarzbauer_dtc_auto.cgi
+**** 
+*** Schwarzbauer RNAi
+Category Search
+No Linked Data
+Alternate links
+**** http://www.cellmigration.org/resource/discovery/schwarzbauer/schwarzbauer_rnai2.cgi
+*** Montell Super Table
+Category Search
+Rowspans
+Color Coding
+**** http://www.cellmigration.org/resource/discovery/montell/montell_super2.cgi
+**** http://www.cellmigration.org/resource/discovery/montell/data/super-table-6.xls
+*** Montell Downstream targets
+Not converted
+**** http://www.cellmigration.org/resource/discovery/montell_down_mig.shtml
+*** Montell cytoskeleton screens
+**** http://www.cellmigration.org/resource/discovery/montell/dm_cytoskel_screen.cgi
+**** http://www.cellmigration.org/resource/discovery/montell/dm_mig_gene_screen1_v1.xls
+*** D'ambrosio RNAi
+Color-coding
+Images
+Column Footnotes
+**** http://www.cellmigration.org/resource/discovery/vale/dambrosio2010_rnai.cgi
+**** http://www.cellmigration.org/resource/discovery/vale/down_file.cgi?name=dambrosio_all.tab&mode=text
+*** Montell Up-regulation
+Not converted
+**** http://www.cellmigration.org/resource/discovery/montell_up_mig.shtml
+*** Montell vesicle screen
+**** http://www.cellmigration.org/resource/discovery/montell/dm_vesicle_screen.cgi
+**** http://www.cellmigration.org/resource/discovery/montell/dm_mig_gene_screen2_v1.xls
+** Genetic Screens
+*** Condeelis MTLn3
+**** http://www.cellmigration.org/resource/discovery/condeelis/view_condeelis2.cgi
+**** Weird: 2nd table: http://www.cellmigration.org/resource/discovery/condeelis/view_condeelis2.cgi?table=table2
+*** Geiger Bg4
+Nothing
+**** http://www.cellmigration.org/resource/discovery/geiger/geiger_bg4.shtml
+*** Geiger Bg5
+Nothing
+**** http://www.cellmigration.org/resource/discovery/geiger/geiger_bg5.shtml
+*** Geiger RNAi
+No Data
+Images
+**** http://www.cellmigration.org/resource/discovery/geiger/view_geiger_rnai.cgi
+*** Brugge Master
+No Data
+**** http://www.cellmigration.org/resource/discovery/brugge/brugge_master.cgi
+*** Simpson 2008 RNAi:
+Category Search
+Images
+Column Footnotes
+**** http://www.cellmigration.org/resource/discovery/brugge/simpson2008_rnai.cgi
+**** http://www.cellmigration.org/resource/discovery/brugge/simpson2008/Simpson_etal_NCB_2008-2.xls
+*** Geiger Bg3
+Not converted
+**** http://www.cellmigration.org/resource/discovery/geiger/geiger_bg3.shtml
+*** Horwitz Lw1
+Not converted
+**** http://www.cellmigration.org/resource/discovery/horwitz/horwitz_lw1.shtml
+*** Geiger RNAi 2009
+Images
+Category Search
+**** http://www.cellmigration.org/resource/discovery/geiger/geiger2009_rnai.cgi
+*** Geiger Bg2
+Not converted
+**** http://www.cellmigration.org/resource/discovery/geiger/geiger_bg2.shtml
+*** Geiger Chembridge
+Not Converted
+**** http://www.cellmigration.org/resource/discovery/geiger/geiger_chembridge.shtml

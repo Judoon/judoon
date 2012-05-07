@@ -1,0 +1,71 @@
+# org-mode config
+#+STARTUP: indent
+#+TODO: TODO | DONE WONT
+
+* Judoon::Web
+** TODO [#A] URL widgets                                           :feature:
+Finish this feature
+** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
+** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
+** User::edit
+*** TODO Need delete button for datasets
+*** TODO Don't try to upload w/o file
+** Dataset::edit
+*** Allow multiple pages
+User may want to create multiple views of a complex dataset
+** Login
+*** TODO [#A] update Login to use proper users, i.e. from db
+Catalyst::Plugin::Authorization::Roles - Role-based authorization
+Catalyst::Plugin::Authorization::ACL - ACL-based authorization
+*** TODO [#C] Allow alternative logins? (FB, OAuth, etc?)         :feature:
+** modules for evaluation:
+*** Catalyst::Controller::DBIC::API::REST
+*** Catalyst::Plugin::StatusMessage
+*** Catalyst::Plugin::ErrorCatcher
+After new catalyst is released
+
+** TODO [#B] Should I switch to REST::ForBrowsers?
+most of our actions are pretty basic
+HTML5 allows multiple forms
+wierd paths:
+   Page/preview  => could be /?view=preview or accept-type?
+   Dataset/postadd => not sure I'm still using this
+** TODO Feature: upload excel spreadsheet, automatically create page
+No formatting, no annotation, dead simple.
+* Judoon::DB::Users
+** DONE [#A] Convert DB::User to DBIC
+CLOSED: [2012-03-28 Wed 13:45]
+** DONE [#A] Get rid of J::DB::Users / J::W::Model::Users / tests
+CLOSED: [2012-03-28 Wed 14:10]
+** TODO [#A] Fill out User class to make a proper user
+password, email, etc.
+DBIx::Class::PassphraseColumn
+Authen::Passphrase::BlowfishCrypt
+http://www.catalystframework.org/calendar/2011/15
+Catalyst::Authentication::Realm::SimpleDB
+Catalyst::Authentication::Store::DBIx::Class
+** TODO [#A] move R::User::import_data into its own module
+** TODO [#A] DSColumn creation code should probably be moved into Dataset
+Right now, User creates DSColumns.  That seems weird. That should be
+DS's responsibility.  Also, DSColumns create their own shortname.  I
+think that that's Dataset's job, since we don't want DSColumns in a
+dataset to have identical shortnames.
+** Later may need to create a wrapper class for code that doesn't live in any one result
+See http://www.perlmonks.org/?node_id=915657 for how to wrap this with a model.
+E.G. create Judoon::DB::User that has => schema
+* Judoon::TemplateTranslator
+** TODO Fill out TemplateTranslator
+- Create J::Tmpl::Widget class
+J::Tmpl::Widget::Text, J::Tmpl::Widget::Data, etc.
+Can convert from class to html or template?
+** Tmpl::Translator::Dialect::WebWidgets
+*** move widget-format-target into it's own hidden with name widget-link-null
+need to update WebWidgets.pm && library.tt
+* judoon.js
+** TODO Move JS into object
+* Judoon::Spreadsheet::Importer
+** TODO [#B] move code from J:DB::U::S::R::U::import_data() into here
+
+
+* Judoon user deployment
+** Look at Wordpress, drupal for quick deployment ideas
