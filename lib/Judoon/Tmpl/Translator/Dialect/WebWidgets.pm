@@ -85,24 +85,28 @@ method process_link($widget) {
     my (%link_props, @formatting);
     for my $input (@inputs) {
         my $input_classes = $input->attr('class');
-        my ($link_field_type) = $input_classes =~ m/widget-link-([a-z\-]+)/g;
+        my ($link_field_type) = $input_classes =~ m/widget-link-([a-z0-9\-]+)/g;
         $link_props{$link_field_type} = $input->attr('value') if ($link_field_type);
         if (my @formats = ($input_classes =~ m/widget-formatting-(\w+)/g)) {
             @formatting = @formats;
         }
     }
 
-    my @fields = qw(url-site url-prefix url-postfix url-datafield label-type label-value);
-    my %link_args = (
-        uri_text_segments     => [$link_props{'url-prefix'}],
-        uri_variable_segments => [$link_props{'url-datafield'}],
-        label_type            => $link_props{'label-type'},
-    );
-    if ($link_props{'url-postfix'}) {
-        push @{$link_args{text_segments}}, $link_props{'url-postfix'};
-    }
-    if ($link_props{'label-value'}) {
-        $link_args{label_value} = $link_props{'label-value'};
+    my %link_args;
+    for my $component (qw(url label)) {
+        $link_args{$component} = {
+            varstring_type => $link_props{"${component}-type"},
+            accession      => $link_props{"${component}-accession"} || '',
+        };
+
+        for my $segtype (qw(text variable)) {
+            my @segs = map {$link_props{"${component}-${segtype}-segment-$_"}}
+                sort {$a <=> $b}
+                    grep {defined}
+                        map {m/$component\-$segtype\-segment\-(\d+)/}
+                            keys %link_props;
+            $link_args{$component}->{"${segtype}_segments"} = @segs ? \@segs : [q{}];
+        }
     }
 
     return new_link_node({formatting => [@formatting], %link_args,});
@@ -162,19 +166,21 @@ has produce_link_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
 sub _build_produce_link_tmpl {
     return <<'EOT';
 [% IF ! node %][% placeholder_text = 'Click here to edit link' %][% ELSE %]
-[% display_url = node.uri_text_segments.0 _ node.uri_variable_segments.0 %]
-[% display_label = node.label_type == 'url' ? display_url : node.label_value _ ' (' _ display_url _ ')' %]
-[% placeholder_text = "Link to: " _ display_label %]
+[% display_url   = node.url.text_segments.0 _ (node.url.variable_segments.0 ? node.url.variable_segments.0 : '') %]
+[% display_label = node.label.text_segments.0 _ (node.label.variable_segments.0 ? node.label.variable_segments.0 : '') %]
+[% placeholder_text = "Link to: " _ (display_url == display_label ? display_url : display_label _ ' (' _ display_url _ ')') %]
+<!-- display_url is [% display_url %] -->
+<!-- display_label is [% display_label %] -->
 [% END %]
 <div class="widget-object widget-type-link widget-inline btn-group">
   <input type="text" class="inner-small span3 w-dropdown disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="[% placeholder_text %]" />
-  <input type="hidden" class="widget-link-url-source"    value="">
-  <input type="hidden" class="widget-link-url-site"      value="">
-  <input type="hidden" class="widget-link-url-prefix"    value="">
-  <input type="hidden" class="widget-link-url-postfix"   value="">
-  <input type="hidden" class="widget-link-url-datafield" value="">
-  <input type="hidden" class="widget-link-label-type"  value="[% node.label_type %]">
-  <input type="hidden" class="widget-link-label-value" value="[% node.label_value %]">
+  [% FOREACH component IN ['url', 'label'] %]
+  <input type="hidden" class="widget-link-[% component %]-accession" value="[% node.$component.accession %]">
+  <input type="hidden" class="widget-link-[% component %]-type"      value="[% node.$component.varstring_type %]">
+  [% FOREACH segtype IN ['text', 'variable'] %][% seg_method = segtype _ '_segments' %][% FOREACH seg IN node.$component.$seg_method %]
+  <input type="hidden" class="widget-link-[% component %]-[% segtype %]-segment-[% loop.count %]" value="[% seg %]">
+  [% END %][% END %]
+  [% END %]
 </div>
 EOT
 }

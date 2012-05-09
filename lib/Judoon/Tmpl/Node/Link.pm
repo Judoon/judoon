@@ -10,19 +10,20 @@ with qw(
 );
 
 use Judoon::Tmpl::Factory;
-use List::AllUtils qw(each_arrayref);
+use Judoon::Tmpl::Node::VarString;
 use Method::Signatures;
-use Moose::Util::TypeConstraints qw(enum);
-
-enum 'LabelType', [qw(url static)];
+use Moose::Util::TypeConstraints qw(subtype as coerce from via);
 
 sub type { return 'link'; }
-has uri_text_segments     => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
-has uri_variable_segments => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
 
-has label_type => (is => 'ro', isa => 'LabelType', required => 1);
-has label_value => (is => 'ro', isa => 'Str', );
+subtype 'VarStringNode',
+    as 'Judoon::Tmpl::Node::VarString';
+coerce 'VarStringNode',
+    from 'HashRef',
+    via { return Judoon::Tmpl::Node::VarString->new($_) };
 
+has url   => (is => 'ro', isa => 'VarStringNode', required => 1, coerce => 1, );
+has label => (is => 'ro', isa => 'VarStringNode', required => 1, coerce => 1, );
 
 =head2 decompose()
 
@@ -37,28 +38,17 @@ method decompose {
     # open anchor tag: <a href="
     my @nodes = $self->make_text_node(q{<a href="});
 
-    # build the nodes for the url, but save them since they might be
-    # needed for the label
-    my @url_nodes;
-    my $it = each_arrayref $self->uri_text_segments, $self->uri_variable_segments;
-    while (my ($text, $var) = $it->()) {
-        push @url_nodes, $self->make_text_node($text) if ($text);
-        push @url_nodes, $self->make_variable_node($var) if ($var);
-    }
-    push @nodes, @url_nodes;
+    # build the nodes for the url
+    push @nodes, $self->url->decompose;
 
     # close html link: ">
     push @nodes, $self->make_text_node(q{">});
 
     # add the label
-    push @nodes,
-        $self->label_type eq 'url'    ? @url_nodes
-      : $self->label_type eq 'static' ? $self->make_text_node($self->label_value)
-      : die "Unsupported label_type: " . $self->label_type;
+    push @nodes, $self->label->decompose;
 
     # close a tag: </a>
     push @nodes, $self->make_text_node(q{</a>});
-
 
     return @nodes;
 }

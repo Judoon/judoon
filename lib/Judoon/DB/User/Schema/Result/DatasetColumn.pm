@@ -125,111 +125,6 @@ __PACKAGE__->belongs_to(
 );
 
 
-has accession_types => ( is => 'ro', isa => 'ArrayRef', lazy_build => 1, );
-sub _build_accession_types {
-    return [
-        { group_label => 'NCBI', types => [
-            map {{field => $_->[0], label => $_->[1],}} (
-                ['gene_id',    'Gene ID',   ],
-                ['gene_name',  'Gene Name', ],
-                ['refseq_id',  'RefSeq ID', ],
-                ['protein_id', 'Protein ID',],
-                ['unigene_id', 'UniGene ID',],
-                ['pubmed_id',  'PubMed ID', ],
-            )
-        ], },
-        { group_label => 'Uniprot', types => [
-            map {{field => $_->[0], label => $_->[1],}} (
-                ['uniprot_id', 'Uniprot ID'],
-            )
-        ], },
-        { group_label => 'CritterBases', types => [
-            map {{field => $_->[0], label => $_->[1],}} (
-                ['flybase_id',  'FlyBase ID',  ],
-                ['wormbase_id', 'WormBase ID', ],
-            )
-        ], },
-    ];
-}
-
-has linkthings => ( is => 'ro', isa => 'HashRef', lazy_build => 1, );
-sub _build_linkthings {
-    return {
-    gene_name  => {label => '', links => [
-        {
-            value=>'gene',
-            text=>'Entrez Gene',
-            example=>'http://www.ncbi.nlm.nih.gov/gene/7094',
-            prefix=>'http://www.ncbi.nlm.nih.gov/gene/',
-            postfix=>'',
-        },
-        {
-            value=>'uniprot',
-            text=>'Uniprot',
-            example=>'http://www.uniprot.org/uniprot/Q9Y490',
-            prefix=>'http://www.uniprot.org/uniprot/',
-            postfix=>'',
-        },
-        {
-            value=>'cmkb',
-            text=>'Cell Migration KnowledgeBase',
-            example=>'http://cmckb.cellmigration.org/gene/?gene_name=TLN1',
-            prefix=>'http://cmckb.cellmigration.org/gene/?gene_name=',
-            postfix=>'',
-        },
-        {
-            value=>'omim',
-            text=>'OMIM',
-            example=>'http://www.ncbi.nlm.nih.gov/omim/186745',
-            prefix=>'http://www.ncbi.nlm.nih.gov/omim/',
-            postfix=>'',
-        },
-        {
-            value=>'pfam',
-            text=>'PFAM',
-            example=>'http://pfam.sanger.ac.uk/protein?acc=Q9Y490',
-            prefix=>'http://pfam.sanger.ac.uk/protein?acc=',
-            postfix=>'',
-        },
-        {
-            value=>'addgene',
-            text=>'AddGene',
-            example=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=7094',
-            prefix=>'http://www.addgene.org/pgvec1?f=c&cmd=showgene&geneid=',
-            postfix=>'',
-        },
-        {
-            value=>'kegg',
-            text=>'KEGG',
-            example=>'http://www.genome.jp/dbget-bin/www_bget?hsa:7094',
-            prefix=>'http://www.genome.jp/dbget-bin/www_bget?hsa:',
-            postfix=>'',
-        },
-    ],},
-    flybase_id => {label => '', links => [
-        {
-            value => 'flybase',
-            text => 'FlyBase',
-            example => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?FBgn0025725',
-            prefix => 'http://flybase.bio.indiana.edu/.bin/fbidq.html?',
-            postfix=>'',
-        },
-    ],},
-    unigene_id => {
-        label => '',
-        links => [
-        {
-            value=>'unigene',
-            text=>'UniGene',
-            example=>'http://www.ncbi.nlm.nih.gov/unigene/686173',
-            prefix=>'http://www.ncbi.nlm.nih.gov/unigene/',
-            postfix=>'',
-        },
-    ],},
-};
-}
-
-
 # from MooseX::NonMoose, lets us preprocess the args to new()
 sub FOREIGNBUILDARGS {
     my ($class, $args) = @_;
@@ -243,33 +138,35 @@ sub FOREIGNBUILDARGS {
     return $args;
 }
 
+use Judoon::SiteLinker;
+has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
+sub _build_sitelinker { return Judoon::SiteLinker->new; }
+
 
 sub linkset {
     my ($self) = @_;
 
     my @links;
     if ($self->is_accession) {
-        @links = @{$self->linkthings->{$self->accession_type}->{links}}
+        my $sites = $self->sitelinker->mapping->{accession}{$self->accession_type};
+        for my $site (keys %$sites) {
+            my $site_conf = $self->sitelinker->sites->{$site};
+            push @links, {
+                value   => $site_conf->{name},
+                example => '',
+                text    => $site_conf->{label},
+            };
+        }
     }
     elsif ($self->is_url) {
         @links = 'something else?';
     }
+
+
     return \@links;
 }
 
 
-sub get_linksites {
-    my ($self) = @_;
-
-    my %new_struct;
-    for my $t (values %{$self->linkthings}) {
-        for my $l (@{$t->{links}}) {
-            $new_struct{$l->{value}} = $l;
-        }
-    }
-
-    return \%new_struct;
-}
 
 
 

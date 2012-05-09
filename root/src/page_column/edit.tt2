@@ -96,6 +96,14 @@
 </div>
 
 <script>
+  var delay = (function(){
+      var timer = 0;
+      return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+      };
+  })();
+
   $(document).ready(function () {
     $('#btn_add_text').on(   'click', function() {pbuild_add_widget('text');}    );
     $('#btn_add_data').on(   'click', function() {pbuild_add_widget('data');}    );
@@ -117,12 +125,14 @@
        function(event) {pbuild_open_link_form(event.currentTarget); }
     );
 
-    $('#link_source').on('change', function() {pbuild_select_link_source();});
-    $('#link_widget_url_source select.link_site').on(  'change', function() {pbuild_select_link_site();});
-    $('#link_label_static').on( 'change', function() {pbuild_link_widget_preview();} );
-    $('#link_widget_label_form input[name="link.label_type"]').on(
-        'change', function() {pbuild_link_widget_preview();} 
-    );
+    $('#link_source').on('change', function() {pbuild_update_link_sites(); pbuild_update_preview();});
+    $('#link_widget_url_form').on( 'change', 'input', function() {pbuild_update_preview();} );
+    $('#link_widget_url_form').on( 'change', 'select', function() {pbuild_update_preview();} );
+    $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_preview();}, 200);} );
+
+    $('#link_widget_label_form').on( 'change', 'input', function() {pbuild_update_label_preview();} );
+    $('#link_widget_label_form').on( 'change', 'select', function() {pbuild_update_label_preview();} );
+    $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_label_preview();}, 200);} );
 
     $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
 

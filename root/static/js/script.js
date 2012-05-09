@@ -155,76 +155,271 @@ function translate_column_template() {
 }
 
 
-function pbuild_select_link_source() {
-    var source = $('#link_source').val();
-    $("#link_widget_url_source select.link_site_active").removeClass('link_site_active');
-    $("#link_site_" + source).addClass('link_site_active');
-    pbuild_select_link_site();
+/* ========================================
+
+   Link Builder Modal functions
+
+   ======================================== */
+
+function pbuild_get_url_type() {
+    return $('input[name="url_type"]');
 }
 
-function pbuild_select_link_site() {
-    var new_site = $("#link_widget_url_source select.link_site_active option").filter("option:selected");
-    $('#link_widget_label_default_preview').html(new_site.text());
-    $('#link_widget_label_url_preview').html(new_site.attr('title'));
-    pbuild_link_widget_preview();
+function pbuild_get_active_link_site() {
+    return $("#link_widget_url_source select.link_site_active");
 }
 
-function pbuild_link_widget_preview() {
-    var link_site = $("#link_widget_url_source select.link_site_active option").filter(":selected");
-    var label_url = link_site.attr('title');
+function pbuild_get_selected_link_site() {
+    return pbuild_get_active_link_site().children("option:selected");
+}
 
-    var label_type_val = $('#link_widget_label_form input[name="link.label_type"]:checked').val();
-    var label_preview = label_type_val === 'default' ? link_site.text()
-                      : label_type_val === 'url'     ? label_url
-                      : label_type_val === 'static'  ? $('#link_label_static').val()
-                      :                                'Something went wrong!';
-                     
-    $('#link_widget_label_preview').html('<a href="'+label_url+'" title="'+label_url+'">'+label_preview+'</a>');
-    $('#link_widget_url_preview').html(label_url);
+function pbuild_set_link_source(source_key) {
+    $('#link_source').val(source_key);
+    pbuild_update_link_sites();
+}
+
+function pbuild_update_link_sites() {
+    pbuild_get_active_link_site().removeClass('link_site_active');
+    $("#link_site_" + $('#link_source').val()).addClass('link_site_active');
+}
+
+function pbuild_get_label_type() {
+    return $('#link_widget_label_form input[name="label_type"]');
+}
+
+// get the dropdown to use dataset columns as labels
+function pbuild_get_label_source() { return $('#label_source'); }
+
+// zip a text list and variable list into a string
+// the text list always goes first
+function pbuild_zip_segments(text_segs, data_segs) {
+    var maxlen = Math.max(text_segs.length, data_segs.length);
+    var retstring = '';
+    for (var i = 0; i < maxlen; i++) {
+        retstring += text_segs[i] || '';
+        retstring += data_segs[i] || '';
+    }
+    return retstring;
+}
+
+// update the link preview panel
+function pbuild_update_preview() {
+    pbuild_update_url_preview();
+    pbuild_update_label_preview();
+}
+
+// this shouldn't be called directly, since a change in url could require
+// a change in label. Use pbuild_update_preview() instead.
+function pbuild_update_url_preview() {
+    var preview_url   = '';
+    var url_type_val = pbuild_get_url_type().filter(':checked').val();
+    switch (url_type_val) {
+        case 'static':
+            preview_url = $('#link_widget_url_static').val();
+            break;
+        case 'variable_simple':
+            preview_url = sample_data[$('#link_url_source').val()];
+            break;
+        case 'variable_complex':
+            var var_sample = sample_data[$('#constructed_url_source').val()];
+            var var_prefix = $('#constructed_url_prefix').val();
+            var var_suffix = $('#constructed_url_suffix').val();
+            preview_url = pbuild_zip_segments([var_prefix, var_suffix],[var_sample]);
+            break;
+        case 'accession':
+            var site_id    = pbuild_get_selected_link_site().val();
+            var accession  = column_acctype[$('#link_source').val()];
+            var link       = pbuild_links[site_id][accession];
+            var acc_sample = sitelinker_accs[accession].example;
+            preview_url    = pbuild_zip_segments([link.prefix, link.postfix], [acc_sample]);
+            break;
+        default:
+            preview_url = 'Something went wrong!';
+    }
+
+    $('#link_widget_url_preview').html(preview_url);
+}
+
+function pbuild_update_label_preview() {
+    var preview_url = $('#link_widget_url_preview').html();
+    var preview_label = '';
+    var label_type_val = pbuild_get_label_type().filter(':checked').val();
+    switch (label_type_val) {
+        case 'default':
+            preview_label = pbuild_get_url_type().filter(':checked').val() === 'accession' ?
+                sitelinker_sites[pbuild_get_selected_link_site().val()].label
+              : 'Link';
+            break;
+        case 'url':
+            preview_label = preview_url;
+            break;
+        case 'variable':
+            var lbl_sample = sample_data[pbuild_get_label_source().val()];
+            var lbl_prefix = $('#label_source_prefix').val();
+            var lbl_suffix = $('#label_source_suffix').val();
+            preview_label = pbuild_zip_segments([lbl_prefix, lbl_suffix],[lbl_sample]);
+            break;
+        case 'static':
+            preview_label = $('#link_label_static').val();
+            break;
+        default:
+            preview_label = 'Something went wrong!';
+    }
+
+    $('#link_widget_label_preview').html('<a href="'+preview_url+'" title="'+preview_url+'">'+preview_label+'</a>');
 }
 
 
+// open and initialize the link modal
 function pbuild_open_link_form(link_widget_button) {
     var this_btn = link_widget_button;
+    var widget   = $(this_btn).parent();
+    $('#linkModal').data('widget_id', widget.attr('id'));
+
+    var props = pbuild_get_link_props_for_widget(widget);
+
+    // initialize url form values
+    var default_label = 'Link';
+    var url_radio = pbuild_get_url_type();
+    if (props.url.type === 'accession') {
+        url_radio.val(['accession']);
+        pbuild_set_link_source(props.url['variable-segment-1']);
+        pbuild_get_active_link_site().val(props.url.accession);
+        default_label = sitelinker_sites[props.url.accession].label;
+    }
+    else if (props.url.type === 'variable') {
+        var not_empty = /\S/;
+        if (not_empty.test(props.url['text-segment-1'])) {
+            url_radio.val(['variable_complex']);
+            $('#constructed_url_source').val(props.url['variable-segment-1']);
+            $('#constructed_url_prefix').val(props.url['text-segment-1']);
+            $('#constructed_url_suffix').val(props.url['text-segment-2']);
+        }
+        else {
+            url_radio.val(['variable_simple']);
+            $('#link_url_source').val(props.url['variable-segment-1']);
+        }
+    }
+    else if (props.url.type === 'static') {
+        url_radio.val(['static']);
+        $('#link_widget_url_static').val(props.url['text-segment-1']);
+    }
+    else {
+        // do what?
+        // do nothing.
+    }
+
+    // initialize label form values
+    var label_radio = pbuild_get_label_type();
+    if (props.label.type === "accession") {
+        label_radio.val(['url']);
+    }
+    else if (props.label.type === "variable") {
+        label_radio.val(['variable']);
+        pbuild_get_label_source().val(props.label['variable-segment-1']);
+        $('#label_source_prefix').val(props.label['text-segment-1']);
+        $('#label_source_suffix').val(props.label['text-segment-2']);
+    }
+    else if (props.label.type === "static") {
+        if (props.label['text-segment-1'] === default_label) {
+            label_radio.val(['default']);
+        }
+        else {
+            label_radio.val(['static']);
+            $('#link_label_static').val(props.label['text-segment-1']);
+        }
+    }
+    else {
+        // do what?
+        // do nothing.
+    }
+
+    pbuild_update_preview();
+
+    // show the modal
     $('#linkModal').modal();
-    $('#linkModal').data('widget_id', $(this_btn).parent().attr('id'));
-    pbuild_link_widget_preview();
 }
 
-
+// Runs when user clicks 'submit' on the link modal.
+// Responsible for reading the modal forms and writing
+// out the appropriate html into the canvas
 function pbuild_submit_link_form() {
     $('#linkModal').modal('hide');
     var widget_id = $('#linkModal').data('widget_id');
-    var widget = $('#'+widget_id);
+    var widget    = $('#'+widget_id);
 
     // set link url properties
-    var link_source = $('#link_source').val();
-    widget.find('input[class*="widget-link-url-source"]').attr('value', link_source);
-    widget.find('input[class*="widget-link-url-datafield"]').attr('value', link_source);
-
-    var link_site = $("#link_widget_url_source select.link_site_active option").filter(":selected");
-    var link_site_val = link_site.val();
-    widget.find('input[class*="widget-link-url-site"]').attr('value', link_site_val);
-
-    widget.find('input[class*="widget-link-url-prefix"]').attr('value', pbuild_links[link_site_val].prefix);
-    widget.find('input[class*="widget-link-url-postfix"]').attr('value', pbuild_links[link_site_val].postfix);
+    var url_attrs = {};
+    var url_type  = pbuild_get_url_type().filter(':checked').val();
+    if (url_type === 'static') {
+        url_attrs.type = 'static';
+        url_attrs['text-segment-1'] = $('#link_widget_url_static').val();
+    }
+    else if (url_type === 'variable_simple') {
+        url_attrs.type = 'variable';
+        url_attrs['variable-segment-1'] = $('#link_url_source').val();
+    }
+    else if (url_type === 'variable_complex') {
+        url_attrs.type = 'variable';
+        url_attrs['variable-segment-1'] = $('#constructed_url_source').val();
+        url_attrs['text-segment-1']     = $('#constructed_url_prefix').val();
+        url_attrs['text-segment-2']     = $('#constructed_url_suffix').val();
+    }
+    else if (url_type === 'accession') {
+        url_attrs.type = 'accession';
+        var link_source_val = $('#link_source').val();
+        var link_site_val   = pbuild_get_selected_link_site().val();
+        pbuild_set_link_attrs(url_attrs, link_source_val, link_site_val);
+    }
+    else {
+        throw {
+            name : 'InvalidFieldError',
+            message : url_type + ' is not a supported url_type'
+        };
+    }
+    pbuild_write_attrs(widget, url_attrs, 'url');
 
 
     // set label properties
-    var label_type_val = $('#link_widget_label_form input[name="link.label_type"]:checked').val();
-    var label_type = label_type_val === 'url' ? 'url' : 'static';
-    var label_value = label_type_val === 'default' ? link_site.text()
-                    : label_type_val === 'url'     ? ''
-                    : label_type_val === 'static'  ? $('#link_label_static').val()
-                    :                                'Something went wrong!';
-    widget.find('input[class*="widget-link-label-type"]').attr('value', label_type);
-    widget.find('input[class*="widget-link-label-value"]').attr('value', label_value);
+    var label_type = pbuild_get_label_type().filter(':checked').val();
+    var label_attrs = {};
+    if (label_type === 'default') {
+        if (url_attrs.type === 'static' || url_attrs.type === 'variable') {
+            label_attrs.type = 'static';
+            label_attrs['text-segment-1'] = 'Link';
+        }
+        else {
+            label_attrs.type = 'static';
+            label_attrs['text-segment-1'] = sitelinker_sites[url_attrs.accession].label;
+        }
+    }
+    else if (label_type === 'url') {
+        label_attrs = url_attrs;
+    }
+    else if (label_type === 'static') {
+        label_attrs['text-segment-1'] = $('#link_label_static').val();
+        label_attrs.type = 'static';
+    }
+    else if (label_type === 'variable') {
+        label_attrs['text-segment-1']     = $('#label_source_prefix').val();
+        label_attrs['variable-segment-1'] = $('#label_source').val();
+        label_attrs['text-segment-2']     = $('#label_source_suffix').val();
+        label_attrs.type = 'variable';
+    }
+    else {
+        throw {
+            name : 'InvalidFieldError',
+            message : label_type + ' is not a supported label type'
+        };
+    }
+    pbuild_write_attrs(widget, label_attrs, 'label');
+    
 
-    // Update display
+    // Update canvas display
     var display_label = $('#link_widget_label_preview').text();
     var display_url   = $('#link_widget_url_preview').text();
     var link_display  = "Link to: ";
-    if (label_type === 'url') {
+    if (display_label === display_url) {
         link_display += display_url;
     }
     else {
@@ -234,6 +429,49 @@ function pbuild_submit_link_form() {
 
 }
 
+// for a given link widget, fetch the url and label props
+// and stick them in a data struct
+function pbuild_get_link_props_for_widget(widget) {
+    var props = {};
+    var components = ['url', 'label'];
+    for (var i in components) {
+        props[components[i]] = {};
+        var class_string = 'widget-link-' + components[i] + '-';
+        widget.find('input[class^="'+class_string+'"]').each(function() {
+            var prop_type = $(this).attr('class').replace(class_string, '');
+            props[components[i]][prop_type] = $(this).val();
+        });
+    }
+    return props;
+}
+
+// for urls & labels of type 'accession', lookup the segment properties
+// in the property dictionaries
+function pbuild_set_link_attrs(attrs, link_source, link_site, url_type) {
+    attrs.accession = link_site;
+    var acc_type = column_acctype[link_source];
+    attrs['text-segment-1'] = pbuild_links[link_site][acc_type].prefix;
+    attrs['text-segment-2'] = pbuild_links[link_site][acc_type].postfix;
+    attrs['variable-segment-1'] = link_source;
+}
+
+// write the url & label attributes to the canvas as hidden inputs
+function pbuild_write_attrs(widget, attrs, type) {
+
+    // clear previous entries
+    widget.find('input[class^="widget-link-'+type+'-"]').each(function() { $(this).val(""); });
+
+    // amend or append all attributes
+    for (var key in attrs) {
+        var attr_input = widget.find('input.widget-link-'+type+'-'+key);
+        if (attr_input.length) {
+            attr_input.val(attrs[key]);
+        }
+        else {
+            widget.append('<input type="hidden" class="widget-link-' + type + '-' + key + '" value="' + attrs[key] + '">');
+        }
+    }
+}
 
 function pbuild_init_stored_widget(widget) {
     pbuild_init_widget(widget);
@@ -241,9 +479,10 @@ function pbuild_init_stored_widget(widget) {
         var select = widget.find('select');
         var selected_option =  select.find('option').filter(':selected').detach();
 
+        var col;
         for (col in ds_columns_dict) {
-            select.append('<option value="'+ds_columns_dict[col]['shortname']+'">{'+ ds_columns_dict[col]['name'] + '}</option>');
-            if (ds_columns_dict[col]['shortname'] === selected_option.attr('value')) {
+            select.append('<option value="'+ds_columns_dict[col].shortname+'">{'+ ds_columns_dict[col].name + '}</option>');
+            if (ds_columns_dict[col].shortname === selected_option.attr('value')) {
                 select.children().last().attr('selected', 1);
             }
         }
@@ -288,98 +527,98 @@ function pbuild_add_formatter(widget) {
 function judoon_dt_bootstrap_init() {
 
     $.extend( $.fn.dataTableExt.oStdClasses, {
-    	"sWrapper": "dataTables_wrapper form-inline"
+        "sWrapper": "dataTables_wrapper form-inline"
     } );
 
     /* API method to get paging information */
     $.fn.dataTableExt.oApi.fnPagingInfo = function ( oSettings )
     {
-    	return {
-    	    "iStart":         oSettings._iDisplayStart,
-    	    "iEnd":           oSettings.fnDisplayEnd(),
-    	    "iLength":        oSettings._iDisplayLength,
-    	    "iTotal":         oSettings.fnRecordsTotal(),
-    	    "iFilteredTotal": oSettings.fnRecordsDisplay(),
-    	    "iPage":          Math.ceil( oSettings._iDisplayStart / oSettings._iDisplayLength ),
-    	    "iTotalPages":    Math.ceil( oSettings.fnRecordsDisplay() / oSettings._iDisplayLength )
-    	};
-    }
+        return {
+            "iStart":         oSettings._iDisplayStart,
+            "iEnd":           oSettings.fnDisplayEnd(),
+            "iLength":        oSettings._iDisplayLength,
+            "iTotal":         oSettings.fnRecordsTotal(),
+            "iFilteredTotal": oSettings.fnRecordsDisplay(),
+            "iPage":          Math.ceil( oSettings._iDisplayStart / oSettings._iDisplayLength ),
+            "iTotalPages":    Math.ceil( oSettings.fnRecordsDisplay() / oSettings._iDisplayLength )
+        };
+    };
 
     /* Bootstrap style pagination control */
     $.extend( $.fn.dataTableExt.oPagination, {
-	"bootstrap": {
-	    "fnInit": function( oSettings, nPaging, fnDraw ) {
-		var oLang = oSettings.oLanguage.oPaginate;
-		var fnClickHandler = function ( e ) {
-		    e.preventDefault();
-		    if ( oSettings.oApi._fnPageChange(oSettings, e.data.action) ) {
-			fnDraw( oSettings );
-		    }
-		};
+        "bootstrap": {
+            "fnInit": function( oSettings, nPaging, fnDraw ) {
+                var oLang = oSettings.oLanguage.oPaginate;
+                var fnClickHandler = function ( e ) {
+                    e.preventDefault();
+                    if ( oSettings.oApi._fnPageChange(oSettings, e.data.action) ) {
+                        fnDraw( oSettings );
+                    }
+                };
 
-		$(nPaging).addClass('pagination').append(
-		    '<ul>'+
-			'<li class="prev disabled"><a href="#">&larr; '+oLang.sPrevious+'</a></li>'+
-			'<li class="next disabled"><a href="#">'+oLang.sNext+' &rarr; </a></li>'+
-			'</ul>'
-		);
-		var els = $('a', nPaging);
-		$(els[0]).bind( 'click.DT', { action: "previous" }, fnClickHandler );
-		$(els[1]).bind( 'click.DT', { action: "next" }, fnClickHandler );
-	    },
+                $(nPaging).addClass('pagination').append(
+                    '<ul>'+
+                        '<li class="prev disabled"><a href="#">&larr; '+oLang.sPrevious+'</a></li>'+
+                        '<li class="next disabled"><a href="#">'+oLang.sNext+' &rarr; </a></li>'+
+                        '</ul>'
+                );
+                var els = $('a', nPaging);
+                $(els[0]).bind( 'click.DT', { action: "previous" }, fnClickHandler );
+                $(els[1]).bind( 'click.DT', { action: "next" }, fnClickHandler );
+            },
 
-	    "fnUpdate": function ( oSettings, fnDraw ) {
-		var iListLength = 5;
-		var oPaging = oSettings.oInstance.fnPagingInfo();
-		var an = oSettings.aanFeatures.p;
-		var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
+            "fnUpdate": function ( oSettings, fnDraw ) {
+                var iListLength = 5;
+                var oPaging = oSettings.oInstance.fnPagingInfo();
+                var an = oSettings.aanFeatures.p;
+                var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
 
-		if ( oPaging.iTotalPages < iListLength) {
-		    iStart = 1;
-		    iEnd = oPaging.iTotalPages;
-		}
-		else if ( oPaging.iPage <= iHalf ) {
-		    iStart = 1;
-		    iEnd = iListLength;
-		} else if ( oPaging.iPage >= (oPaging.iTotalPages-iHalf) ) {
-		    iStart = oPaging.iTotalPages - iListLength + 1;
-		    iEnd = oPaging.iTotalPages;
-		} else {
-		    iStart = oPaging.iPage - iHalf + 1;
-		    iEnd = iStart + iListLength - 1;
-		}
+                if ( oPaging.iTotalPages < iListLength) {
+                    iStart = 1;
+                    iEnd = oPaging.iTotalPages;
+                }
+                else if ( oPaging.iPage <= iHalf ) {
+                    iStart = 1;
+                    iEnd = iListLength;
+                } else if ( oPaging.iPage >= (oPaging.iTotalPages-iHalf) ) {
+                    iStart = oPaging.iTotalPages - iListLength + 1;
+                    iEnd = oPaging.iTotalPages;
+                } else {
+                    iStart = oPaging.iPage - iHalf + 1;
+                    iEnd = iStart + iListLength - 1;
+                }
 
-		for ( i=0, iLen=an.length ; i<iLen ; i++ ) {
-		    // Remove the middle elements
-		    $('li:gt(0)', an[i]).filter(':not(:last)').remove();
+                for ( i=0, iLen=an.length ; i<iLen ; i++ ) {
+                    // Remove the middle elements
+                    $('li:gt(0)', an[i]).filter(':not(:last)').remove();
 
-		    // Add the new list items and their event handlers
-		    for ( j=iStart ; j<=iEnd ; j++ ) {
-			sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
-			$('<li '+sClass+'><a href="#">'+j+'</a></li>')
-			    .insertBefore( $('li:last', an[i])[0] )
-			    .bind('click', function (e) {
-				e.preventDefault();
-				oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
-				fnDraw( oSettings );
-			    } );
-		    }
+                    // Add the new list items and their event handlers
+                    for ( j=iStart ; j<=iEnd ; j++ ) {
+                        sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
+                        $('<li '+sClass+'><a href="#">'+j+'</a></li>')
+                            .insertBefore( $('li:last', an[i])[0] )
+                            .bind('click', function (e) {
+                                e.preventDefault();
+                                oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
+                                fnDraw( oSettings );
+                            } );
+                    }
 
-		    // Add / remove disabled classes from the static elements
-		    if ( oPaging.iPage === 0 ) {
-			$('li:first', an[i]).addClass('disabled');
-		    } else {
-			$('li:first', an[i]).removeClass('disabled');
-		    }
+                    // Add / remove disabled classes from the static elements
+                    if ( oPaging.iPage === 0 ) {
+                        $('li:first', an[i]).addClass('disabled');
+                    } else {
+                        $('li:first', an[i]).removeClass('disabled');
+                    }
 
-		    if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
-			$('li:last', an[i]).addClass('disabled');
-		    } else {
-			$('li:last', an[i]).removeClass('disabled');
-		    }
-		}
-	    }
-	}
+                    if ( oPaging.iPage === oPaging.iTotalPages-1 || oPaging.iTotalPages === 0 ) {
+                        $('li:last', an[i]).addClass('disabled');
+                    } else {
+                        $('li:last', an[i]).removeClass('disabled');
+                    }
+                }
+            }
+        }
     } );
 
 }

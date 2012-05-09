@@ -26,14 +26,6 @@
     <div id="link_widget">
       <div class="widget-object widget-type-link widget-inline btn-group">
         <input type="text" class="inner-small span3 w-dropdown disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="Click here to edit link"  />
-        <input type="hidden" class="widget-link-url-source"    value="">
-        <input type="hidden" class="widget-link-url-site"      value="">
-        <input type="hidden" class="widget-link-url-prefix"    value="">
-        <input type="hidden" class="widget-link-url-postfix"   value="">
-        <input type="hidden" class="widget-link-url-datafield" value="">
-
-        <input type="hidden" class="widget-link-label-type"  value="static">
-        <input type="hidden" class="widget-link-label-value" value="Entrez">
       </div>
     </div>
 
@@ -100,12 +92,13 @@
               <div class="span1">&nbsp;</div>
               <div class="span11">
                 <div class="accordion" id="link_widget_url_accordion">
+
                   <div class="accordion-group">
                     <div class="accordion-heading">
                       <div class="accordion-inner">
                       <label class="radio">
-                        <input type="radio" name="link.url_type" value="predefined" checked="checked" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_source">
-                        Select a predefined link from the following list:
+                        <input type="radio" name="url_type" value="accession" checked="checked" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_source">
+                        Link to another site using an accession in your dataset:
                       </label>
                       </div>
                     </div>
@@ -113,10 +106,10 @@
                       <div class="accordion-inner">
                         <p class="help-block">Which column should the link be based off of?</p>
                         <select name="link_source" id="link_source">
-                          [% FOREACH acc_column IN linksets %][% NEXT UNLESS acc_column.is_accession %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
+                          [% FOREACH acc_column IN acc_columns %]<option value="[% acc_column.shortname %]">[% acc_column.name %]</option>[% END %]
                         </select>
                         <p class="help-block">What site do you want to link to?</p>
-                        [% FOREACH acc_column IN linksets %]
+                        [% FOREACH acc_column IN acc_columns %]
                         <select id="link_site_[% acc_column.shortname %]" name="link_site_[% acc_column.shortname %]" class="link_site [% IF loop.first %]link_site_active[% END %]">
                           [% FOREACH link IN acc_column.linkset %]
                           <option value="[% link.value %]" title="[% link.example %]">[% link.text %]</option>
@@ -126,25 +119,68 @@
                       </div>
                     </div>
                   </div>
+
+                  [% IF url_columns.length %]
                   <div class="accordion-group">
                     <div class="accordion-heading">
                       <div class="accordion-inner">
                       <label class="radio">
-                        <input type="radio" name="link.url_type" value="provided" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_provided"> Use the following URL:
+                        <input type="radio" name="url_type" value="variable_simple" checked="checked" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_variable_simple">
+                        Use a link from your dataset:
+                      </label>
+                      </div>
+                    </div>
+                    <div id="link_widget_url_variable_simple" class="accordion-body collapse" style="height: 0px;">
+                      <div class="accordion-inner">
+                        <select name="link_url_source" id="link_url_source">
+                          [% FOREACH url_column IN url_columns %]<option value="[% url_column.shortname %]">[% url_column.name %]</option>[% END %]
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  [% END %]
+
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <div class="accordion-inner">
+                      <label class="radio">
+                        <input type="radio" name="url_type" value="variable_complex" checked="checked" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_variable_complex">
+                        Construct your own url from a dataset column:
+                      </label>
+                      </div>
+                    </div>
+                    <div id="link_widget_url_variable_complex" class="accordion-body collapse" style="height: 0px;">
+                      <div class="accordion-inner">
+                        <label>URL prefix: <input type="text" class="span3" id="constructed_url_prefix" placeholder="usually http://..."></label>
+                        <select name="constructed_url_source" id="constructed_url_source">
+                          [% FOREACH column IN ds_column.list %]<option value="[% column.shortname %]">[% column.name %]</option>[% END %]
+                        </select>
+                        <label>URL suffix: <input type="text" class="span3" id="constructed_url_suffix" placeholder="ex.: /index.html"></label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="accordion-group">
+                    <div class="accordion-heading">
+                      <div class="accordion-inner">
+                      <label class="radio">
+                        <input type="radio" name="url_type" value="static" data-toggle="collapse" data-parent="#link_widget_url_accordion" data-target="#link_widget_url_provided"> Use the following URL:
                       </label>
                       </div>
                     </div>
                     <div id="link_widget_url_provided" class="accordion-body collapse" style="height: 0px;">
                       <div class="accordion-inner">
-                        <input type="text" class="span3" placeholder="Type URL here...">
+                        <input type="text" id="link_widget_url_static" class="span3" placeholder="Type URL here...">
                       </div>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
           </fieldset>
         </form>
+
         <form class="" id="link_widget_label_form">
           <fieldset>
             <div class="row-fluid">
@@ -156,17 +192,23 @@
               <div class="span1">&nbsp;</div>
               <div class="span11">
                 <label class="radio">
-                  <input type="radio" name="link.label_type" value="default" checked="checked"> Use the default label text
-                  <span class="label label-info" id="link_widget_label_default_preview" style="display: none;"></span>
+                  <input type="radio" name="label_type" value="default" checked="checked"> Use the default label text
                 </label>
                 <label class="radio">
-                  <input type="radio" name="link.label_type" value="url"> Use the URL
-                  <span class="label label-info" id="link_widget_label_url_preview"  style="display: none;"></span>
+                  <input type="radio" name="label_type" value="url"> Use the URL
                 </label>
                 <label class="radio">
-                  <input type="radio" name="link.label_type" value="static"> Use the following label:
+                  <input type="radio" name="label_type" value="static"> Use the following label:
                 </label>
-                <input type="text" class="span3" name="user_provided" id="link_label_static">
+                <input type="text" class="span3" name="label_provided" id="link_label_static">
+                <label class="radio">
+                  <input type="radio" name="label_type" value="variable"> Use column data:
+                </label>
+                <label><input type="text" class="span3" id="label_source_prefix" placeholder="Label prefix (optional)"></label>
+                <select name="label_source" id="label_source">
+                  [% FOREACH column IN ds_column.list %]<option value="[% column.shortname %]">[% column.name %]</option>[% END %]
+                </select>
+                <label><input type="text" class="span3" id="label_source_suffix" placeholder="Label suffix (optional)"></label>
               </div>
             </div>
           </fieldset>
@@ -200,6 +242,10 @@
     </div>
 
 <script>
-  var pbuild_links    = [% link_site_json %];
-  var ds_columns_dict = [% ds_column_json %];
+  var pbuild_links     = [% link_site_json %];
+  var ds_columns_dict  = [% ds_column_json %];
+  var sitelinker_sites = [% sitelinker_sites %];
+  var sitelinker_accs  = [% sitelinker_accs %];
+  var column_acctype   = [% column_acctype %];
+  var sample_data      = [% sample_data %];
 </script>
