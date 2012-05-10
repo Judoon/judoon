@@ -32,6 +32,9 @@ wierd paths:
    Dataset/postadd => not sure I'm still using this
 ** TODO Feature: upload excel spreadsheet, automatically create page
 No formatting, no annotation, dead simple.
+** TODO DatasetColumn
+during annotation, if user sets field as accession, create virtual column
+e.g.:  {gene_symbol} => {__annotation_gene_symbol_to_gene_id}
 * Judoon::DB::User::Schema
 ** DONE [#A] Convert DB::User to DBIC
 CLOSED: [2012-03-28 Wed 13:45]
@@ -66,6 +69,11 @@ need to update WebWidgets.pm && library.tt
 * Judoon::Spreadsheet::Importer
 ** TODO [#B] move code from J:DB::U::S::R::U::import_data() into here
 
-
 * Judoon user deployment
 ** Look at Wordpress, drupal for quick deployment ideas
+* Judoon::SiteLinker
+** TODO Needs a lot more maps
+** TODO Can use Uniprot ID mapper to convert ids
+Then, the uniprot_acc to gene map could convert to gene_id, and use that mapping
+** Would this be easier to do in a database, or more simply represented as a schema?
+** TODO Need order encoded in mapping
