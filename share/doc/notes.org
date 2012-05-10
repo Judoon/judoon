@@ -19,14 +19,27 @@ dbicm install --to_version 1
 dbicm upgrade
 
 * Links
+- A Link is an Href and a Label
+  + an Href  may be /static/, /variable/, /variable+acc_tmpl/
+  + a  Label may be /static/, /variable/, /variable+acc_tmpl/
+- /static/ :: provided
+  + Href: http://google.com
+  + Label: Google
+- /variable/ :: from variable field
+  + Href: http://mysite.com/{my_id}/view  *or* {my_site}
+  + Label: http://mysite.com/{my_id}/view *or* "MyAcc: {my_id}" *or* {my_site}
+- /variable+acc_tmpl/ :: accession field provides url
+  + Href: http://pubmed.org/{pmid} *or* http://pubmed.org/?doi={doi} *or* http://pubmed.org/<trans(doi)>/ 
+  + Label: <default from accession> *or* see above *or* "DOI: {doi}"
+  +   need some metadata to tell what type of accession (J::Acc::Pubmed)
+
+
 - accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value: 
 - accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: url label_value: 
 - accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: static label_value: "See Entrez Gene" 
    For these, easy:  [textseg],[varseg is {gene_id}]
-
 - accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value: 
    Tougher:  [textseg], [varseg is convert_acc({gene_id})]
-
 - accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value:  url_postfix: '?filter=boo'
   scheme: [textseg],[varseg is {gene_id}],[url-postfix]
 
@@ -35,6 +48,33 @@ dbicm upgrade
 for Entrez::GeneId, Uniprot::UniprotId, etc.
 ** Judoon::Accession::Roles::IsntCanonical
 Entrez::GeneName, Uniprot::
+** schema
+
+Site
+  id 
+  name
+  default_label
+
+
+Accession
+  id
+  name
+
+
+SiteAccession
+  id
+  site_id
+  accession_id
+
+
+Segments
+  id
+  text
+  order
+
+
+
+
 
 * Color Scheme
 Color Scheme: http://colorschemedesigner.com/#3861Tw0w0w0w0
