@@ -33,7 +33,7 @@ requires 'Method::Signatures';
 requires 'Module::Pluggable';
 requires 'Moose';
 requires 'MooseX::MarkAsMethods';
-requries 'MooseX::NonMoose';
+requires 'MooseX::NonMoose';
 requires 'namespace::autoclean';
 requires 'Spreadsheet::Read';
 
