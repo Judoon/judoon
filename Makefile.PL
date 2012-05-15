@@ -37,6 +37,9 @@ requires 'MooseX::NonMoose';
 requires 'namespace::autoclean';
 requires 'Spreadsheet::Read';
 
+test_requires 'indirect';
+test_requires 'multidimensional';
+test_requires 'bareword::filehandles';
 test_requires 'Pod::Coverage';
 test_requires 'Test::DBIx::Class';
 test_requires 'Test::More' => '0.88';
