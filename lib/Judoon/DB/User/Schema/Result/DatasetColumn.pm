@@ -143,6 +143,12 @@ has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
 sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 
+=head2 linkset()
+
+Return a list of linkable sites via Judoon::SiteLinker
+
+=cut
+
 sub linkset {
     my ($self) = @_;
 
