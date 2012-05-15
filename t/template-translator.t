@@ -76,13 +76,17 @@ my $webwidget_html = <<'EOWW';
           <li><a class="widget-action-delete"><i class="icon-trash"></i>Delete</a></li>
         </ul>
         <input id="widget_format_id_5" class="widget-link-url-source widget-format-target" value="" type="hidden">
-        <input class="widget-link-url-site" value="" type="hidden">
-        <input class="widget-link-url-prefix" value="http://www.ncbi.nlm.nih.gov/gene/" type="hidden">
-        <input class="widget-link-url-postfix" value="" type="hidden">
-        <input class="widget-link-url-datafield" value="protein_name" type="hidden">
+        <input class="widget-link-url-type" value="accession" type="hidden">
+        <input class="widget-link-url-accession" value="" type="hidden">
+        <input class="widget-link-url-text-segment-1" value="http://www.ncbi.nlm.nih.gov/gene/" type="hidden">
+        <input class="widget-link-url-text-segment-2" value="" type="hidden">
+        <input class="widget-link-url-variable-segment-1" value="protein_name" type="hidden">
 
         <input class="widget-link-label-type" value="static" type="hidden">
-        <input class="widget-link-label-value" value="Entrez" type="hidden">
+        <input class="widget-link-label-accession" value="" type="hidden">
+        <input class="widget-link-label-text-segment-1" value="Entrez" type="hidden">
+        <input class="widget-link-label-text-segment-2" value="" type="hidden">
+        <input class="widget-link-label-variable-segment-1" value="" type="hidden">
       </div>
 
       <div id="canvas_cursor"></div>
