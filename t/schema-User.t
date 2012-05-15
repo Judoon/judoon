@@ -51,18 +51,6 @@ subtest 'Result::DatasetColumn' => sub {
     my $ds_column_rs = ResultSet('DatasetColumn');
     my $ds_column = $ds_column_rs->first;
 
-    # we have this stupid class data stuck in DatasetColumn that
-    # should probably be moved somewhere else.  For the time being,
-    # simply test to make sure they are there, since they will
-    # eventually be move and the content changed.
-    is ref $ds_column->accession_types, 'ARRAY',
-        'basic test for accession_types()';
-    is ref $ds_column->linkthings, 'HASH',
-        'basic test for linkthings()';
-    is ref $ds_column->get_linksites, 'HASH',
-        'basic test for get_linksites()';
-
-
     my $dataset = $ds_column->dataset;
     my $new_ds_col = $dataset->create_related('ds_columns', {
         name => 'Test Column', sort => 99,
