@@ -168,6 +168,19 @@ __PACKAGE__->many_to_many("roles", "user_roles", "role");
 # Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SzGqoNkBtKX9SumB+vTVCw
 
+__PACKAGE__->load_components('PassphraseColumn');
+__PACKAGE__->add_columns(
+    '+password' => {
+        passphrase       => 'rfc2307',
+        passphrase_class => 'BlowfishCrypt',
+        passphrase_args  => {
+            cost        => 8,
+            salt_random => 20,
+        },
+        passphrase_check_method => 'check_password',
+    }
+);
+
 
 use Spreadsheet::Read ();
 

@@ -9,6 +9,7 @@ use Module::Install::Catalyst; # Complain loudly if you don't have
 name 'Judoon-Web';
 all_from 'lib/Judoon/Web.pm';
 
+requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Controller::REST';
 requires 'Catalyst::Model::DBIC::Schema';
@@ -24,6 +25,7 @@ requires 'Data::Section::Simple';
 requires 'DBI';
 requires 'DBIx::Class';
 requires 'DBIX::Class::InflateColumn::Serializer';
+requires 'DBIx::Class::PassphraseColumn';
 requires 'File::Temp';
 requires 'FindBin';
 requires 'HTML::TreeBuilder';
