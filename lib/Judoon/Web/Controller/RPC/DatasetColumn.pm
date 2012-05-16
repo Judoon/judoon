@@ -17,6 +17,9 @@ __PACKAGE__->config(
     },
 );
 
+has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
+sub _build_sitelinker { return Judoon::SiteLinker->new; }
+
 
 override get_list => sub {
     my ($self, $c) = @_;
@@ -95,8 +98,7 @@ override edit_object => sub {
 
 after private_edit => sub {
     my ($self, $c) = @_;
-    $c->stash->{accession_types}
-        = $c->stash->{ds_column}{object}->accession_types();
+    $c->stash->{accession_types} = $self->sitelinker->accession_groups;
 };
 
 after private_edit_do => sub {

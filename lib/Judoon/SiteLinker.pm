@@ -89,18 +89,23 @@ sub _build_mapping {
     return \%mappings;
 }
 
-has accession_groups => (is => 'ro', isa => 'HashRef', lazy_build => 1);
+has accession_groups => (is => 'ro', isa => 'ArrayRef', lazy_build => 1);
 sub _build_accession_groups {
     my ($self) = @_;
 
     my @acc_groups = (
         # group_name [accessions]
-        ['NCBI',         [qw(entrez_gene_id entrez_gene_symbol entrez_refseq_id entrez_protein_id entrez_unigene_id pubmed_id unigene_id)],],
+        ['NCBI',         [qw(entrez_gene_id entrez_gene_symbol entrez_refseq_id entrez_protein_id entrez_unigene_id pubmed_id)],],
         ['Uniprot',      [qw(uniprot_acc uniprot_id)], ],
         ['CritterBases', [qw(flybase_id wormbase_id)],],
 #        [],
     );
 
+    my @return = map {{
+        group_label => $_->[0], types => [map {$self->accessions->{$_}} @{$_->[1]}],
+    }} @acc_groups;
+
+    return \@return;
 }
 
 __PACKAGE__->meta->make_immutable;
