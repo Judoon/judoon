@@ -19,12 +19,12 @@ __PACKAGE__->config(
 
 
 sub base      : Chained('fixme') PathPart('fixme')      CaptureArgs(0) { shift->private_base(        @_); }
-sub list      : Chained('base')  PathPart('')           Args(0)        { shift->private_list(        @_); }
+sub list      : Chained('base')  PathPart('list')       Args(0)        { shift->private_list(        @_); }
 sub list_do   : Chained('base')  PathPart('list_do')    Args(0)        { shift->private_list_do(     @_); }
 sub add       : Chained('base')  PathPart('add')        Args(0)        { shift->private_add(         @_); }
 sub add_do    : Chained('base')  PathPart('add_do')     Args(0)        { shift->private_add_do(      @_); }
-sub id        : Chained('base')  PathPart('')           CaptureArgs(1) { shift->private_id(          @_); }
-sub edit      : Chained('id')    PathPart('')           Args(0)        { shift->private_edit(        @_); }
+sub id        : Chained('base')  PathPart('id')         CaptureArgs(1) { shift->private_id(          @_); }
+sub edit      : Chained('id')    PathPart('edit')       Args(0)        { shift->private_edit(        @_); }
 sub edit_do   : Chained('id')    PathPart('edit_do')    Args(0)        { shift->private_edit_do(     @_); }
 sub delete    : Chained('id')    PathPart('delete')     Args(0)        { shift->private_delete(      @_); }
 sub delete_do : Chained('id')    PathPart('delete_do')  Args(0)        { shift->private_delete_do(   @_); }
