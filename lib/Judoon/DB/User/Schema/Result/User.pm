@@ -32,25 +32,68 @@ __PACKAGE__->table("users");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 login
+=head2 active
+
+  data_type: 'char'
+  is_nullable: 0
+  size: 1
+
+=head2 username
 
   data_type: 'text'
   is_nullable: 0
+
+=head2 password
+
+  data_type: 'text'
+  is_nullable: 0
+
+=head2 password_expires
+
+  data_type: 'timestamp'
+  is_nullable: 1
 
 =head2 name
 
   data_type: 'text'
   is_nullable: 0
 
+=head2 email_address
+
+  data_type: 'text'
+  is_nullable: 0
+
+=head2 phone_number
+
+  data_type: 'text'
+  is_nullable: 1
+
+=head2 mail_address
+
+  data_type: 'text'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "login",
+  "active",
+  { data_type => "char", is_nullable => 0, size => 1 },
+  "username",
   { data_type => "text", is_nullable => 0 },
+  "password",
+  { data_type => "text", is_nullable => 0 },
+  "password_expires",
+  { data_type => "timestamp", is_nullable => 1 },
   "name",
   { data_type => "text", is_nullable => 0 },
+  "email_address",
+  { data_type => "text", is_nullable => 0 },
+  "phone_number",
+  { data_type => "text", is_nullable => 1 },
+  "mail_address",
+  { data_type => "text", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -67,17 +110,17 @@ __PACKAGE__->set_primary_key("id");
 
 =head1 UNIQUE CONSTRAINTS
 
-=head2 C<login_unique>
+=head2 C<username_unique>
 
 =over 4
 
-=item * L</login>
+=item * L</username>
 
 =back
 
 =cut
 
-__PACKAGE__->add_unique_constraint("login_unique", ["login"]);
+__PACKAGE__->add_unique_constraint("username_unique", ["username"]);
 
 =head1 RELATIONS
 
@@ -96,9 +139,34 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 user_roles
 
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 21:45:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JaVEg27Di1P/uHQIdKKbng
+Type: has_many
+
+Related object: L<Judoon::DB::User::Schema::Result::UserRole>
+
+=cut
+
+__PACKAGE__->has_many(
+  "user_roles",
+  "Judoon::DB::User::Schema::Result::UserRole",
+  { "foreign.user_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
+=head2 roles
+
+Type: many_to_many
+
+Composing rels: L</user_roles> -> role
+
+=cut
+
+__PACKAGE__->many_to_many("roles", "user_roles", "role");
+
+
+# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SzGqoNkBtKX9SumB+vTVCw
 
 
 use Spreadsheet::Read ();
