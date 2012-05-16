@@ -1,6 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::DatasetColumn;
 
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::DatasetColumn
@@ -123,6 +126,10 @@ __PACKAGE__->belongs_to(
   { id => "dataset_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
+
+
+# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 21:44:31
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AjdNiBkWSaIe1b1bk6VjNQ
 
 
 # from MooseX::NonMoose, lets us preprocess the args to new()

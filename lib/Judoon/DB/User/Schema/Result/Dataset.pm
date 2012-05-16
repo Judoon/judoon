@@ -1,6 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Dataset;
 
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Dataset
@@ -57,7 +60,6 @@ __PACKAGE__->table("datasets");
 
 =cut
 
-__PACKAGE__->load_components('InflateColumn::Serializer');
 __PACKAGE__->add_columns(
   "id",
   { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
@@ -70,7 +72,7 @@ __PACKAGE__->add_columns(
   "original",
   { data_type => "text", is_nullable => 0 },
   "data",
-  { data_type => "text", is_nullable => 0, serializer_class => 'JSON', },
+  { data_type => "text", is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -131,6 +133,13 @@ __PACKAGE__->belongs_to(
   { id => "user_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
+
+
+# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 21:45:25
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cupiUeObtZ+Rq4ggaqN6ig
+
+__PACKAGE__->load_components('InflateColumn::Serializer');
+__PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
 
 
 __PACKAGE__->meta->make_immutable;

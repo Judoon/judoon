@@ -1,6 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::User;
 
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::User
@@ -94,6 +97,8 @@ __PACKAGE__->has_many(
 );
 
 
+# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 21:45:25
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JaVEg27Di1P/uHQIdKKbng
 
 
 use Spreadsheet::Read ();
