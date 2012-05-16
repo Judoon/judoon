@@ -20,13 +20,13 @@
   <tbody>
     <tr>
       <td>1</td>
-      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.login, '1']) %]">RNAi - 05/07/2011</a></td>
-      <td><a href="[% c.uri_for_action('/rpc/page/edit', [user.login,'l','1']) %]">View</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.username, '1']) %]">RNAi - 05/07/2011</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/page/edit', [user.username,'l','1']) %]">View</a></td>
       <td><input type="checkbox" checked="checked" /></td>
     </tr>
     <tr>
       <td>2</td>
-      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.login, 7]) %]">Migration Screen</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.username, 7]) %]">Migration Screen</a></td>
       <td> - </td>
       <td><input type="checkbox"  disabled="disabled" /></td>
     </tr>
@@ -34,10 +34,10 @@
     [% FOREACH dataset IN datasets %]
     <tr>
       <td>[% loop.count + 2 %]</td>
-      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.login, dataset.id]) %]">[% dataset.name %]</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.username, dataset.id]) %]">[% dataset.name %]</a></td>
       [% IF dataset.page %]
       [% page = dataset.page %]
-      <td><a href="[% c.uri_for_action('/rpc/page/edit', [user.login, dataset.id, 1]) %]">View</a></td>
+      <td><a href="[% c.uri_for_action('/rpc/page/edit', [user.username, dataset.id, 1]) %]">View</a></td>
       <td><input type="checkbox" checked="[% page.public ? '1' : '0' %]" /></td>
       [% ELSE %]
       <td> - </td>
@@ -54,7 +54,7 @@
 <div class="row">
   <h4>Add new data set</h4>
   <div class="span4">
-    <form action="[% c.uri_for_action('/rpc/dataset/add_do', [user.login]) %]" method="post" enctype="multipart/form-data" class="form-vertical">
+    <form action="[% c.uri_for_action('/rpc/dataset/add_do', [user.username]) %]" method="post" enctype="multipart/form-data" class="form-vertical">
       <fieldset>
         <input type="file" id="dataset" name="dataset" class="" />
         <div class="form-submit"><button class="btn btn-primary" type="submit"><i class="icon-upload"></i> Upload</button></div>

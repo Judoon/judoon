@@ -21,8 +21,9 @@ use Catalyst qw/
     Static::Simple
     +CatalystX::SimpleLogin
     Authentication
+    Authorization::Roles
     Session
-    Session::Store::File
+    Session::Store::Memcached
     Session::State::Cookie
     StackTrace
 /;
@@ -59,21 +60,19 @@ __PACKAGE__->config(
         render_die   => 1,
     },
     'Plugin::Authentication' => {
-        default => {
-            credential => {
-                class => 'Password',
-                password_field => 'password',
-                password_type => 'clear'
-            },
-            store => {
-                class => 'Minimal',
-                users => {
-                    fge7z => {
-                        password => "moomoo",
-                    },
-                    wrp => {
-                        password => "gstmu",
-                    },
+        default_realm => 'users',
+        realms => {
+            users => {
+                credential => {
+                    class          => 'Password',
+                    password_field => 'password',
+                    password_type  => 'self_check',
+                },
+                store => {
+                    class         => 'DBIx::Class',
+                    user_model    => 'User::User',
+                    role_relation => 'roles',
+                    role_field    => 'name',
                 },
             },
         },

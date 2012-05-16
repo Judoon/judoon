@@ -59,12 +59,12 @@ sub edit : Chained('/login/required') PathPart('') CaptureArgs(0) {}
 sub user_base    : Chained('edit')      PathPart('user') CaptureArgs(0) {}
 sub user_addlist : Chained('user_base') PathPart('')     Args(0) {
     my ($self, $c) = @_;
-    $c->res->redirect($c->uri_for_action('user_view', [$c->user->id]));
+    $c->res->redirect($c->uri_for_action('user_view', [$c->user->username]));
 }
 sub user_id : Chained('user_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $user_login) = @_;
     $c->stash->{user_login} = $user_login;
-    $c->stash->{user}       = $c->model('User::User')->find({login => $user_login});
+    $c->stash->{user}       = $c->model('User::User')->find({username => $user_login});
 }
 sub user_view : Chained('user_id') PathPart('') Args(0) {
     my ($self, $c) = @_;

@@ -25,7 +25,7 @@
   table tr.first { font-weight: bold; }
 </style>
 
-<form action="[% c.uri_for_action('/rpc/dataset/postadd_do', [user.login, dataset.id]) %]" method="post" accept-charset="utf-8">
+<form action="[% c.uri_for_action('/rpc/dataset/postadd_do', [user.username, dataset.id]) %]" method="post" accept-charset="utf-8">
 
 
   <div style="height: 6em;"></div>

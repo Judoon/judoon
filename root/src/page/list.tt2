@@ -5,7 +5,7 @@
 [% IF pages %]
 <ul>
   [% FOREACH page IN pages %]
-  <li><a href="[% c.uri_for_action('page_view', [user.login, page.id]) %]">[% page.name %]</a></li>
+  <li><a href="[% c.uri_for_action('page_view', [user.username, page.id]) %]">[% page.name %]</a></li>
   [% END %]
 </ul>
 [% END %]
