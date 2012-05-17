@@ -64,6 +64,10 @@ E.G. create Judoon::DB::User that has => schema
 ** TODO [#B] create per-user databases
 When a user uploads a spreadsheet, create a new database and deploy to there.
 See Catalyst mailing list, "[Catalyst] Authentication in a Many Database Scenario (again)", May 15, 2012
+** TODO [#A] DatasetColumns needs an order field
+** TODO [#A] DatasetColumns.name should probably be called .title
+PageColumns uses .title  (title seems more apropos for Columns)
+what about Page or Dataset?
 * Judoon::Tmpl
 ** DONE [#A] Fill out TemplateTranslator
 CLOSED: [2012-05-15 Tue 16:14]
