@@ -26,7 +26,9 @@ override get_list => sub {
 override add_object => sub {
     my ($self, $c, $params) = @_;
     my $upload = $c->req->upload('dataset');
-    return $c->stash->{user}->import_data($upload->fh);
+    my $dataset = $c->stash->{user}->import_data($upload->fh);
+    $dataset->create_basic_page();
+    return $dataset;
 };
 
 override get_object => sub {
