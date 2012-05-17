@@ -10,13 +10,44 @@
 [% END %]
 
 
-<h2>Welcome to Judoon</h2>
+<div class="hero-unit">
+<h1>Welcome to Judoon.</h1>
+
+<br>
 
 <p>
   Judoon helps you to turn organized scientific data into searchable,
   customizable, dynamic data tables.
 </p>
 
-<p><a href="[% c.uri_for_action('user_addlist') %]">Get started</a></p>
+<br>
+
+<div class="row-fluid">
+  <div class="span12">
+    <div class="row-fluid">
+      <div class="span6">
+        <h3>In other words, it turns this:</h3>
+      </div>
+      <div class="span6">
+        <h3>Into this:</h3>
+      </div>
+    </div>
+    <div class="row-fluid"><br></div>
+    <div class="row-fluid">
+      <div class="span6">
+        <img  src="/static/images/index_spreadsheet.png" />
+      </div>
+      <div class="span6">
+        <img src="/static/images/index_demopage.png" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<p><a class="btn btn-primary" href="[% c.uri_for_action('user_addlist') %]">Get started</a></p>
+
+</div>
 
 [% END %]
