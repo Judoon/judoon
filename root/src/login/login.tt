@@ -7,11 +7,12 @@
 
 <div class="error">[% error_msg %]</div>
 
-<form id="login_form" method="post" class="form-inline" >
+<form id="login_form" method="post" action="[% c.uri_for_action('/login/login') %]" class="well" >
   <input type="text" name="username" id="username" class="input-small" placeholder="Username" tabindex="1" />
   <input type="password" name="password" id="password" class="input-small" placeholder="Password" tabindex="2" />
   <button type="submit" class="btn">Submit</button>
 </form>
 
+<p>Don't have an account?  <a href="[% c.uri_for_action('user_add_placeholder') %]">Sign up here!</a></p>
 
 [% END %]
