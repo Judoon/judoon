@@ -2,6 +2,13 @@
   title = 'Welcome'
 %]
 
+[% IF message %]
+<div class="alert">
+  <button class="close" data-dismiss="alert">×</button>
+  <strong>Warning!</strong> [% message %]
+</div>
+[% END %]
+
 
 <h2>Welcome to Judoon</h2>
 
