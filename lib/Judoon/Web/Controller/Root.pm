@@ -50,6 +50,15 @@ sub default :Path {
 
 sub base : Chained('') PathPart('') CaptureArgs(0) {}
 
+sub placeholder :Private {
+    my ($self, $c) = @_;
+    $c->flash->{message} = "Sorry, this is page is not yet implemented.";
+    $c->res->redirect('/');
+}
+
+sub user_add_placeholder : Chained('base') PathPart('user/add') Args(0) { shift->placeholder(@_); }
+sub public_page_placeholder : Chained('base') PathPart('page') Args(0) { shift->placeholder(@_); }
+
 
 
 
