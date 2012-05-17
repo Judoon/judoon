@@ -16,7 +16,7 @@
 <br>
 
 <p>
-  Judoon helps you to turn organized scientific data into searchable,
+  Judoon helps you to turn your spreadsheets into searchable,
   customizable, dynamic data tables.
 </p>
 
@@ -46,7 +46,7 @@
 
 <br>
 
-<p><a class="btn btn-primary" href="[% c.uri_for_action('user_addlist') %]">Get started</a></p>
+<p><a class="btn btn-primary" href="[% c.uri_for_action('user_addlist') %]">Get started!</a></p>
 
 </div>
 
