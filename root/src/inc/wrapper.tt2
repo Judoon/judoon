@@ -59,11 +59,18 @@
       <div class="span2">
         <ul class="nav nav-list">
           <li class="nav-header">Things to do:</li>
-          [% IF user %]<li><a href="[% c.uri_for_action('user_view', [user.username]) %]">Your homepage</a></li>[% END %]
-          <li><a href="[% c.uri_for_action('public_page_addlist') %]">View Public Pages</a></li>
-          <li><a href="moo">Another Thing</a></li>
-          <li><a href="moo">Something Else</a></li>
-          [% IF c.user_exists %]<li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>[% END %]
+          [% IF !user %]
+          <li><a href="[% c.uri_for_action('user_addlist') %]">Login</a></li>
+          <li><a href="[% c.uri_for_action('user_add_placeholder') %]">Signup</a></li>
+          [% ELSE %]
+          <li><a href="[% c.uri_for_action('user_view', [user.username]) %]">Your homepage</a></li>
+          <li><a href="[% c.uri_for_action('user_view', [user.username]) %]">Your datasets</a></li>
+          <li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>
+          [% END %]
+          <li class="nav-header">Things to see:</li>
+          <li><a href="[% c.uri_for_action('public_page_placeholder', {type=>'public'}) %]">Public Pages</a></li>
+          <li><a href="/static/html/news.html">News</a></li>
+          <li><a href="/static/html/about.html">About</a></li>
         </ul>
       </div>
       <div class="span10" id="content">
