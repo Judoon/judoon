@@ -52,8 +52,5 @@ test_requires 'Test::More' => '0.88';
 test_requires 'Test::Fatal';
 test_requires 'Test::Pod';
 test_requires 'Test::Pod::Coverage';
-catalyst;
 
-install_script glob('script/*.pl');
-auto_install;
-WriteAll;
+WriteAll(meta => 0);
