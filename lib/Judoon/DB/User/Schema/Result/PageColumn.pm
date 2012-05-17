@@ -119,6 +119,13 @@ sub template_to_objects {
     );
 }
 
+sub set_template {
+    my ($self, @objects) = @_;
+    $self->template($self->translator->from_objects(
+        to => 'Native', objects => \@objects,
+    ));
+}
+
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;
