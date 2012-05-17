@@ -141,6 +141,41 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->load_components('InflateColumn::Serializer');
 __PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
 
+use DateTime;
+use Judoon::Tmpl::Factory;
+
+sub create_basic_page {
+    my ($self) = @_;
+
+    my $DEFAULT_PREAMBLE = <<'EOS';
+<p>This is a standard table.</p>
+<p>Edit this by logging into your account and selecting 'edit page'.</p>
+EOS
+    my $DEFAULT_POSTAMBLE = <<'EOS';
+Created with Judoon on 
+EOS
+    $DEFAULT_POSTAMBLE .= DateTime->now();
+
+    my $page = $self->create_related('pages', {
+        title     => $self->name,
+        preamble  => $DEFAULT_PREAMBLE,
+        postamble => $DEFAULT_POSTAMBLE,
+    });
+
+    for my $ds_column ($self->ds_columns) {
+        my $page_column = $page->create_related('page_columns', {
+            title    => $ds_column->name,
+            template => '',
+        });
+        $page_column->set_template(new_variable_node({name => $ds_column->shortname}));
+        $page_column->update;
+    }
+
+    return $page;
+}
+
+
+
 
 __PACKAGE__->meta->make_immutable;
 1;
