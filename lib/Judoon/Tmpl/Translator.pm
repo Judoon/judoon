@@ -39,6 +39,11 @@ method to_objects(:$from!, :$template!) {
     return $self->dialect_objects->{$from}->parse($template);
 }
 
+method from_objects(:$to!, :$objects!) {
+    die "$to is not a valid dialect" if (not grep {$_ eq $to} dialects());
+    return $self->dialect_objects->{$to}->produce($objects);
+}
+
 
 __PACKAGE__->meta->make_immutable;
 
