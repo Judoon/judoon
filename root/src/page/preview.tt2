@@ -8,14 +8,19 @@
 </script>
 [% END %]
 
+<div class="alert alert-block">
+  <a class="close" data-dismiss="alert" href="#">×</a>
+  <h4 class="alert-heading">Warning!</h4>
+  This is just a preview. You need to publish it before others can see it.
+  <a href="[% c.uri_for_action('/rpc/page/edit', c.req.captures) %]">Go back and edit</a>.
+</div>
 
-<p><a class="btn" href="[% c.uri_for_action('/rpc/page/edit', c.req.captures) %]">Return to page</a></p>
 <br>
 
-<h2>Preview of [% page.object.title %]</h2>
-<br>
+<h2>[% page.object.title %]</h2>
 
-<p>[% page.object.preamble %]</p>
+<br>
+[% page.object.preamble %]
 <br>
 
 <table id="demo_page" class="display data_table table table-striped table-condensed table-border">
