@@ -8,6 +8,7 @@ all_from 'lib/Judoon/Web.pm';
 
 requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'Catalyst::Action::RenderView';
+requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::Controller::REST';
 requires 'Catalyst::Model::DBIC::Schema';
 requires 'Catalyst::Plugin::Authentication';
