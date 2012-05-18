@@ -41,7 +41,7 @@ CREATE TEMPORARY TABLE users_temp_alter (
 );
 
 ;
-INSERT INTO users_temp_alter( id, username, name, password, email_address) SELECT id, login, name, "", "" FROM users;
+INSERT INTO users_temp_alter( id, active, username, name, password, email_address) SELECT id, 1, login, name, "", "" FROM users;
 
 ;
 DROP TABLE users;
