@@ -17,6 +17,7 @@ requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'Catalyst::Plugin::Session::Store::File';
 requires 'Catalyst::Plugin::Session::Store::Memcached';
 requires 'Catalyst::Plugin::Static::Simple';
+requires 'Catalyst::Plugin::StackTrace';
 requires 'Catalyst::Runtime' => '5.90007';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::SimpleLogin';
