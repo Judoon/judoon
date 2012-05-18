@@ -33,6 +33,7 @@ requires 'File::Temp';
 requires 'FindBin';
 requires 'HTML::TreeBuilder';
 requires 'JSON';
+requires 'JSON::Any';
 requires 'List::AllUtils';
 requires 'Method::Signatures';
 requires 'Module::Pluggable';
