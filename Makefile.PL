@@ -27,7 +27,7 @@ requires 'Data::Printer';
 requires 'Data::Section::Simple';
 requires 'DBI';
 requires 'DBIx::Class';
-requires 'DBIX::Class::InflateColumn::Serializer';
+requires 'DBIx::Class::InflateColumn::Serializer';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'File::Temp';
 requires 'FindBin';
