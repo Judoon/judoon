@@ -39,6 +39,7 @@ requires 'Module::Pluggable';
 requires 'Moose';
 requires 'MooseX::MarkAsMethods';
 requires 'MooseX::NonMoose';
+requires 'MooseX::Storage';
 requires 'namespace::autoclean';
 requires 'Spreadsheet::Read';
 
