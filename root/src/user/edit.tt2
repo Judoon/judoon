@@ -1,0 +1,80 @@
+[% WRAPPER inc/wrapper.tt2
+  title = user.object.name
+%]
+
+<h3>Welcome, [% user.object.name || user.object.username %]!</h3>
+<br>
+
+[% IF !datasets %]
+<div class="row-fluid">
+  <p>You haven't uploaded any spreadsheets yet.</p>
+</div>
+[% ELSE %]
+<div class="row-fluid">
+  <p>Here are your data sets:</p>
+
+  <table class="table table-striped table-condensed dataset_list">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Data Set</th>
+      <th>Webpage</th>
+      <th>Publish?</th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH dataset IN datasets %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td><a href="[% c.uri_for_action('/rpc/dataset/edit', [user.object.username, dataset.id]) %]">[% dataset.name %]</a></td>
+      [% IF dataset.pages %]
+      [% page = dataset.pages %]
+      <td>
+        <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/page/preview', [user.object.username, dataset.id, page.id]) %]">Preview</a>
+        <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/page/edit', [user.object.username, dataset.id, page.id]) %]">Edit</a>
+      </td>
+      <td><input type="checkbox" [% IF page.public %]checked="checked"[% END %] /></td>
+      [% ELSE %]
+      <td><a class="btn btn-mini" href="[% c.uri_for_action('/rpc/page/add', [user.object.username, dataset.id]) %]">Create</a></td>
+      <td><input type="checkbox" disabled="disabled" /></td>
+      [% END %]
+    </tr>
+    [% END %]
+
+  </tbody>
+    </table>
+
+</div>
+
+<div class="row-fluid">
+  <h4>Add new data set</h4>
+  <div class="span4">
+    <form action="[% c.uri_for_action('/rpc/dataset/add_do', [user.object.username]) %]" method="post" enctype="multipart/form-data" class="form-vertical">
+      <fieldset>
+        <input type="file" id="dataset" name="dataset" class="" />
+        <div class="form-submit"><button class="btn btn-primary" type="submit"><i class="icon-upload"></i> Upload</button></div>
+      </fieldset>
+    </form>
+  </div>
+  <div class="span4">
+    <h6>Accepted file types are:</h6>
+    <dl>
+      <dt>.xls</dt><dd>Excel 97</dd>
+      <dt>.xlsx</dt><dd>Excel XML</dd>
+      <dt>.csv</dt><dd><abbr title="comma-separated values">CSV</abbr></dd>
+    </dl>
+  </div>
+</div>
+[% END %]
+
+<script>
+  $(document).ready(function() {
+     $('#add_data').on('click', function() {
+       $("#data_add_button").css("display", "none");
+       $("#data_upload_form").css("display", "block");
+     });
+  });
+</script>
+
+
+[% END %]

@@ -1,0 +1,13 @@
+[% WRAPPER inc/wrapper.tt2
+  title = 'No.'
+%]
+
+<div class="alert alert-error">
+  <strong>Hey!</strong> You don't have permission to see that page!
+</div>
+
+
+
+</div>
+
+[% END %]

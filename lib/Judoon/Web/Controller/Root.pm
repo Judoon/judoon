@@ -50,37 +50,21 @@ sub default :Path {
 
 sub base : Chained('') PathPart('') CaptureArgs(0) {}
 
+sub denied :Chained('') PathPart('') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'denied.tt2';
+}
+
 sub placeholder :Private {
     my ($self, $c) = @_;
     $c->flash->{message} = "Sorry, this is page is not yet implemented.";
     $c->res->redirect('/');
 }
 
-sub user_add_placeholder : Chained('base') PathPart('user/add') Args(0) { shift->placeholder(@_); }
 sub public_page_placeholder : Chained('base') PathPart('page') Args(0) { shift->placeholder(@_); }
 
 
-
-
 sub edit : Chained('/login/required') PathPart('') CaptureArgs(0) {}
-
-
-sub user_base    : Chained('edit')      PathPart('user') CaptureArgs(0) {}
-sub user_addlist : Chained('user_base') PathPart('')     Args(0) {
-    my ($self, $c) = @_;
-    $c->res->redirect($c->uri_for_action('user_view', [$c->user->username]));
-}
-sub user_id : Chained('user_base') PathPart('') CaptureArgs(1) {
-    my ($self, $c, $user_login) = @_;
-    $c->stash->{user_login} = $user_login;
-    $c->stash->{user}       = $c->model('User::User')->find({username => $user_login});
-}
-sub user_view : Chained('user_id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{datasets} = [$c->stash->{user}->datasets()];
-    $c->stash->{template} = 'user_view.tt2';
-}
-
 
 
 # Public pages

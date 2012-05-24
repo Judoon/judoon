@@ -60,11 +60,11 @@
         <ul class="nav nav-list">
           <li class="nav-header">Things to do:</li>
           [% IF !c.user_exists %]
-          <li><a href="[% c.uri_for_action('user_addlist') %]">Login</a></li>
-          <li><a href="[% c.uri_for_action('user_add_placeholder') %]">Signup</a></li>
-          [% ELSE %][% user_this = user || c.user %]
-          <li><a href="[% c.uri_for_action('user_view', [user_this.username]) %]">Your homepage</a></li>
-          <li><a href="[% c.uri_for_action('user_view', [user_this.username]) %]">Your datasets</a></li>
+          <li><a href="[% c.uri_for_action('/login/login') %]">Login</a></li>
+          <li><a href="[% c.uri_for_action('/user/signup') %]">Signup</a></li>
+          [% ELSE %][% user_this = user.object || c.user %]
+          <li><a href="[% c.uri_for_action('/user/edit', [user_this.username]) %]">Your homepage</a></li>
+          <li><a href="[% c.uri_for_action('/rpc/dataset/list', [user_this.username]) %]">Your datasets</a></li>
           <li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>
           [% END %]
           <li class="nav-header">Things to see:</li>

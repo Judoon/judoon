@@ -1,0 +1,54 @@
+[% WRAPPER inc/wrapper.tt2
+  title = 'Signup'
+%]
+
+[% IF error %]
+<div class="alert alert-error">
+  <button class="close" data-dismiss="alert">×</button>
+  <strong>Error!</strong> [% error %]
+</div>
+[% END %]
+
+
+<form action="[% c.uri_for_action('/user/signup_do') %]" method="post" class="form-vertical">
+
+  <label>
+    Username<span class="required">*</span>
+    <input type="text" class="span3" name="user.username">
+  </label>
+
+  <label>
+    Password<span class="required">*</span>
+    <input type="password" class="span3" name="user.password">
+  </label>
+
+  <label>
+    Confirm Password<span class="required">*</span>
+    <input type="password" class="span3" name="user.confirm_password">
+  </label>
+
+  <label>
+    Email<span class="required">*</span>
+    <input type="text" class="span3" name="user.email_address">
+  </label>
+
+  <label>
+    Name
+    <input type="text" class="span3" name="user.name">
+  </label>
+
+  <label>
+    Phone Number
+    <input type="text" class="span3" name="user.phone_number">
+  </label>
+
+  <label>
+    Mailing Address
+    <input type="text" class="span3" name="user.mail_address">
+  </label>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+
+[% END %]
