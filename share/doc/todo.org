@@ -40,6 +40,10 @@ No formatting, no annotation, dead simple.
 ** TODO DatasetColumn
 during annotation, if user sets field as accession, create virtual column
 e.g.:  {gene_symbol} => {__annotation_gene_symbol_to_gene_id}
+** RPC
+*** TODO update munge_*_params to do basic parameter unpacking
+my %good_p = map {s/$st//r => $p->{$_}} grep {m/$st/} keys %$p;
+RPC::*.pm will need to be updated.
 * Judoon::DB::User::Schema
 ** DONE [#A] Convert DB::User to DBIC
 CLOSED: [2012-03-28 Wed 13:45]
@@ -89,3 +93,9 @@ need to update WebWidgets.pm && library.tt
 Then, the uniprot_acc to gene map could convert to gene_id, and use that mapping
 ** Would this be easier to do in a database, or more simply represented as a schema?
 ** TODO Need order encoded in mapping
+* deployment
+** add deployment deps
+- [ ] Starman
+- [ ] Server::Starter
+- [ ] Net::Server::SS::PreFork
+- [ ] DBIx::Class::Migration
