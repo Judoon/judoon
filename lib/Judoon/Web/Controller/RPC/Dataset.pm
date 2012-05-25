@@ -20,20 +20,20 @@ __PACKAGE__->config(
 
 override get_list => sub {
     my ($self, $c) = @_;
-    return [$c->stash->{user}->datasets];
+    return [$c->stash->{user}{object}->datasets];
 };
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
     my $upload = $c->req->upload('dataset');
-    my $dataset = $c->stash->{user}->import_data($upload->fh);
+    my $dataset = $c->stash->{user}{object}->import_data($upload->fh);
     $dataset->create_basic_page();
     return $dataset;
 };
 
 override get_object => sub {
     my ($self, $c) = @_;
-    return $c->stash->{user}->datasets_rs
+    return $c->stash->{user}{object}->datasets_rs
         ->find({id => $c->stash->{dataset}{id}});
 };
 
