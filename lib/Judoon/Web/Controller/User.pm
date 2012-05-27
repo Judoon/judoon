@@ -38,7 +38,7 @@ sub signup_do : Chained('/base') PathPart('signup_do') Args(0) {
 
     # fixme: need to login use here
 
-    $c->res->redirect($c->uri_for_action('/user/edit', [$user->username]));
+    $c->res->redirect($c->uri_for_action('/rpc/dataset/list', [$user->username]));
     $c->detach;
 }
 
