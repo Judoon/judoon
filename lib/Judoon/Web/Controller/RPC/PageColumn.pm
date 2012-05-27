@@ -105,6 +105,13 @@ override munge_edit_params => sub {
     return \%valid;;
 };
 
+after private_edit_do => sub {
+    my ($self, $c) = @_;
+    my @captures = @{$c->req->captures};
+    pop @captures;
+    $c->res->redirect($c->uri_for_action('/rpc/page/edit', \@captures));
+};
+
 override delete_object => sub {
     my ($self, $c) = @_;
     $c->stash->{page_column}{object}->delete;
