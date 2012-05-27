@@ -30,7 +30,9 @@
       <input type="password" class="span3" name="user.confirm_new_password">
     </label>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
+    [% INCLUDE 'components/forms/form_submit.tt'
+       submit_type = 'update'
+    %]
   </fieldset>
 </form>
 

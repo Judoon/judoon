@@ -28,7 +28,10 @@
       </div>
     </div>
     
-    [% INCLUDE 'components/forms/form_submit.tt' allow_reset=1 %]
+    [% INCLUDE 'components/forms/form_submit.tt'
+       submit_type = 'update'
+       allow_reset = 1
+    %]
   </fieldset>
 </form>
 

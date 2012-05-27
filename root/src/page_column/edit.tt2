@@ -82,9 +82,9 @@
 
     
     [% INCLUDE 'components/forms/form_submit.tt'
-        allow_reset = 1
-        return_url = c.uri_for_action('/rpc/page/edit', c.req.captures.slice(0,-2))
-        return_page = 'page'
+       submit_type = 'submit'
+       return_url  = c.uri_for_action('/rpc/page/edit', c.req.captures.slice(0,-2))
+       return_page = 'page'
     %]
 
   </fieldset>
