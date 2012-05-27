@@ -192,3 +192,17 @@ Not converted
 *** Geiger Chembridge
 Not Converted
 **** http://www.cellmigration.org/resource/discovery/geiger/geiger_chembridge.shtml
+* form submit buttons:
+- dataset/list:   [Upload]
+- dataset/edit:   [Update] updates & refreshes, [Reset] resets
+- ds_column/list: [Save Changes] update & refresh, [Cancel and return to dataset] href to previous
+- ds_column/edit: [Submit] Submits and returns
+- page/edit:      [Save Changes] update & refresh, [Reset] resets
+- page/list:      empty
+- page_column/edit: [Save Changes] Submits & returns, [Reset] resets, [Cancel and return to pae] href to previous
+- user/edit:       [Submit]
+
+[Update] Updates & refreshes
+[Submit] Submits & returns to previous
+[Reset]  resets
+[Cancel and return] href to previous
