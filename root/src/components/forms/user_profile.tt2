@@ -1,0 +1,19 @@
+  <label>
+    Email<span class="required">*</span>
+    <input type="text" class="span3" name="user.email_address" value="[% user.object.email_address %]">
+  </label>
+
+  <label>
+    Name
+    <input type="text" class="span3" name="user.name" value="[% user.object.name %]">
+  </label>
+
+  <label>
+    Phone Number
+    <input type="text" class="span3" name="user.phone_number" value="[% user.object.phone_number %]">
+  </label>
+
+  <label>
+    Mailing Address
+    <input type="text" class="span3" name="user.mail_address" value="[% user.object.mail_address %]">
+  </label>
