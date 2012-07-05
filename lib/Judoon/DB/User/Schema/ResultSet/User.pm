@@ -22,8 +22,8 @@ sub create_user {
     if (not $valid{username}) {
         $errmsg = q{No username was given!};
     }
-    elsif (not $valid{password}) {
-        $errmsg = q{No password given!};
+    elsif (not defined $valid{password}) {
+        $errmsg = q{No password was given!};
     }
     elsif (not $self->validate_username($valid{username})) {
         $errmsg = q{Invalid username! Use only a-z, 0-9, and '_'.};
@@ -32,7 +32,7 @@ sub create_user {
         $errmsg = q{This username is already taken!};
     }
     elsif (not $self->validate_password($valid{password})) {
-        $errmsg = q{Password must be at least 8 characters!};
+        $errmsg = q{Password is not valid!};
     }
 
     die $errmsg if ($errmsg);
