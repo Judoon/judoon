@@ -15,8 +15,8 @@ use Data::Printer;
 
 fixtures_ok [
     User => [
-        [qw/login name/],
-        ['testuser', 'Test User'],
+        [qw/username name active email_address password/],
+        ['testuser', 'Test User', 1, 'testuser@example.com', 'testpass'],
     ],
 ], 'installed fixtures';
 
@@ -24,7 +24,11 @@ fixtures_ok [
 subtest 'Result::User' => sub {
     my $user_rs = ResultSet('User');
 
-    is_result my $user = $user_rs->find({login => 'testuser'});
+    is_result my $user = $user_rs->find({username => 'testuser'});
+
+
+    $user->change_password('newpass');
+    ok $user->password, 'newpass';
 
     # pivot_data()
     my $data     = [['boo'],['boo',1..4],['boo',5..8],['boo',9..12]];
@@ -42,6 +46,45 @@ subtest 'Result::User' => sub {
     close $TEST_XLS;
 };
 
+subtest 'ResultSet::User' => sub {
+    my $user_rs = ResultSet('User');
+
+    ok $user_rs->validate_username('boo'), 'validate simple username';
+    ok !$user_rs->validate_username('b!!o'), 'reject invalid username';
+
+    ok $user_rs->validate_password('boo'), 'validate simple password';
+    ok $user_rs->validate_password('0q98347'), 'validate complex password';
+
+    ok $user_rs->user_exists('testuser'), 'found existing user';
+    ok !$user_rs->user_exists('fakeuser'), 'did not find fake user';
+
+    my %newuser = (
+        username => 'newuser', password => 'newuser', name => 'New User',
+        email_address => 'newuser@example.com',
+    );
+
+    my @exceptions = (
+        ['nousername', qr/no username was given/i, 'missing username',],
+        ['nopassword', qr/no password was given/i, 'missing password',],
+        ['badusername', qr/invalid username/i,     'invalid username',],
+        ['dupeusername', qr/this username is already taken/i,  'duplicate username',],
+    );
+    my %create_user_exceptions = map {$_->[0] => {
+        data => {%newuser}, exception => $_->[1], descr => $_->[2],
+    }} @exceptions;
+
+    delete $create_user_exceptions{nousername}->{data}{username};
+    delete $create_user_exceptions{nopassword}->{data}{password};
+    $create_user_exceptions{badusername}->{data}{username} = 'sdf@#sfdg';
+    $create_user_exceptions{dupeusername}->{data}{username} = 'testuser';
+
+    for my $i (values %create_user_exceptions) {
+        like exception { $user_rs->create_user($i->{data}); },
+            $i->{exception}, $i->{descr};
+    }
+
+    ok $user_rs->create_user(\%newuser), 'able to create new user';
+};
 
 subtest 'Result::Dataset' => sub {
     pass 'placeholder test';
