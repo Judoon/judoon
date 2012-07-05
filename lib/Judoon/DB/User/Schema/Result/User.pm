@@ -185,6 +185,12 @@ __PACKAGE__->add_columns(
 use Spreadsheet::Read ();
 
 
+sub change_password {
+    my ($self, $newpass) = @_;
+    $self->password($newpass);
+    $self->update;
+}
+
 
 =head2 import_data( $filehandle )
 
