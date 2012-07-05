@@ -4,7 +4,9 @@
 
 <h3>Welcome, [% user.object.name || user.object.username %]!</h3>
 
-<form method="post" action="[% c.uri_for_action('/user/edit_do') %]" class="form-vertical">
+[% INCLUDE 'components/notification.tt2' %]
+
+<form method="post" action="[% c.uri_for_action('/user/edit_do', [user.id]) %]" class="form-vertical">
   <fieldset>
     <legend>Update your profile</legend>
 
@@ -17,17 +19,17 @@
 
     <label>
       Old Password<span class="required">*</span>
-      <input type="password" class="span3" name="user.old_password">
+      <input type="password" class="span3" name="old_password">
     </label>
 
     <label>
       New Password<span class="required">*</span>
-      <input type="password" class="span3" name="user.new_password">
+      <input type="password" class="span3" name="new_password">
     </label>
 
     <label>
       Confirm New Password<span class="required">*</span>
-      <input type="password" class="span3" name="user.confirm_new_password">
+      <input type="password" class="span3" name="confirm_new_password">
     </label>
 
     [% INCLUDE 'components/forms/form_submit.tt'
