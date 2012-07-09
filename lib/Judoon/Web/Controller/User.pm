@@ -1,5 +1,11 @@
 package Judoon::Web::Controller::User;
 
+=pod
+
+=encoding utf8
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -8,16 +14,18 @@ with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 use Try::Tiny;
 
+
+=head2 signup
+
+Get/submit the new user signup page.
+
+=cut
+
 sub signup : Chained('/base') PathPart('signup') Args(0) :ActionClass('REST') {
     my ($self, $c) = @_;
     $c->stash->{template} = 'signup.tt2';
 }
-
-sub signup_GET {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'signup.tt2';
-}
-
+sub signup_GET {}
 sub signup_POST {
     my ($self, $c) = @_;
 
@@ -49,6 +57,12 @@ sub signup_POST {
 }
 
 
+=head2 settings
+
+This is the base for all the /settings/* pages
+
+=cut
+
 sub settings : Chained('/edit') PathPart('settings') CaptureArgs(0) {
     my ($self, $c) = @_;
     $c->stash->{user}{object} = $c->user;
@@ -58,6 +72,13 @@ sub settings_view : Chained('settings') PathPart('') Args(0) {
     $self->go_here($c, '/user/profile');
     $c->detach;
 }
+
+=head2 profile
+
+This is where the user goes to change their profile (name, email, phone, etc.)
+
+=cut
+
 sub profile : Chained('settings') PathPart('profile') Args(0) :ActionClass('REST') {
     my ($self, $c) = @_;
     $c->stash->{user}{object} = $c->user;
@@ -79,6 +100,13 @@ sub profile_POST {
 
     $c->stash->{alert}{success} = 'Your profile has been updated.';
 }
+
+
+=head2 password
+
+The action for changing the users password.
+
+=cut
 
 sub password : Chained('settings') PathPart('password') Args(0) :ActionClass('REST') {
     my ($self, $c) = @_;
@@ -110,6 +138,8 @@ sub password_POST {
 
     $c->stash->{alert}{success} = 'Your password has been updated.';
 }
+
+
 
 
 sub base : Chained('/edit') PathPart('user') CaptureArgs(0) {}
