@@ -10,7 +10,6 @@ use Test::DBIx::Class {
 };
 use Test::WWW::Mechanize::Catalyst;
 
-
 use Config::General;
 use Data::Printer;
 use File::Temp qw(tempdir);
@@ -57,17 +56,39 @@ subtest 'Basic Tests' => sub {
 
 
 subtest 'User Tests' => sub {
+    my %newuser = (
+        'user.username' => 'newuser', 'user.password' => 'newuserisme',
+        'user.email_address' => 'newuser@example.com',
+        'user.name' => 'New User',
+    );
+
     subtest 'Signup' => sub {
         $mech->get_ok('/signup', 'got signup page');
-        my %newuser = (
-            'user.username' => 'newuser', 'user.password' => 'newuserisme',
-            'user.confirm_password' => 'newuserisme',
-            'user.email_address' => 'newuser@example.com',
-            'user.name' => 'New User',
+
+        $newuser{'user.confirm_password'} = 'wontmatch';
+        $mech->post_ok('/signup', \%newuser);
+        $mech->content_like(
+            qr{passwords do not match}i,
+            q{can't create user w/o matching passwords},
         );
+
+        $newuser{'user.confirm_password'} = 'newuserisme';
+        $newuser{'user.username'}         = 'testuser';
+        $mech->post_ok('/signup', \%newuser);
+        $mech->content_like(
+            qr{this username is already taken}i,
+            q{can't create user w/ same name as current user},
+        );
+
+
+        $newuser{'user.username'} = 'newuser';
         $mech->post_ok('/signup', \%newuser, 'can create new user');
         like $mech->uri, qr{/user/newuser/dataset/list},
             '  ...and send new user to their datasets';
+    };
+
+    subtest 'Profile' => sub {
+        redirects_to_ok('/settings','/settings/profile');
 
         $mech->get_ok('/settings/profile', 'get user profile');
         $mech->post_ok(
@@ -82,7 +103,33 @@ subtest 'User Tests' => sub {
         my ($phone_input) = $mech->grep_inputs({name => qr/^user\.phone_number$/});
         is $phone_input->value, '555-5505', 'phone number has been updated';
 
+        # broken: we're way too permissive right now
+        # $mech->post_ok(
+        #     '/settings/profile',
+        #     {
+        #         'user.email_address' => undef,
+        #         'user.name'          => 'New Name',
+        #         'user.phone_number'  => '555-5505',
+        #     },
+        # );
+        # $mech->content_like(qr{unable to update profile}i, q{cant duplicate email address});
+    };
+
+    subtest 'Password' => sub {
         $mech->get_ok('/settings/password', 'get user password change');
+
+        $mech->post_ok(
+            '/settings/password',
+            {old_password => $newuser{'user.password'},},
+        );
+        $mech->content_like(qr/Something is missing/i, 'need all three fields');
+
+        $mech->post_ok(
+            '/settings/password',
+            {old_password => 'incorrect', new_password => 'boo', confirm_new_password => 'boo',},
+        );
+        $mech->content_like(qr/old password is incorrect/i, 'cant update password without old password');
+
         $mech->post_ok(
             '/settings/password',
             {
@@ -92,7 +139,6 @@ subtest 'User Tests' => sub {
             },
             'able to update password',
         );
-        # diag $mech->content;
         $mech->content_like(qr/Your password has been updated/, 'can update password');
         $newuser{'user.password'} = 'newuserisstillme';
     };
