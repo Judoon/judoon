@@ -39,7 +39,11 @@ sub signup_POST {
         $c->detach;
     };
 
-    # fixme: need to login use here
+    $c->authenticate({
+        username => $user_params{username},
+        password => $user_params{password},
+    });
+    $c->user_exists(1);
 
     $self->go_here($c, '/rpc/dataset/list', [$user->username]);
     $c->detach;
