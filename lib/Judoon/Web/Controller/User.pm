@@ -25,8 +25,7 @@ sub signup_POST {
 
     if ($user_params{password} ne $user_params{confirm_password}) {
         $c->log->debug("PASS MATCH ERROR!");
-        $c->flash->{error} = 'Passwords do not match!';
-        $self->go_here($c, '/user/signup');
+        $c->stash->{error} = 'Passwords do not match!';
         $c->detach;
     }
 
@@ -36,8 +35,7 @@ sub signup_POST {
     };
     if ($@) {
         $c->log->debug("USER ADD ERROR! $@");
-        $c->flash->{error} = $@;
-        $self->go_here($c, '/user/signup');
+        $c->stash->{error} = $@;
         $c->detach;
     };
 
