@@ -26,6 +26,11 @@ footer p {
     background-color: #fff;
 }
 
+/* for frontpage */
+#getstarted a.btn:visited { color: #fff; }
+
+
+/* for template edit page */
 
 input.w-dropdown,
 select.w-dropdown {
