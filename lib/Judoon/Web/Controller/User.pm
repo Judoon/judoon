@@ -115,7 +115,7 @@ sub password_POST {
 
 
 sub base : Chained('/edit') PathPart('user') CaptureArgs(0) {}
-sub id   : Chained('base')  PathPart('id')   CaptureArgs(1) {
+sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {
     my ($self, $c, $username) = @_;
     my $user = $c->model('User::User')->find({username => $username});
     if (not $user) {
