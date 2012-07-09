@@ -20,8 +20,7 @@ sub signup_POST {
     my ($self, $c) = @_;
 
     my $params = $c->req->params;
-    my %user_params = map {my $k = $_; $k=~ s/^user\.//; $k => $params->{$_}}
-        grep {m/^user\./} keys %$params;
+    my %user_params = $self->extract_params('user', $params);
 
     if ($user_params{password} ne $user_params{confirm_password}) {
         $c->log->debug("PASS MATCH ERROR!");
