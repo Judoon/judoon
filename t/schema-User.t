@@ -29,17 +29,21 @@ subtest 'Result::User' => sub {
 
     $user->change_password('newpass');
     ok $user->password, 'newpass';
+    like exception { $user->change_password(); }, qr{invalid password}i,
+        'Cant set invalid password';
 
     # pivot_data()
     my $data     = [['boo'],['boo',1..4],['boo',5..8],['boo',9..12]];
-    #diag "Data: " . p($data);
     my $piv_data = [[1,5,9],[2,6,10],[3,7,11],[4,8,12]];
     my $pivoted  = $user->pivot_data($data, 4, 3);
-    #diag "Pivoted is: " . p($pivoted);
     is_deeply $pivoted, $piv_data, 'pivot_data() pivots data!';
 
 
     # import_data()
+    like exception { $user->import_data(); },
+        qr{import_data\(\) needs a filehandle}i, 'import_data() dies w/o fh';
+
+
     open my $TEST_XLS, '<', 't/etc/data/test1.xls'
         or die "Can't open test spreadsheet: $!";
     is_result my $dataset = $user->import_data($TEST_XLS);
@@ -49,11 +53,14 @@ subtest 'Result::User' => sub {
 subtest 'ResultSet::User' => sub {
     my $user_rs = ResultSet('User');
 
-    ok $user_rs->validate_username('boo'), 'validate simple username';
+    ok $user_rs->validate_username('boo'),   'validate simple username';
     ok !$user_rs->validate_username('b!!o'), 'reject invalid username';
+    ok !$user_rs->validate_username(''),     'reject empty username';
+    ok !$user_rs->validate_username(),       'reject undef username';
 
-    ok $user_rs->validate_password('boo'), 'validate simple password';
+    ok $user_rs->validate_password('boo'),     'validate simple password';
     ok $user_rs->validate_password('0q98347'), 'validate complex password';
+    ok !$user_rs->validate_password(),         'reject undefined password';
 
     ok $user_rs->user_exists('testuser'), 'found existing user';
     ok !$user_rs->user_exists('fakeuser'), 'did not find fake user';
@@ -84,6 +91,11 @@ subtest 'ResultSet::User' => sub {
     }
 
     ok $user_rs->create_user(\%newuser), 'able to create new user';
+
+    $newuser{username} = 'neweruser';
+    $newuser{active}   = 0;
+    ok my $inactive = $user_rs->create_user(\%newuser), 'create new user (explicitly not active)';
+    ok !$inactive->active, 'inactive user is inactive';
 };
 
 subtest 'Result::Dataset' => sub {

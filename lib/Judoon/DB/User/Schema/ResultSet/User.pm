@@ -1,5 +1,11 @@
 package Judoon::DB::User::Schema::ResultSet::User;
 
+=pod
+
+=encoding utf8
+
+=cut
+
 use strict;
 use warnings;
 use feature ':5.10';
@@ -9,10 +15,16 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::ResultSet';
 
+
+=head2 B<C<create_user( \%params )>>
+
+Add a new user to the database, with sanity checks
+
+=cut
+
 sub create_user {
     my ($self, $params) = @_;
 
-    $DB::single = 1;
     my %valid;
     for my $k (qw(username password name email_address phone_number mail_address active)) {
         $valid{$k} = $params->{$k} if (exists $params->{$k});
@@ -44,9 +56,9 @@ sub create_user {
 }
 
 
-=head2 B<C<validate_username>>
+=head2 B<C<validate_username( $username )>>
 
-Makes sure the username is valid.  Current regex is C<m/^\w+$/>.
+Makes sure C<$username> is valid.  Current regex is C<m/^\w+$/>.
 
 =cut
 
@@ -56,16 +68,21 @@ sub validate_username {
 }
 
 
-=head2 B<C<validate_password>>
+=head2 B<C<validate_password( $password )>>
 
-Makes sure the password is valid.  Currently always return true.
+Makes sure the password is valid.  Currently allows all defined passwords.
 
 =cut
 
-sub validate_password { return 1; }
+sub validate_password {
+    my ($self, $password) = @_;
+    return defined $password;
+}
 
 
-=head2 B<C<user_exists>>
+=head2 B<C<user_exists( $username )>>
+
+Check to see if the username C<username> is in the database.
 
 =cut
 

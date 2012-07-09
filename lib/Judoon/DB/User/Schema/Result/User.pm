@@ -184,9 +184,15 @@ __PACKAGE__->add_columns(
 
 use Spreadsheet::Read ();
 
+=head2 B<C<change_password( $password )>>
+
+Validates and sets password
+
+=cut
 
 sub change_password {
     my ($self, $newpass) = @_;
+    die 'Invalid password.' unless ($self->result_source->resultset->validate_password($newpass));
     $self->password($newpass);
     $self->update;
 }
