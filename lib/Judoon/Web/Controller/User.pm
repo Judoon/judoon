@@ -122,8 +122,8 @@ sub id   : Chained('base')  PathPart('id')   CaptureArgs(1) {
         $c->forward('/error');
     }
 
-    if ($user->username ne $c->user->username) {
-        $c->forward('/denied');
+    if ($user->username eq $c->user->username) {
+        $c->stash->{user}{is_owner} = 1;
     }
 
     $c->stash->{user}{id}     = $username;
@@ -133,36 +133,6 @@ sub edit : Chained('id') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'user/edit.tt2';
     $c->stash->{datasets} = [$c->stash->{user}{object}->datasets()];
-}
-sub edit_do : Chained('id') PathPart('edit_do') Args(0) {
-    my ($self, $c) = @_;
-
-    my $user = $c->stash->{user}{object};
-    my $params = $c->req->params;
-    my %user_params = $self->extract_params('user', $params);
-
-    my $found = grep {$params->{$_}} qw(old_password new_password confirm_new_password);
-    $c->log->debug("Changing password... Found: $found");
-    if ($found) {
-        if ($found != 3) {
-            $self->fail_helpfully($c, 'something is missing?');
-        }
-        elsif (not $user->check_password($params->{old_password})) {
-            $self->fail_helpfully($c, 'Your old password is incorrect')
-        }
-        elsif ($params->{new_password} ne $params->{confirm_new_password}) {
-            $self->fail_helpfully($c, 'Passwords do not match!');
-        }
-        else {
-            $user->change_password($params->{new_password});
-        }
-    }
-
-    # delete @user_params{qw(old_password new_password confirm_new_password)};
-    $c->stash->{user}{object}->update(\%user_params);
-
-
-    $self->go_relative($c, 'edit', $c->req->captures);
 }
 
 
