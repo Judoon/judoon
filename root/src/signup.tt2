@@ -10,7 +10,7 @@
 [% END %]
 
 
-<form action="[% c.uri_for_action('/user/signup_do') %]" method="post" class="form-vertical">
+<form action="[% c.uri_for_action('/user/signup') %]" method="post" class="form-vertical">
 
   <label>
     Username<span class="required">*</span>
@@ -33,7 +33,7 @@
   </label>
 
   <label>
-    Name
+    Name<span class="required">*</span>
     <input type="text" class="span3" name="user.name">
   </label>
 

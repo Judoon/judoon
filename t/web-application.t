@@ -46,19 +46,28 @@ fixtures_ok( sub {
 my $mech = Test::WWW::Mechanize::Catalyst->new(
     catalyst_app => 'Judoon::Web',
 );
-
 ok $mech, 'created test mech' or BAIL_OUT;
 
 
+# START TESTING!!!!
+
 subtest 'Basic Tests' => sub {
     $mech->get_ok('/', 'get frontpage');
-    redirects_to_ok('/user/id/felliott', '/login', 'login required for user page');
 };
 
 
 subtest 'User Tests' => sub {
     subtest 'Signup' => sub {
         $mech->get_ok('/signup', 'got signup page');
+        my %newuser = (
+            'user.username' => 'newuser', 'user.password' => 'newuserisme',
+            'user.confirm_password' => 'newuserisme',
+            'user.email_address' => 'newuser@example.com',
+            'user.name' => 'New User',
+        );
+        $mech->post_ok('/signup', \%newuser, 'can create new user');
+        like $mech->uri, qr{/login},
+            '  ...and new user is asked to login';
 
     };
 

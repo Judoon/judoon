@@ -6,12 +6,17 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::Controller'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
-sub signup : Chained('/base') PathPart('signup') Args(0) {
+sub signup : Chained('/base') PathPart('signup') Args(0) :ActionClass('REST') {
     my ($self, $c) = @_;
     $c->stash->{template} = 'signup.tt2';
 }
 
-sub signup_do : Chained('/base') PathPart('signup_do') Args(0) {
+sub signup_GET {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'signup.tt2';
+}
+
+sub signup_POST {
     my ($self, $c) = @_;
 
     my $params = $c->req->params;
@@ -21,7 +26,7 @@ sub signup_do : Chained('/base') PathPart('signup_do') Args(0) {
     if ($user_params{password} ne $user_params{confirm_password}) {
         $c->log->debug("PASS MATCH ERROR!");
         $c->flash->{error} = 'Passwords do not match!';
-        $c->go_here('/user/signup');
+        $self->go_here($c, '/user/signup');
         $c->detach;
     }
 
@@ -32,13 +37,13 @@ sub signup_do : Chained('/base') PathPart('signup_do') Args(0) {
     if ($@) {
         $c->log->debug("USER ADD ERROR! $@");
         $c->flash->{error} = $@;
-        $c->go_here('/user/signup');
+        $self->go_here($c, '/user/signup');
         $c->detach;
     };
 
     # fixme: need to login use here
 
-    $c->go_here('/rpc/dataset/list', [$user->username]);
+    $self->go_here($c, '/rpc/dataset/list', [$user->username]);
     $c->detach;
 }
 
