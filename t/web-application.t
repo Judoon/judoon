@@ -8,7 +8,7 @@ use Test::DBIx::Class {
     schema_class => 'Judoon::DB::User::Schema',
     connect_info => ['dbi:SQLite:dbname=t/var/testdb.sqlite','',''],
 };
-require Catalyst::Test;
+use Test::WWW::Mechanize::Catalyst;
 
 
 use Config::General;
@@ -35,24 +35,55 @@ $test_config->save_file($TEST_CONF_FILE);
 # install basic fixtures
 fixtures_ok( sub {
     my ($schema) = @_;
-    $schema->resultset('User')->create({
-        login => 'testuser', name => 'Test User',
+    $schema->resultset('User')->create_user({
+        username => 'testuser', password => 'testuser',
+        name => 'Test User', email_address => 'testuser@example.com',
     });
 } );
 
 
 # start test server
-Catalyst::Test->import('Judoon::Web');
+my $mech = Test::WWW::Mechanize::Catalyst->new(
+    catalyst_app => 'Judoon::Web',
+);
+
+ok $mech, 'created test mech' or BAIL_OUT;
 
 
-# basic test
-action_ok('/', 'root page');
-action_redirect('/user/testuser', 'ask for testuser without login redirects');
+subtest 'Basic Tests' => sub {
+    $mech->get_ok('/', 'get frontpage');
+    redirects_to_ok('/user/id/felliott', '/login', 'login required for user page');
+};
 
 
-# fixme: can't login until logins are db-driven
+subtest 'User Tests' => sub {
+    subtest 'Signup' => sub {
+        $mech->get_ok('/signup', 'got signup page');
+
+    };
+
+
+};
+
 
 
 unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE);
 done_testing();
 
+
+sub redirects_ok {
+    my ($req_url) = @_;
+
+    my $req_redir = $mech->requests_redirectable();
+    $mech->requests_redirectable([]);
+    $mech->get($req_url);
+    is($mech->status(), 302, 'requests for ' . $req_url . ' are redirected');
+    $mech->requests_redirectable($req_redir);
+}
+
+sub redirects_to_ok {
+    my ($req_url, $res_url) = @_;
+    redirects_ok($req_url);
+    $mech->get_ok($req_url, 'Redirection for ' . $req_url . ' succeeded...');
+    like($mech->uri(), qr/$res_url/, '  ...to correct url: ' . $res_url);
+}
