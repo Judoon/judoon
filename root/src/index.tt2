@@ -46,7 +46,7 @@
 
   <br>
 
-  <p><a class="btn btn-primary" href="[% c.user_exists ? c.uri_for_action('/user/edit', [c.user.username]) : c.uri_for_action('/login/login') %]">Get started!</a></p>
+  <p><a class="btn btn-primary" href="[% c.user_exists ? c.uri_for_action('/user/profile') : c.uri_for_action('/login/login') %]">Get started!</a></p>
 
 </div>
 
