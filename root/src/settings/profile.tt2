@@ -1,0 +1,22 @@
+[% WRAPPER inc/wrapper.tt2
+  title = user.object.name
+%]
+
+<h3>Welcome, [% user.object.name || user.object.username %]!</h3>
+
+[% INCLUDE 'components/notification.tt2' %]
+
+<form method="post" action="[% c.uri_for_action('/user/profile') %]" class="form-vertical">
+  <fieldset>
+    <legend>Update your profile</legend>
+
+    [% INCLUDE 'components/forms/user_profile.tt2' %]
+
+    [% INCLUDE 'components/forms/form_submit.tt'
+    submit_type = 'update'
+    %]
+  </fieldset>
+</form>
+
+
+[% END %]

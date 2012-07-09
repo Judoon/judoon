@@ -69,6 +69,32 @@ subtest 'User Tests' => sub {
         like $mech->uri, qr{/user/id/newuser/dataset/list},
             '  ...and send new user to their datasets';
 
+        $mech->get_ok('/settings/profile', 'get user profile');
+        $mech->post_ok(
+            '/settings/profile',
+            {
+                'user.email_address' => 'newuser@example.com',
+                'user.name'          => 'New Name',
+                'user.phone_number'  => '555-5505',
+            },
+            'can update profile',
+        );
+        my ($phone_input) = $mech->grep_inputs({name => qr/^user\.phone_number$/});
+        is $phone_input->value, '555-5505', 'phone number has been updated';
+
+        $mech->get_ok('/settings/password', 'get user password change');
+        $mech->post_ok(
+            '/settings/password',
+            {
+                old_password         => $newuser{'user.password'},
+                new_password         => 'newuserisstillme',
+                confirm_new_password => 'newuserisstillme',
+            },
+            'able to update password',
+        );
+        # diag $mech->content;
+        $mech->content_like(qr/Your password has been updated/, 'can update password');
+        $newuser{'user.password'} = 'newuserisstillme';
     };
 
 
