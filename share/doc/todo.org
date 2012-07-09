@@ -8,17 +8,34 @@ CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
 ** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
 ** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
-** User::edit
+** Interface [/]
+*** TODO [#B] lessen gray border, way to wide
+*** TODO [#A] make front page fit without scrolling
+*** TODO [#A] make 'Get Started' not get :visited coloration
+*** TODO [#A] Integrate color scheme with bootstrap
+*** TODO [#A] Make Header not get :visited coloration
+*** TODO [#A] maybe center the page? the splash screen looks weirdly off-center
+*** TODO [#A] Feature: upload excel spreadsheet, automatically create page
+No formatting, no annotation, dead simple.
+** User [/]
 *** TODO [#A] Need delete button for datasets
-*** TODO [#A] Deon't try to upload w/o file
+*** TODO [#A] Don't try to upload w/o file
 *** TODO [#A] Forgot username / password link
-** Dataset::edit
+*** TODO [#A] set up Fill In Form
+*** TODO [#A] update profile: make sure other email not in use?
+*** TODO [#A] settings/profile: don't allow user to unset email
+** Dataset::edit [/]
 *** TODO [#A] Allow multiple pages per ds
 User may want to create multiple views of a complex dataset
-** DatasetColumn::edit
+** DatasetColumn::edit [/]
 *** TODO [#A] accession lost on re-annotation
 I set column 1 to be a gene_symbol. Save, return to list, re-annotate: it's now a gene_id
-** Login
+*** TODO [#A] virtual columns for mapped accessions
+some columns may need to be mapped to real accessions
+e.g. gene_symbols => gene_ids. For these during annotation, if user
+sets field as accession, create virtual column e.g.: {gene_symbol} =>
+{__annotation_gene_symbol_to_gene_id}
+** Login [/]
 *** TODO [#A] update Login to use proper users, i.e. from db
 Catalyst::Plugin::Authorization::Roles - Role-based authorization
 Catalyst::Plugin::Authorization::ACL - ACL-based authorization
@@ -29,17 +46,13 @@ Catalyst::Plugin::Authorization::ACL - ACL-based authorization
 *** Catalyst::Plugin::ErrorCatcher
 After new catalyst is released
 
-** TODO [#B] Should I switch to REST::ForBrowsers?
+*** DBIx::Class::UnicornLogger 
+*** Catalyst::Controller::REST::ForBrowsers?
 most of our actions are pretty basic
 HTML5 allows multiple forms
 wierd paths:
    Page/preview  => could be /?view=preview or accept-type?
    Dataset/postadd => not sure I'm still using this
-** TODO [#A] Feature: upload excel spreadsheet, automatically create page
-No formatting, no annotation, dead simple.
-** TODO DatasetColumn
-during annotation, if user sets field as accession, create virtual column
-e.g.:  {gene_symbol} => {__annotation_gene_symbol_to_gene_id}
 ** RPC
 *** TODO update munge_*_params to do basic parameter unpacking
 my %good_p = map {s/$st//r => $p->{$_}} grep {m/$st/} keys %$p;
