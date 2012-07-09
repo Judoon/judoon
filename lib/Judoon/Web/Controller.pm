@@ -13,7 +13,7 @@ sub go_relative {
 
 sub go_here {
     my ($self, $c, $action, $captures) = @_;
-    $c->res->redirect($c->uri_for_action($action, $captures));
+    $c->res->redirect($c->uri_for_action($action, ($captures // [])));
 }
 
 sub push_path {
