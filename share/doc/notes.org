@@ -117,6 +117,56 @@ right:
 | /user/$user_id/page           | list of your pages                                      |
 | /user/$user_id/page/$page_id  | view of $user's $page                                   |
 
+Troublesome.  I'm not good at REST.
+
+Start Over:
+
+Two types of users, browsers and owners.  Browsers are like me view
+someone elses github repo.  All I can really do is view/GET, maybe
+add/POST new issues.
+
+Github:
+Broswer:
+  Viewing: /$id/$repo/@nouns
+     This generally works and maps well to git. Logged in user is *not* part of url.
+  Manipulating:
+     Issues:
+       GET /$id/$repo/issues/$issue_id => see issue
+       GET /$id/$repo/issues/new => new issue post form
+       Issues is okay, b/c issue id is \d+, but other places might need reserved names
+     Unwatch:
+        Not sure what this does.  I think if $login_id != $url_id, calls on log_in->repo
+Owner:
+    Self admin: no $user is URL
+        GET /settings/profile
+        GET /dashboard/{issues,pulls,yours}
+    New repo: /new
+    Inbox: /inbox/notifications
+      Deleting notification does HTTP DELETE on /inbox/$id    Logout: /logout
+    $user/$repo/{admin,pulls/new,toggle_watch,fork_select}
+    Basic account view is /$user
+
+
+Twitter:
+Browser:
+  View timeline: /$user/
+  See tweet: /$user/status/$id
+Owner:
+  Edit profiles: GET /settings/profile
+  Add new tweet POST /1/status/update.json
+  Delete tweet  POST /1/status/delete.json
+
+
+Me: I like github model, but I'm not smart, so put user ids under /user
+/signup
+/settings/*
+/dashboard/*
+/user/felliott/dataset/5/
+/user/felliott/table/7
+/user/felliott/page/6
+
+
+
 * existing data
 ** Genetic Approaches
 *** Schwarzbauer DTC
