@@ -9,6 +9,7 @@ header {
     color: #006D4C;
     margin-bottom: 3px;
 }
+header a:visited { color: #006D4C; }
 footer {
     padding: 5px;
     background: none repeat scroll 0% 0% rgb(104, 154, 211);
