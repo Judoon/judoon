@@ -130,7 +130,6 @@ subtest 'User Tests' => sub {
         );
         $mech->content_like(qr/old password is incorrect/i, 'cant update password without old password');
 
-
         $mech->post_ok(
             '/settings/password',
             {old_password => $newuser{'user.password'}, new_password => 'boo', confirm_new_password => 'boo',},
