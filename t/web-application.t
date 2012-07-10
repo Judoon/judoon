@@ -32,12 +32,15 @@ $test_config->save_file($TEST_CONF_FILE);
 
 
 # install basic fixtures
-fixtures_ok( sub {
-    my ($schema) = @_;
-    $schema->resultset('User')->create_user({
+my %users = (
+    testuser => {
         username => 'testuser', password => 'testuser',
         name => 'Test User', email_address => 'testuser@example.com',
-    });
+    },
+);
+fixtures_ok( sub {
+    my ($schema) = @_;
+    $schema->resultset('User')->create_user($users{testuser});
 } );
 
 
