@@ -122,6 +122,7 @@ sub password_POST {
         = $found != 3                                                ? 'something is missing?'
         : !$c->user->check_password($params->{old_password})         ? 'Your old password is incorrect'
         : $params->{new_password} ne $params->{confirm_new_password} ? 'Passwords do not match!'
+        : !$c->model('User::User')->validate_password($params->{new_password}) ? 'Invalid password'
         :                                                               '';
     if ($errmsg) {
         $c->stash->{alert}{error} = $errmsg;
