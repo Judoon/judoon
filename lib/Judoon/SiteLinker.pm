@@ -5,9 +5,31 @@ use namespace::autoclean;
 
 use List::AllUtils qw(zip);
 
-has sites      => (is => 'ro', isa => 'HashRef', lazy_build => 1);
-has accessions => (is => 'ro', isa => 'HashRef', lazy_build => 1);
+=pod
 
+=encoding utf8
+
+=head1 NAME
+
+Judoon::SiteLinker - Utility class for mapping accessions to websites
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
+
+
+=head2 _build_sites
+
+sites is a hashref of website properties keyed off the website
+identifier.  The properties have the following structure:
+
+ {name => $website_id, label => $descriptive_name}
+
+=cut
+
+has sites      => (is => 'ro', isa => 'HashRef', lazy_build => 1);
 sub _build_sites {
     my ($self) = @_;
 
@@ -30,6 +52,17 @@ sub _build_sites {
     };
 }
 
+
+=head2 _build_accessions
+
+accessions is a hashref of accession properties keyed off the
+accession identifier.  The property structure is:
+
+ {name => $acc_id, label => $descriptive_name, example => $example_accession}
+
+=cut
+
+has accessions => (is => 'ro', isa => 'HashRef', lazy_build => 1);
 sub _build_accessions {
     my ($self) = @_;
 
@@ -54,6 +87,26 @@ sub _build_accessions {
     };
 }
 
+
+=head2 mapping
+
+C<mapping> holds the specific properties of how to link a particular
+accession to a particular website.  It's a hashref with two subkeys,
+C<site> and C<accession>, to allow bidirectional lookups of
+properties. Ex. given C<$site> and C<$accession>, you can get link
+properties either by:
+
+ $sitelinker->mapping->{site}{$site}{$accession}
+ $sitelinker->mapping->{accession}{$accession}{$site}
+
+The resulting link properties have the following structure:
+
+ {
+  prefix => $link_prefix, postfix => $link_postfix,
+  exact => 1, one_to_many => 0,
+ }
+
+=cut
 
 has mapping => (is => 'ro', isa => 'HashRef', lazy_build => 1);
 sub _build_mapping {
