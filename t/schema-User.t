@@ -42,10 +42,14 @@ subtest 'Result::User' => sub {
     like exception { $user->import_data(); },
         qr{import_data\(\) needs a filehandle}i, 'import_data() dies w/o fh';
 
-
     open my $TEST_XLS, '<', 't/etc/data/test1.xls'
         or die "Can't open test spreadsheet: $!";
     is_result my $dataset = $user->import_data($TEST_XLS);
+    close $TEST_XLS;
+
+    open $TEST_XLS, '<', 't/etc/data/troublesome.xls'
+        or die "Can't open test spreadsheet: $!";
+    is_result $user->import_data($TEST_XLS);
     close $TEST_XLS;
 };
 
