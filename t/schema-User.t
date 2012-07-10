@@ -136,12 +136,15 @@ subtest 'Result::DatasetColumn' => sub {
         is_url => 0, url_root => q{},
     }), 'can create column w/ empty name';
     is $ds_col3->shortname, 'nothing', 'shortname defaulted correctly';
+    is_deeply $ds_col3->linkset, [], 'unannotated column gives empty linkset';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
         name => q{#$*^(}, sort => 97, is_accession => 0, accession_type => q{},
-        is_url => 0, url_root => q{},
+        is_url => 1, url_root => q{http://google.com/?q=},
     }), 'can create column w/ non-ascii name';
     is $ds_col4->shortname, '_____', 'shortname defaulted correctly';
+    ok $ds_col4->linkset, 'can get linkset for url';
+
 };
 
 
