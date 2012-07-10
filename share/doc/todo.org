@@ -8,22 +8,27 @@ CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
 ** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
 ** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
-** Interface [/]
-*** TODO [#B] lessen gray border, way to wide
-*** TODO [#A] make front page fit without scrolling
-*** TODO [#A] make 'Get Started' not get :visited coloration
-*** TODO [#A] Integrate color scheme with bootstrap
-*** TODO [#A] Make Header not get :visited coloration
-*** TODO [#A] maybe center the page? the splash screen looks weirdly off-center
-*** TODO [#A] Feature: upload excel spreadsheet, automatically create page
+** Interface [4/7]
+*** DONE [#B] lessen gray border, way to wide
+CLOSED: [2012-07-09 Mon 17:46]
+*** DONE [#A] make 'Get Started' not get :visited coloration
+CLOSED: [2012-07-09 Mon 17:44]
+*** DONE [#A] Make Header not get :visited coloration
+CLOSED: [2012-07-09 Mon 17:46]
+*** DONE [#A] Feature: upload excel spreadsheet, automatically create page
+CLOSED: [2012-07-09 Mon 17:47]
 No formatting, no annotation, dead simple.
-** User [/]
+*** TODO [#A] make front page fit without scrolling
+*** TODO [#A] Integrate color scheme with bootstrap
+*** TODO [#A] maybe center the page? the splash screen looks weirdly off-center
+** User [0/7]
 *** TODO [#A] Need delete button for datasets
 *** TODO [#A] Don't try to upload w/o file
 *** TODO [#A] Forgot username / password link
 *** TODO [#A] set up Fill In Form
 *** TODO [#A] update profile: make sure other email not in use?
 *** TODO [#A] settings/profile: don't allow user to unset email
+*** TODO [#A] what happens when logged in user goes to /login?
 ** Dataset::edit [/]
 *** TODO [#A] Allow multiple pages per ds
 User may want to create multiple views of a complex dataset
@@ -85,6 +90,9 @@ See Catalyst mailing list, "[Catalyst] Authentication in a Many Database Scenari
 ** TODO [#A] DatasetColumns.name should probably be called .title
 PageColumns uses .title  (title seems more apropos for Columns)
 what about Page or Dataset?
+** Result::User [0/1]
+*** TODO [#B] create test xls to excercise import_data()               :test:
+specifically, add a data column w/o a name
 * Judoon::Tmpl
 ** DONE [#A] Fill out TemplateTranslator
 CLOSED: [2012-05-15 Tue 16:14]
