@@ -126,6 +126,18 @@ subtest 'Result::DatasetColumn' => sub {
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
     is $new_ds_col2->linkset->[0], 'something else?', 'BOGUS TEST: linkset works for url';
+
+    ok my $ds_col3 = $dataset->create_related('ds_columns', {
+        name => q{}, sort => 98, is_accession => 0, accession_type => q{},
+        is_url => 0, url_root => q{},
+    }), 'can create column w/ empty name';
+    is $ds_col3->shortname, 'nothing', 'shortname defaulted correctly';
+
+    ok my $ds_col4 = $dataset->create_related('ds_columns', {
+        name => q{#$*^(}, sort => 97, is_accession => 0, accession_type => q{},
+        is_url => 0, url_root => q{},
+    }), 'can create column w/ non-ascii name';
+    is $ds_col4->shortname, '_____', 'shortname defaulted correctly';
 };
 
 

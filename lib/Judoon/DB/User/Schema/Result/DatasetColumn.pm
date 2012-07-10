@@ -137,9 +137,7 @@ sub FOREIGNBUILDARGS {
     my ($class, $args) = @_;
 
     if (not $args->{shortname}) {
-        (my $shortname = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
-        $shortname ||= 'empty';
-        $args->{shortname} = $shortname;
+        ($args->{shortname} = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
     }
 
     return $args;
