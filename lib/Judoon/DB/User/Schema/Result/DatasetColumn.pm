@@ -132,6 +132,12 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AjdNiBkWSaIe1b1bk6VjNQ
 
 
+=pod
+
+=encoding utf8
+
+=cut
+
 # from MooseX::NonMoose, lets us preprocess the args to new()
 sub FOREIGNBUILDARGS {
     my ($class, $args) = @_;

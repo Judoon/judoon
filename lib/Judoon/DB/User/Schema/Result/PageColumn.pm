@@ -94,6 +94,14 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07017 @ 2012-02-28 16:31:02
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:aX9vDbJcTpDsvGsCsgYoCg
 
+
+=pod
+
+=encoding utf8
+
+=cut
+
+
 use Judoon::Tmpl::Translator;
 has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 1);
 sub _build_translator { return Judoon::Tmpl::Translator->new; }

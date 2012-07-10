@@ -98,6 +98,11 @@ __PACKAGE__->belongs_to(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XrchGfDp18BCEhxTl0FrZA
 
 
-# You can replace this text with custom code or comments, and it will be preserved on regeneration
+=pod
+
+=encoding utf8
+
+=cut
+
 __PACKAGE__->meta->make_immutable;
 1;
