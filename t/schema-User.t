@@ -11,6 +11,7 @@ use Test::Fatal;
 
 
 use Data::Printer;
+use Judoon::Tmpl::Factory ();
 
 
 fixtures_ok [
@@ -99,7 +100,8 @@ subtest 'ResultSet::User' => sub {
 };
 
 subtest 'Result::Dataset' => sub {
-    pass 'placeholder test';
+    my $dataset = ResultSet('Dataset')->first;
+    ok $dataset->create_basic_page(), 'create_basic_page() works';
 };
 
 subtest 'Result::DatasetColumn' => sub {
@@ -126,5 +128,18 @@ subtest 'Result::DatasetColumn' => sub {
 };
 
 
+subtest 'Result::PageColumn' => sub {
+    my $page_column = ResultSet('PageColumn')->first;
+
+    ok $page_column->template_to_jquery,     'can produce jquery';
+    ok $page_column->template_to_webwidgets, 'can produce webwidgets';
+    ok $page_column->template_to_objects,    'can produce objects';
+
+    my $newline = Judoon::Tmpl::Factory::new_newline_node();
+    ok $page_column->set_template($newline), 'can set template...';
+    my @objects = $page_column->template_to_objects;
+    ok @objects == 1 && ref($objects[0]) eq 'Judoon::Tmpl::Node::Newline',
+        '  ...and get correct objects back';
+};
 
 done_testing();
