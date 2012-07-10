@@ -144,6 +144,17 @@ __PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
 use DateTime;
 use Judoon::Tmpl::Factory;
 
+=pod
+
+=encoding utf8
+
+=head2 B<C<create_basic_page()>>
+
+Turn a dataset into a simple page with a one-to-one mapping between
+data columns and page columns.
+
+=cut
+
 sub create_basic_page {
     my ($self) = @_;
 
