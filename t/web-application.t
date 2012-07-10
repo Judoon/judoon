@@ -55,6 +55,21 @@ ok $mech, 'created test mech' or BAIL_OUT;
 
 subtest 'Basic Tests' => sub {
     $mech->get_ok('/', 'get frontpage');
+
+    subtest 'Login / Logout' => sub {
+        redirects_to_ok('/settings/profile', '/login');
+
+        $mech->get_ok('/login', 'get login page');
+        $mech->submit_form_ok({
+            form_number => 1,
+            fields => {username => 'testuser', password => 'testuser',},
+        }, 'submitted login okay');
+
+        no_redirect_ok('/settings/profile', 'can get to profile after login');
+        $mech->get_ok('/logout', 'can logout okay');
+        redirects_to_ok('/settings/profile', '/login');
+    };
+
 };
 
 
@@ -176,4 +191,15 @@ sub redirects_to_ok {
     redirects_ok($req_url);
     $mech->get_ok($req_url, 'Redirection for ' . $req_url . ' succeeded...');
     like($mech->uri(), qr/$res_url/, '  ...to correct url: ' . $res_url);
+}
+
+sub no_redirect_ok {
+    my ($req_url, $descr) = @_;
+    $descr //= 'requests for ' . $req_url . ' are not redirected';
+
+    my $req_redir = $mech->requests_redirectable();
+    $mech->requests_redirectable([]);
+    $mech->get($req_url);
+    is $mech->status(), 200, $descr;
+    $mech->requests_redirectable($req_redir);
 }
