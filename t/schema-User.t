@@ -24,13 +24,11 @@ fixtures_ok [
 
 subtest 'Result::User' => sub {
     my $user_rs = ResultSet('User');
-
     is_result my $user = $user_rs->find({username => 'testuser'});
 
-
-    $user->change_password('newpass');
-    ok $user->password, 'newpass';
-    like exception { $user->change_password(); }, qr{invalid password}i,
+    $user->change_password('testuser');
+    ok $user->check_password('testuser'), 'password successfully set';
+    like exception { $user->change_password('moo'); }, qr{invalid password}i,
         'Cant set invalid password';
 
     # pivot_data()
@@ -59,22 +57,24 @@ subtest 'ResultSet::User' => sub {
     ok !$user_rs->validate_username(''),     'reject empty username';
     ok !$user_rs->validate_username(),       'reject undef username';
 
-    ok $user_rs->validate_password('boo'),     'validate simple password';
-    ok $user_rs->validate_password('0q98347'), 'validate complex password';
-    ok !$user_rs->validate_password(),         'reject undefined password';
+    ok $user_rs->validate_password('boobooboo'),   'validate simple password';
+    ok $user_rs->validate_password('n(&*M09{}}#'), 'validate complex password';
+    ok !$user_rs->validate_password(),             'reject undefined password';
+    ok !$user_rs->validate_password('boo'),        'reject too short password';
 
     ok $user_rs->user_exists('testuser'), 'found existing user';
     ok !$user_rs->user_exists('fakeuser'), 'did not find fake user';
 
     my %newuser = (
-        username => 'newuser', password => 'newuser', name => 'New User',
+        username => 'newuser', password => 'iamnewuser', name => 'New User',
         email_address => 'newuser@example.com',
     );
 
     my @exceptions = (
-        ['nousername', qr/no username was given/i, 'missing username',],
-        ['nopassword', qr/no password was given/i, 'missing password',],
-        ['badusername', qr/invalid username/i,     'invalid username',],
+        ['nousername', qr/no username was given/i,  'missing username',],
+        ['nopassword', qr/no password was given/i,  'missing password',],
+        ['badusername', qr/invalid username/i,      'invalid username',],
+        ['badpassword', qr/password is not valid/i, 'invalid password',],
         ['dupeusername', qr/this username is already taken/i,  'duplicate username',],
     );
     my %create_user_exceptions = map {$_->[0] => {
@@ -84,6 +84,7 @@ subtest 'ResultSet::User' => sub {
     delete $create_user_exceptions{nousername}->{data}{username};
     delete $create_user_exceptions{nopassword}->{data}{password};
     $create_user_exceptions{badusername}->{data}{username} = 'sdf@#sfdg';
+    $create_user_exceptions{badpassword}->{data}{password} = 'short';
     $create_user_exceptions{dupeusername}->{data}{username} = 'testuser';
 
     for my $i (values %create_user_exceptions) {

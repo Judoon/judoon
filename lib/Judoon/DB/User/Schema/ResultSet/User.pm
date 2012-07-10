@@ -15,6 +15,8 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::ResultSet';
 
+use constant MIN_PASSWORD_LENGTH => 8;
+
 
 =head2 B<C<create_user( \%params )>>
 
@@ -44,7 +46,7 @@ sub create_user {
         $errmsg = q{This username is already taken!};
     }
     elsif (not $self->validate_password($valid{password})) {
-        $errmsg = q{Password is not valid!};
+        $errmsg = q{Password is not valid!  Must be more than eight characters long.};
     }
 
     die $errmsg if ($errmsg);
@@ -76,7 +78,7 @@ Makes sure the password is valid.  Currently allows all defined passwords.
 
 sub validate_password {
     my ($self, $password) = @_;
-    return defined $password;
+    return defined $password && length($password) >= MIN_PASSWORD_LENGTH;
 }
 
 

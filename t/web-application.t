@@ -126,9 +126,16 @@ subtest 'User Tests' => sub {
 
         $mech->post_ok(
             '/settings/password',
-            {old_password => 'incorrect', new_password => 'boo', confirm_new_password => 'boo',},
+            {old_password => 'incorrect', new_password => 'boobooboo', confirm_new_password => 'boobooboo',},
         );
         $mech->content_like(qr/old password is incorrect/i, 'cant update password without old password');
+
+
+        $mech->post_ok(
+            '/settings/password',
+            {old_password => $newuser{'user.password'}, new_password => 'boo', confirm_new_password => 'boo',},
+        );
+        $mech->content_like(qr/Invalid password/i, 'cant update password with invalid password');
 
         $mech->post_ok(
             '/settings/password',
