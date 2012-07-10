@@ -170,15 +170,18 @@ subtest 'User Tests' => sub {
 
     subtest 'User Overview' => sub {
         $mech->get('/logout');
-        login('testuser');
+        $mech->get_ok('/user/newuser', 'can get others overview w/o login');
+        $mech->content_like(qr/newuser's page/i,
+            'got welcome message for visitor w/o login');
 
+        login('testuser');
         $mech->get_ok('/user/testuser', 'can get own overview');
         $mech->content_like(qr/Welcome, $users{testuser}{name}/i,
             'welcome message for owner');
 
-        $mech->get_ok('/user/newuser', 'can get others overview');
+        $mech->get_ok('/user/newuser', 'can get others overview w/ login');
         $mech->content_like(qr/newuser's page/i,
-            'got welcome message for visitor');
+            'got welcome message for visitor w/ login');
     };
 
 };
