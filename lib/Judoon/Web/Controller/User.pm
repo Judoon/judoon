@@ -143,15 +143,16 @@ sub password_POST {
 
 
 
-sub base : Chained('/edit') PathPart('user') CaptureArgs(0) {}
+sub base : Chained('/base') PathPart('user') CaptureArgs(0) {}
 sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {
     my ($self, $c, $username) = @_;
     my $user = $c->model('User::User')->find({username => $username});
     if (not $user) {
         $c->forward('/error');
+        $c->detach;
     }
 
-    if ($user->username eq $c->user->username) {
+    if ($c->user && $c->user->username eq $user->username) {
         $c->stash->{user}{is_owner} = 1;
     }
 
@@ -161,7 +162,15 @@ sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {
 sub edit : Chained('id') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'user/edit.tt2';
-    $c->stash->{datasets} = [$c->stash->{user}{object}->datasets()];
+
+    if ($c->stash->{user}{is_owner}) {
+        $c->stash->{dataset}{list} = [$c->stash->{user}{object}->datasets()];
+        # $c->stash->{page}{list}    = [$c->stash->{user}{object}->pages()];
+    }
+    else {
+        $c->stash->{dataset}{list} = [$c->stash->{user}{object}->datasets()];
+        # $c->stash->{page}{list}    = [$c->stash->{user}{object}->public_pages()];
+    }
 }
 
 

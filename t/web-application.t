@@ -168,6 +168,19 @@ subtest 'User Tests' => sub {
     };
 
 
+    subtest 'User Overview' => sub {
+        $mech->get('/logout');
+        login('testuser');
+
+        $mech->get_ok('/user/testuser', 'can get own overview');
+        $mech->content_like(qr/Welcome, $users{testuser}{name}/i,
+            'welcome message for owner');
+
+        $mech->get_ok('/user/newuser', 'can get others overview');
+        $mech->content_like(qr/newuser's page/i,
+            'got welcome message for visitor');
+    };
+
 };
 
 
@@ -175,6 +188,18 @@ subtest 'User Tests' => sub {
 unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE);
 done_testing();
 
+
+sub login {
+    my ($user) = @_;
+    $mech->get('/login');
+    $mech->submit_form(
+        form_number => 1,
+        fields => {
+            username => $users{$user}->{username},
+            password => $users{$user}->{password},
+        },
+    );
+}
 
 sub redirects_ok {
     my ($req_url) = @_;

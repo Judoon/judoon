@@ -2,13 +2,57 @@
   title = user.object.name
 %]
 
+[% IF user.is_owner %]
 <h3>Welcome, [% user.object.name || user.object.username %]!</h3>
+[% ELSE %]
+<h3>[% user.object.username %]'s page</h3>
+[% END %]
 
 [% INCLUDE 'components/notification.tt2' %]
 
 <div class="well">
-  <h6>Placeholder Page</h6>
+  <h4>Placeholder Page</h4>
   <p>You <strong>[% user.is_owner ? 'are' : 'are not' %]</strong> the owner of this page.</p>
 </div>
+
+<h4>Datasets</h4>
+[% IF dataset.list.size %]
+<ul>
+  [% FOREACH dataset_obj IN dataset.list %]
+  <li>[% dataset_obj.name %]</li>
+  [% END %]
+</ul>
+[% ELSE %]
+[% IF user.is_owner %]
+<p>You haven't uploaded any datasets yet.</p>
+[% ELSE %]
+<p>This user has not publicized any datasets yet.</p>
+[% END %]
+[% END %]
+
+[% IF 0 %]
+<h4>Tables</h4>
+<ul>
+  [% FOREACH table_obj IN table.list %]
+  <li>[% table_obj.name %]</li>
+  [% END %]
+</ul>
+[% END %]
+
+<h4>Webpages</h4>
+[% IF !page.list.size %]
+[% IF user.is_owner %]
+<p>You haven't created any webpages yet.</p>
+[% ELSE %]
+<p>This user has not publicized any webpages yet.</p>
+[% END %]
+[% ELSE %]
+<ul>
+  [% FOREACH page_obj IN page.list %]
+  <li>[% page_obj.name %]</li>
+  [% END %]
+</ul>
+[% END %]
+
 
 [% END %]
