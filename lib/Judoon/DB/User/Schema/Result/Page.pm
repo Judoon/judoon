@@ -123,5 +123,9 @@ __PACKAGE__->has_many(
 
 =cut
 
+with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
+__PACKAGE__->register_permissions;
+
+
 __PACKAGE__->meta->make_immutable;
 1;

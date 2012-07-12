@@ -1,0 +1,1277 @@
+---
+schema:
+  procedures: {}
+  tables:
+    dataset_columns:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - dataset_id
+          match_type: ''
+          name: dataset_columns_fk_dataset_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: datasets
+          type: FOREIGN KEY
+      fields:
+        accession_type:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: accession_type
+          order: 6
+          size:
+            - 0
+        dataset_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: dataset_id
+          order: 2
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        is_accession:
+          data_type: integer
+          default_value: 0
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: is_accession
+          order: 5
+          size:
+            - 0
+        is_url:
+          data_type: integer
+          default_value: 0
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: is_url
+          order: 7
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 3
+          size:
+            - 0
+        shortname:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: shortname
+          order: 9
+          size:
+            - 0
+        sort:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: sort
+          order: 4
+          size:
+            - 0
+        url_root:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: url_root
+          order: 8
+          size:
+            - 0
+      indices:
+        - fields:
+            - dataset_id
+          name: dataset_columns_idx_dataset_id
+          options: []
+          type: NORMAL
+      name: dataset_columns
+      options: []
+      order: 1
+    datasets:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: datasets_fk_user_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        data:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: data
+          order: 6
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 3
+          size:
+            - 0
+        notes:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: notes
+          order: 4
+          size:
+            - 0
+        original:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: original
+          order: 5
+          size:
+            - 0
+        user_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: user_id
+          order: 2
+          size:
+            - 0
+      indices:
+        - fields:
+            - user_id
+          name: datasets_idx_user_id
+          options: []
+          type: NORMAL
+      name: datasets
+      options: []
+      order: 2
+    page_columns:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - page_id
+          match_type: ''
+          name: page_columns_fk_page_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: pages
+          type: FOREIGN KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        page_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: page_id
+          order: 2
+          size:
+            - 0
+        template:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: template
+          order: 4
+          size:
+            - 0
+        title:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: title
+          order: 3
+          size:
+            - 0
+      indices:
+        - fields:
+            - page_id
+          name: page_columns_idx_page_id
+          options: []
+          type: NORMAL
+      name: page_columns
+      options: []
+      order: 3
+    pages:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - dataset_id
+          match_type: ''
+          name: pages_fk_dataset_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: datasets
+          type: FOREIGN KEY
+      fields:
+        dataset_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: dataset_id
+          order: 2
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        postamble:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: postamble
+          order: 5
+          size:
+            - 0
+        preamble:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: preamble
+          order: 4
+          size:
+            - 0
+        title:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: title
+          order: 3
+          size:
+            - 0
+      indices:
+        - fields:
+            - dataset_id
+          name: pages_idx_dataset_id
+          options: []
+          type: NORMAL
+      name: pages
+      options: []
+      order: 4
+    permissions:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - obj_id
+          match_type: ''
+          name: obj_id_unique
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        obj_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: obj_id
+          order: 2
+          size:
+            - 0
+        password:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: password
+          order: 4
+          size:
+            - 0
+        permission:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: permission
+          order: 3
+          size:
+            - 0
+      indices: []
+      name: permissions
+      options: []
+      order: 5
+    roles:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - name
+          match_type: ''
+          name: name_unique
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: name
+          order: 2
+          size:
+            - 0
+      indices: []
+      name: roles
+      options: []
+      order: 6
+    user_roles:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - user_id
+            - role_id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - role_id
+          match_type: ''
+          name: user_roles_fk_role_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: roles
+          type: FOREIGN KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - user_id
+          match_type: ''
+          name: user_roles_fk_user_id
+          on_delete: CASCADE
+          on_update: CASCADE
+          options: []
+          reference_fields:
+            - id
+          reference_table: users
+          type: FOREIGN KEY
+      fields:
+        role_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: role_id
+          order: 2
+          size:
+            - 0
+        user_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: user_id
+          order: 1
+          size:
+            - 0
+      indices:
+        - fields:
+            - role_id
+          name: user_roles_idx_role_id
+          options: []
+          type: NORMAL
+        - fields:
+            - user_id
+          name: user_roles_idx_user_id
+          options: []
+          type: NORMAL
+      name: user_roles
+      options: []
+      order: 7
+    users:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - username
+          match_type: ''
+          name: username_unique
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        active:
+          data_type: char
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: active
+          order: 2
+          size:
+            - 1
+        email_address:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: email_address
+          order: 7
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        mail_address:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: mail_address
+          order: 9
+          size:
+            - 0
+        name:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: name
+          order: 6
+          size:
+            - 0
+        password:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: password
+          order: 4
+          size:
+            - 0
+        password_expires:
+          data_type: timestamp
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: password_expires
+          order: 5
+          size:
+            - 0
+        phone_number:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: phone_number
+          order: 8
+          size:
+            - 0
+        username:
+          data_type: text
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: username
+          order: 3
+          size:
+            - 0
+      indices: []
+      name: users
+      options: []
+      order: 8
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    package: &1 !!perl/hash:Judoon::DB::User::Schema
+      class_mappings:
+        DBIx::Class::DeploymentHandler::VersionStorage::Standard::VersionResult: __VERSION
+        Judoon::DB::User::Schema::Result::Dataset: Dataset
+        Judoon::DB::User::Schema::Result::DatasetColumn: DatasetColumn
+        Judoon::DB::User::Schema::Result::Page: Page
+        Judoon::DB::User::Schema::Result::PageColumn: PageColumn
+        Judoon::DB::User::Schema::Result::Permission: Permission
+        Judoon::DB::User::Schema::Result::Role: Role
+        Judoon::DB::User::Schema::Result::User: User
+        Judoon::DB::User::Schema::Result::UserRole: UserRole
+      source_registrations:
+        Dataset: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            data:
+              _inflate_info:
+                deflate: !!perl/code '{ "DUMMY" }'
+                inflate: !!perl/code '{ "DUMMY" }'
+              data_type: text
+              is_nullable: 0
+              serializer_class: JSON
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+            notes:
+              data_type: text
+              is_nullable: 0
+            original:
+              data_type: text
+              is_nullable: 0
+            user_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - user_id
+            - name
+            - notes
+            - original
+            - data
+          _primaries: &2
+            - id
+          _relationships:
+            ds_columns:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::DB::User::Schema::Result::DatasetColumn
+              cond:
+                foreign.dataset_id: self.id
+              source: Judoon::DB::User::Schema::Result::DatasetColumn
+            pages:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::DB::User::Schema::Result::Page
+              cond:
+                foreign.dataset_id: self.id
+              source: Judoon::DB::User::Schema::Result::Page
+            user:
+              attrs:
+                accessor: single
+                fk_columns:
+                  user_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::DB::User::Schema::Result::User
+              cond:
+                foreign.id: self.user_id
+              source: Judoon::DB::User::Schema::Result::User
+          _unique_constraints:
+            primary: *2
+          name: datasets
+          result_class: Judoon::DB::User::Schema::Result::Dataset
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: Dataset
+        DatasetColumn: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            accession_type:
+              data_type: text
+              is_nullable: 0
+            dataset_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            is_accession:
+              data_type: integer
+              default_value: 0
+              is_nullable: 0
+            is_url:
+              data_type: integer
+              default_value: 0
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+            shortname:
+              data_type: text
+              is_nullable: 1
+            sort:
+              data_type: integer
+              is_nullable: 0
+            url_root:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - dataset_id
+            - name
+            - sort
+            - is_accession
+            - accession_type
+            - is_url
+            - url_root
+            - shortname
+          _primaries: &3
+            - id
+          _relationships:
+            dataset:
+              attrs:
+                accessor: single
+                fk_columns:
+                  dataset_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::DB::User::Schema::Result::Dataset
+              cond:
+                foreign.id: self.dataset_id
+              source: Judoon::DB::User::Schema::Result::Dataset
+          _unique_constraints:
+            primary: *3
+          name: dataset_columns
+          result_class: Judoon::DB::User::Schema::Result::DatasetColumn
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: DatasetColumn
+        Page: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            dataset_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            postamble:
+              data_type: text
+              is_nullable: 0
+            preamble:
+              data_type: text
+              is_nullable: 0
+            title:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - dataset_id
+            - title
+            - preamble
+            - postamble
+          _primaries: &4
+            - id
+          _relationships:
+            dataset:
+              attrs:
+                accessor: single
+                fk_columns:
+                  dataset_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::DB::User::Schema::Result::Dataset
+              cond:
+                foreign.id: self.dataset_id
+              source: Judoon::DB::User::Schema::Result::Dataset
+            page_columns:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::DB::User::Schema::Result::PageColumn
+              cond:
+                foreign.page_id: self.id
+              source: Judoon::DB::User::Schema::Result::PageColumn
+          _unique_constraints:
+            primary: *4
+          name: pages
+          result_class: Judoon::DB::User::Schema::Result::Page
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: Page
+        PageColumn: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            page_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            template:
+              data_type: text
+              is_nullable: 0
+            title:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - page_id
+            - title
+            - template
+          _primaries: &5
+            - id
+          _relationships:
+            page:
+              attrs:
+                accessor: single
+                fk_columns:
+                  page_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::DB::User::Schema::Result::Page
+              cond:
+                foreign.id: self.page_id
+              source: Judoon::DB::User::Schema::Result::Page
+          _unique_constraints:
+            primary: *5
+          name: page_columns
+          result_class: Judoon::DB::User::Schema::Result::PageColumn
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: PageColumn
+        Permission: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            obj_id:
+              data_type: integer
+              is_nullable: 0
+            password:
+              data_type: text
+              is_nullable: 1
+            permission:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - obj_id
+            - permission
+            - password
+          _primaries: &6
+            - id
+          _relationships: {}
+          _unique_constraints:
+            obj_id_unique:
+              - obj_id
+            primary: *6
+          name: permissions
+          result_class: Judoon::DB::User::Schema::Result::Permission
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: Permission
+        Role: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - name
+          _primaries: &7
+            - id
+          _relationships:
+            user_roles:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::DB::User::Schema::Result::UserRole
+              cond:
+                foreign.role_id: self.id
+              source: Judoon::DB::User::Schema::Result::UserRole
+          _unique_constraints:
+            name_unique:
+              - name
+            primary: *7
+          name: roles
+          result_class: Judoon::DB::User::Schema::Result::Role
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: Role
+        User: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            active:
+              data_type: char
+              is_nullable: 0
+              size: 1
+            email_address:
+              data_type: text
+              is_nullable: 0
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            mail_address:
+              data_type: text
+              is_nullable: 1
+            name:
+              data_type: text
+              is_nullable: 0
+            password:
+              _inflate_info:
+                deflate: !!perl/code '{ "DUMMY" }'
+                inflate: !!perl/code '{ "DUMMY" }'
+              data_type: text
+              inflate_passphrase: rfc2307
+              is_nullable: 0
+              passphrase: rfc2307
+              passphrase_args:
+                cost: 8
+                salt_random: 20
+              passphrase_check_method: check_password
+              passphrase_class: BlowfishCrypt
+            password_expires:
+              data_type: timestamp
+              is_nullable: 1
+            phone_number:
+              data_type: text
+              is_nullable: 1
+            username:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - active
+            - username
+            - password
+            - password_expires
+            - name
+            - email_address
+            - phone_number
+            - mail_address
+          _primaries: &8
+            - id
+          _relationships:
+            datasets:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::DB::User::Schema::Result::Dataset
+              cond:
+                foreign.user_id: self.id
+              source: Judoon::DB::User::Schema::Result::Dataset
+            user_roles:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::DB::User::Schema::Result::UserRole
+              cond:
+                foreign.user_id: self.id
+              source: Judoon::DB::User::Schema::Result::UserRole
+          _unique_constraints:
+            primary: *8
+            username_unique:
+              - username
+          name: users
+          result_class: Judoon::DB::User::Schema::Result::User
+          resultset_attributes: {}
+          resultset_class: Judoon::DB::User::Schema::ResultSet::User
+          schema: *1
+          source_name: User
+        UserRole: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            role_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            user_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - user_id
+            - role_id
+          _primaries: &9
+            - user_id
+            - role_id
+          _relationships:
+            role:
+              attrs:
+                accessor: single
+                fk_columns:
+                  role_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::DB::User::Schema::Result::Role
+              cond:
+                foreign.id: self.role_id
+              source: Judoon::DB::User::Schema::Result::Role
+            user:
+              attrs:
+                accessor: single
+                fk_columns:
+                  user_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::DB::User::Schema::Result::User
+              cond:
+                foreign.id: self.user_id
+              source: Judoon::DB::User::Schema::Result::User
+          _unique_constraints:
+            primary: *9
+          name: user_roles
+          result_class: Judoon::DB::User::Schema::Result::UserRole
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: UserRole
+        __VERSION: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            ddl:
+              data_type: text
+              is_nullable: 1
+            id:
+              data_type: int
+              is_auto_increment: 1
+            upgrade_sql:
+              data_type: text
+              is_nullable: 1
+            version:
+              data_type: varchar
+              size: 50
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - version
+            - ddl
+            - upgrade_sql
+          _primaries: &10
+            - id
+          _relationships: {}
+          _unique_constraints:
+            dbix_class_deploymenthandler_versions_version:
+              - version
+            primary: *10
+          name: dbix_class_deploymenthandler_versions
+          result_class: DBIx::Class::DeploymentHandler::VersionStorage::Standard::VersionResult
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::DeploymentHandler::VersionStorage::Standard::VersionResultSet
+          schema: *1
+          source_name: __VERSION
+      storage: !!perl/hash:DBIx::Class::Storage::DBI::SQLite
+        _conn_pid: 57589
+        _connect_info:
+          - DBI:SQLite:/Users/fge7z/Code/work/judoon/share/judoon-db-user-schema.db
+          - ''
+          - ''
+        _dbh: !!perl/hash:DBI::db {}
+        _dbh_autocommit: 1
+        _dbh_details: {}
+        _dbh_gen: 0
+        _dbi_connect_info:
+          - DBI:SQLite:/Users/fge7z/Code/work/judoon/share/judoon-db-user-schema.db
+          - ''
+          - ''
+          - &11
+            AutoCommit: 1
+            PrintError: 0
+            RaiseError: 1
+            ShowErrorStatement: 1
+        _dbic_connect_attributes: *11
+        _driver_determined: 1
+        _in_do_block: 0
+        _sql_maker: ~
+        _sql_maker_opts: {}
+        savepoints: []
+        schema: *1
+        transaction_depth: 0
+    sources:
+      - Role
+      - UserRole
+      - User
+      - Permission
+      - PageColumn
+      - Dataset
+      - DatasetColumn
+      - Page
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11012

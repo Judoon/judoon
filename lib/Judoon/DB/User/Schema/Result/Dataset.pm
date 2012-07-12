@@ -144,6 +144,9 @@ __PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
 use DateTime;
 use Judoon::Tmpl::Factory;
 
+with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
+__PACKAGE__->register_permissions;
+
 =pod
 
 =encoding utf8

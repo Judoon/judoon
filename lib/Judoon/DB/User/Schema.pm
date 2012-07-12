@@ -25,7 +25,7 @@ to work
 
 =cut
 
-our $VERSION = 3;
+our $VERSION = 4;
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
 1;
