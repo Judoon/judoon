@@ -256,3 +256,29 @@ Not Converted
 [Submit] Submits & returns to previous
 [Reset]  resets
 [Cancel and return] href to previous
+* permissions
+need a permissions flag for Pages.
+
+If a page is public, its dataset is necessarily public, yes?)
+Not necessarily. Maybe they're only showing part of the dataset.
+Which means we need to flag datasets as well.
+Plus, when offering to d/l spreadsheet, need to be able to say 'only export some columns';
+
+permission_enum
+  0 = private, 1 = public, 2 = password-protect,
+password-protect: owner creates password, user needs password.
+private / public are obvious, what's the best restriction model?
+
+password protects well, but announces that a page exists even if not accessible
+private url can hide, but doesn't protect contents
+
+do we need both?
+start with password-protect, we can add url hiding later. (I think)
+
+permissions integer foreign key references tt_permissions(pk)
+tt_permissions (pk, type)
+1 private
+2 public
+3 password-protect
+
+permissions_field
