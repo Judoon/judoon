@@ -135,8 +135,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 21:45:25
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:cupiUeObtZ+Rq4ggaqN6ig
+# Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-07-12 12:56:24
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JrQ45OumPMbWAMAGmA8KHg
 
 __PACKAGE__->load_components('InflateColumn::Serializer');
 __PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
