@@ -17,7 +17,6 @@ use lib qq{$Bin/../../../lib};
 use DBIx::Class::Schema::Loader 'make_schema_at';
 use DBIx::RunSQL;
 use Getopt::Long;
-use Judoon::Web;
 use Pod::Usage;
 
 main: {
