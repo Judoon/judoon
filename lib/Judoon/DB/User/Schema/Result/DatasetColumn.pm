@@ -18,7 +18,7 @@ use MooseX::NonMoose;
 use MooseX::MarkAsMethods autoclean => 1;
 extends 'DBIx::Class::Core';
 
-=head1 TABLE: C<columns>
+=head1 TABLE: C<dataset_columns>
 
 =cut
 
