@@ -164,12 +164,14 @@ sub edit : Chained('id') PathPart('') Args(0) {
     $c->stash->{template} = 'user/edit.tt2';
 
     if ($c->stash->{user}{is_owner}) {
-        $c->stash->{dataset}{list} = [$c->stash->{user}{object}->datasets()];
-        # $c->stash->{page}{list}    = [$c->stash->{user}{object}->pages()];
+        my @datasets = $c->stash->{user}{object}->datasets();
+        $c->stash->{dataset}{list} = \@datasets;
+        $c->stash->{page}{list}    = [map {$_->pages} @datasets];
     }
     else {
-        $c->stash->{dataset}{list} = [$c->stash->{user}{object}->datasets()];
-        # $c->stash->{page}{list}    = [$c->stash->{user}{object}->public_pages()];
+        my @datasets = $c->stash->{user}{object}->datasets_rs()->public();
+        $c->stash->{dataset}{list} = \@datasets;
+        $c->stash->{page}{list}    = [map {$_->pages_rs->public} @datasets];
     }
 }
 
