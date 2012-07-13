@@ -62,6 +62,7 @@
       <td>[% page_url = c.uri_for_action('/user/page', [user.object.username, page_obj.id]) %]
         <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
         [%- IF page_obj.notes -%]About this page: [%- page_obj.notes -%]<br>[%- END -%]
+        Parent Dataset: [% page_obj.dataset.name %]<br>
         Columns: [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
         This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]<strong>.<br>
         <a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a><br>
