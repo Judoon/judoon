@@ -20,7 +20,7 @@ sub type { return 'varstring'; }
 has varstring_type    => (is => 'ro', isa => 'VarStringType', required => 1, );
 has text_segments     => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
 has variable_segments => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
-has accession         => (is => 'ro', isa => 'Str');
+has accession         => (is => 'ro', isa => 'Str', default => '',);
 
 
 =head2 decompose()
