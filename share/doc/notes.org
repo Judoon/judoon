@@ -282,3 +282,16 @@ tt_permissions (pk, type)
 3 password-protect
 
 permissions_field
+
+* templates
+** versioning
+May be needed in the future.  Demo interface:
+
+# versioning syntax
+# my $output = $translator->translate({
+#     from         => 'Judoon::WebWidgets',
+#     from_version => 1,
+#     to           => 'JQuery::Template',
+#     to_version   => 1,
+#     template     => $template,
+# });
