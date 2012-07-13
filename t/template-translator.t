@@ -4,13 +4,29 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
 use Data::Section::Simple qw(get_data_section);
-
-
-use_ok 'Judoon::Tmpl::Translator';
+use Judoon::Tmpl::Translator;
 
 my $translator = Judoon::Tmpl::Translator->new;
+
+subtest 'input validation' => sub {
+    like exception {
+        $translator->to_objects(from => 'BadDialect', template => '');
+    }, qr{is not a valid dialect}i, 'dies w/ bad dialect to to_objects()';
+    like exception {
+        $translator->from_objects(to => 'BadDialect', objects => []);
+    }, qr{is not a valid dialect}i, 'dies w/ bad dialect to from_objects()';
+    # like exception {
+    #     $translator->translate(from => 'JQueryTemplate', to => 'BadDialect', template => 'foo{{=bar}}');
+    # }, qr{is not a valid dialect}i, 'dies w/ bad dialect for to in translate()';
+    like exception {
+        $translator->translate(from => 'BadDialect', to => 'Native', template => '');
+    }, qr{is not a valid dialect}i, 'dies w/ bad dialect for from in translate()';
+
+};
+
 
 my $webwidget_html = <<'EOWW';
        <div id="widget_id_0" class="widget-object widget-type-text widget-inline btn-group">
