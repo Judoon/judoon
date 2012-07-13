@@ -182,6 +182,9 @@ subtest 'User Tests' => sub {
         $mech->get_ok('/user/newuser', 'can get others overview w/ login');
         $mech->content_like(qr/newuser's page/i,
             'got welcome message for visitor w/ login');
+
+        $mech->get('/user/baduser');
+        is $mech->status, 404, 'baduser 404s';
     };
 
 };

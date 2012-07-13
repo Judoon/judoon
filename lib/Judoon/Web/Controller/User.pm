@@ -163,7 +163,7 @@ sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {
     my ($self, $c, $username) = @_;
     my $user = $c->model('User::User')->find({username => $username});
     if (not $user) {
-        $c->forward('/error');
+        $c->forward('/default');
         $c->detach;
     }
 
