@@ -35,11 +35,11 @@
       <td>[% loop.count %]</td>
       <td>[% dataset_url = c.uri_for_action('/user/dataset', [user.object.username, dataset_obj.id]) %]
         <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows<br>
-        [%- IF dataset_obj.notes -%]About this dataset: [%- dataset_obj.notes -%]<br>[%- END -%]
-        Columns: [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
-        This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]<strong>.<br>
+        [%- IF dataset_obj.notes -%]<strong>About this dataset:</strong> [%- dataset_obj.notes -%]<br>[%- END -%]
+        <strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
+        This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.<br>
         <a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a><br>
-        Actions: 
+        <strong>Actions:</strong>
         [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/user/dataset_column', [user.object.username, dataset_obj.id]) -%]
         [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/user/dataset_data', [user.object.username, dataset_obj.id]) -%]
         [% PROCESS action_button label="Create a New Page" url=c.uri_for_action('/user/dataset_page', [user.object.username, dataset_obj.id]) -%]
@@ -61,12 +61,12 @@
       <td>[% loop.count %]</td>
       <td>[% page_url = c.uri_for_action('/user/page', [user.object.username, page_obj.id]) %]
         <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
-        [%- IF page_obj.notes -%]About this page: [%- page_obj.notes -%]<br>[%- END -%]
-        Parent Dataset: [% page_obj.dataset.name %]<br>
-        Columns: [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
-        This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]<strong>.<br>
+        [%- IF page_obj.notes -%]<strong>About this page:</strong> [%- page_obj.notes -%]<br>[%- END -%]
+        <strong>Parent Dataset:</strong> [% page_obj.dataset.name %]<br>
+        <strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
+        This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.<br>
         <a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a><br>
-        Actions: 
+        <strong>Actions:</strong>
         [% PROCESS action_button label="Preview"     url=c.uri_for_action('/user/page', [user.object.username, page_obj.id], {view => 'preview'}) -%]
         [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/user/page', [user.object.username, page_obj.id]) -%]
         [% PROCESS action_button label="Delete Page" url=c.uri_for_action('/user/page_delete', [user.object.username, page_obj.id]) -%]
