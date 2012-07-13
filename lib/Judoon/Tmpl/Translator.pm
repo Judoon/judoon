@@ -54,7 +54,6 @@ as found in the L<dialects()> sub.
 =cut
 
 method translate(:$from!, :$to!, :$template!) {
-    die "$to is not a valid dialect"   if (not grep {$_ eq $to} dialects());
     my @native_objects = $self->to_objects(from => $from, template => $template);
     return $self->dialect_objects->{$to}->produce(\@native_objects);
 }
