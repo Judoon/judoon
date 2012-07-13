@@ -27,7 +27,10 @@ has accession         => (is => 'ro', isa => 'Str');
 
 This turns a C<VarString> node into a list of C<Text> and C<Variable>
 nodes.  This allows template producers to simplify their production
-code.
+code.  The nodes are zipped, with the C<Text> nodes always being
+created first.  This means that if you want your string to start with
+a C<Variable>, you need to prepend an empty string to
+C<text_segments>.
 
 =cut
 

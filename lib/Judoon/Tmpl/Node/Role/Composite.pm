@@ -6,6 +6,15 @@ use namespace::autoclean;
 use Judoon::Tmpl::Factory;
 use Method::Signatures;
 
+=pod
+
+=encoding utf8
+
+=head2 make_text_node / make_variable_node
+
+utility methods for building subnodes in decompose() methods
+
+=cut
 
 method make_text_node($text) {
     return Judoon::Tmpl::Factory::new_text_node({value => $text, formatting => $self->formatting,});
