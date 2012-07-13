@@ -1,58 +1,132 @@
 [% WRAPPER inc/wrapper.tt2
-  title = user.object.name
+  title = user.object.name || user.object.username
 %]
+
+<h2>[% user.object.username %]'s overview</h2>
 
 [% IF user.is_owner %]
 <h3>Welcome, [% user.object.name || user.object.username %]!</h3>
-[% ELSE %]
-<h3>[% user.object.username %]'s page</h3>
 [% END %]
+<p>You <strong>[% user.is_owner ? 'are' : 'are not' %]</strong> the owner of this page.</p>
 
 [% INCLUDE 'components/notification.tt2' %]
 
-<div class="well">
-  <h4>Placeholder Page</h4>
-  <p>You <strong>[% user.is_owner ? 'are' : 'are not' %]</strong> the owner of this page.</p>
-</div>
+[% IF !user.is_owner && !dataset.list.size && !dataset.page.size %]
+<h4>[% user.object.username %] has not publicized any of their data yet</h4>
+[%- ELSIF user.is_owner -%]
+[%- PROCESS owner_view -%]
+[%- ELSE -%]
+[%- PROCESS visitor_view -%]
+[%- END -%]
+
+[% END %]
+[%# end wrapper %]
+
+
+
+[%- BLOCK owner_view -%]
 
 <h4>Datasets</h4>
 [% IF dataset.list.size %]
-<ul>
-  [% FOREACH dataset_obj IN dataset.list %]
-  <li>[% dataset_obj.name %]</li>
-  [% END %]
-</ul>
+<table class="table table-striped table-condensed dataset_list">
+  <tbody>
+    [% FOREACH dataset_obj IN dataset.list %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% dataset_url = c.uri_for_action('/user/dataset', [user.object.username, dataset_obj.id]) %]
+        <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows<br>
+        [%- IF dataset_obj.notes -%]About this dataset: [%- dataset_obj.notes -%]<br>[%- END -%]
+        Columns: [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
+        This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]<strong>.<br>
+        <a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a><br>
+        Actions: 
+        [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/user/dataset_column', [user.object.username, dataset_obj.id]) -%]
+        [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/user/dataset_data', [user.object.username, dataset_obj.id]) -%]
+        [% PROCESS action_button label="Create a New Page" url=c.uri_for_action('/user/dataset_page', [user.object.username, dataset_obj.id]) -%]
+    </tr>
+    [% END %]
+  </tbody>
+</table>
 [% ELSE %]
-[% IF user.is_owner %]
 <p>You haven't uploaded any datasets yet.</p>
+[% END %]
+
+
+<h4>Pages</h4>
+[% IF page.list.size %]
+<table class="table table-striped table-condensed page_list">
+  <tbody>
+    [% FOREACH page_obj IN page.list %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% page_url = c.uri_for_action('/user/page', [user.object.username, page_obj.id]) %]
+        <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
+        [%- IF page_obj.notes -%]About this page: [%- page_obj.notes -%]<br>[%- END -%]
+        Columns: [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
+        This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]<strong>.<br>
+        <a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a><br>
+        Actions: 
+        [% PROCESS action_button label="Preview"     url=c.uri_for_action('/user/page', [user.object.username, page_obj.id], {view => 'preview'}) -%]
+        [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/user/page', [user.object.username, page_obj.id]) -%]
+        [% PROCESS action_button label="Delete Page" url=c.uri_for_action('/user/page_delete', [user.object.username, page_obj.id]) -%]
+    </tr>
+    [% END %]
+  </tbody>
+</table>
 [% ELSE %]
-<p>This user has not publicized any datasets yet.</p>
-[% END %]
-[% END %]
-
-[% IF 0 %]
-<h4>Tables</h4>
-<ul>
-  [% FOREACH table_obj IN table.list %]
-  <li>[% table_obj.name %]</li>
-  [% END %]
-</ul>
-[% END %]
-
-<h4>Webpages</h4>
-[% IF !page.list.size %]
-[% IF user.is_owner %]
-<p>You haven't created any webpages yet.</p>
-[% ELSE %]
-<p>This user has not publicized any webpages yet.</p>
-[% END %]
-[% ELSE %]
-<ul>
-  [% FOREACH page_obj IN page.list %]
-  <li>[% page_obj.name %]</li>
-  [% END %]
-</ul>
+<p>You haven't created any pages yet.</p>
 [% END %]
 
 
+[%- END -%]
+[%# end owner_view %]
+
+
+
+[%- BLOCK visitor_view -%]
+<h4>[%- user.object.username -%]'s public datasets:</h4>
+[%- IF dataset.list.size -%]
+<table class="table table-striped table-condensed dataset_list">
+  <tbody>
+    [% FOREACH dataset_obj IN dataset.list %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% dataset_url = c.uri_for_action('/user/dataset', [user.object.username, dataset_obj.id]) %]
+        <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a><br>
+        [%- IF dataset_obj.notes -%]About this dataset: [%- dataset_obj.notes -%]<br>[%- END -%]
+        [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows<br>
+        <a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[%- ELSE -%]
+<p>[% user.object.username %] has not publicized any datasets yet.</p>
+[%- END -%]
+
+<h4>[%- user.object.username -%]'s public pages:</h4>
+[%- IF page.list.size -%]
+<table class="table table-striped table-condensed page_list">
+  <tbody>
+    [% FOREACH page_obj IN page.list %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% page_url = c.uri_for_action('/user/page', [user.object.username, page_obj.id]) %]
+        <a href="[%  page_url %]">[%- page_obj.title -%]</a><br>
+        [%- IF page_obj.preamble -%]About this page: [%- page_obj.preamble -%]<br>[%- END -%]
+        [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
+        <a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[%- ELSE -%]
+<p>[% user.object.username %] has not publicized any pages yet.</p>
+[%- END -%]
+
+[%- END -%]
+[%# end visitor_view %]
+
+[% BLOCK action_button %]
+<a class="btn btn-mini" href="[% url %]">[% label %]</a>
 [% END %]
