@@ -191,6 +191,15 @@ sub edit : Chained('id') PathPart('') Args(0) {
 }
 
 
+sub dataset_base : Chained('id') Pathart('dataset') Args(0) {}
+sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {}
+sub dataset : Chained('dataset_id') PathPart('dataset') Args() {}
+sub page    : Chained('id') PathPart('page') Args(1) {}
+
+sub dataset_column : Chained('dataset') PathPart('column') Args() {}
+sub dataset_data   : Chained('dataset') PathPart('data') Args() {}
+sub dataset_page   : Chained('dataset') PathPart('page') Args() {}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
