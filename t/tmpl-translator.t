@@ -78,12 +78,10 @@ subtest 'Making Devel::Cover happy' => sub {
 
     for my $dialect ($translator->dialects()) {
         my $dialect_obj = "Judoon::Tmpl::Translator::Dialect::$dialect"->new;
-        if ($dialect ne 'JQueryTemplate') {
-            like exception {$dialect_obj->parse()}, $ms_missing_arg,
-                "::Dialect::${dialect}::parse w/ no args";
-            like exception {$dialect_obj->parse('moo','moo')}, $ms_too_many_args,
-                "::Dialect::${dialect}::parse w/ too many args";
-        }
+        like exception {$dialect_obj->parse()}, $ms_missing_arg,
+            "::Dialect::${dialect}::parse w/ no args";
+        like exception {$dialect_obj->parse('moo','moo')}, $ms_too_many_args,
+            "::Dialect::${dialect}::parse w/ too many args";
         like exception {$dialect_obj->produce()}, $ms_missing_arg,
             "::Dialect::${dialect}::produce w/ no args";
         like exception {$dialect_obj->produce([],[])}, $ms_too_many_args,
