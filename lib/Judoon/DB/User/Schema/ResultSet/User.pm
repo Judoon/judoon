@@ -6,19 +6,10 @@ package Judoon::DB::User::Schema::ResultSet::User;
 
 =cut
 
-use strict;
-use warnings;
+use Moo;
 use feature ':5.10';
-use base 'DBIx::Class::ResultSet';
+extends 'DBIx::Class::ResultSet';
 
-# use Moose;
-# use namespace::autoclean;
-# use MooseX::NonMoose;
-# extends 'DBIx::Class::ResultSet';
-# 
-# use feature ':5.10';
-# 
-# sub BUILDARGS { $_[2] }
 
 use constant MIN_PASSWORD_LENGTH => 8;
 
@@ -98,9 +89,6 @@ sub user_exists {
     return $self->find({username => $username});
 }
 
-
-
-#__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
