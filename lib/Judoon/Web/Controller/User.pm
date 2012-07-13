@@ -15,7 +15,7 @@ with qw(Judoon::Web::Controller::Role::ExtractParams);
 use Try::Tiny;
 
 
-=head2 signup
+=head2 signup / signup_GET / signup_POST
 
 Get/submit the new user signup page.
 
@@ -67,15 +67,25 @@ sub settings : Chained('/edit') PathPart('settings') CaptureArgs(0) {
     my ($self, $c) = @_;
     $c->stash->{user}{object} = $c->user;
 }
+
+
+=head2 settings_view
+
+Action for /settings/.  Redirects to /user/profile.
+
+=cut
+
 sub settings_view : Chained('settings') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->go_here($c, '/user/profile');
     $c->detach;
 }
 
-=head2 profile
 
-This is where the user goes to change their profile (name, email, phone, etc.)
+=head2 profile / profile_GET / profile_POST
+
+This is where the user goes to change their profile (name, email,
+phone, etc.)
 
 =cut
 
@@ -102,7 +112,7 @@ sub profile_POST {
 }
 
 
-=head2 password
+=head2 password / password_GET / password_POST
 
 The action for changing the users password.
 
@@ -141,7 +151,12 @@ sub password_POST {
 }
 
 
+=head2 base / id /edit
 
+Actions for managing user pages.  base is currently empty.  id pulls
+the $username out of the URL.  edit is the user overview page
+
+=cut
 
 sub base : Chained('/base') PathPart('user') CaptureArgs(0) {}
 sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {

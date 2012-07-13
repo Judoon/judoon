@@ -13,6 +13,10 @@ use Data::Printer;
 #
 __PACKAGE__->config(namespace => '');
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::Web::Controller::Root - Root Controller for Judoon::Web
@@ -48,7 +52,20 @@ sub default :Path {
 }
 
 
+=head2 base
+
+base action. *Everything* passes through here.
+
+=cut
+
 sub base : Chained('') PathPart('') CaptureArgs(0) {}
+
+
+=head2 denied
+
+denied action. should probably return 501
+
+=cut
 
 sub denied :Chained('') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
@@ -63,6 +80,12 @@ sub placeholder :Private {
 
 sub public_page_placeholder : Chained('base') PathPart('page') Args(0) { shift->placeholder(@_); }
 
+
+=head2 edit
+
+edit action. everything that chains off this requires login.
+
+=cut
 
 sub edit : Chained('/login/required') PathPart('') CaptureArgs(0) {}
 
