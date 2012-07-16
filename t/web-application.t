@@ -240,6 +240,30 @@ subtest 'Dataset' => sub {
 };
 
 
+subtest 'DatasetColumns' => sub {
+    login('testuser');
+
+    # create dataset
+    $mech->get('/user/testuser');
+    $mech->submit_form_ok(
+        {
+            form_name => 'add_dataset',
+            fields => {
+                dataset => ["t/etc/data/test1.xls"],
+            },
+        },
+        'Can upload a dataset',
+    );
+
+    # GET datasetcolumn/object
+    my @ds_links = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+/column$}
+    );
+    ok @ds_links, 'found links to specific datasets';
+    $mech->get_ok($ds_links[0], 'can get dataset column list page');
+};
+
+
 unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE);
 done_testing();
 

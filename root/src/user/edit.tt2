@@ -44,9 +44,9 @@
         This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.<br>
         <a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a><br>
         <strong>Actions:</strong>
-        [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/user/dataset_column', [user.object.username, dataset_obj.id]) -%]
-        [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/user/dataset_data', [user.object.username, dataset_obj.id]) -%]
-        [% PROCESS action_button label="Create a New Page" url=c.uri_for_action('/user/dataset_page', [user.object.username, dataset_obj.id]) -%]
+        [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
+        [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) -%]
+        [% PROCESS action_form   label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
         [% PROCESS action_form   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
     </tr>
     [% END %]
