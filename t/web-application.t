@@ -101,7 +101,7 @@ subtest 'User Tests' => sub {
 
         $newuser{'user.username'} = 'newuser';
         $mech->post_ok('/signup', \%newuser, 'can create new user');
-        like $mech->uri, qr{/user/newuser/dataset/list},
+        like $mech->uri, qr{/user/newuser},
             '  ...and send new user to their datasets';
     };
 

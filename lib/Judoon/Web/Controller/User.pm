@@ -52,7 +52,7 @@ sub signup_POST {
     });
     $c->user_exists(1);
 
-    $self->go_here($c, '/rpc/dataset/list', [$user->username]);
+    $self->go_here($c, '/user/edit', [$user->username]);
     $c->detach;
 }
 
