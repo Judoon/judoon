@@ -166,6 +166,16 @@ Me: I like github model, but I'm not smart, so put user ids under /user
 /user/felliott/page/6
 
 
+/user/felliott/ => overview
+/user/felliott/dataset/ => redir to overview
+/user/felliott/dataset/1 => edit dataset 1
+/user/felliott/dataset/1?_method=delete => delete dataset 1
+/user/felliott/dataset/1/columns => Annotate Columns
+
+/user/felliott/page/ => redir to overview?
+/user/felliott/page/1 => edit page
+
+
 
 * existing data
 ** Genetic Approaches
