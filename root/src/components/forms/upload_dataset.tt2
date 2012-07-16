@@ -1,0 +1,28 @@
+<div class="row-fluid">
+  <h4>Add new data set</h4>
+  <div class="span4">
+    <form name="add_dataset" action="[% c.uri_for_action('/rpc/dataset/list', [user.object.username]) %]" method="post" enctype="multipart/form-data" class="form-vertical">
+      <fieldset>
+        <input type="file" id="dataset" name="dataset" class="" />
+        <div class="form-submit"><button class="btn btn-primary" type="submit"><i class="icon-upload"></i> Upload</button></div>
+      </fieldset>
+    </form>
+  </div>
+  <div class="span4">
+    <h6>Accepted file types are:</h6>
+    <dl>
+      <dt>.xls</dt><dd>Excel 97</dd>
+      <dt>.xlsx</dt><dd>Excel XML</dd>
+      <dt>.csv</dt><dd><abbr title="comma-separated values">CSV</abbr></dd>
+    </dl>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+     $('#add_data').on('click', function() {
+       $("#data_add_button").css("display", "none");
+       $("#data_upload_form").css("display", "block");
+     });
+  });
+</script>

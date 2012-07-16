@@ -26,8 +26,12 @@
 
 [%- BLOCK owner_view -%]
 
+<div class="well">
+[%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
+</div>
+
 <h4>Datasets</h4>
-[% IF dataset.list.size %]
+[%- IF dataset.list.size -%]
 <table class="table table-striped table-condensed dataset_list">
   <tbody>
     [% FOREACH dataset_obj IN dataset.list %]

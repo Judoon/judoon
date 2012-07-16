@@ -193,12 +193,41 @@ subtest 'User Tests' => sub {
 subtest 'Dataset' => sub {
     login('testuser');
 
+    # GET dataset/list
     redirects_to_ok('/user/testuser/dataset','/user/testuser');
 
-    my @ds_links = $mech->find_all_links(
-        url_regex => qr{/user/testuser/dataset/\d+/?$}
+    # POST dataset/list
+    $mech->submit_form_ok(
+        {
+            form_name => 'add_dataset',
+            fields => {
+                dataset => ["t/etc/data/test1.xls"],
+            },
+        },
+        'Can upload a dataset',
     );
+
+    # GET dataset/object
+    my @ds_links = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+$}
+    );
+    ok @ds_links, 'found links to specific datasets';
     $mech->get_ok($ds_links[0], 'can get dataset page');
+
+    # PUT dataset/object
+    my %ds_update = (
+        'dataset.name'  => 'Brand New Name',
+        'dataset.notes' => 'These are some notes',
+    );
+    $mech->post_ok(
+        $mech->uri,
+        { %ds_update, 'x-tunneled-method' => 'PUT', },
+        'can update dataset',
+    );
+    while (my ($k, $v) = each %ds_update) {
+        my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
+        is $ds_input->value, $v, "$k has been updated";
+    }
 };
 
 
