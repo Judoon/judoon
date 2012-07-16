@@ -152,6 +152,14 @@ subtest 'Result::DatasetColumn' => sub {
 };
 
 
+subtest 'Result::Page' => sub {
+    my $page = ResultSet('Page')->first;
+
+    is $page->nbr_columns, 3, '::nbr_columns is correct';
+    is $page->nbr_rows, 6,    '::nbr_pages is correct';
+};
+
+
 subtest 'Result::PageColumn' => sub {
     my $page_column = ResultSet('PageColumn')->first;
 

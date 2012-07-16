@@ -127,5 +127,30 @@ with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 
+=head2 nbr_columns
+
+Number of columns in this dataset.
+
+=cut
+
+sub nbr_columns {
+    my ($self) = @_;
+    my @columns = $self->page_columns;
+    return scalar @columns;
+}
+
+
+=head2 nbr_rows
+
+Number of rows in this dataset.
+
+=cut
+
+sub nbr_rows {
+    my ($self) = @_;
+    my $data = $self->dataset->data;
+    return scalar @$data;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
