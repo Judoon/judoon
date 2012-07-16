@@ -48,6 +48,15 @@
         [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) -%]
         [% PROCESS action_form   label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
         [% PROCESS action_form   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
+        <br>
+        [% IF dataset_obj.pages.size %]
+        <strong>Current Pages:</strong>
+        <ul>
+          [%- FOREACH page_obj IN dataset_obj.pages -%]
+          <li><a href="#page_[%- page_obj.id -%]">[%- page_obj.title -%]</a></li>
+          [%- END -%]
+        </ul>
+        [% END %]
     </tr>
     [% END %]
   </tbody>
@@ -63,7 +72,7 @@
   <tbody>
     [% FOREACH page_obj IN page.list %]
     <tr>
-      <td>[% loop.count %]</td>
+      <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"</td>
       <td>[% page_url = c.uri_for_action('/user/page', [user.object.username, page_obj.id]) %]
         <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
         [%- IF page_obj.notes -%]<strong>About this page:</strong> [%- page_obj.notes -%]<br>[%- END -%]
