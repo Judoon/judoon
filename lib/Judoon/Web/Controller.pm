@@ -67,36 +67,6 @@ sub go_relative {
 }
 
 
-=head2 B<C<push_path($c, $action, \@captures, \%query?)>>
-
-C<push_path> pushes \@captures onto the current list of captures, then
-proceeds to C<$action>.
-
-=cut
-
-sub push_path {
-    my ($self, $c, $action, $captures, @args) = @_;
-    my $current_captures = $c->req->captures;
-    push @$current_captures, $captures;
-    $self->go_here($c, $action, $captures, @args);
-}
-
-
-=head2 B<C<pop_path($c, $action, \%query?)>>
-
-C<pop_path> pops C<< $c->req->captures >>, then proceeds to
-C<$action>.
-
-=cut
-
-sub pop_path {
-    my ($self, $c, $action, @args) = @_;
-    my $captures = $c->req->captures;
-    pop @$captures;
-    $self->go_here($c, $action, $captures, @args);
-}
-
-
 __PACKAGE__->meta->make_immutable;
 
 1;
