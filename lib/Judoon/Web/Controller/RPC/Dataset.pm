@@ -45,25 +45,6 @@ after private_id => sub {
 };
 
 
-sub postadd : Chained('id') PathPart('postadd') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'dataset/postadd.tt2';
-}
-sub postadd_do : Chained('id') PathPart('postadd_do') Args(0) {
-    my ($self, $c) = @_;
-
-    my $params     = $c->req->params;
-    my $header_col = $params->{header} // 1;
-    my @row_dels   = $params->{row_delete};
-    my @col_dels   = $params->{col_delete};
-
-    $c->log->debug("Header is: $header_col");
-    $c->log->debug("Row deletes are: " . p(@row_dels));
-    $c->log->debug("Col deletes are: " . p(@col_dels));
-
-    $self->go_here($c, 'edit', $c->req->captures);
-}
-
 override edit_object => sub {
     my ($self, $c, $params) = @_;
     return $c->stash->{dataset}{object}->update({
