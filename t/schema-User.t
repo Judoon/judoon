@@ -107,6 +107,10 @@ subtest 'ResultSet::User' => sub {
 subtest 'Result::Dataset' => sub {
     my $dataset = ResultSet('Dataset')->first;
     ok $dataset->create_basic_page(), 'create_basic_page() works';
+
+    is $dataset->nbr_columns, 3, 'nbr_columns is three';
+    is $dataset->nbr_rows, 6, 'nbr_rows is six';
+
 };
 
 subtest 'Result::DatasetColumn' => sub {

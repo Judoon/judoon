@@ -188,6 +188,30 @@ EOS
     return $page;
 }
 
+=head2 nbr_columns
+
+Number of columns in this dataset.
+
+=cut
+
+sub nbr_columns {
+    my ($self) = @_;
+    my $data = $self->data;
+    return scalar @{$data->[0]};
+}
+
+
+=head2 nbr_rows
+
+Number of rows in this dataset.
+
+=cut
+
+sub nbr_rows {
+    my ($self) = @_;
+    my $data = $self->data;
+    return scalar @$data;
+}
 
 
 
