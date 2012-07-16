@@ -118,6 +118,31 @@ after object_GET => sub {
 };
 
 
+=head2 delete_object
+
+delete the dataset
+
+=cut
+
+override delete_object => sub {
+    my ($self, $c) = @_;
+    $c->stash->{dataset}{object}->delete;
+};
+
+
+=head2 object_DELETE (after)
+
+return to user overview instead of dataset list
+
+=cut
+
+after object_DELETE => sub {
+    my ($self, $c) = @_;
+    my @captures = @{$c->req->captures};
+    pop @captures;
+    $self->go_here($c, '/user/edit', \@captures);
+};
+
 
 __PACKAGE__->meta->make_immutable;
 

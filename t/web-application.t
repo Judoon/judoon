@@ -228,6 +228,15 @@ subtest 'Dataset' => sub {
         my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
         is $ds_input->value, $v, "$k has been updated";
     }
+
+
+    # DELETE dataset/object
+    $mech->get('/user/testuser');
+    $mech->submit_form_ok({
+        form_name => 'delete_dataset_1',
+    }, 'delete the dataset');
+    like $mech->uri, qr{/user/testuser}, 'back to user overview';
+    $mech->content_unlike(qr{table[^\v]dataset_list}, 'no more datasets on this page');
 };
 
 

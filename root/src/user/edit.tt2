@@ -47,6 +47,7 @@
         [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/user/dataset_column', [user.object.username, dataset_obj.id]) -%]
         [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/user/dataset_data', [user.object.username, dataset_obj.id]) -%]
         [% PROCESS action_button label="Create a New Page" url=c.uri_for_action('/user/dataset_page', [user.object.username, dataset_obj.id]) -%]
+        [% PROCESS action_form   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
     </tr>
     [% END %]
   </tbody>
@@ -135,3 +136,10 @@
 [% BLOCK action_button %]
 <a class="btn btn-mini" href="[% url %]">[% label %]</a>
 [% END %]
+
+[%- BLOCK action_form -%]
+<form style="display: inline-block;" name="[%- form_name -%]" action="[%- url -%]" method="post" enctype="multipart/form-data" class="form-inline">
+  <input type="hidden" name="x-tunneled-method" value="[% method %]">
+  <button type="submit" class="btn btn-mini">[%- label -%]</button>
+</form>
+[%- END -%]
