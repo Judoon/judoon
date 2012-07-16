@@ -18,9 +18,9 @@ __PACKAGE__->config(
 );
 
 
-override get_list => sub {
+override list_GET => sub {
     my ($self, $c) = @_;
-    return [$c->stash->{user}{object}->datasets];
+    $self->go_here($c, '/user/edit');
 };
 
 override add_object => sub {
@@ -64,8 +64,6 @@ sub postadd_do : Chained('id') PathPart('postadd_do') Args(0) {
     $self->go_here($c, 'edit', $c->req->captures);
 }
 
-
-
 override edit_object => sub {
     my ($self, $c, $params) = @_;
     return $c->stash->{dataset}{object}->update({
@@ -74,8 +72,7 @@ override edit_object => sub {
     });
 };
 
-
-after private_edit => sub {
+after object_GET => sub {
     my ($self, $c) = @_;
 
     if (my ($page) = $c->stash->{dataset}{object}->pages) {

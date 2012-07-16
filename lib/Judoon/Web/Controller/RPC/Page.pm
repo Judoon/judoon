@@ -37,7 +37,7 @@ override edit_object => sub {
     return $c->stash->{page}{object}->update(\%valid);
 };
 
-after private_edit => sub {
+after object_GET => sub {
     my ($self, $c) = @_;
     $c->stash->{page_columns} = [$c->stash->{page}{object}->page_columns];
 

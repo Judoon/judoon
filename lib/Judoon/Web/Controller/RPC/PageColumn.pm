@@ -41,7 +41,7 @@ override get_object => sub {
         ->find({id => $c->stash->{page_column}{id}});
 };
 
-after private_edit => sub {
+after object_GET => sub {
     my ($self, $c) = @_;
 
     my @ds_columns = $c->stash->{dataset}{object}->ds_columns;
@@ -105,7 +105,7 @@ override munge_edit_params => sub {
     return \%valid;;
 };
 
-after private_edit_do => sub {
+after object_PUT => sub {
     my ($self, $c) = @_;
     my @captures = @{$c->req->captures};
     pop @captures;
@@ -117,7 +117,7 @@ override delete_object => sub {
     $c->stash->{page_column}{object}->delete;
 };
 
-after delete_do => sub {
+after object_DELETE => sub {
     my ($self, $c) = @_;
     $c->res->redirect($c->uri_for_action('/rpc/page/edit', [@{$c->req->captures}[0,-2]]));
 };

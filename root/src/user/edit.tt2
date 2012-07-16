@@ -33,7 +33,7 @@
     [% FOREACH dataset_obj IN dataset.list %]
     <tr>
       <td>[% loop.count %]</td>
-      <td>[% dataset_url = c.uri_for_action('/user/dataset', [user.object.username, dataset_obj.id]) %]
+      <td>[% dataset_url = c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) %]
         <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows<br>
         [%- IF dataset_obj.notes -%]<strong>About this dataset:</strong> [%- dataset_obj.notes -%]<br>[%- END -%]
         <strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]<br>

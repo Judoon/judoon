@@ -26,7 +26,7 @@ override get_list => sub {
     return [$c->stash->{dataset}{object}->ds_columns];
 };
 
-after private_list => sub {
+after list_GET => sub {
     my ($self, $c) = @_;
 
     my $columns = $c->stash->{ds_column}{list};
@@ -96,12 +96,12 @@ override edit_object => sub {
     return $c->stash->{ds_column}{object}->update(\%valid);
 };
 
-after private_edit => sub {
+after object_GET => sub {
     my ($self, $c) = @_;
     $c->stash->{accession_types} = $self->sitelinker->accession_groups;
 };
 
-after private_edit_do => sub {
+after object_PUT => sub {
     my ($self, $c) = @_;
     $c->res->redirect($c->uri_for_action('/rpc/datasetcolumn/list', [@{$c->req->captures}[0,1]]));
 };

@@ -3,7 +3,8 @@ package Judoon::Web::Controller::RPC;
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Catalyst::Controller'; }
+BEGIN { extends 'Judoon::Web::Controller'; }
+
 
 has rpc => (
     is  => 'ro',
@@ -18,43 +19,33 @@ __PACKAGE__->config(
 );
 
 
-sub base      : Chained('fixme') PathPart('fixme')      CaptureArgs(0) { shift->private_base(        @_); }
-sub list      : Chained('base')  PathPart('list')       Args(0)        { shift->private_list(        @_); }
-sub list_do   : Chained('base')  PathPart('list_do')    Args(0)        { shift->private_list_do(     @_); }
-sub add       : Chained('base')  PathPart('add')        Args(0)        { shift->private_add(         @_); }
-sub add_do    : Chained('base')  PathPart('add_do')     Args(0)        { shift->private_add_do(      @_); }
-sub id        : Chained('base')  PathPart('id')         CaptureArgs(1) { shift->private_id(          @_); }
-sub edit      : Chained('id')    PathPart('edit')       Args(0)        { shift->private_edit(        @_); }
-sub edit_do   : Chained('id')    PathPart('edit_do')    Args(0)        { shift->private_edit_do(     @_); }
-sub delete    : Chained('id')    PathPart('delete')     Args(0)        { shift->private_delete(      @_); }
-sub delete_do : Chained('id')    PathPart('delete_do')  Args(0)        { shift->private_delete_do(   @_); }
+sub base      : Chained('fixme') PathPart('fixme') CaptureArgs(0) { shift->private_base(        @_); }
+sub list      : Chained('base')  PathPart('')      Args(0)        :ActionClass('REST') {}
+sub id        : Chained('base')  PathPart(''  )    CaptureArgs(1) { shift->private_id(          @_); }
+sub object    : Chained('id')    PathPart('')      Args(0)        :ActionClass('REST') {}
 
 
 sub private_base :Private {}
 
-sub private_list :Private {
+
+sub list_GET :Private {
     my ($self, $c) = @_;
     my $key                 = $self->rpc->{stash_key};
     $c->stash->{$key}{list} = $self->get_list($c);
     $c->stash->{template}   = $self->rpc->{template_dir} . '/list.tt2';
 }
 
-sub private_list_do :Private {
+sub list_PUT :Private {
     my ($self, $c) = @_;
     $self->manage_list($c);
-    $self->go_here($c, 'list', $c->req->captures);
+    $self->go_relative($c, 'list');
 }
 
-sub private_add :Private {
-    my ($self, $c) = @_;
-    $c->stash->{template} = $self->rpc->{template_dir} . '/add.tt2';
-}
-
-sub private_add_do :Private {
+sub list_POST :Private {
     my ($self, $c) = @_;
     my $params = $self->munge_add_params($c);
     my $object = $self->add_object($c, $params);
-    $self->go_here($c, 'edit', [@{$c->req->captures}, $object->id]);
+    $self->go_relative($c, 'object', [@{$c->req->captures}, $object->id]);
 }
 
 sub private_id :Private {
@@ -64,39 +55,28 @@ sub private_id :Private {
     $c->stash->{$key}{object} = $self->get_object($c);
 }
 
-sub private_edit :Private {
+
+sub object_GET :Private {
     my ($self, $c) = @_;
     $c->stash->{template}   = $self->rpc->{template_dir} . '/edit.tt2';
 }
 
-sub private_edit_do :Private {
+sub object_PUT :Private {
     my ($self, $c) = @_;
     my $params                = $self->munge_edit_params($c);
     my $key                   = $self->rpc->{stash_key};
     $c->stash->{$key}{object} = $self->edit_object($c, $params);
-    $self->go_here($c, 'edit', $c->req->captures);
+    $self->go_relative($c, 'object');
 }
 
-sub private_delete :Private {
-    my ($self, $c) = @_;
-    $c->stash->{template}   = $self->rpc->{template_dir} . '/delete.tt2';
-}
-
-sub private_delete_do :Private {
+sub object_DELETE :Private {
     my ($self, $c) = @_;
     $self->delete_object($c);
     my @captures = @{$c->req->captures};
     pop @captures;
-    $self->go_here($c, 'list', \@captures);
+    $self->go_relative($c, 'list', \@captures);
 }
 
-sub go_here {
-    my ($self, $c, $action, $captures) = @_;
-    $c->res->redirect( $c->uri_for_action(
-        $c->controller->action_for($action),
-        $captures,
-    ));
-}
 
 
 sub get_list          :Private { return [];    }

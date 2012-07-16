@@ -27,8 +27,13 @@ use Catalyst qw/
     Session::State::Cookie
     StackTrace
 /;
+use CatalystX::RoleApplicator;
 
 extends 'Catalyst';
+
+__PACKAGE__->apply_request_class_roles(qw[
+    Catalyst::TraitFor::Request::REST::ForBrowsers
+]);
 
 our $VERSION = '0.01';
 

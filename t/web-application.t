@@ -190,6 +190,17 @@ subtest 'User Tests' => sub {
 };
 
 
+subtest 'Dataset' => sub {
+    login('testuser');
+
+    redirects_to_ok('/user/testuser/dataset','/user/testuser');
+
+    my @ds_links = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+/?$}
+    );
+    $mech->get_ok($ds_links[0], 'can get dataset page');
+};
+
 
 unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE);
 done_testing();
