@@ -84,7 +84,7 @@ after object_GET => sub {
     my ($self, $c) = @_;
 
     my @page_columns = $c->stash->{page}{object}->page_columns;
-    $c->stash->{page_columns} = \@page_columns;
+    $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
     if ($view eq 'preview') {
