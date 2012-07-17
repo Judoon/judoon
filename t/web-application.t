@@ -249,12 +249,35 @@ subtest 'DatasetColumns' => sub {
         },
     }, 'Can upload a dataset', );
 
-    # GET datasetcolumn/object
-    my @ds_links = $mech->find_all_links(
+    # GET datasetcolumn/list
+    my @ds_col_list_links = $mech->find_all_links(
         url_regex => qr{/user/testuser/dataset/\d+/column$}
     );
-    ok @ds_links, 'found links to specific datasets';
-    $mech->get_ok($ds_links[0], 'can get dataset column list page');
+    ok @ds_col_list_links, 'found links to dataset column lists';
+    $mech->get_ok($ds_col_list_links[0], 'can get dataset column list page');
+
+    # PUT datasetcolumn/list
+    # todo: add delete column test
+
+    # GET datasetcolumn/object
+    my @ds_col_links = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+/column/\d+$}
+    );
+    ok @ds_col_links, 'found links to specific dataset columns';
+    $mech->get_ok($ds_col_links[0], 'can get dataset column page');
+
+    # PUT datatsetcolumn/object
+    my %ds_col_update = (
+        'column.is_url'   => '1',
+        'column.url_root' => 'http://www.google.com/',
+    );
+    $mech->post_ok(
+        $mech->uri,
+        { %ds_col_update, 'x-tunneled-method' => 'PUT', },
+        'can update dataset column',
+    );
+    $mech->content_like(qr{url: http://www.google.com/},
+                        'can update dataset column');
 };
 
 
