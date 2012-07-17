@@ -27,15 +27,15 @@
         <p class="help-block">Add formatting with the buttons or <a href="#">preview</a>.</p>
 
 
-        <div id="actions" class="row">
+        <div id="actions" class="row-fluid">
           <div class="span8">
-            <div class="row">
-              <div class="span3"><h6>Elements</h6></div>
-              <div class="span2"><h6>Containers</h6></div>
-              <div class="span2"><h6>Conditionals</h6></div>
+            <div class="row-fluid">
+              <div class="span6"><h6>Elements</h6></div>
+              <div class="span3"><h6>Containers</h6></div>
+              <div class="span3"><h6>Conditionals</h6></div>
             </div>
-            <div class="row">
-              <div class="span3">
+            <div class="row-fluid">
+              <div class="span6">
                 <div class="btn-group">
                   <a class="btn" id="btn_add_text">Text</a>
                   <a class="btn" id="btn_add_data">Data</a>
@@ -43,25 +43,24 @@
                   <a class="btn" id="btn_add_newline">Newline</a>
                 </div>
               </div>
-              <div class="span2">
+              <div class="span3">
                 <div class="btn-group">
                   <a class="btn disabled">List</a>
                 </div>
               </div>
-              <div class="span2">
+              <div class="span3">
                 <div class="btn-group">
                   <a class="btn disabled">If / Then / Else</a>
                 </div>
               </div>
             </div>
-            <div class="row"><div class="span8"><h6>&nbsp;</h6></div></div>
-            <div class="row">
-              <div class="span4"><h6>Move Cursor</h6></div>
-              <div class="span2"><h6>Actions</h6></div>
-              <div class="span2"><h6></h6></div>
+            <div class="row-fluid"><div class="span8"><h6>&nbsp;</h6></div></div>
+            <div class="row-fluid">
+              <div class="span6"><h6>Move Cursor</h6></div>
+              <div class="span6"><h6>Actions</h6></div>
             </div>
-            <div class="row">
-              <div class="span4">
+            <div class="row-fluid">
+              <div class="span6">
                 <div class="btn-group">
                   <a class="btn" id="btn_cursor_up"><i class="icon-arrow-up"></i> Up</a>
                   <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i> Down</a>
@@ -69,7 +68,7 @@
                   <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i> Right</a>
                 </div>
               </div>
-              <div class="span4">
+              <div class="span6">
                 <div class="btn-group">
                   <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Backspace</a>
                 </div>

@@ -123,8 +123,8 @@ method process_newline($widget) {
 has produce_text_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
 sub _build_produce_text_tmpl {
     return <<'EOT';
-<div class="widget-object widget-type-text widget-inline btn-group">
-  <input type="text" class="inner-small span2 w-dropdown widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]" placeholder="Type text here" [% IF node %]value="[% node.value %]"[% END %] />
+<div class="widget-object widget-type-text widget-inline input-append dropdown">
+  <input type="text" class="input-medium widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]" placeholder="Type text here" [% IF node %]value="[% node.value %]"[% END %] />
 </div>
 EOT
 }
@@ -153,8 +153,8 @@ sub _build_produce_variable_tmpl {
 #    </select>
 #  </div>
     return <<'EOT';
-<div class="widget-object widget-type-data widget-inline btn-group">
-  <select class="w-dropdown widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]">
+<div class="widget-object widget-type-data widget-inline input-append dropdown">
+  <select class="widget-format-target widget-format-sibling [% FOREACH format IN node.formatting %]widget-formatting-[% format %] [% END %]">
     <option [% IF node %]value="[% node.name %]" selected="selected"[% END %]></option>
   </select>
 </div>
@@ -172,8 +172,8 @@ sub _build_produce_link_tmpl {
 <!-- display_url is [% display_url %] -->
 <!-- display_label is [% display_label %] -->
 [% END %]
-<div class="widget-object widget-type-link widget-inline btn-group">
-  <input type="text" class="inner-small span3 w-dropdown disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="[% placeholder_text %]" />
+<div class="widget-object widget-type-link widget-inline input-append dropdown">
+  <input type="text" class="input-medium disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="[% placeholder_text %]" />
   [% FOREACH component IN ['url', 'label'] %]
   <input type="hidden" class="widget-link-[% component %]-accession" value="[% node.$component.accession %]">
   <input type="hidden" class="widget-link-[% component %]-type"      value="[% node.$component.varstring_type %]">

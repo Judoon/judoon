@@ -5,15 +5,15 @@
 
     <h6>Text widget</h6>
     <div id="text_widget">
-      <div class="widget-object widget-type-text widget-inline btn-group">
-        <input type="text" class="inner-small span2 w-dropdown widget-format-target widget-format-sibling" placeholder="Type text here" />
+      <div class="widget-object widget-type-text widget-inline input-append dropdown">
+        <input type="text" class="input-medium widget-format-target widget-format-sibling" placeholder="Type text here" />
       </div>
     </div>
 
     <h6>Data widget</h6>
     <div id="data_widget">
-      <div class="widget-object widget-type-data widget-inline btn-group">
-        <select class="w-dropdown widget-format-target widget-format-sibling">
+      <div class="widget-object widget-type-data widget-inline input-append dropdown">
+        <select class="widget-format-target widget-format-sibling">
           [% FOREACH column IN ds_column.list %]
           <option value="[% column.shortname %]">{[% column.name | html %]}</option>
           [% END %]
@@ -24,8 +24,8 @@
 
     <h6>Link widget</h6>
     <div id="link_widget">
-      <div class="widget-object widget-type-link widget-inline btn-group">
-        <input type="text" class="inner-small span3 w-dropdown disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="Click here to edit link"  />
+      <div class="widget-object widget-type-link widget-inline input-append dropdown">
+        <input type="text" class="input-medium disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="Click here to edit link"  />
       </div>
     </div>
 
@@ -38,7 +38,7 @@
 
     <h6>Formatting Menu</h6>
     <div id="formatting_menu">
-      <a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i></a>
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-cog"></i></a>
       <ul class="dropdown-menu">
         <li><a class="widget-action-bold"><i class="icon-bold"></i>Bold</a></li>
         <li><a class="widget-action-italic"><i class="icon-italic"></i>Italicize</a></li>

@@ -2,6 +2,10 @@
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
+<ul class="nav nav-pills">
+  <li class="active"><a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+</ul>
+
 
 <form action="[% c.uri_for_action('/rpc/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
   <fieldset>
@@ -37,18 +41,19 @@
   </fieldset>
 </form>
 
-<form action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-inline">
+<form action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Table Layout</legend>
+
+    <div class="control-group">
+      <input type="text" name="page_column.title" class="" placeholder="Column title..." />
+      <button type="submit" class="btn"><i class="icon-plus"></i>Add page column</button>
+    </div>
+
+
     <div class="row-fluid">
 
       <div class="span8">
-        <div class="row-fluid">
-          <input type="text" name="page_column.title" class="" placeholder="Column title..." />
-          <button type="submit" class="btn"><i class="icon-plus"></i>Add page column</button>
-        </div>
-
-        <br>
         <div class="row-fluid">
           <h4>Current columns</h4>
           <div class="well">
@@ -96,13 +101,11 @@
 
     </div>
 
-      <div class="row-fluid">
-        <div class="span12">
-          <a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]" class="btn">Preview</a>
-        </div>
-      </div>
-
   </fieldset>
 </form>
+
+<ul class="nav nav-pills">
+  <li class="active"><a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+</ul>
 
 [% END %]
