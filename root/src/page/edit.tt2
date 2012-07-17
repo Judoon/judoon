@@ -3,7 +3,7 @@
 %]
 
 
-<form action="[% c.uri_for_action('/rpc/page/edit_do', c.req.captures) %]" method="post" class="form-horizontal">
+<form action="[% c.uri_for_action('/rpc/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
   <fieldset>
     <legend>Page Layout</legend>
 
@@ -27,6 +27,8 @@
         <textarea class="tinymce" name="page.postamble">[% page.object.postamble %]</textarea>
       </div>
     </div>
+
+    <input type="hidden" name="x-tunneled-method" value="PUT">
     
     [% INCLUDE 'components/forms/form_submit.tt'
        submit_type = 'update'
@@ -35,7 +37,7 @@
   </fieldset>
 </form>
 
-<form action="[% c.uri_for_action('/rpc/pagecolumn/add_do', c.req.captures) %]" method="post" class="form-inline">
+<form action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-inline">
   <fieldset>
     <legend>Table Layout</legend>
     <div class="row-fluid">
@@ -60,8 +62,8 @@
                 [% column.template_to_jquery %]
               </div>
               <div>
-                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/edit', c.req.captures.merge([column.id])) %]"><i class="icon-plus"></i>Edit</a>
-                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/delete_do', c.req.captures.merge([column.id])) %]"><i class="icon-trash"></i>Delete</a>
+                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])) %]"><i class="icon-plus"></i>Edit</a>
+                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])) %]"><i class="icon-trash"></i>Delete</a>
               </div>
               <div class="clearsep"></div>
             </div>
@@ -96,7 +98,7 @@
 
       <div class="row-fluid">
         <div class="span12">
-          <a href="[% c.uri_for_action('/rpc/page/preview', c.req.captures) %]" class="btn">Preview</a>
+          <a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]" class="btn">Preview</a>
         </div>
       </div>
 

@@ -73,7 +73,7 @@
     [% FOREACH page_obj IN page.list %]
     <tr>
       <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"</td>
-      <td>[% page_url = c.uri_for_action('/user/page', [user.object.username, page_obj.id]) %]
+      <td>[% page_url = c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
         <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
         [%- IF page_obj.notes -%]<strong>About this page:</strong> [%- page_obj.notes -%]<br>[%- END -%]
         <strong>Parent Dataset:</strong> [% page_obj.dataset.name %]<br>
@@ -81,9 +81,9 @@
         This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.<br>
         <a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a><br>
         <strong>Actions:</strong>
-        [% PROCESS action_button label="Preview"     url=c.uri_for_action('/user/page', [user.object.username, page_obj.id], {view => 'preview'}) -%]
-        [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/user/page', [user.object.username, page_obj.id]) -%]
-        [% PROCESS action_button label="Delete Page" url=c.uri_for_action('/user/page_delete', [user.object.username, page_obj.id]) -%]
+        [% PROCESS action_button label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
+        [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) -%]
+        [% PROCESS action_form   label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_"_loop.count -%]
     </tr>
     [% END %]
   </tbody>
