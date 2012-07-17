@@ -119,7 +119,9 @@ override delete_object => sub {
 
 after object_DELETE => sub {
     my ($self, $c) = @_;
-    $c->res->redirect($c->uri_for_action('/rpc/page/edit', [@{$c->req->captures}[0,-2]]));
+    my $captures = $c->req->captures;
+    pop @$captures;
+    $self->go_here($c, '/rpc/page/object', $captures);
 };
 
 __PACKAGE__->meta->make_immutable;
