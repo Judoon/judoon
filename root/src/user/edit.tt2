@@ -83,7 +83,7 @@
         <strong>Actions:</strong>
         [% PROCESS action_button label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
         [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) -%]
-        [% PROCESS action_form   label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_"_loop.count -%]
+        [% PROCESS action_form   label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
     </tr>
     [% END %]
   </tbody>

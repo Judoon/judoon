@@ -98,6 +98,32 @@ after object_GET => sub {
 };
 
 
+=head2 object_DELETE (after)
+
+return to user overview instead of page list
+
+=cut
+
+after object_DELETE => sub {
+    my ($self, $c) = @_;
+    my @captures = @{$c->req->captures};
+    pop @captures; pop @captures;
+    $self->go_here($c, '/user/edit', \@captures);
+};
+
+
+=head2 delete_object
+
+delete the page
+
+=cut
+
+override delete_object => sub {
+    my ($self, $c) = @_;
+    $c->stash->{page}{object}->delete;
+};
+
+
 sub preview : Chained('id') PathPart('preview') Args(0) {
     my ($self, $c) = @_;
 

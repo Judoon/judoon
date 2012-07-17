@@ -293,6 +293,13 @@ subtest 'Page' => sub {
         is $page_input->value, $v, "$k has been updated";
     }
 
+    # DELETE page/object
+    $mech->get('/user/testuser');
+    $mech->submit_form_ok({
+        form_name => 'delete_page_1',
+    }, 'delete the page');
+    like $mech->uri, qr{/user/testuser}, 'back to user overview';
+    $mech->content_unlike(qr{table[^\v]page_list}, 'no more pages on the overview');
 };
 
 
