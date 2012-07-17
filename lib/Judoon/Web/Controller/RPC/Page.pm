@@ -19,6 +19,7 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 use Data::Printer;
 
@@ -67,8 +68,7 @@ Update the page in the database.
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    my %valid = map {my $o = $_; s/^page\.//; $_ => ($params->{$o} // '')}
-        grep {m/^page\./} keys %$params;
+    my %valid = $self->extract_params('page', $params);
     return $c->stash->{page}{object}->update(\%valid);
 };
 

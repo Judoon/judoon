@@ -19,6 +19,7 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 use Data::Printer;
 
@@ -145,9 +146,7 @@ Update the dataset columns
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
-    my %valid = map {s/^column\.//r => ($params->{$_} // '')}
-        grep {m/^column\./} keys %$params;
-    $c->log->debug('Valid params are: ' . p(%valid));
+    my %valid = $self->extract_params('column', $params);
     delete $valid{multiple_ids}; # NYI
     return $c->stash->{ds_column}{object}->update(\%valid);
 };
