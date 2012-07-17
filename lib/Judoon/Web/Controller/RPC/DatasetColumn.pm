@@ -172,7 +172,9 @@ Redirect to dataset columns
 
 after object_PUT => sub {
     my ($self, $c) = @_;
-    $c->res->redirect($c->uri_for_action('/rpc/datasetcolumn/list', [@{$c->req->captures}[0,1]]));
+    my $captures = $c->req->captures;
+    pop @$captures;
+    $self->go_relative($c, 'list', $captures);
 };
 
 __PACKAGE__->meta->make_immutable;
