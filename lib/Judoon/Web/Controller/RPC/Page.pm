@@ -1,5 +1,20 @@
 package Judoon::Web::Controller::RPC::Page;
 
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::RPC::Page - page actions
+
+=head1 DESCRIPTION
+
+The RESTful controller for managing actions on one or more pages.
+Currently chains off of ::RPC::Dataset, but this may be changed later.
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -18,6 +33,12 @@ __PACKAGE__->config(
 );
 
 
+=head2 add_object
+
+Add a new page linked to the parent dataset.
+
+=cut
+
 override add_object => sub {
     my ($self, $c, $params) = @_;
     return $c->stash->{dataset}{object}->create_related('pages', {
@@ -25,10 +46,24 @@ override add_object => sub {
     });
 };
 
+
+=head2 get_object
+
+Fetch a page from the database.
+
+=cut
+
 override get_object => sub {
     my ($self, $c) = @_;
     return $c->stash->{dataset}{object}->pages_rs->find({id => $c->stash->{page}{id}});
 };
+
+
+=head2 edit_object
+
+Update the page in the database.
+
+=cut
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
@@ -36,6 +71,14 @@ override edit_object => sub {
         grep {m/^page\./} keys %$params;
     return $c->stash->{page}{object}->update(\%valid);
 };
+
+
+=head2 object_GET (after)
+
+After L<RPC/object_GET>, set up the stash parameters the page's edit
+page will need.
+
+=cut
 
 after object_GET => sub {
     my ($self, $c) = @_;
