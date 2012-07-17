@@ -3,12 +3,31 @@
 #+TODO: TODO | DONE WONT
 
 * Judoon::Web
-** DONE [#A] URL widgets                                           :feature:
+** General / Misc [3/6]
+*** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
-** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
-** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
-** Interface [4/8]
+*** DONE [#A] one button page-making
+CLOSED: [2012-05-17 Thu 17:55]
+user uploads sheet, we create page that exactly maps the spreadsheet
+no formatting, linking, etc.
+just a searchable table
+*** DONE [#A] intro page: splash screen:
+CLOSED: [2012-07-09 Mon 17:48]
+Judoon turns this: <xls screenshot> into this: <web screenshot>
+Supports:
+   linking to well-known databases
+   automatic sorting, paging, searching
+   downloadable and self-hostable
+
+*** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
+*** TODO [#A] quick deployment
+user downloads tarball or zip
+Look at Wordpress, drupal for quick deployment ideas
+*** TODO [#A] unify webwidget templates
+Right now we have webwidget templates in ::Dialect::WebWidgets and in forms/*/library.tt
+Find some way so we don't have to edit in two places.
+** Interface [4/9]
 *** DONE [#B] lessen gray border, way to wide
 CLOSED: [2012-07-09 Mon 17:46]
 *** DONE [#A] make 'Get Started' not get :visited coloration
@@ -22,6 +41,7 @@ No formatting, no annotation, dead simple.
 *** TODO [#A] Integrate color scheme with bootstrap
 *** TODO [#A] maybe center the page? the splash screen looks weirdly off-center
 *** TODO [#A] pages should generally use components notification
+*** TODO [#A] how do visitors see deep urls /user/notme/dataset/1/column/4?
 ** User [1/9]
 *** DONE [#A] Need delete button for datasets
 CLOSED: [2012-07-17 Tue 11:29]
@@ -33,12 +53,24 @@ CLOSED: [2012-07-17 Tue 11:29]
 *** TODO [#A] what happens when logged in user goes to /login?
 *** TODO [#B] add how to contact field to model
 Whe user publicizes page, need a "Contact me by: .." blurb.
-** Page [/]
+** Page [0/2]
 *** TODO [#A] add a "how to cite" field to Pages / Datasets
-** Dataset::edit [1/1]
+*** TODO [#A] New layout idea
+GET page/object has page form, button "Edit columns", underneath is
+blurb about where title / preamble / postamble / attribution go (w/ example)
+"Title"
+"Preamble"
+"Attribute"
+<dummytable>
+"Postamble"
+
+The "Edit Columns" button goes to GET pagecolumns/list
+
+** Dataset::edit [1/2]
 *** DONE [#A] Allow multiple pages per ds
 CLOSED: [2012-07-17 Tue 11:30]
 User may want to create multiple views of a complex dataset
+*** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
 ** DatasetColumn::list [0/1]
 *** TODO [#B] replace delete list with delete button?      :interface:eval:
 ** DatasetColumn::edit [/]
@@ -57,13 +89,16 @@ Catalyst::Plugin::Authorization::ACL - ACL-based authorization
 *** TODO [#C] Allow alternative logins? (FB, OAuth, etc?)         :feature:
 *** TODO [#B] implement roles and acls                            :feature:
 admin privileges
-** RPC [0/3]
+** RPC [0/4]
 *** TODO [#A] update munge_*_params to do basic parameter unpacking
 can call ExtractParams::extract_params()
 RPC::*.pm will need to be updated.
 *** TODO [#B] update ::RPC::*.pm to return 'Unsupported' unsupported actions
 e.g. most don't support list_PUT.
 *** TODO [#A] finish pod-ing
+*** TODO [#A] Are subclasses using the default behaviors? Should we implement/remove them?
+add_object -> create($params);
+get_object -> find(id => $id);
 ** Tests [0/2]
 *** TODO web-application.t needs some refactoring [0/4]
 **** TODO probably should reset fixtures between subtests
@@ -93,20 +128,12 @@ HTML5 allows multiple forms
 wierd paths:
    Page/preview  => could be /?view=preview or accept-type?
    Dataset/postadd => not sure I'm still using this
-* Judoon::DB::User::Schema [/]
-** DONE [#A] Convert DB::User to DBIC
-CLOSED: [2012-03-28 Wed 13:45]
-** DONE [#A] Get rid of J::DB::Users / J::W::Model::Users / tests
-CLOSED: [2012-03-28 Wed 14:10]
-** DONE [#A] Fill out User class to make a proper user
-CLOSED: [2012-07-17 Tue 12:17]
-password, email, etc.
-DBIx::Class::PassphraseColumn
-Authen::Passphrase::BlowfishCrypt
-http://www.catalystframework.org/calendar/2011/15
-Catalyst::Authentication::Realm::SimpleDB
-Catalyst::Authentication::Store::DBIx::Class
+* Judoon::DB::User::Schema
 ** General / Misc [/]
+*** DONE [#A] Get rid of J::DB::Users / J::W::Model::Users / tests
+CLOSED: [2012-03-28 Wed 14:10]
+*** DONE [#A] Convert DB::User to DBIC
+CLOSED: [2012-03-28 Wed 13:45]
 *** TODO [#A] DSColumn creation code should probably be moved into Dataset
 Right now, User creates DSColumns.  That seems weird. That should be
 DS's responsibility.  Also, DSColumns create their own shortname.  I
@@ -124,34 +151,42 @@ See Catalyst mailing list, "[Catalyst] Authentication in a Many Database Scenari
 PageColumns uses .title  (title seems more apropos for Columns)
 what about Page or Dataset?
 ** Result::User [0/1]
+*** DONE [#A] Fill out User class to make a proper user
+CLOSED: [2012-07-17 Tue 12:17]
+password, email, etc.
+DBIx::Class::PassphraseColumn
+Authen::Passphrase::BlowfishCrypt
+http://www.catalystframework.org/calendar/2011/15
+Catalyst::Authentication::Realm::SimpleDB
+Catalyst::Authentication::Store::DBIx::Class
 *** TODO [#B] create test xls to excercise import_data()               :test:
 specifically, add a data column w/o a name
 *** TODO [#A] move R::User::import_data into its own module
 * Judoon::Tmpl
-** DONE [#A] Fill out TemplateTranslator
+** TemplateTranslator [/]
+*** DONE [#A] Fill out TemplateTranslator
 CLOSED: [2012-05-15 Tue 16:14]
 - Create J::Tmpl::Widget class
 J::Tmpl::Widget::Text, J::Tmpl::Widget::Data, etc.
 Can convert from class to html or template?
+** Node [/]
 ** Dialect::WebWidgets [0/1]
 *** TODO [#B] move widget-format-target into its own hidden with name widget-link-null
 need to update WebWidgets.pm && library.tt
 ** Dialect::JQueryTemplate [0/1]
 *** TODO need to write a parser
-* judoon.js
-** TODO Move JS into object
 * Judoon::Spreadsheet::Importer
 ** TODO [#B] move code from J:DB::U::S::R::U::import_data() into here
-* Judoon user deployment
-** Look at Wordpress, drupal for quick deployment ideas
-* Judoon::SiteLinker [/]
+* Judoon::SiteLinker [0/4]
 ** TODO Needs a lot more maps
 ** TODO Can use Uniprot ID mapper to convert ids
 Then, the uniprot_acc to gene map could convert to gene_id, and use that mapping
-** Would this be easier to do in a database, or more simply represented as a schema?
 ** TODO Need order encoded in mapping
-* deployment
-** add deployment deps
+** TODO Would this be easier to do in a database, or more simply represented as a schema?
+* judoon.js
+** TODO Move JS into object
+* deployment [0/1]
+** TODO add deployment deps
 - [ ] Starman
 - [ ] Server::Starter
 - [ ] Net::Server::SS::PreFork
