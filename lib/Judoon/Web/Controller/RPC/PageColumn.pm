@@ -4,6 +4,8 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+with qw(Judoon::Web::Controller::Role::ExtractParams);
+
 
 use JSON qw(encode_json);
 use Judoon::SiteLinker;
@@ -29,8 +31,7 @@ sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
-    my %valid = map {my $o = $_; s/^page_column\.//; $_ => ($params->{$o} // '')}
-        grep {m/^page_column\./} keys %$params;
+    my %valid = $self->extract_params('page_column', $params);
     $valid{template} = q{};
     return $c->stash->{page}{object}->create_related('page_columns', \%valid);
 };
@@ -100,16 +101,15 @@ override munge_edit_params => sub {
     );
     $params->{'page_column.template'} = $template;
 
-    my %valid = map {my $o = $_; s/page_column\.//; $_ => $params->{$o}}
-        keys %$params;
+    my %valid = $self->extract_params('page_column', $params);
     return \%valid;;
 };
 
 after object_PUT => sub {
     my ($self, $c) = @_;
-    my @captures = @{$c->req->captures};
-    pop @captures;
-    $c->res->redirect($c->uri_for_action('/rpc/page/edit', \@captures));
+    my $captures = $c->req->captures;
+    pop @$captures;
+    $self->go_here($c, '/rpc/page/object', $captures);
 };
 
 override delete_object => sub {
