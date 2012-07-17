@@ -197,15 +197,12 @@ subtest 'Dataset' => sub {
     redirects_to_ok('/user/testuser/dataset','/user/testuser');
 
     # POST dataset/list
-    $mech->submit_form_ok(
-        {
-            form_name => 'add_dataset',
-            fields => {
-                dataset => ["t/etc/data/test1.xls"],
-            },
+    $mech->submit_form_ok({
+        form_name => 'add_dataset',
+        fields => {
+            dataset => ["t/etc/data/test1.xls"],
         },
-        'Can upload a dataset',
-    );
+    }, 'Can upload a dataset', );
 
     # GET dataset/object
     my @ds_links = $mech->find_all_links(
