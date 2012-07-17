@@ -1,5 +1,20 @@
 package Judoon::Web::Controller::RPC::DatasetColumn;
 
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::RPC::DatasetColumn - dataset column actions
+
+=head1 DESCRIPTION
+
+The RESTful controller for managing actions on one or more dataset
+columns.  Chains off of L</Judoon::Web::Controller::RPC::Dataset>.
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -17,14 +32,35 @@ __PACKAGE__->config(
     },
 );
 
+=head2 sitelinker / _build_sitelinker
+
+C<sitelinker> is a L</Judoon::SiteLinker> object.  This classes stores
+what we know about linking accessions to websites.
+
+=cut
+
 has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
 sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
+
+=head2 get_list
+
+returns the list of columns for the current dataset
+
+=cut
 
 override get_list => sub {
     my ($self, $c) = @_;
     return [$c->stash->{dataset}{object}->ds_columns];
 };
+
+
+=head2 list_GET (after)
+
+Do some postprocessing on the dataset data to get sample data and set
+up some convenience variables.
+
+=cut
 
 after list_GET => sub {
     my ($self, $c) = @_;
@@ -59,6 +95,12 @@ after list_GET => sub {
 };
 
 
+=head2 manage_list
+
+PUTing to ds_column/list lets us remove items from the collection.
+
+=cut
+
 override manage_list => sub {
     my ($self, $c) = @_;
 
@@ -81,11 +123,25 @@ override manage_list => sub {
 
 };
 
+
+=head2 get_object
+
+Get the column for the given id
+
+=cut
+
 override get_object => sub {
     my ($self, $c) = @_;
     return $c->stash->{dataset}{object}->ds_columns_rs
         ->find({id => $c->stash->{ds_column}{id}});
 };
+
+
+=head2 edit_object
+
+Update the dataset columns
+
+=cut
 
 override edit_object => sub {
     my ($self, $c, $params) = @_;
@@ -96,10 +152,24 @@ override edit_object => sub {
     return $c->stash->{ds_column}{object}->update(\%valid);
 };
 
+
+=head2 object_GET (after)
+
+Add accession types to stash.
+
+=cut
+
 after object_GET => sub {
     my ($self, $c) = @_;
     $c->stash->{accession_types} = $self->sitelinker->accession_groups;
 };
+
+
+=head2 object_PUT (after)
+
+Redirect to dataset columns
+
+=cut
 
 after object_PUT => sub {
     my ($self, $c) = @_;
