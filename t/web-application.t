@@ -245,15 +245,12 @@ subtest 'DatasetColumns' => sub {
 
     # create dataset
     $mech->get('/user/testuser');
-    $mech->submit_form_ok(
-        {
-            form_name => 'add_dataset',
-            fields => {
-                dataset => ["t/etc/data/test1.xls"],
-            },
+    $mech->submit_form_ok({
+        form_name => 'add_dataset',
+        fields => {
+            dataset => ["t/etc/data/test1.xls"],
         },
-        'Can upload a dataset',
-    );
+    }, 'Can upload a dataset', );
 
     # GET datasetcolumn/object
     my @ds_links = $mech->find_all_links(
@@ -261,6 +258,62 @@ subtest 'DatasetColumns' => sub {
     );
     ok @ds_links, 'found links to specific datasets';
     $mech->get_ok($ds_links[0], 'can get dataset column list page');
+};
+
+
+subtest 'Page' => sub {
+    login('testuser');
+    $mech->get('/user/testuser');
+
+    # POST page/list
+    $mech->submit_form_ok({
+        form_name => 'add_page_1',
+    }, 'add new page');
+    my $page_uri = $mech->uri;
+    like $page_uri, qr{/user/testuser/dataset/\d+/page/\d+},
+        q{got new page's edit page};
+
+    # GET page/object
+    $mech->get('/user/testuser');
+    $mech->get_ok($page_uri);
+
+    # PUT page/object
+    my %page_update = (
+        'page.title'     => 'This is a new page',
+        'page.preamble'  => 'Mumble, mumble, preamble',
+        'page.postamble' => 'Humble bumblebee postamble',
+    );
+    $mech->post_ok(
+        $mech->uri,
+        { %page_update, 'x-tunneled-method' => 'PUT', },
+        'can update page',
+    );
+    while (my ($k, $v) = each %page_update) {
+        my ($page_input) = $mech->grep_inputs({name => qr/^$k$/});
+        is $page_input->value, $v, "$k has been updated";
+    }
+
+};
+
+
+# These tests are a bit gratuitious and don't really fit anywhere
+# else.  It's mostly about trying to achieve 100% test coverage.
+subtest 'Complete Coverage' => sub {
+    login('testuser');
+    $mech->get('/user/testuser');
+
+    # test for error handling of ::Controller::Role::ExtractParams
+    my ($ds_link) = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+/?$}
+    );
+    $mech->get($ds_link);
+    $mech->post_ok(
+        $mech->uri,
+        { 'dataset.name' => 'boo', 'x-tunneled-method' => 'PUT', 'dataset.notes' => undef, },
+        'can update dataset w/ undef param',
+    );
+    my ($ds_input) = $mech->grep_inputs({name => qr/^dataset\.notes$/});
+    is $ds_input->value, q{}, "ExtractParams sets undef parameter to q{}";
 };
 
 
