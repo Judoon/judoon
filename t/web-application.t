@@ -327,6 +327,48 @@ subtest 'Page' => sub {
 };
 
 
+subtest 'PageColumn' => sub {
+    login('testuser');
+    $mech->get('/user/testuser');
+
+    my ($page_link) = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+/page/\d+$}
+    );
+    $mech->get($page_link);
+
+    # POST pagecolumn/list
+    $mech->submit_form_ok({
+        form_name => 'add_page_column_form',
+        fields => { 'page_column.title' => 'Chaang Column', },
+    }, 'can create new page column',);
+    my $pagecol_link = $mech->uri;
+    like $pagecol_link, qr{/user/testuser/dataset/\d+/page/\d+/column/\d+},
+        'was sent to column page';
+
+    # PUT pagecolumn/object
+    $mech->submit_form_ok({
+        form_name => 'pagecol_form',
+        fields => {
+            'page_column.title' => 'Chaang Column Update',
+        },
+    }, 'can update page column (simple)',);
+    like $mech->uri, qr{/user/testuser/dataset/\d+/page/\d+},
+        'was sent back to page edit page';
+    $mech->get($pagecol_link);
+    my ($pagecol_title) = $mech->grep_inputs({name => qr/^page_column.title$/});
+    is $pagecol_title->value, 'Chaang Column Update', 'field was updated';
+
+    # GET pagecolumn/object
+    $mech->get($page_link);
+    $mech->follow_link_ok({
+        url_regex => qr{/page/\d+/column/\d+},
+    }, 'can get all pagecolumn links');
+
+    # DELETE pagecolumn/object
+
+};
+
+
 # These tests are a bit gratuitious and don't really fit anywhere
 # else.  It's mostly about trying to achieve 100% test coverage.
 subtest 'Complete Coverage' => sub {

@@ -41,7 +41,7 @@
   </fieldset>
 </form>
 
-<form action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
+<form name="add_page_column_form" action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Table Layout</legend>
 
