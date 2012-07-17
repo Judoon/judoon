@@ -52,8 +52,8 @@
         <div class="row-fluid">
           <h4>Current columns</h4>
           <div class="well">
-            [% IF page_columns.size %]
-            [% FOREACH column IN page_columns %]
+            [% IF page_column.list.size %]
+            [% FOREACH column IN page_column.list %]
             <div class="column_container">
               <button class="btn btn-mini" [% loop.first ? 'disabled' : '' %]><i class="icon-arrow-left"></i></button>
               <span class="label">[% column.title | html %]</span>

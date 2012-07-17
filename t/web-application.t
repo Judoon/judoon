@@ -274,7 +274,11 @@ subtest 'Page' => sub {
     $mech->get('/user/testuser');
     $mech->get_ok($page_uri);
 
+    # GET page/object preview page
+    $mech->get_ok("$page_uri?view=preview");
+
     # PUT page/object
+    $mech->get($page_uri);
     my %page_update = (
         'page.title'     => 'This is a new page',
         'page.preamble'  => 'Mumble, mumble, preamble',

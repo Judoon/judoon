@@ -12,7 +12,7 @@
   <a class="close" data-dismiss="alert" href="#">×</a>
   <h4 class="alert-heading">Warning!</h4>
   This is just a preview. You need to publish it before others can see it.
-  <a href="[% c.uri_for_action('/rpc/page/edit', c.req.captures) %]">Go back and edit</a>.
+  <a href="[% c.uri_for_action('/rpc/page/object', c.req.captures) %]">Go back and edit</a>.
 </div>
 
 <br>

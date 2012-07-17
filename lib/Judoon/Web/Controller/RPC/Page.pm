@@ -82,10 +82,20 @@ page will need.
 
 after object_GET => sub {
     my ($self, $c) = @_;
-    $c->stash->{page_columns} = [$c->stash->{page}{object}->page_columns];
+
+    my @page_columns = $c->stash->{page}{object}->page_columns;
+    $c->stash->{page_columns} = \@page_columns;
+
+    my $view = $c->req->param('view') // '';
+    if ($view eq 'preview') {
+        $c->stash->{page_column}{templates}
+            = [map {$_->template_to_jquery} @page_columns];
+        $c->stash->{template} = 'page/preview.tt2';
+        $c->detach();
+    }
 
     my %used;
-    for my $page_col (@{$c->stash->{page_columns}}) {
+    for my $page_col (@page_columns) {
         for my $node (map {$_->decompose} $page_col->template_to_objects()) {
             next unless ($node->type eq 'variable');
             push @{$used{$node->name}}, $page_col->title;
@@ -123,16 +133,6 @@ override delete_object => sub {
     $c->stash->{page}{object}->delete;
 };
 
-
-sub preview : Chained('id') PathPart('preview') Args(0) {
-    my ($self, $c) = @_;
-
-    my $page_columns = [$c->stash->{page}{object}->page_columns];
-    $c->stash->{page_column}{list} = $page_columns;
-    $c->stash->{page_column}{templates}
-        = [map {$_->template_to_jquery} @$page_columns];
-    $c->stash->{template} = 'page/preview.tt2';
-}
 
 
 __PACKAGE__->meta->make_immutable;
