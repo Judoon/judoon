@@ -8,7 +8,7 @@ CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
 ** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
 ** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
-** Interface [4/7]
+** Interface [4/8]
 *** DONE [#B] lessen gray border, way to wide
 CLOSED: [2012-07-09 Mon 17:46]
 *** DONE [#A] make 'Get Started' not get :visited coloration
@@ -21,7 +21,8 @@ No formatting, no annotation, dead simple.
 *** TODO [#A] make front page fit without scrolling
 *** TODO [#A] Integrate color scheme with bootstrap
 *** TODO [#A] maybe center the page? the splash screen looks weirdly off-center
-** User [1/7]
+*** TODO [#A] pages should generally use components notification
+** User [1/9]
 *** DONE [#A] Need delete button for datasets
 CLOSED: [2012-07-17 Tue 11:29]
 *** TODO [#A] Don't try to upload w/o file
@@ -30,14 +31,20 @@ CLOSED: [2012-07-17 Tue 11:29]
 *** TODO [#A] update profile: make sure other email not in use?
 *** TODO [#A] settings/profile: don't allow user to unset email
 *** TODO [#A] what happens when logged in user goes to /login?
+*** TODO [#B] add how to contact field to model
+Whe user publicizes page, need a "Contact me by: .." blurb.
+** Page [/]
+*** TODO [#A] add a "how to cite" field to Pages / Datasets
 ** Dataset::edit [1/1]
 *** DONE [#A] Allow multiple pages per ds
 CLOSED: [2012-07-17 Tue 11:30]
 User may want to create multiple views of a complex dataset
+** DatasetColumn::list [0/1]
+*** TODO [#B] replace delete list with delete button?      :interface:eval:
 ** DatasetColumn::edit [/]
-*** TODO [#A] accession lost on re-annotation
+*** TODO [#A] accession lost on re-annotation                         :bug:
 I set column 1 to be a gene_symbol. Save, return to list, re-annotate: it's now a gene_id
-*** TODO [#A] virtual columns for mapped accessions
+*** TODO [#B] virtual columns for mapped accessions               :feature:
 some columns may need to be mapped to real accessions
 e.g. gene_symbols => gene_ids. For these during annotation, if user
 sets field as accession, create virtual column e.g.: {gene_symbol} =>
@@ -48,12 +55,15 @@ CLOSED: [2012-07-17 Tue 11:28]
 Catalyst::Plugin::Authorization::Roles - Role-based authorization
 Catalyst::Plugin::Authorization::ACL - ACL-based authorization
 *** TODO [#C] Allow alternative logins? (FB, OAuth, etc?)         :feature:
-*** TODO [#B] implement roles and acls
+*** TODO [#B] implement roles and acls                            :feature:
 admin privileges
-** RPC
-*** TODO update munge_*_params to do basic parameter unpacking
-my %good_p = map {s/$st//r => $p->{$_}} grep {m/$st/} keys %$p;
+** RPC [0/3]
+*** TODO [#A] update munge_*_params to do basic parameter unpacking
+can call ExtractParams::extract_params()
 RPC::*.pm will need to be updated.
+*** TODO [#B] update ::RPC::*.pm to return 'Unsupported' unsupported actions
+e.g. most don't support list_PUT.
+*** TODO [#A] finish pod-ing
 ** Tests [0/2]
 *** TODO web-application.t needs some refactoring [0/4]
 **** TODO probably should reset fixtures between subtests
@@ -83,53 +93,58 @@ HTML5 allows multiple forms
 wierd paths:
    Page/preview  => could be /?view=preview or accept-type?
    Dataset/postadd => not sure I'm still using this
-* Judoon::DB::User::Schema
+* Judoon::DB::User::Schema [/]
 ** DONE [#A] Convert DB::User to DBIC
 CLOSED: [2012-03-28 Wed 13:45]
 ** DONE [#A] Get rid of J::DB::Users / J::W::Model::Users / tests
 CLOSED: [2012-03-28 Wed 14:10]
-** TODO [#A] Fill out User class to make a proper user
+** DONE [#A] Fill out User class to make a proper user
+CLOSED: [2012-07-17 Tue 12:17]
 password, email, etc.
 DBIx::Class::PassphraseColumn
 Authen::Passphrase::BlowfishCrypt
 http://www.catalystframework.org/calendar/2011/15
 Catalyst::Authentication::Realm::SimpleDB
 Catalyst::Authentication::Store::DBIx::Class
-** TODO [#A] move R::User::import_data into its own module
-** TODO [#A] DSColumn creation code should probably be moved into Dataset
+** General / Misc [/]
+*** TODO [#A] DSColumn creation code should probably be moved into Dataset
 Right now, User creates DSColumns.  That seems weird. That should be
 DS's responsibility.  Also, DSColumns create their own shortname.  I
 think that that's Dataset's job, since we don't want DSColumns in a
 dataset to have identical shortnames.
-** TODO [#C] Later may need to create a wrapper class for code that doesn't live in any one result
+*** TODO [#C] Later may need to create a wrapper class for code that doesn't live in any one result
 See http://www.perlmonks.org/?node_id=915657 for how to wrap this with a model.
 E.G. create Judoon::DB::User that has => schema
-** TODO [#B] create per-user databases
+*** TODO [#B] create per-user databases
 When a user uploads a spreadsheet, create a new database and deploy to there.
 See Catalyst mailing list, "[Catalyst] Authentication in a Many Database Scenario (again)", May 15, 2012
-** TODO [#A] DatasetColumns needs an order field
-** TODO [#A] DatasetColumns.name should probably be called .title
+** Result::DatasetColumn [/]
+*** TODO [#A] DatasetColumns needs an order field
+*** TODO [#A] DatasetColumns.name should probably be called .title
 PageColumns uses .title  (title seems more apropos for Columns)
 what about Page or Dataset?
 ** Result::User [0/1]
 *** TODO [#B] create test xls to excercise import_data()               :test:
 specifically, add a data column w/o a name
+*** TODO [#A] move R::User::import_data into its own module
 * Judoon::Tmpl
 ** DONE [#A] Fill out TemplateTranslator
 CLOSED: [2012-05-15 Tue 16:14]
 - Create J::Tmpl::Widget class
 J::Tmpl::Widget::Text, J::Tmpl::Widget::Data, etc.
 Can convert from class to html or template?
-** TODO Tmpl::Translator::Dialect::WebWidgets
-*** move widget-format-target into its own hidden with name widget-link-null
+** Dialect::WebWidgets [0/1]
+*** TODO [#B] move widget-format-target into its own hidden with name widget-link-null
 need to update WebWidgets.pm && library.tt
+** Dialect::JQueryTemplate [0/1]
+*** TODO need to write a parser
 * judoon.js
 ** TODO Move JS into object
 * Judoon::Spreadsheet::Importer
 ** TODO [#B] move code from J:DB::U::S::R::U::import_data() into here
 * Judoon user deployment
 ** Look at Wordpress, drupal for quick deployment ideas
-* Judoon::SiteLinker
+* Judoon::SiteLinker [/]
 ** TODO Needs a lot more maps
 ** TODO Can use Uniprot ID mapper to convert ids
 Then, the uniprot_acc to gene map could convert to gene_id, and use that mapping
