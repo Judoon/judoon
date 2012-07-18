@@ -71,7 +71,6 @@ subtest 'Basic Tests' => sub {
         $mech->get_ok('/logout', 'can logout okay');
         redirects_to_ok('/settings/profile', '/login');
     };
-
 };
 
 
@@ -107,9 +106,15 @@ subtest 'User Tests' => sub {
             '  ...and send new user to their datasets';
     };
 
-    subtest 'Profile' => sub {
-        redirects_to_ok('/settings','/settings/profile');
+    subtest 'Settings' => sub {
+        $mech->get_ok('/settings', 'Got settings page');
+        $mech->links_ok(
+            [$mech->find_all_links(url_regex => qr{/settings/})],
+            'links are good',
+        );
+    };
 
+    subtest 'Profile' => sub {
         $mech->get_ok('/settings/profile', 'get user profile');
         $mech->post_ok(
             '/settings/profile',
@@ -178,8 +183,8 @@ subtest 'User Tests' => sub {
 
         login('testuser');
         $mech->get_ok('/user/testuser', 'can get own overview');
-        $mech->content_like(qr/Welcome, $users{testuser}{name}/i,
-            'welcome message for owner');
+        $mech->content_like(qr/id="dataset_upload_help"/i,
+            'can find upload dataset widget');
 
         $mech->get_ok('/user/newuser', 'can get others overview w/ login');
         $mech->content_like(qr/newuser's overview/i,

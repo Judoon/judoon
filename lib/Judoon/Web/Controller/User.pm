@@ -71,14 +71,13 @@ sub settings : Chained('/edit') PathPart('settings') CaptureArgs(0) {
 
 =head2 settings_view
 
-Action for /settings/.  Redirects to /user/profile.
+Action for /settings/.  Displays list of available setting pages.
 
 =cut
 
 sub settings_view : Chained('settings') PathPart('') Args(0) {
     my ($self, $c) = @_;
-    $self->go_here($c, '/user/profile');
-    $c->detach;
+    $c->stash->{template} = 'settings/view.tt2';
 }
 
 
