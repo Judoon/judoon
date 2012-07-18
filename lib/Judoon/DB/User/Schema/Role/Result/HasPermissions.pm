@@ -19,6 +19,7 @@ sub register_permissions {
     $class->might_have(
         permission => 'Judoon::DB::User::Schema::Result::Permission',
         {'foreign.obj_id' => 'self.id'},
+        { cascade_delete => 1, },
     );
 }
 

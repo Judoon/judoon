@@ -101,7 +101,7 @@ __PACKAGE__->has_many(
   "ds_columns",
   "Judoon::DB::User::Schema::Result::DatasetColumn",
   { "foreign.dataset_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+  { cascade_copy => 0, cascade_delete => 1 },
 );
 
 =head2 pages
@@ -116,7 +116,7 @@ __PACKAGE__->has_many(
   "pages",
   "Judoon::DB::User::Schema::Result::Page",
   { "foreign.dataset_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+  { cascade_copy => 0, cascade_delete => 1 },
 );
 
 =head2 user
