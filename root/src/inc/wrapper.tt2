@@ -68,9 +68,9 @@
           <li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>
           [% END %]
           <li class="nav-header">Things to see:</li>
-          <li><a href="[% c.uri_for_action('public_page_placeholder', {type=>'public'}) %]">Public Pages</a></li>
-          <li><a href="/static/html/news.html">News</a></li>
-          <li><a href="/static/html/about.html">About</a></li>
+          <li><a href="[% c.uri_for_action('placeholder') %]">Public Pages</a></li>
+          <li><a href="[% c.uri_for_action('placeholder') %]">News</a></li>
+          <li><a href="[% c.uri_for_action('placeholder') %]">About</a></li>
         </ul>
       </div>
       <div class="span10" id="content">
