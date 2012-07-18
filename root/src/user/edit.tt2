@@ -36,27 +36,32 @@
   <tbody>
     [% FOREACH dataset_obj IN dataset.list %]
     <tr>
-      <td>[% loop.count %]</td>
+      <td>[% loop.count %]<a name="dataset_[%- dataset_obj.id -%]"></td>
       <td>[% dataset_url = c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) %]
-        <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows<br>
-        [%- IF dataset_obj.notes -%]<strong>About this dataset:</strong> [%- dataset_obj.notes -%]<br>[%- END -%]
-        <strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
-        This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.<br>
-        <a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a><br>
-        <strong>Actions:</strong>
-        [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
-        [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) -%]
-        [% PROCESS action_form   label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
-        [% PROCESS action_form   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
-        <br>
-        [% IF dataset_obj.pages.size %]
-        <strong>Current Pages:</strong>
-        <ul>
-          [%- FOREACH page_obj IN dataset_obj.pages -%]
-          <li><a href="#page_[%- page_obj.id -%]">[%- page_obj.title -%]</a></li>
-          [%- END -%]
-        </ul>
-        [% END %]
+        <p>
+          <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows
+          <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#dataset_info_[% loop.count %]">Show more</button></span>
+        </p>
+        <section>
+          [% PROCESS action_button label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
+          [% PROCESS action_button label="Edit Data"         url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) -%]
+          [% PROCESS action_form   label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
+          [% PROCESS action_form   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
+        </section>
+        <section id="dataset_info_[% loop.count %]" class="collapse in">
+          [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
+          <p><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
+          <p>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
+          <p><a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a></p>
+          [% IF dataset_obj.pages.size %]
+          <h5>Current Pages:</h5>
+          <ul>
+            [%- FOREACH page_obj IN dataset_obj.pages -%]
+            <li><a href="#page_[%- page_obj.id -%]">[%- page_obj.title -%]</a></li>
+            [%- END -%]
+          </ul>
+          [% END %]
+        </section>
     </tr>
     [% END %]
   </tbody>
@@ -65,6 +70,7 @@
 <p>You haven't uploaded any datasets yet.</p>
 [% END %]
 
+<br>
 
 <h4>Pages</h4>
 [% IF page.list.size %]
@@ -72,18 +78,24 @@
   <tbody>
     [% FOREACH page_obj IN page.list %]
     <tr>
-      <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"</td>
+      <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
       <td>[% page_url = c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
-        <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows<br>
-        [%- IF page_obj.notes -%]<strong>About this page:</strong> [%- page_obj.notes -%]<br>[%- END -%]
-        <strong>Parent Dataset:</strong> [% page_obj.dataset.name %]<br>
-        <strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]<br>
-        This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.<br>
-        <a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a><br>
-        <strong>Actions:</strong>
-        [% PROCESS action_button label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
-        [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) -%]
-        [% PROCESS action_form   label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+        <p>
+          <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
+          <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_info_[% loop.count %]">Show more</button></span>
+        </p>
+        <section>
+          [% PROCESS action_button label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
+          [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) -%]
+          [% PROCESS action_form   label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+        </section>
+        <section id="page_info_[% loop.count %]" class="collapse in">
+          [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]
+          <p><strong>Parent Dataset:</strong> <a href="#dataset_[% page_obj.dataset.id %]">[% page_obj.dataset.name %]</a></p>
+          <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
+          <p>This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
+          <p><a href="[% page_url _ '?view=as_csv' %]">download raw</a>, <a href="[% page_url _ '?view=as_xls' %]">download Excel</a></p>
+        </section>
     </tr>
     [% END %]
   </tbody>
@@ -92,6 +104,11 @@
 <p>You haven't created any pages yet.</p>
 [% END %]
 
+<script>
+  $(document).ready(function () {
+      $(".collapse").collapse()
+  });
+</script>
 
 [%- END -%]
 [%# end owner_view %]
