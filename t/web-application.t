@@ -56,7 +56,7 @@ ok $mech, 'created test mech' or BAIL_OUT;
 subtest 'Basic Tests' => sub {
     $mech->get_ok('/', 'get frontpage');
     $mech->get_ok('/placeholder', 'get placeholder page');
-
+    $mech->get_ok('/api');
 
     subtest 'Login / Logout' => sub {
         redirects_to_ok('/settings/profile', '/login');
