@@ -2,13 +2,11 @@
   title = user.object.name || user.object.username
 %]
 
+[%- INCLUDE 'components/identification.tt2' -%]
+
 <h2>[% user.object.username %]'s overview</h2>
 
-[% IF user.is_owner %]
-<h3>Welcome, [% user.object.name || user.object.username %]!</h3>
-[% END %]
-<p>You <strong>[% user.is_owner ? 'are' : 'are not' %]</strong> the owner of this page.</p>
-
+<br>
 [% INCLUDE 'components/notification.tt2' %]
 
 [% IF !user.is_owner && !dataset.list.size && !dataset.page.size %]

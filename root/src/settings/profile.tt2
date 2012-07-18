@@ -2,7 +2,7 @@
   title = user.object.name
 %]
 
-<h3>Welcome, [% user.object.name || user.object.username %]!</h3>
+[%- INCLUDE 'components/identification.tt2' -%]
 
 [% INCLUDE 'components/notification.tt2' %]
 
