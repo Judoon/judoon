@@ -29,7 +29,7 @@
             [% FOREACH accgroup IN accession_types %]
             <optgroup label="[% accgroup.group_label %]">
               [% FOREACH acctype IN accgroup.types %]
-              <option value="[% acctype.name %]">[% acctype.label %]</option>
+              <option value="[% acctype.name %]" [% IF acctype.name == ds_column.object.accession_type %]selected[% END %]>[% acctype.label | html %]</option>
               [% END %]
             </optgroup>
             [% END %]
