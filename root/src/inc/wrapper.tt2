@@ -63,8 +63,9 @@
           <li><a href="[% c.uri_for_action('/login/login') %]">Login</a></li>
           <li><a href="[% c.uri_for_action('/user/signup') %]">Signup</a></li>
           [% ELSE %][% user_this = user.object || c.user %]
-          <li><a href="[% c.uri_for_action('/user/profile') %]">Your Profile</a></li>
-          <li><a href="[% c.uri_for_action('/rpc/dataset/list', [user_this.username]) %]">Your datasets</a></li>
+          <li><a href="[% c.uri_for_action('/user/edit', [user_this.username]) %]">Overview</a></li>
+          <li><a href="[% c.uri_for_action('/user/profile') %]">Profile</a></li>
+          <li><a href="[% c.uri_for_action('/user/settings_view') %]">Settings</a></li>
           <li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>
           [% END %]
           <li class="nav-header">Things to see:</li>
