@@ -24,5 +24,18 @@ sub register_permissions {
 }
 
 
+=head2 is_private
+
+Is this object a private or public?
+
+=cut
+
+sub is_private {
+    my ($self) = @_;
+    my $permission = $self->permission;
+    return (not(defined $permission) or $permission->permission eq 'private');
+}
+
+
 1;
 __END__
