@@ -45,7 +45,7 @@
           [% PROCESS action_form   label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
           [% PROCESS action_form   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
         </section>
-        <section id="dataset_info_[% loop.count %]" class="collapse in">
+        <section id="dataset_info_[% loop.count %]" class="collapse">
           [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
           <p><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
           <p>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
@@ -90,7 +90,7 @@
           [% PROCESS action_button label="Edit Page"   url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) -%]
           [% PROCESS action_form   label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
         </section>
-        <section id="page_info_[% loop.count %]" class="collapse in">
+        <section id="page_info_[% loop.count %]" class="collapse">
           [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]
           <p><strong>Parent Dataset:</strong> <a href="#dataset_[% page_obj.dataset.id %]">[% page_obj.dataset.name %]</a></p>
           <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
@@ -104,12 +104,6 @@
 [% ELSE %]
 <p>You haven't created any pages yet.</p>
 [% END %]
-
-<script>
-  $(document).ready(function () {
-      $(".collapse").collapse()
-  });
-</script>
 
 [%- END -%]
 [%# end owner_view %]
