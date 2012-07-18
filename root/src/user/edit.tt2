@@ -26,9 +26,6 @@
 
 [%- BLOCK owner_view -%]
 
-<div class="well">
-[%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
-</div>
 
 <h4>Datasets</h4>
 [%- IF dataset.list.size -%]
@@ -69,6 +66,10 @@
 [% ELSE %]
 <p>You haven't uploaded any datasets yet.</p>
 [% END %]
+
+<div class="row-fluid"><div class="span6"></div><div class="span6">
+[%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
+</div></div>
 
 <br>
 
