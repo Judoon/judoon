@@ -24,7 +24,7 @@
 
 [%- BLOCK owner_view -%]
 
-
+<section id="datasets">
 <h4>Datasets</h4>
 [%- IF dataset.list.size -%]
 <table class="table table-striped table-condensed dataset_list">
@@ -68,9 +68,10 @@
 <div class="row-fluid"><div class="span6"></div><div class="span6">
 [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
 </div></div>
+</section>
 
-<br>
 
+<section id="pages">
 <h4>Pages</h4>
 [% IF page.list.size %]
 <table class="table table-striped table-condensed page_list">
@@ -102,6 +103,7 @@
 [% ELSE %]
 <p>You haven't created any pages yet.</p>
 [% END %]
+</section>
 
 [%- END -%]
 [%# end owner_view %]
