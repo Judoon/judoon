@@ -28,8 +28,8 @@ sub required     : Chained('/') PathPart('') CaptureArgs(0) {
 
 
 sub login :Chained('not_required') :PathPart('login') :Args(0) ActionClass('REST') {
-    my ($self, $ctx) = @_;
-    $ctx->stash->{template} = 'login/login.tt2';
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'login/login.tt2';
 }
 
 sub login_GET {
