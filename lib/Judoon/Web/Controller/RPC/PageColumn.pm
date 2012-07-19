@@ -105,12 +105,6 @@ override munge_edit_params => sub {
     return \%valid;;
 };
 
-after object_PUT => sub {
-    my ($self, $c) = @_;
-    my $captures = $c->req->captures;
-    pop @$captures;
-    $self->go_here($c, '/rpc/page/object', $captures);
-};
 
 override delete_object => sub {
     my ($self, $c) = @_;
