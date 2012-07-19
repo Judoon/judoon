@@ -57,20 +57,41 @@ subtest 'Basic Tests' => sub {
     $mech->get_ok('/', 'get frontpage');
     $mech->get_ok('/placeholder', 'get placeholder page');
     $mech->get_ok('/api');
+};
 
-    subtest 'Login / Logout' => sub {
-        redirects_to_ok('/settings/profile', '/login');
 
-        $mech->get_ok('/login', 'get login page');
-        $mech->submit_form_ok({
-            form_number => 1,
-            fields => {username => 'testuser', password => 'testuser',},
-        }, 'submitted login okay');
+subtest 'Login / Logout' => sub {
+    redirects_to_ok('/settings/profile', '/login');
 
-        no_redirect_ok('/settings/profile', 'can get to profile after login');
-        $mech->get_ok('/logout', 'can logout okay');
-        redirects_to_ok('/settings/profile', '/login');
-    };
+    my %credentials = (username => 'testuser', password => 'testuser'),
+    $mech->get_ok('/login', 'get login page');
+
+    # bad login
+    $mech->submit_form_ok({
+        form_number => 1,
+        fields => {%credentials, password => 'badpass'},
+    }, 'submitted bad login okay');
+    $mech->content_like(
+        qr{Username or password is incorrect}i, 'denied login'
+    );
+    redirects_to_ok('/settings/profile', '/login');
+
+    # good login
+    $mech->submit_form_ok({
+        form_number => 1,
+        fields => \%credentials,
+    }, 'submitted login okay');
+    no_redirect_ok('/settings/profile', 'can get to profile after login');
+
+    # can't re-login
+    redirects_to_ok('/login', '/user/testuser');
+    $mech->post('/login', \%credentials,);
+    like $mech->uri, qr{/user/testuser$},
+        'posting to login redirects to overview';
+
+    # logout
+    $mech->get_ok('/logout', 'can logout okay');
+    redirects_to_ok('/settings/profile', '/login');
 };
 
 
