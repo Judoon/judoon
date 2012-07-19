@@ -24,7 +24,6 @@ requires 'Catalyst::Runtime' => '5.90013';
 requires 'Catalyst::View::Download';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::RoleApplicator';
-requires 'CatalystX::SimpleLogin';
 requires 'Config::General' => '2.51';
 requires 'Data::Printer';
 requires 'Data::Section::Simple';

@@ -19,7 +19,6 @@ use Catalyst::Runtime 5.80;
 use Catalyst qw/
     ConfigLoader
     Static::Simple
-    +CatalystX::SimpleLogin
     Authentication
     Authorization::Roles
     Session
@@ -84,9 +83,6 @@ __PACKAGE__->config(
     },
     'Plugin::Session' => {
         flash_to_stash => 1,
-    },
-    'Controller::Login' => {
-        traits => ['-RenderAsTTTemplate'],
     },
     'Plugin::Static::Simple' => { dirs => ['static',], },
 );
