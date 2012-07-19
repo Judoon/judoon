@@ -3,7 +3,7 @@
 #+TODO: TODO | DONE WONT
 
 * Judoon::Web
-** General / Misc [3/6]
+** General / Misc [3/8]
 *** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
@@ -27,6 +27,14 @@ Look at Wordpress, drupal for quick deployment ideas
 *** TODO [#A] unify webwidget templates
 Right now we have webwidget templates in ::Dialect::WebWidgets and in forms/*/library.tt
 Find some way so we don't have to edit in two places.
+*** TODO [#C] unify catalyst views for tables
+in Controller::RPC::Dataset, we have some sloppy code for permitting
+downloads of tabular data in different formats.  Perhaps this should
+be unified under one module, Judoon::Web::View::Tabular.  Store the 2d
+arrayref in stash->{tabular}{data}, the format in ->{tabular}{format},
+and create / dispatch based on that.
+Maybe we can do this already by patching C::V::Download?
+*** TODO [#B] Page edit can go back to dataset, but not overview
 ** Interface [4/9]
 *** DONE [#B] lessen gray border, way to wide
 CLOSED: [2012-07-09 Mon 17:46]
