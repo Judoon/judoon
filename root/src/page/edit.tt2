@@ -72,8 +72,12 @@
                 [% column.template_to_jquery %]
               </div>
               <div>
-                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])) %]"><i class="icon-plus"></i>Edit</a>
-                <a class="btn btn-mini" href="[% c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])) %]"><i class="icon-trash"></i>Delete</a>
+                [%- INCLUDE 'components/action_button.tt2' label='<i class="icon-plus"></i> Edit' url=c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])) -%]
+                [%- INCLUDE 'components/forms/action_form.tt2'
+                      label='<i class="icon-trash"></i> Delete',
+                      url=c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])),
+                      method="DELETE", form_name="delete_page_column_" _ loop.count
+                -%]
               </div>
               <div class="clearsep"></div>
             </div>
