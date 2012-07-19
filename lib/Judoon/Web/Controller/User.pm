@@ -4,6 +4,10 @@ package Judoon::Web::Controller::User;
 
 =encoding utf8
 
+=head1 NAME
+
+Judoon::Web::Controller::User - user-centric actions (signup, settings, etc.)
+
 =cut
 
 use Moose;
