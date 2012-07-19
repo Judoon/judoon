@@ -1,0 +1,9 @@
+[%- WRAPPER inc/wrapper.tt2
+  title = page.object.title
+-%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+
+[%- INCLUDE 'components/page/display.tt2' -%]
+
+[%- END -%]

@@ -69,6 +69,10 @@ Display a particular table
 
 sub view : Chained('id') PathPart('') Args(0) {
     my ($self, $c) = @_;
+    my @page_columns = $c->stash->{page}{object}->page_columns;
+    $c->stash->{page_column}{list} = \@page_columns;
+    $c->stash->{page_column}{templates}
+        = [map {$_->template_to_jquery} @page_columns];
     $c->stash->{template} = 'public_page/view.tt2';
 }
 
