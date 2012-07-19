@@ -32,7 +32,14 @@ sub login :Chained('not_required') :PathPart('login') :Args(0) ActionClass('REST
     $ctx->stash->{template} = 'login/login.tt2';
 }
 
-sub login_GET {}
+sub login_GET {
+    my ($self, $c) = @_;
+
+    if ($c->user) {
+        $self->go_here($c, '/user/edit', [$c->user->username]);
+        $c->detach;
+    }
+}
 
 sub login_POST {
     my ($self, $c) = @_;
