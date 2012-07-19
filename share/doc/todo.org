@@ -3,7 +3,7 @@
 #+TODO: TODO | DONE WONT
 
 * Judoon::Web
-** General / Misc [3/8]
+** General / Misc [3/11]
 *** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
@@ -35,6 +35,11 @@ arrayref in stash->{tabular}{data}, the format in ->{tabular}{format},
 and create / dispatch based on that.
 Maybe we can do this already by patching C::V::Download?
 *** TODO [#B] Page edit can go back to dataset, but not overview
+*** TODO [#A] Signup, on bad password, get the module name, too.
+*** TODO [#B] Add hierarchicahl nav at the top of edit pages
+From Page Column, it would be nice to get to:
+<Overview> <Dataset> <Dataset Columns> <Page>
+*** TODO [#A] Delete a dataset column, does not remove that data from the data array
 ** Interface [4/9]
 *** DONE [#B] lessen gray border, way to wide
 CLOSED: [2012-07-09 Mon 17:46]
