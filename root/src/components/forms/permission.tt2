@@ -1,0 +1,26 @@
+    <div class="control-group">
+      <label class="control-label" for="[% prefix %]_permission">Public</label>
+      <div class="controls">
+        <select name="[% prefix %].permission" id="[% prefix %]_permission">
+          <option value="public"   [% IF current_permission == 'public'   %]selected[% END %]>Yes.</option>
+          <option value="password" [% IF current_permission == 'password' %]selected[% END %]>Yes, but password-protect.</option>
+          <option value="private"  [% IF current_permission == 'private'  %]selected[% END %]>No</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="permission_password" class="control-group" style="display: none;">
+      <label class="control-label" for="[% prefix %].permission.password">Password</label>
+      <div class="controls">
+        <input type="text" name="[% prefix %].permission.password" id="[% prefix %].permission.password" value="[% permission_password %]">
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+        $('#[% prefix %]_permission').on('change', function() {
+          var permission_val = $('#[% prefix %]_permission option:selected').val();
+      $("#permission_password").css("display", (permission_val === 'password' ? "block" : "none"));
+        });
+      });
+    </script>
