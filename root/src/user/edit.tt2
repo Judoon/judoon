@@ -39,7 +39,6 @@
         </p>
         <section>
           [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
-          [% INCLUDE 'components/action_button.tt2' label="Edit Data"         url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) -%]
           [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
           [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
         </section>
@@ -86,7 +85,6 @@
         </p>
         <section>
           [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
-          [% INCLUDE 'components/action_button.tt2'     label="Edit Page"   url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) -%]
           [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
         </section>
         <section id="page_info_[% loop.count %]" class="collapse">
@@ -94,7 +92,7 @@
           <p><strong>Parent Dataset:</strong> <a href="#dataset_[% page_obj.dataset.id %]">[% page_obj.dataset.name %]</a></p>
           <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
           <p>This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
-          <p><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
+          <p style="display:none;"><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
         </section>
     </tr>
     [% END %]
@@ -143,7 +141,7 @@
       <td>[% page_url = c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
         <p><a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows</p>
         [%- IF 0 -%]<p><strong>About this page:</strong> [%- page_obj.preamble -%]</p>[%- END -%]
-        <p><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
+        <p style="display: none;"><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
     </tr>
     [% END %]
   </tbody>

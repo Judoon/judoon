@@ -42,7 +42,6 @@
 
     <div class="btn-group">
       <a href="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures) %]" class="btn"><i class="icon-pencil"></i> Annotate Columns</a>
-      <a href="[% c.uri_for_action('/rpc/dataset/object', c.req.captures) %]" class="btn"><i class="icon-th"></i> Edit Data</a>
       [% IF dataset.object.has_page %]
       <a href="[% c.uri_for_action('/rpc/page/object', c.req.captures.merge([dataset.object.page.id])) %]" class="btn"><i class="icon-pencil"></i> Edit Page</a>
       [% ELSE %]
