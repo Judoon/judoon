@@ -10,6 +10,7 @@ use Moo;
 use feature ':5.10';
 extends 'DBIx::Class::ResultSet';
 
+use Judoon::Error;
 
 use constant MIN_PASSWORD_LENGTH => 8;
 
@@ -45,7 +46,7 @@ sub create_user {
         $errmsg = q{Password is not valid!  Must be more than eight characters long.};
     }
 
-    die $errmsg if ($errmsg);
+    Judoon::Error->throw($errmsg) if ($errmsg);
 
     $valid{active} //= 1;
 

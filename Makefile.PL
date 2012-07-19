@@ -54,6 +54,7 @@ requires 'namespace::autoclean';
 requires 'Pod::Usage';
 requires 'Spreadsheet::Read';
 requires 'Spreadsheet::WriteExcel';
+requires 'Throwable::Error';
 requires 'Try::Tiny';
 
 test_requires 'indirect';

@@ -33,16 +33,17 @@ sub signup_POST {
     my %user_params = $self->extract_params('user', $params);
 
     if ($user_params{password} ne $user_params{confirm_password}) {
-        $c->stash->{error} = 'Passwords do not match!';
+        $c->stash->{alert}{error} = 'Passwords do not match!';
         $c->detach;
     }
 
     my $user;
-    eval {
+    try {
         $user = $c->model('User::User')->create_user(\%user_params);
-    };
-    if ($@) {
-        $c->stash->{error} = $@;
+    }
+    catch {
+        my $e = $_;
+        $self->handle_error($c, $e);
         $c->detach;
     };
 

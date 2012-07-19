@@ -2,13 +2,7 @@
   title = 'Signup'
 %]
 
-[% IF error %]
-<div class="alert alert-error">
-  <button class="close" data-dismiss="alert">×</button>
-  <strong>Error!</strong> [% error %]
-</div>
-[% END %]
-
+[%- INCLUDE 'components/notification.tt2' -%]
 
 <form action="[% c.uri_for_action('/user/signup') %]" method="post" class="form-vertical">
 

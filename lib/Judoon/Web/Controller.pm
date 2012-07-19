@@ -23,6 +23,7 @@ use namespace::autoclean;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
+use Judoon::Error;
 
 =head2 B<C<go_here($c, $action, \@captures?, \%query?)>>
 
@@ -66,6 +67,19 @@ sub go_relative {
     $self->go_here($c, $action, @args);
 }
 
+
+sub handle_error :Private {
+    my ($self, $c, $error) = @_;
+    if (not ref $error) {
+        Judoon::Error->throw({message => $error, recoverable => 0});
+    }
+    elsif (not $error->recoverable) {
+        $error->throw;
+    }
+    else {
+        $c->stash->{alert}{error} = $error->message;
+    }
+}
 
 __PACKAGE__->meta->make_immutable;
 
