@@ -41,7 +41,7 @@ sub required : Chained('/') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
     if (!$c->user) {
         my $message = 'You need to login to view this page!';
-        $c->controller('Login')->login_redirect($c, $message);
+        $self->login_redirect($c, $message);
         $c->detach;
     }
 }
@@ -53,10 +53,18 @@ Action for logging in. GET requests show the login page, POST requests
 attempt a login. Dispatches to C<L</login_GET>> for GETs,
 C<L</login_POST>> for POSTs.
 
+If an already logged-in user hits this action again, they are sent to
+their overview.
+
+
 =cut
 
 sub login :Chained('not_required') :PathPart('login') :Args(0) ActionClass('REST') {
     my ($self, $c) = @_;
+    if ($c->user) {
+        $self->go_here($c, '/user/edit', [$c->user->username]);
+        $c->detach;
+    }
     $c->stash->{template} = 'login/login.tt2';
 }
 
@@ -79,18 +87,11 @@ sub logout : Chained('/') PathPart('logout') Args(0) {
 
 =head3 C<B<login_GET>>
 
-If an already loged-in user hits this page again, they are sent to
-their overview.
+Placeholder method. C<L</login>> does all the necessary work.
 
 =cut
 
-sub login_GET {
-    my ($self, $c) = @_;
-    if ($c->user) {
-        $self->go_here($c, '/user/edit', [$c->user->username]);
-        $c->detach;
-    }
-}
+sub login_GET {}
 
 
 =head3 C<B<login_POST>>
