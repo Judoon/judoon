@@ -15,8 +15,11 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
 
+=head1 DESCRIPTION
 
-=head2 C<B<not_required>>
+=head2 Actions
+
+=head3 C<B<not_required>>
 
 C<not_required> is a no-op chaining point for actions that do not
 require a login.
@@ -26,7 +29,7 @@ require a login.
 sub not_required : Chained('/') PathPart('') CaptureArgs(0) {}
 
 
-=head2 C<B<required>>
+=head3 C<B<required>>
 
 C<required> is a chaining point for actions that require a user to be
 logged in.  If they are not, they will be sent to the login page, and
@@ -44,10 +47,11 @@ sub required : Chained('/') PathPart('') CaptureArgs(0) {
 }
 
 
-=head2 login
+=head3 C<B<login>>
 
 Action for logging in. GET requests show the login page, POST requests
-attempt a login.
+attempt a login. Dispatches to C<L</login_GET>> for GETs,
+C<L</login_POST>> for POSTs.
 
 =cut
 
@@ -57,7 +61,23 @@ sub login :Chained('not_required') :PathPart('login') :Args(0) ActionClass('REST
 }
 
 
-=head2 login_GET
+=head3 C<B<logout>>
+
+Action for logging out users.  Returns to index.
+
+=cut
+
+sub logout : Chained('/') PathPart('logout') Args(0) {
+    my ($self, $c) = @_;
+    $c->logout;
+    $c->delete_session;
+    $c->res->redirect($c->uri_for('/'));
+}
+
+
+=head2 Other methods
+
+=head3 C<B<login_GET>>
 
 If an already loged-in user hits this page again, they are sent to
 their overview.
@@ -73,7 +93,7 @@ sub login_GET {
 }
 
 
-=head2 login_POST
+=head3 C<B<login_POST>>
 
 Attepts to login the user with the supplied credentials.  If
 successful, redirects to the user's overview or the previously
@@ -86,7 +106,7 @@ sub login_POST {
 
     my $p = $c->req->parameters;
     if ( $c->authenticate({username => $p->{username}, password => $p->{password}}) ) {
-        $self->do_post_login_redirect($c);
+        $c->res->redirect($self->redirect_after_login_uri($c));
         $c->extend_session_expires(999999999999)
             if $p->{remember};
     }
@@ -96,13 +116,7 @@ sub login_POST {
 }
 
 
-sub do_post_login_redirect {
-    my ($self, $c) = @_;
-    $c->res->redirect($self->redirect_after_login_uri($c));
-}
-
-
-=head2 login_redirect
+=head3 B<C<login_redirect>>
 
 C<login_redirect> saves the requested url and redirects to the login
 page.
@@ -118,33 +132,18 @@ sub login_redirect {
 }
 
 
-=head2 redirect_after_login_uri
+=head3 C<B<redirect_after_login_uri>>
 
-returns the saved url if user was attempting to get to a protected
+Returns the saved url if user was attempting to get to a protected
 page. Otherwise, sends user to their overview.
 
 =cut
 
 sub redirect_after_login_uri {
     my ($self, $c) = @_;
-
     return $c->session->{redirect_to_after_login}
         ? delete $c->session->{redirect_to_after_login}
         : $c->uri_for_action('/user/edit', [$c->user->username]);
-}
-
-
-=head2 logout
-
-Action for logging out users.  Returns to index.
-
-=cut
-
-sub logout : Chained('/') PathPart('logout') Args(0) {
-    my ($self, $c) = @_;
-    $c->logout;
-    $c->delete_session;
-    $c->res->redirect($c->uri_for('/'));
 }
 
 
