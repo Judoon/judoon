@@ -36,20 +36,23 @@
   </fieldset>
 </form>
 
-<form>
-  <fieldset>
-    <legend>Actions</legend>
+<section id="actions">
+  <h4>Actions</h4>
+  [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
+  [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
+  [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
 
-    <div class="btn-group">
-      <a href="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures) %]" class="btn"><i class="icon-pencil"></i> Annotate Columns</a>
-      [% IF dataset.object.has_page %]
-      <a href="[% c.uri_for_action('/rpc/page/object', c.req.captures.merge([dataset.object.page.id])) %]" class="btn"><i class="icon-pencil"></i> Edit Page</a>
-      [% ELSE %]
-      <a href="[% c.uri_for_action('/rpc/page/', c.req.captures) %]" class="btn"><i class="icon-plus"></i> Create Page</a>
-      [% END %]
-    </div>
 
-  </fieldset>
-</form>
+  <h4>Pages</h4>
+  <ul>
+    [%- FOREACH page IN dataset.object.pages -%]
+    <li>
+      <a href="[%- c.uri_for_action('/rpc/page/object', [c.user.username, dataset.id, page.id]) -%]">[%- page.title -%]</a>
+      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.id, page.id], {view => 'preview'}) -%]
+      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.id, page.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+    </li>
+    [%- END -%]
+  </ul>
+</section>
 
 [% END %]
