@@ -16,10 +16,9 @@ Register the permissions relationship with the composing class.
 
 sub register_permissions {
     my ($class) = @_;
-    $class->might_have(
-        permission => 'Judoon::DB::User::Schema::Result::Permission',
-        {'foreign.obj_id' => 'self.id'},
-        { cascade_delete => 1, },
+    $class->add_columns(
+        "permission",
+        { data_type => "text", is_nullable => 0, default_value => 'private', },
     );
 }
 
@@ -32,8 +31,7 @@ Is this object a private or public?
 
 sub is_private {
     my ($self) = @_;
-    my $permission = $self->permission;
-    return (not(defined $permission) or $permission->permission eq 'private');
+    return $self->permission eq 'private';
 }
 
 
