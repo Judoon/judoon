@@ -2,6 +2,9 @@
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
+[%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
+
 <ul class="nav nav-pills">
   <li class="active"><a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
 </ul>

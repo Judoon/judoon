@@ -2,9 +2,8 @@
   title = user.object.name
 %]
 
+[%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
-
-[% INCLUDE 'components/notification.tt2' %]
 
 <form method="post" action="[% c.uri_for_action('/user/profile') %]" class="form-vertical">
   <fieldset>

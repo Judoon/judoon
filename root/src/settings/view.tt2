@@ -2,9 +2,8 @@
   title = user.object.name
 -%]
 
-[%- INCLUDE 'components/identification.tt2' -%]
-
 [%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
 
 <section>
   <h3>What would you like to update?</h3>

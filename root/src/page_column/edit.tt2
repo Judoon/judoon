@@ -2,6 +2,9 @@
   title = "Add column to page for &quot;$dataset.object.name&quot;"
 %]
 
+[%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
+
 <form id="pagecol_form" name="pagecol_form" action="[% c.uri_for_action('/rpc/pagecolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Page Column</legend>
