@@ -143,6 +143,7 @@ __PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
 
 use DateTime;
 use Judoon::Tmpl::Factory;
+use Spreadsheet::WriteExcel ();
 
 with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
@@ -213,6 +214,57 @@ sub nbr_rows {
     return scalar @$data;
 }
 
+
+=head2 data_table
+
+Returns an arrayref of arrayref of the dataset's data with the header
+columns.
+
+=cut
+
+sub data_table {
+    my ($self) = @_;
+    return [[map {$_->name} $self->ds_columns], @{$self->data}];
+}
+
+
+=head2 as_raw
+
+Return data as a tab-delimited file
+
+=cut
+
+sub as_raw {
+    my ($self) = @_;
+
+    my $raw_file = q{};
+    for my $row (@{$self->data_table}) {
+        $raw_file .= join "\t", @$row;
+        $raw_file .= "\n";
+    }
+
+    return $raw_file;
+}
+
+
+=head2 as_excel
+
+Return data as an Excel spreadsheet
+
+=cut
+
+sub as_excel {
+    my ($self) = @_;
+
+    my $output;
+    open my $fh, '>', \$output;
+    my $workbook = Spreadsheet::WriteExcel->new($fh);
+    $workbook->compatibility_mode();
+    my $worksheet = $workbook->add_worksheet();
+    $worksheet->write_col('A1', $self->data_table);
+    $workbook->close();
+    return $output;
+}
 
 
 __PACKAGE__->meta->make_immutable;

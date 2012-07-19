@@ -47,7 +47,7 @@
           [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
           <p><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
           <p>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
-          <p><a href="[% dataset_url _ '?view=as_csv' %]">download raw</a>, <a href="[% dataset_url _ '?view=as_xls' %]">download Excel</a></p>
+          <p><strong>Download:</strong> <a href="[% dataset_url _ '?view=raw' %]">raw</a>, <a href="[% dataset_url _ '?view=csv' %]">csv</a>, <a href="[% dataset_url _ '?view=xls' %]">Excel</a></p>
           [% IF dataset_obj.pages.size %]
           <h5>Current Pages:</h5>
           <ul>
