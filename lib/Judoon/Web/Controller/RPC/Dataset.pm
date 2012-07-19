@@ -98,6 +98,7 @@ override edit_object => sub {
     return $c->stash->{dataset}{object}->update({
         name  => ($params->{'dataset.name'}  // ''),
         notes => ($params->{'dataset.notes'} // ''),
+        permission => ($params->{'dataset.permission'} // ''),
     });
 };
 

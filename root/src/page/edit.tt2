@@ -35,6 +35,8 @@
       </div>
     </div>
 
+    [%- INCLUDE 'components/forms/permission.tt2' prefix="page" current_permission=page.object.permission -%]
+
     <input type="hidden" name="x-tunneled-method" value="PUT">
     
     [% INCLUDE 'components/forms/form_submit.tt'
