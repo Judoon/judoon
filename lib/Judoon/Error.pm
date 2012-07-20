@@ -6,7 +6,7 @@ extends 'Throwable::Error';
 
 has 'recoverable' => (is => 'ro', isa => 'Bool', default => 1);
 
-__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 
 1;
 __END__
