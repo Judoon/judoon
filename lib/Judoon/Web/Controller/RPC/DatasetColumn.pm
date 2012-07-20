@@ -114,7 +114,7 @@ override manage_list => sub {
 
     for my $id (@del_ids) {
         $c->log->warn("Deleting column $id");
-        $c->stash->{dataset}{object}->ds_columns_rs->find({id => $id})->delete;
+        $c->stash->{dataset}{object}->ds_columns_rs->find({id => $id})->delete_column;
     }
 
     if (@del_ids) {

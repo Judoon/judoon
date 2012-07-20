@@ -184,6 +184,22 @@ sub linkset {
 }
 
 
+=head2 C<B<delete_column>>
+
+C<delete_column> deletes not just the DatasetColumn itself (which
+actually represents the column header), but the actual column of data
+in the Dataset.
+
+You should probably call this instead of C<delete>, or else your data
+and data headers will be out of sync.
+
+=cut
+
+sub delete_column {
+    my ($self) = @_;
+    $self->dataset->delete_data_columns($self->sort);
+    return $self->delete;
+}
 
 
 
