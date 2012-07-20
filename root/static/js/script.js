@@ -218,7 +218,8 @@ function pbuild_update_url_preview() {
             preview_url = $('#link_widget_url_static').val();
             break;
         case 'variable_simple':
-            preview_url = sample_data[$('#link_url_source').val()];
+            preview_url = url_prefixes[$('#link_url_source').val()]
+                        + sample_data[$('#link_url_source').val()];
             break;
         case 'variable_complex':
             var var_sample = sample_data[$('#constructed_url_source').val()];
@@ -357,6 +358,7 @@ function pbuild_submit_link_form() {
     }
     else if (url_type === 'variable_simple') {
         url_attrs.type = 'variable';
+        url_attrs['text-segment-1']     = url_prefixes[$('#link_url_source').val()];
         url_attrs['variable-segment-1'] = $('#link_url_source').val();
     }
     else if (url_type === 'variable_complex') {

@@ -250,4 +250,5 @@
   var sitelinker_accs  = [% sitelinker_accs %];
   var column_acctype   = [% column_acctype %];
   var sample_data      = [% sample_data %];
+  var url_prefixes     = [% url_prefixes %];
 </script>

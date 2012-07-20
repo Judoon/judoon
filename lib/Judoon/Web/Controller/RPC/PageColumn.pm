@@ -63,9 +63,13 @@ after object_GET => sub {
     $c->stash->{sitelinker_sites} = encode_json( $self->sitelinker->sites );
     $c->stash->{sitelinker_accs}  = encode_json( $self->sitelinker->accessions );
 
+    $c->stash->{url_prefixes} = encode_json({
+        map {$_->shortname => $_->url_root} @{$c->stash->{url_columns}}
+    });
+
     # copied & pasted from DataSetColumn
     # need to factor this out.
-    my $rows = $c->stash->{dataset}{object}{rows};
+    my $rows = $c->stash->{dataset}{object}->data;
     my @sample_data;
     for my $idx (0..$#ds_columns) {
       ROW_SEARCH:
