@@ -31,7 +31,7 @@ requires 'DateTime';
 requires 'DBI';
 requires 'DBIx::Class';
 requires 'DBIx::Class::InflateColumn::Serializer';
-requires 'DBIX::Class::Migration';
+requires 'DBIx::Class::Migration';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'DBIx::Class::Schema::Loader';
 requires 'DBIx::RunSQL';
@@ -52,7 +52,9 @@ requires 'MooseX::Storage';
 requires 'namespace::autoclean';
 requires 'Pod::Usage';
 requires 'Spreadsheet::Read';
+requires 'Spreadsheet::ParseExcel';
 requires 'Spreadsheet::WriteExcel';
+requires 'Spreadsheet::XLSX';
 requires 'Throwable::Error';
 requires 'Try::Tiny';
 
