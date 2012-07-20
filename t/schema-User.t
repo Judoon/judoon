@@ -111,6 +111,29 @@ subtest 'Result::Dataset' => sub {
     is $dataset->nbr_columns, 3, 'nbr_columns is three';
     is $dataset->nbr_rows, 5, 'nbr_rows is five';
 
+    # mutating methods, create new dataset
+    my $user = ResultSet('User')->first;
+    open my $TEST_XLS, '<', 't/etc/data/test1.xls'
+        or die "Can't open test spreadsheet: $!";
+    my $mutable_ds = $user->import_data($TEST_XLS);
+    close $TEST_XLS;
+
+    my @delete_failures = (
+        [[1,2,'boo'], qr{positive integer}i, 'string', ],
+        [[1,2,undef], qr{positive integer}i, 'undef',  ],
+        [[1,0,2],     qr{1-indexed}i,        'zero',   ],
+        [[100,2,3],   qr{larger than the number of columns}i, 'too big', ],
+    );
+    for my $del_failure (@delete_failures) {
+        my ($cols, $error, $descr) = @$del_failure;
+        like exception { $mutable_ds->delete_data_columns(@$cols); },
+            $error, $descr;
+    }
+
+    $mutable_ds->delete_data_columns(3,1);
+    is $mutable_ds->nbr_rows, 5, 'still five rows';
+    is $mutable_ds->nbr_columns, 1, 'now just 1 row';
+    is_deeply $mutable_ds->data, [[14],[2],[8],[5],[1]], 'Data is as expected';
 };
 
 subtest 'Result::DatasetColumn' => sub {
