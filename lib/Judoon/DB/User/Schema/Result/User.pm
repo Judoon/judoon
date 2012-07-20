@@ -221,12 +221,12 @@ sub import_data {
     my $ds   = $ref->[1];
     my $data = $self->pivot_data($ds->{cell}, $ds->{maxrow}, $ds->{maxcol});
 
+    my $headers = shift @$data;
     my $dataset = $self->create_related('datasets', {
         name => $ds->{label}, original => q{},
         data => $data, notes => q{},
     });
 
-    my $headers = shift @$data;
     my $sort = 1;
     for my $header (@$headers) {
         $dataset->create_related('ds_columns', {

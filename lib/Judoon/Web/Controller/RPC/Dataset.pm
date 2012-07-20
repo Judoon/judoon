@@ -81,9 +81,9 @@ Unpack the dataset's headers and rows into the stash.
 
 after private_id => sub {
     my ($self, $c) = @_;
-    my $ds_data = $c->stash->{dataset}{object}->data();
-    $c->stash->{dataset}{object}{headers} = shift @$ds_data;
-    $c->stash->{dataset}{object}{rows}    = $ds_data;
+    my $dataset = $c->stash->{dataset}{object};
+    $c->stash->{dataset}{object}{headers} = [map {$_->name} $dataset->ds_columns];
+    $c->stash->{dataset}{object}{rows}    = $dataset->data;
 };
 
 

@@ -109,7 +109,7 @@ subtest 'Result::Dataset' => sub {
     ok $dataset->create_basic_page(), 'create_basic_page() works';
 
     is $dataset->nbr_columns, 3, 'nbr_columns is three';
-    is $dataset->nbr_rows, 6, 'nbr_rows is six';
+    is $dataset->nbr_rows, 5, 'nbr_rows is five';
 
 };
 
@@ -156,7 +156,7 @@ subtest 'Result::Page' => sub {
     my $page = ResultSet('Page')->first;
 
     is $page->nbr_columns, 3, '::nbr_columns is correct';
-    is $page->nbr_rows, 6,    '::nbr_pages is correct';
+    is $page->nbr_rows, 5,    '::nbr_rows is correct';
 };
 
 
