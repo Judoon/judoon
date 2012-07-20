@@ -231,13 +231,12 @@ subtest 'Dataset' => sub {
             dataset => ["t/etc/data/test1.xls"],
         },
     }, 'Can upload a dataset', );
+    like $mech->uri, qr{/user/testuser/dataset/\d+},
+        'taken to new datasets edit page';
 
     # GET dataset/object
-    my @ds_links = $mech->find_all_links(
-        url_regex => qr{/user/testuser/dataset/\d+$}
-    );
-    ok @ds_links, 'found links to specific datasets';
-    $mech->get_ok($ds_links[0], 'can get dataset page');
+    $mech->get('/user/testuser');
+    $mech->get_ok('/user/testuser/dataset/1', 'can get dataset page');
 
     # PUT dataset/object
     my %ds_update = (
@@ -249,6 +248,8 @@ subtest 'Dataset' => sub {
         { %ds_update, 'x-tunneled-method' => 'PUT', },
         'can update dataset',
     );
+    # diag "_----------__";
+    #diag $mech->content;
     while (my ($k, $v) = each %ds_update) {
         my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
         is $ds_input->value, $v, "$k has been updated";
@@ -404,10 +405,7 @@ subtest 'Complete Coverage' => sub {
     $mech->get('/user/testuser');
 
     # test for error handling of ::Controller::Role::ExtractParams
-    my ($ds_link) = $mech->find_all_links(
-        url_regex => qr{/user/testuser/dataset/\d+/?$}
-    );
-    $mech->get($ds_link);
+    $mech->get('/user/testuser/dataset/1');
     $mech->post_ok(
         $mech->uri,
         { 'dataset.name' => 'boo', 'x-tunneled-method' => 'PUT', 'dataset.notes' => undef, },
@@ -424,6 +422,7 @@ done_testing();
 
 sub login {
     my ($user) = @_;
+    $mech->get('/logout');
     $mech->get('/login');
     $mech->submit_form(
         form_number => 1,
