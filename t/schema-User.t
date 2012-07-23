@@ -12,6 +12,7 @@ use Test::Fatal;
 
 use Data::Printer;
 use Judoon::Tmpl::Factory ();
+use Spreadsheet::Read;
 
 
 fixtures_ok [
@@ -133,7 +134,25 @@ subtest 'Result::Dataset' => sub {
     $mutable_ds->delete_data_columns(3,1);
     is $mutable_ds->nbr_rows, 5, 'still five rows';
     is $mutable_ds->nbr_columns, 1, 'now just 1 row';
-    is_deeply $mutable_ds->data, [[14],[2],[8],[5],[1]], 'Data is as expected';
+    is_deeply $mutable_ds->data, [[14],[2],[8],[5],[1]],
+        'Data is as expected';
+
+
+    is_deeply $mutable_ds->data_table, [["Name", "Age", "Gender"], [14],[2],[8],[5],[1]],
+        'Data table is as expected';
+
+    is $mutable_ds->as_raw, "Name\tAge\tGender\n14\n2\n8\n5\n1\n", 'Got as Raw';
+
+    ok my $excel = $mutable_ds->as_excel, 'can get excel object';
+    open my $XLS, '<', \$excel;
+    ok my $xls_data  = Spreadsheet::Read::ReadData($XLS, parser => 'xls'),
+        'is a readable xls';
+    close $XLS;
+    is $xls_data->[1]{A1}, 'Name', 'Check header value';
+    is $xls_data->[1]{C1}, 'Gender', 'Check header value';
+    is $xls_data->[1]{A2}, 14, 'Check data value';
+    is $xls_data->[1]{A6}, 1, 'Check data value';
+    is $xls_data->[1]{C3}, undef, 'Check for undef value';
 };
 
 subtest 'Result::DatasetColumn' => sub {
@@ -172,6 +191,24 @@ subtest 'Result::DatasetColumn' => sub {
     is $ds_col4->shortname, '_____', 'shortname defaulted correctly';
     ok $ds_col4->linkset, 'can get linkset for url';
 
+    # mutating methods, create new dataset
+    my $user = ResultSet('User')->first;
+    open my $TEST_XLS, '<', 't/etc/data/test1.xls'
+        or die "Can't open test spreadsheet: $!";
+    my $mutable_ds = $user->import_data($TEST_XLS);
+    close $TEST_XLS;
+
+    my @ds_cols = $mutable_ds->ds_columns;
+    $ds_cols[0]->delete_column;
+    $mutable_ds->discard_changes;
+    is_deeply $mutable_ds->data_table,
+        [["Age", "Gender"], [14, 'female',],[2, 'female'],[8, 'male'],[5, 'male'],[1, 'female']],
+            'Data table is as expected';
+
+    $ds_cols[2]->delete_column;
+    $mutable_ds->discard_changes;
+    is_deeply $mutable_ds->data_table, [map {[$_]} qw(Age 14 2 8 5 1)],
+        'Data table is as expected';
 };
 
 
