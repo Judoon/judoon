@@ -4,44 +4,44 @@
 
 [%- INCLUDE 'components/notification.tt2' -%]
 
-<form action="[% c.uri_for_action('/user/signup') %]" method="post" class="form-vertical">
+<form name="signup_form" id="signup_form" action="[% c.uri_for_action('/user/signup') %]" method="post" class="form-vertical">
 
   <label>
     Username<span class="required">*</span>
-    <input type="text" class="span3" name="user.username">
+    <input type="text" form="signup_form" class="span3" name="user.username">
   </label>
 
   <label>
     Password<span class="required">*</span>
-    <input type="password" class="span3" name="user.password">
+    <input type="password" form="signup_form" class="span3" name="user.password">
   </label>
 
   <label>
     Confirm Password<span class="required">*</span>
-    <input type="password" class="span3" name="user.confirm_password">
+    <input type="password" form="signup_form" class="span3" name="user.confirm_password">
   </label>
 
   <label>
     Email<span class="required">*</span>
-    <input type="text" class="span3" name="user.email_address">
+    <input type="text" form="signup_form" class="span3" name="user.email_address">
   </label>
 
   <label>
     Name<span class="required">*</span>
-    <input type="text" class="span3" name="user.name">
+    <input type="text" form="signup_form" class="span3" name="user.name">
   </label>
 
   <label>
     Phone Number
-    <input type="text" class="span3" name="user.phone_number">
+    <input type="text" form="signup_form" class="span3" name="user.phone_number">
   </label>
 
   <label>
     Mailing Address
-    <input type="text" class="span3" name="user.mail_address">
+    <input type="text" form="signup_form" class="span3" name="user.mail_address">
   </label>
 
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" form="signup_form" class="btn btn-primary">Submit</button>
 </form>
 
 

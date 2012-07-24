@@ -10,34 +10,34 @@
 </ul>
 
 
-<form action="[% c.uri_for_action('/rpc/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
+<form name="page_edit" id="page_edit" action="[% c.uri_for_action('/rpc/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
   <fieldset>
     <legend>Page Layout</legend>
 
     <div class="control-group">
       <label class="control-label" for="page.title">Title: </label>
       <div class="controls">
-        <input type="text" name="page.title" id="page.title" value="[% page.object.title %]" />
+        <input type="text" form="page_edit" name="page.title" id="page.title" value="[% page.object.title %]" />
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.preamble">Preamble: </label>
       <div class="controls">
-        <textarea class="tinymce" name="page.preamble">[% page.object.preamble %]</textarea>
+        <textarea form="page_edit" class="tinymce" name="page.preamble">[% page.object.preamble %]</textarea>
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.postamble">Postamble:</label>
       <div class="controls">
-        <textarea class="tinymce" name="page.postamble">[% page.object.postamble %]</textarea>
+        <textarea form="page_edit" class="tinymce" name="page.postamble">[% page.object.postamble %]</textarea>
       </div>
     </div>
 
     [%- INCLUDE 'components/forms/permission.tt2' prefix="page" current_permission=page.object.permission -%]
 
-    <input type="hidden" name="x-tunneled-method" value="PUT">
+    <input type="hidden" form="page_edit" name="x-tunneled-method" value="PUT">
     
     [% INCLUDE 'components/forms/form_submit.tt'
        submit_type = 'update'
@@ -48,13 +48,13 @@
   </fieldset>
 </form>
 
-<form name="add_page_column_form" action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
+<form name="add_page_column_form" id="add_page_column_form" action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Table Layout</legend>
 
     <div class="control-group">
       <input type="text" name="page_column.title" class="" placeholder="Column title..." />
-      <button type="submit" class="btn"><i class="icon-plus"></i>Add page column</button>
+      <button type="submit" class="btn" form="add_page_column_form"><i class="icon-plus"></i>Add page column</button>
     </div>
 
 

@@ -5,27 +5,27 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form action="[% c.uri_for_action('/rpc/dataset/object', c.req.captures) %]" method="post" accept-charset="utf-8" class="form-horizontal">
+<form name="dataset_edit" id="dataset_edit" action="[% c.uri_for_action('/rpc/dataset/object', c.req.captures) %]" method="post" accept-charset="utf-8" class="form-horizontal">
   <fieldset>
     <legend>Dataset Properties</legend>
 
     <div class="control-group">
       <label class="control-label" for="dataset.name">Name</label>
       <div class="controls">
-        <input id="dataset.name" class="span3" name="dataset.name" type="text" value="[% dataset.object.name %]" />
+        <input id="dataset.name" class="span3" name="dataset.name" form="dataset_edit" type="text" value="[% dataset.object.name %]" />
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="dataset.notes">Notes</label>
       <div class="controls">
-        <textarea class="tinymce" style="width: 34em;" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
+        <textarea class="tinymce" style="width: 34em;" form="dataset_edit" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
       </div>
     </div>
 
     [%- INCLUDE 'components/forms/permission.tt2' prefix="dataset" current_permission=dataset.object.permission -%]
 
-    <input type="hidden" name="x-tunneled-method" value="PUT">
+    <input type="hidden" name="x-tunneled-method" value="PUT" form="dataset_edit">
 
     [% INCLUDE 'components/forms/form_submit.tt'
        submit_type = 'update'
