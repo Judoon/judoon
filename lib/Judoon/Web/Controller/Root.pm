@@ -2,7 +2,7 @@ package Judoon::Web::Controller::Root;
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Catalyst::Controller::ActionRole' }
+BEGIN { extends 'Judoon::Web::Controller' }
 
 
 use Data::Printer;
