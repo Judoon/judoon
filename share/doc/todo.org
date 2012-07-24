@@ -3,7 +3,7 @@
 #+TODO: TODO | DONE WONT
 
 * Judoon::Web
-** General / Misc [5/17]
+** General / Misc [7/22]
 *** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
@@ -23,6 +23,10 @@ Supports:
 CLOSED: [2012-07-19 Thu 14:51]
 *** DONE [#A] Signup, on bad password, get the module name, too.
 CLOSED: [2012-07-19 Thu 16:16]
+*** DONE [#A] Delete a dataset column, does not remove that data from the data array
+CLOSED: [2012-07-20 Fri 07:49]
+*** DONE [#A] PageColumn does not support link prefix?
+CLOSED: [2012-07-23 Mon 20:01]
 *** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
 *** TODO [#A] quick deployment
 user downloads tarball or zip
@@ -37,18 +41,22 @@ be unified under one module, Judoon::Web::View::Tabular.  Store the 2d
 arrayref in stash->{tabular}{data}, the format in ->{tabular}{format},
 and create / dispatch based on that.
 Maybe we can do this already by patching C::V::Download?
-*** TODO [#B] Page edit can go back to dataset, but not overview
-*** TODO [#B] Add hierarchicahl nav at the top of edit pages
+*** TODO [#B] Add hierarchical nav at the top of edit pages
 From Page Column, it would be nice to get to:
 <Overview> <Dataset> <Dataset Columns> <Page>
-*** TODO [#A] Delete a dataset column, does not remove that data from the data array
 *** TODO [#A] Add raw/csv/dataset downloads for page (maybe create RPC::Role::TabularView)
 *** TODO [#A] permissions: protect visitors from edit pages
 *** TODO [#B] switch to passing only Hashrefs to templates
 Need to go through and audit controllers / templates figure out where
 we can simplify
-*** TODO [#A] What happens when a logged-in user hits /signup?
-*** TODO [#A] PageColumn does not support link prefix?
+*** TODO [#B] Gene wiki for sitelinker
+*** TODO [#A] Can we use google docs to process our spreadsheets?
+*** TODO [#A] need ordered relationships (Dataset => DatasetColumn, Page => PageColumn)
+*** TODO [#A] need timestamps for Pages / Datasets  
+*** TODO [#A] Signup page always shows not-logged-in sidebar because user.is_owner is never set
+I guess we need to do the user check in the base controller?
+*** TODO [#B] Page::edit: add option for advanced (i.e. TinyMCE) {pre,post}amble editor
+*** TODO [#B] Seem to have encoding errors with troublesome.xls
 ** Interface [5/9]
 *** DONE [#B] lessen gray border, way to wide
 CLOSED: [2012-07-09 Mon 17:46]
@@ -75,7 +83,7 @@ CLOSED: [2012-07-17 Tue 11:29]
 *** TODO [#A] settings/profile: don't allow user to unset email
 *** TODO [#B] add how to contact field to model
 Whe user publicizes page, need a "Contact me by: .." blurb.
-** Page [0/2]
+** Page::edit [0/4]
 *** TODO [#A] add a "how to cite" field to Pages / Datasets
 *** TODO [#A] New layout idea
 GET page/object has page form, button "Edit columns", underneath is
@@ -88,6 +96,9 @@ blurb about where title / preamble / postamble / attribution go (w/ example)
 
 The "Edit Columns" button goes to GET pagecolumns/list
 
+*** TODO [#B] Page edit can go back to dataset, but not overview
+*** TODO [#A] Add column submit button submits to wrong form
+I think I need to add form ids to submit butons
 ** Dataset::edit [1/2]
 *** DONE [#A] Allow multiple pages per ds
 CLOSED: [2012-07-17 Tue 11:30]
@@ -118,6 +129,8 @@ CLOSED: [2012-07-19 Thu 18:53]
 *** TODO [#C] Allow alternative logins? (FB, OAuth, etc?)           :feature:
 *** TODO [#B] implement roles and acls                            :feature:
 admin privileges
+*** TODO [#A] What happens when a logged-in user hits /signup?
+
 ** RPC [0/4]
 *** TODO [#A] update munge_*_params to do basic parameter unpacking
 can call ExtractParams::extract_params()
