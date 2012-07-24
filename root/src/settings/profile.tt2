@@ -29,8 +29,9 @@
       <input type="text" form="profile_form" class="span3" name="user.mail_address" value="[% user.object.mail_address %]">
     </label>
 
-    [% INCLUDE 'components/forms/form_submit.tt'
-         submit_type = 'update'
+    [% INCLUDE 'components/forms/form_submit.tt2'
+       submit_type = 'update'
+       form_name   = 'profile_form'
     %]
   </fieldset>
 </form>

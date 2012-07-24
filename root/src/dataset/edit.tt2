@@ -27,11 +27,12 @@
 
     <input type="hidden" name="x-tunneled-method" value="PUT" form="dataset_edit">
 
-    [% INCLUDE 'components/forms/form_submit.tt'
+    [% INCLUDE 'components/forms/form_submit.tt2'
        submit_type = 'update'
        allow_reset = 1
-       return_url = c.uri_for_action('/user/edit', [user.object.username])
+       return_url  = c.uri_for_action('/user/edit', [user.object.username])
        return_page = 'overview'
+       form_name   = 'dataset_edit'
     %]
   </fieldset>
 </form>

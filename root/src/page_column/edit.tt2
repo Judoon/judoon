@@ -12,7 +12,7 @@
     <div class="control-group">
       <label class="control-label" for="page_column.title">Column Title:</label>
       <div class="controls">
-        <input type="text" class="" name="page_column.title" id="page_column.title" value="[% page_column.object.title %]" />
+        <input type="text" form="pagecol_form" class="" name="page_column.title" id="page_column.title" value="[% page_column.object.title %]" />
         <p class="help-block">This will be the header for the column</p>
       </div>
     </div>
@@ -25,7 +25,7 @@
           [% page_column.object.webwidgets %]
           <div id="canvas_cursor"></div>
         </div>
-        <input type="hidden" name="page_column.template" />
+        <input type="hidden" form="pagecol_form" name="page_column.template" />
 
         <p class="help-block">Add formatting with the buttons or <a href="#">preview</a>.</p>
 
@@ -82,12 +82,13 @@
       </div>
     </div>
 
-    <input type="hidden" name="x-tunneled-method" value="PUT">
+    <input type="hidden" form="pagecol_form" name="x-tunneled-method" value="PUT">
     
-    [% INCLUDE 'components/forms/form_submit.tt'
+    [% INCLUDE 'components/forms/form_submit.tt2'
        submit_type = 'update'
        return_url  = c.uri_for_action('/rpc/page/object', c.req.captures.slice(0,-2))
        return_page = 'page'
+       form_name   = 'pagecol_form'
     %]
 
   </fieldset>

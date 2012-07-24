@@ -1,0 +1,5 @@
+    <div class="form-actions">
+      <button type="submit" form="[%- form_name -%]" class="btn btn-primary">[% submit_type == 'submit' ? 'Submit' : submit_type == 'update' ? 'Update' : '' %]</button>
+      [% IF allow_reset %]<button type="reset" form="[%- form_name -%]" class="btn">Reset</button>[% END %]
+      [% IF return_url %]<a class="btn" href="[% return_url %]"><i class="icon arrow-right"></i>Return to [% return_page %]</a>[% END %]
+    </div>
