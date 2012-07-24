@@ -37,6 +37,11 @@ my %users = (
         username => 'testuser', password => 'testuser',
         name => 'Test User', email_address => 'testuser@example.com',
     },
+    newuser => {
+        username => 'newuser', password => 'newuserisme',
+        name => 'New User', email_address => 'newuser@example.com',
+    },
+
 );
 fixtures_ok( sub {
     my ($schema) = @_;
@@ -96,11 +101,9 @@ subtest 'Login / Logout' => sub {
 
 
 subtest 'User Tests' => sub {
-    my %newuser = (
-        'user.username' => 'newuser', 'user.password' => 'newuserisme',
-        'user.email_address' => 'newuser@example.com',
-        'user.name' => 'New User',
-    );
+    my $newuser_canon = $users{newuser};
+    my %newuser = map {; "user.$_" => $newuser_canon->{$_}}
+        keys %$newuser_canon;
 
     subtest 'Signup' => sub {
         $mech->get_ok('/signup', 'got signup page');
@@ -112,7 +115,7 @@ subtest 'User Tests' => sub {
             q{can't create user w/o matching passwords},
         );
 
-        $newuser{'user.confirm_password'} = 'newuserisme';
+        $newuser{'user.confirm_password'} = $newuser{'user.password'};
         $newuser{'user.username'}         = 'testuser';
         $mech->post_ok('/signup', \%newuser);
         $mech->content_like(
@@ -192,7 +195,7 @@ subtest 'User Tests' => sub {
             'able to update password',
         );
         $mech->content_like(qr/Your password has been updated/, 'can update password');
-        $newuser{'user.password'} = 'newuserisstillme';
+        $newuser_canon->{password} = 'newuserisstillme';
     };
 
 
@@ -242,14 +245,13 @@ subtest 'Dataset' => sub {
     my %ds_update = (
         'dataset.name'  => 'Brand New Name',
         'dataset.notes' => 'These are some notes',
+        'dataset.permission' => 'public',
     );
     $mech->post_ok(
         $mech->uri,
         { %ds_update, 'x-tunneled-method' => 'PUT', },
         'can update dataset',
     );
-    # diag "_----------__";
-    #diag $mech->content;
     while (my ($k, $v) = each %ds_update) {
         my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
         is $ds_input->value, $v, "$k has been updated";
@@ -398,6 +400,27 @@ subtest 'PageColumn' => sub {
 };
 
 
+subtest 'Permissions' => sub {
+    login('testuser');
+    $mech->get_ok('/user/testuser/dataset/1');
+    $mech->post_ok('/user/testuser/dataset/1', {
+        'dataset.permission' => 'public',
+        'x-tunneled-method'  => 'PUT',
+    });
+    logout();
+    $mech->get_ok('/user/testuser', q{logged-out user can visit testuser's overview});
+    my ($ds_link) = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+}
+    );
+    my $ds_id = ($ds_link->url =~ m{/dataset/(\d+)});
+    redirects_to_ok("/user/testuser/dataset/$ds_id", "/login");
+
+    login('newuser');
+    redirects_to_ok("/user/testuser/dataset/$ds_id", "/user/newuser");
+
+};
+
+
 # These tests are a bit gratuitious and don't really fit anywhere
 # else.  It's mostly about trying to achieve 100% test coverage.
 subtest 'Complete Coverage' => sub {
@@ -416,13 +439,14 @@ subtest 'Complete Coverage' => sub {
 };
 
 
-unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE);
 done_testing();
+
+END { unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE); }
 
 
 sub login {
     my ($user) = @_;
-    $mech->get('/logout');
+    logout();
     $mech->get('/login');
     $mech->submit_form(
         form_number => 1,
@@ -431,6 +455,10 @@ sub login {
             password => $users{$user}->{password},
         },
     );
+}
+
+sub logout {
+    $mech->get('/logout');
 }
 
 sub redirects_ok {

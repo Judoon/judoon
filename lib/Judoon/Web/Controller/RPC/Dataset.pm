@@ -23,7 +23,7 @@ use Data::Printer;
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/user/id', PathPart => 'dataset', },
+        base => { Chained => '/user/logged_in', PathPart => 'dataset', },
     },
     rpc => {
         template_dir => 'dataset',

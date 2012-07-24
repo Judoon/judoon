@@ -69,7 +69,13 @@ denied action. should probably return 501
 
 sub denied :Chained('') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
-    $c->stash->{template} = 'denied.tt2';
+    if ($c->user_exists) {
+        $c->flash->{alert}{error} = q{You don't have permission to see that page};
+        $self->go_here($c, '/user/edit', [$c->user->username]);
+    }
+    else {
+        $c->stash->{template} = 'denied.tt2';
+    }
 }
 
 
@@ -96,14 +102,6 @@ sub get_started :Local {
     my ($self, $c) = @_;
     $c->stash->{template} = 'intro.tt2';
 }
-
-=head2 edit
-
-edit action. everything that chains off this requires login.
-
-=cut
-
-sub edit : Chained('/login/required') PathPart('') CaptureArgs(0) {}
 
 
 =head2 end

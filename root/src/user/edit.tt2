@@ -138,7 +138,7 @@
     [% FOREACH page_obj IN page.list %]
     <tr>
       <td>[% loop.count %]</td>
-      <td>[% page_url = c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
+      <td>[% page_url = c.uri_for_action('/page/view', [page_obj.id]) %]
         <p><a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows</p>
         [%- IF 0 -%]<p><strong>About this page:</strong> [%- page_obj.preamble -%]</p>[%- END -%]
         <p style="display: none;"><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>

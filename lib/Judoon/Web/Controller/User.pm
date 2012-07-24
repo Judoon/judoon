@@ -68,7 +68,7 @@ This is the base for all the /settings/* pages
 
 =cut
 
-sub settings : Chained('/edit') PathPart('settings') CaptureArgs(0) {
+sub settings : Chained('/login/required') PathPart('settings') CaptureArgs(0) {
     my ($self, $c) = @_;
     $c->stash->{user}{object} = $c->user;
 }
@@ -194,6 +194,15 @@ sub edit : Chained('id') PathPart('') Args(0) {
     }
 }
 
+
+sub logged_in : Chained('id') PathPart('') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    $c->forward('/login/required');
+
+    if (not $c->stash->{user}{is_owner}) {
+        $c->detach('/denied');
+    }
+}
 
 
 __PACKAGE__->meta->make_immutable;
