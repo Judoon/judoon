@@ -1,0 +1,51 @@
+[% WRAPPER inc/wrapper.tt2
+  title = 'Welcome'
+%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+
+<section>
+  <h2>Getting started</h2>
+  <p>
+    To get started with Judoon, you'll need to first 
+    <a href="[% c.uri_for_action('/user/signup') %]">create
+    an account</a>.  It's quick, and once you're done you'll
+    be taken to your [% IF c.user_exists %]<a href="[% c.uri_for_action('/user/edit/', [c.user.username]) %]">overview page</a>[% ELSE %]overview page[% END %].
+  </p>
+
+  [% IF !c.user_exists %]
+  <p>(Already signed-up?  Then <a href="[% c.uri_for_action('/login/login') %]">log in</a>.)</p>
+  [% END %]
+
+  <p>
+    The overview page allows you to see and manage
+    your <strong>datasets</strong>
+    and <strong>pages</strong>. A <strong>dataset</strong> represents
+    the data in your spreadsheet.  Once uploaded, you can annotate
+    your dataset. For instance, if one of your columns
+    contains <a href="http://www.ncbi.nlm.nih.gov/pubmed/">PubMed</a>
+    IDs, you can mark it as such.  This will allow you quickly and
+    conveniently make links to your publication's PubMed entry when
+    you build your page.
+  </p>
+
+  <p>
+    A <strong>page</strong> is simply a webpage that displays your
+    data in a searchable, pageable format.  When you upload a dataset,
+    we'll automatically create a new page for you that looks just like
+    your Excel spreadsheet.  If you want to customize it, for example
+    to group some of the column data together or to add links to other
+    websites, you can do that too.
+  </p>
+
+  <p>
+    Does that sound interesting?  If so, then please 
+    <a href="[% c.uri_for_action('/user/signup') %]">sign up</a>
+    to get started!  Or check out what other users have done
+    on the <a href="[% c.uri_for_action('/page/list') %]">public page</a> list.
+  </p>
+  
+</section>
+
+
+[% END %]
