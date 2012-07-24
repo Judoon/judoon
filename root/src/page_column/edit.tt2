@@ -96,7 +96,7 @@
 
 
 <div class="">
-  [% INCLUDE 'components/forms/library.tt' %]
+  [% INCLUDE 'components/forms/library.tt2' %]
 </div>
 
 <script>
