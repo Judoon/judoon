@@ -55,7 +55,6 @@ we can simplify
 *** TODO [#A] need timestamps for Pages / Datasets  
 *** TODO [#A] Signup page always shows not-logged-in sidebar because user.is_owner is never set
 I guess we need to do the user check in the base controller?
-*** TODO [#B] Page::edit: add option for advanced (i.e. TinyMCE) {pre,post}amble editor
 *** TODO [#B] Seem to have encoding errors with troublesome.xls
 ** Interface [5/9]
 *** DONE [#B] lessen gray border, way to wide
@@ -99,6 +98,8 @@ The "Edit Columns" button goes to GET pagecolumns/list
 *** TODO [#B] Page edit can go back to dataset, but not overview
 *** TODO [#A] Add column submit button submits to wrong form
 I think I need to add form ids to submit butons
+*** TODO [#B] Page::edit: add option for advanced (i.e. TinyMCE) {pre,post}amble editor
+
 ** Dataset::edit [1/2]
 *** DONE [#A] Allow multiple pages per ds
 CLOSED: [2012-07-17 Tue 11:30]
