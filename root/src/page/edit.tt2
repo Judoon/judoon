@@ -2,6 +2,9 @@
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
+[%- WRAPPER 'components/breadcrumbs.tt2' -%]
+[%- INCLUDE 'components/breadcrumbs/page.tt2' -%]
+[%- END -%]
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 

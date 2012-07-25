@@ -2,6 +2,9 @@
   title = "View columns in &quot;$dataset.object.name&quot;"
 %]
 
+[%- WRAPPER 'components/breadcrumbs.tt2' -%]
+[%- INCLUDE 'components/breadcrumbs/dataset_columns.tt2' -%]
+[%- END -%]
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 

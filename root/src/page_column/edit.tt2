@@ -2,6 +2,9 @@
   title = "Add column to page for &quot;$dataset.object.name&quot;"
 %]
 
+[%- WRAPPER 'components/breadcrumbs.tt2' -%]
+[%- INCLUDE 'components/breadcrumbs/page_column.tt2' -%]
+[%- END -%]
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 

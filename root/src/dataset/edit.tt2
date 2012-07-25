@@ -2,6 +2,9 @@
   title = "View the &quot;$dataset.object.name&quot; Dataset"
 %]
 
+[%- WRAPPER 'components/breadcrumbs.tt2' -%]
+[%- INCLUDE 'components/breadcrumbs/dataset.tt2' -%]
+[%- END -%]
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 

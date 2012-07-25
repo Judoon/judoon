@@ -2,6 +2,9 @@
   title = user.object.name || user.object.username
 %]
 
+[%- WRAPPER 'components/breadcrumbs.tt2' -%]
+[%- INCLUDE 'components/breadcrumbs/overview.tt2' -%]
+[%- END -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
 <h2>[% user.object.username %]'s overview</h2>

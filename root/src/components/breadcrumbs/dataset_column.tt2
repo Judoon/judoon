@@ -1,0 +1,2 @@
+[% INCLUDE 'components/breadcrumbs/dataset_columns.tt2' divider=1 active=1 %]
+<li>[% UNLESS active %]Column: [% ds_column.object.name %][% ELSE %]<a href="[% c.uri_for_action('/rpc/datasetcolumn/object', [user.id, dataset.id, ds_column.id]) %]">Column: [% ds_column.object.name %]</a>[% IF divider %] <span class="divider">/</span>[% END %][% END %]</li>
