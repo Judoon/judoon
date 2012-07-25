@@ -176,6 +176,32 @@ Me: I like github model, but I'm not smart, so put user ids under /user
 /user/felliott/page/1 => edit page
 
 
+Access Control:
+  Visitor:
+    /settings   => login
+    /user/$user => visitor view
+    /user/$user/dataset/$ds => view if public?
+    /user/$user/dataset/$ds/page/$page => view if public
+    /page/$page_id
+
+    I think:
+    Eventually:
+    /user/$user
+    /dataset/$ds_id
+    /dataset/$ds_id/column/$col_id
+    /page/$page_id
+    /page/$page_id/column/$page_id
+    Postpone as part of API work.
+
+    For now:
+    Don't allow visitor to see anything below /user/edit_GET.
+    Public Datasets go to /dataset/
+    Public Pages got to /page/
+
+  Owner:
+    /settings => /settings
+    
+
 
 * existing data
 ** Genetic Approaches
