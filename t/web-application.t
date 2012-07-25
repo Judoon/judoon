@@ -41,11 +41,18 @@ my %users = (
         username => 'newuser', password => 'newuserisme',
         name => 'New User', email_address => 'newuser@example.com',
     },
-
+);
+my %spreadsheets = (
+    basic       => 't/etc/data/test1.xls',
+    troublesome => 't/etc/data/test1.xls',
 );
 fixtures_ok( sub {
     my ($schema) = @_;
-    $schema->resultset('User')->create_user($users{testuser});
+    my $user = $schema->resultset('User')->create_user($users{testuser});
+    open my $TEST_XLS, '<', $spreadsheets{basic};
+    my $dataset = $user->import_data($TEST_XLS);
+    close $TEST_XLS;
+    $dataset->create_basic_page;
 } );
 
 
@@ -198,26 +205,26 @@ subtest 'User Tests' => sub {
         $newuser_canon->{password} = 'newuserisstillme';
     };
 
+};
 
-    subtest 'User Overview' => sub {
-        $mech->get('/logout');
-        $mech->get_ok('/user/newuser', 'can get others overview w/o login');
-        $mech->content_like(qr/newuser's overview/i,
-            'got welcome message for visitor w/o login');
 
-        login('testuser');
-        $mech->get_ok('/user/testuser', 'can get own overview');
-        $mech->content_like(qr/id="dataset_upload_help"/i,
-            'can find upload dataset widget');
+subtest 'User Overview' => sub {
+    $mech->get('/logout');
+    $mech->get_ok('/user/newuser', 'can get others overview w/o login');
+    $mech->content_like(qr/newuser's overview/i,
+        'got welcome message for visitor w/o login');
 
-        $mech->get_ok('/user/newuser', 'can get others overview w/ login');
-        $mech->content_like(qr/newuser's overview/i,
-            'got welcome message for visitor w/ login');
+    login('testuser');
+    $mech->get_ok('/user/testuser', 'can get own overview');
+    $mech->content_like(qr/id="dataset_upload_help"/i,
+        'can find upload dataset widget');
 
-        $mech->get('/user/baduser');
-        is $mech->status, 404, 'baduser 404s';
-    };
+    $mech->get_ok('/user/newuser', 'can get others overview w/ login');
+    $mech->content_like(qr/newuser's overview/i,
+        'got welcome message for visitor w/ login');
 
+    $mech->get('/user/baduser');
+    is $mech->status, 404, 'baduser 404s';
 };
 
 
@@ -231,20 +238,21 @@ subtest 'Dataset' => sub {
     $mech->submit_form_ok({
         form_name => 'add_dataset',
         fields => {
-            dataset => ["t/etc/data/test1.xls"],
+            dataset => [$spreadsheets{basic}],
         },
     }, 'Can upload a dataset', );
     like $mech->uri, qr{/user/testuser/dataset/\d+},
         'taken to new datasets edit page';
+    my ($new_ds_id) = ($mech->uri =~ m{/user/testuser/dataset/(\d+)});
 
     # GET dataset/object
     $mech->get('/user/testuser');
-    $mech->get_ok('/user/testuser/dataset/1', 'can get dataset page');
+    $mech->get_ok("/user/testuser/dataset/$new_ds_id", 'can get dataset page');
 
     # PUT dataset/object
     my %ds_update = (
-        'dataset.name'  => 'Brand New Name',
-        'dataset.notes' => 'These are some notes',
+        'dataset.name'       => 'Brand New Name',
+        'dataset.notes'      => 'These are some notes',
         'dataset.permission' => 'public',
     );
     $mech->post_ok(
@@ -261,10 +269,11 @@ subtest 'Dataset' => sub {
     # DELETE dataset/object
     $mech->get('/user/testuser');
     $mech->submit_form_ok({
-        form_name => 'delete_dataset_1',
+        form_name => "delete_dataset_$new_ds_id",
     }, 'delete the dataset');
     like $mech->uri, qr{/user/testuser}, 'back to user overview';
-    $mech->content_unlike(qr{table[^\v]dataset_list}, 'no more datasets on this page');
+    $mech->content_unlike(qr{/user/testuser/dataset/$new_ds_id},
+        'no more datasets on this page');
 };
 
 
@@ -276,7 +285,7 @@ subtest 'DatasetColumns' => sub {
     $mech->submit_form_ok({
         form_name => 'add_dataset',
         fields => {
-            dataset => ["t/etc/data/test1.xls"],
+            dataset => [$spreadsheets{basic}],
         },
     }, 'Can upload a dataset', );
 
