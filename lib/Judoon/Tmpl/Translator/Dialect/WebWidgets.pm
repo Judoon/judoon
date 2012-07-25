@@ -17,6 +17,7 @@ sub _build_tt { return Template->new; }
 
 
 method parse($input) {
+    $input //= '';
     my $root = HTML::TreeBuilder->new_from_content($input);
     my @widgets = $root->look_down(qw(_tag div class), qr/widget-object/);
     # warn "Widgets is: " . p(@widgets);
