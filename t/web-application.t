@@ -69,6 +69,7 @@ subtest 'Basic Tests' => sub {
     $mech->get_ok('/', 'get frontpage');
     $mech->get_ok('/placeholder', 'get placeholder page');
     $mech->get_ok('/api');
+    $mech->get_ok('/get_started');
 };
 
 
@@ -370,6 +371,28 @@ subtest 'PageColumn' => sub {
 };
 
 
+subtest 'Public Pages' => sub {
+    login('testuser');
+    $mech->get_ok('/user/testuser/dataset/1');
+    $mech->post_ok('/user/testuser/dataset/1', {
+        'dataset.permission' => 'public',
+        'x-tunneled-method'  => 'PUT',
+    });
+    $mech->get_ok('/user/testuser/dataset/1/page/1');
+    $mech->post_ok('/user/testuser/dataset/1/page/1', {
+        'page.permission' => 'public',
+        'x-tunneled-method'  => 'PUT',
+    });
+    logout();
+
+    $mech->get_ok('/page', 'can get public page list');
+    my $page_uri = get_link_like_ok('public page', qr{/page/1});
+    $mech->get_ok($page_uri);
+
+    $mech->get('/page/39873459345');
+    like $mech->uri, qr{/page}, 'Sent back to list page';
+};
+
 subtest 'Permissions' => sub {
     login('testuser');
     $mech->get_ok('/user/testuser/dataset/1');
@@ -387,7 +410,6 @@ subtest 'Permissions' => sub {
 
     login('newuser');
     redirects_to_ok("/user/testuser/dataset/$ds_id", "/user/newuser");
-
 };
 
 
@@ -480,7 +502,7 @@ sub puts_ok {
 
 sub get_link_like_ok {
     my ($object_descr, $uri_qr) = @_;
-    my @links = $mech->find_all_links(url_regex => qr{$uri_qr});
+    my @links = $mech->find_all_links(url_regex => $uri_qr);
     ok @links, "found links to $object_descr lists";
     $mech->get_ok($links[0], "can get $object_descr page");
     return $links[0]->url;
