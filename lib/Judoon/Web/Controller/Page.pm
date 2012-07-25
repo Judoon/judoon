@@ -52,7 +52,7 @@ sub id : Chained('base') PathPart('') CaptureArgs(1) {
     my $page = $c->model('User::Page')->public->find({id => $id});
     if (not $page) {
         $c->flash->{alert}{error} = q{Couldn't find that page};
-        $self->go_here('/page/list');
+        $self->go_here($c, '/page/list', []);
         $c->detach();
     }
 
