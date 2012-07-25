@@ -79,7 +79,7 @@
                 [%- INCLUDE 'components/forms/action_form.tt2'
                       label='<i class="icon-trash"></i> Delete',
                       url=c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])),
-                      method="DELETE", form_name="delete_page_column_" _ loop.count
+                      method="DELETE", form_name="delete_page_column_" _ column.id
                 -%]
               </div>
               <div class="clearsep"></div>

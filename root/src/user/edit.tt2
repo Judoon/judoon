@@ -39,8 +39,8 @@
         </p>
         <section>
           [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ loop.count -%]
-          [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
         </section>
         <section id="dataset_info_[% loop.count %]" class="collapse">
           [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
@@ -85,7 +85,7 @@
         </p>
         <section>
           [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
-          [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+          [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ page_obj.id -%]
         </section>
         <section id="page_info_[% loop.count %]" class="collapse">
           [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]

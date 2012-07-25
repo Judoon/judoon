@@ -235,45 +235,30 @@ subtest 'Dataset' => sub {
     redirects_to_ok('/user/testuser/dataset','/user/testuser');
 
     # POST dataset/list
-    $mech->submit_form_ok({
-        form_name => 'add_dataset',
-        fields => {
+    my $dataset_uri = add_new_object_ok({
+        object => 'dataset', list_uri => '/user/testuser',
+        form_name => 'add_dataset', form_args => {
             dataset => [$spreadsheets{basic}],
-        },
-    }, 'Can upload a dataset', );
-    like $mech->uri, qr{/user/testuser/dataset/\d+},
-        'taken to new datasets edit page';
-    my ($new_ds_id) = ($mech->uri =~ m{/user/testuser/dataset/(\d+)});
+        }, page_uri_re => qr{/user/testuser/dataset/\d+},
+    });
 
     # GET dataset/object
-    $mech->get('/user/testuser');
-    $mech->get_ok("/user/testuser/dataset/$new_ds_id", 'can get dataset page');
+    $mech->get_ok($dataset_uri, 'can get dataset page');
 
     # PUT dataset/object
-    my %ds_update = (
+    puts_ok('dataset', $dataset_uri, {
         'dataset.name'       => 'Brand New Name',
         'dataset.notes'      => 'These are some notes',
         'dataset.permission' => 'public',
-    );
-    $mech->post_ok(
-        $mech->uri,
-        { %ds_update, 'x-tunneled-method' => 'PUT', },
-        'can update dataset',
-    );
-    while (my ($k, $v) = each %ds_update) {
-        my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
-        is $ds_input->value, $v, "$k has been updated";
-    }
-
+    });
 
     # DELETE dataset/object
-    $mech->get('/user/testuser');
-    $mech->submit_form_ok({
-        form_name => "delete_dataset_$new_ds_id",
-    }, 'delete the dataset');
-    like $mech->uri, qr{/user/testuser}, 'back to user overview';
-    $mech->content_unlike(qr{/user/testuser/dataset/$new_ds_id},
-        'no more datasets on this page');
+    my ($dataset_id) = ($dataset_uri =~ m{(\d+)$});
+    delete_ok({
+        object => 'dataset', object_id => $dataset_id,
+        object_uri => $dataset_uri, list_uri => '/user/testuser',
+        form_prefix => 'delete_dataset_',
+    });
 };
 
 
@@ -289,33 +274,24 @@ subtest 'DatasetColumns' => sub {
         },
     }, 'Can upload a dataset', );
 
+
     # GET datasetcolumn/list
-    my @ds_col_list_links = $mech->find_all_links(
-        url_regex => qr{/user/testuser/dataset/\d+/column$}
-    );
-    ok @ds_col_list_links, 'found links to dataset column lists';
-    $mech->get_ok($ds_col_list_links[0], 'can get dataset column list page');
+    my $dscol_list_uri = get_link_like_ok("dataset column list",
+         qr{/user/testuser/dataset/\d+/column$});
 
     # PUT datasetcolumn/list
     # todo: add delete column test
 
     # GET datasetcolumn/object
-    my @ds_col_links = $mech->find_all_links(
-        url_regex => qr{/user/testuser/dataset/\d+/column/\d+$}
-    );
-    ok @ds_col_links, 'found links to specific dataset columns';
-    $mech->get_ok($ds_col_links[0], 'can get dataset column page');
+    my $dscol_uri = get_link_like_ok("dataset column",
+         qr{/user/testuser/dataset/\d+/column/\d+$});
 
     # PUT datatsetcolumn/object
-    my %ds_col_update = (
+    puts_ok('dataset_column', $dscol_uri, {
         'column.is_url'   => '1',
         'column.url_root' => 'http://www.google.com/',
-    );
-    $mech->post_ok(
-        $mech->uri,
-        { %ds_col_update, 'x-tunneled-method' => 'PUT', },
-        'can update dataset column',
-    );
+    });
+    $mech->get($dscol_list_uri);
     $mech->content_like(qr{url: http://www.google.com/},
                         'can update dataset column');
 };
@@ -323,47 +299,34 @@ subtest 'DatasetColumns' => sub {
 
 subtest 'Page' => sub {
     login('testuser');
-    $mech->get('/user/testuser');
 
     # POST page/list
-    $mech->submit_form_ok({
-        form_name => 'add_page_1',
-    }, 'add new page');
-    my $page_uri = $mech->uri;
-    like $page_uri, qr{/user/testuser/dataset/\d+/page/\d+},
-        q{got new page's edit page};
+    my $page_uri = add_new_object_ok({
+        object => 'page', list_uri => '/user/testuser',
+        form_name => 'add_page_1', form_args => {},
+        page_uri_re => qr{/user/testuser/dataset/\d+/page/\d+},
+    });
 
     # GET page/object
-    $mech->get('/user/testuser');
-    $mech->get_ok($page_uri);
+    $mech->get_ok($page_uri, 'get page edit page');
 
     # GET page/object preview page
-    $mech->get_ok("$page_uri?view=preview");
+    $mech->get_ok("$page_uri?view=preview", 'get page preview page');
 
     # PUT page/object
-    $mech->get($page_uri);
-    my %page_update = (
+    puts_ok("page", $page_uri, {
         'page.title'     => 'This is a new page',
         'page.preamble'  => 'Mumble, mumble, preamble',
         'page.postamble' => 'Humble bumblebee postamble',
-    );
-    $mech->post_ok(
-        $mech->uri,
-        { %page_update, 'x-tunneled-method' => 'PUT', },
-        'can update page',
-    );
-    while (my ($k, $v) = each %page_update) {
-        my ($page_input) = $mech->grep_inputs({name => qr/^$k$/});
-        is $page_input->value, $v, "$k has been updated";
-    }
+    });
 
     # DELETE page/object
-    $mech->get('/user/testuser');
-    $mech->submit_form_ok({
-        form_name => 'delete_page_1',
-    }, 'delete the page');
-    like $mech->uri, qr{/user/testuser}, 'back to user overview';
-    $mech->content_unlike(qr{table[^\v]page_list}, 'no more pages on the overview');
+    my ($page_id) = ($page_uri =~ m{(\d+)$});
+    delete_ok({
+        object => 'page', object_id => $page_id,
+        object_uri => $page_uri, list_uri => '/user/testuser',
+        form_prefix => 'delete_page_',
+    });
 };
 
 
@@ -371,41 +334,39 @@ subtest 'PageColumn' => sub {
     login('testuser');
     $mech->get('/user/testuser');
 
-    my ($page_link) = $mech->find_all_links(
+    my ($page_uri) = $mech->find_all_links(
         url_regex => qr{/user/testuser/dataset/\d+/page/\d+$}
     );
-    $mech->get($page_link);
+    $mech->get($page_uri);
 
     # POST pagecolumn/list
-    $mech->submit_form_ok({
+    my $pagecol_uri = add_new_object_ok({
+        object => 'page column', list_uri => $page_uri,
         form_name => 'add_page_column_form',
-        fields => { 'page_column.title' => 'Chaang Column', },
-    }, 'can create new page column',);
-    my $pagecol_link = $mech->uri;
-    like $pagecol_link, qr{/user/testuser/dataset/\d+/page/\d+/column/\d+},
-        'was sent to column page';
+        form_args => {
+            'page_column.title' => 'Chaang Column',
+            'x-tunneled-method' => 'POST',
+        }, page_uri_re => qr{/user/testuser/dataset/\d+/page/\d+/column/\d+},
+    });
 
     # PUT pagecolumn/object
-    $mech->submit_form_ok({
-        form_name => 'pagecol_form',
-        fields => {
-            'page_column.title' => 'Chaang Column Update',
-        },
-    }, 'can update page column (simple)',);
-    like $mech->uri, qr{/user/testuser/dataset/\d+/page/\d+},
-        'was sent back to page edit page';
-    $mech->get($pagecol_link);
-    my ($pagecol_title) = $mech->grep_inputs({name => qr/^page_column.title$/});
-    is $pagecol_title->value, 'Chaang Column Update', 'field was updated';
+    puts_ok("page_column", $pagecol_uri, {
+        'page_column.title' => 'Chaang Column Update',
+    });
 
     # GET pagecolumn/object
-    $mech->get($page_link);
+    $mech->get($page_uri);
     $mech->follow_link_ok({
         url_regex => qr{/page/\d+/column/\d+},
     }, 'can get all pagecolumn links');
 
     # DELETE pagecolumn/object
-
+    my ($pagecol_id) = ($pagecol_uri =~ m{(\d+)$});
+    delete_ok({
+        object => 'page column', object_id => $pagecol_id,
+        object_uri => $pagecol_uri, list_uri => $page_uri,
+        form_prefix => 'delete_page_column_',
+    });
 };
 
 
@@ -496,4 +457,56 @@ sub no_redirect_ok {
     $mech->get($req_url);
     is $mech->status(), 200, $descr;
     $mech->requests_redirectable($req_redir);
+}
+
+
+sub puts_ok {
+    my ($object, $edit_uri, $put_args) = @_;
+
+    $mech->get_ok($edit_uri, "can get $object edit page");
+    # PUT dataset/object
+    $mech->post_ok(
+        $mech->uri,
+        { %$put_args, 'x-tunneled-method' => 'PUT', },
+        "can update $object",
+    );
+    $mech->get($edit_uri);
+    while (my ($k, $v) = each %$put_args) {
+        my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
+        is $ds_input->value, $v, "$k has been updated";
+    }
+}
+
+
+sub get_link_like_ok {
+    my ($object_descr, $uri_qr) = @_;
+    my @links = $mech->find_all_links(url_regex => qr{$uri_qr});
+    ok @links, "found links to $object_descr lists";
+    $mech->get_ok($links[0], "can get $object_descr page");
+    return $links[0]->url;
+}
+
+
+sub delete_ok {
+    my ($args) = @_;
+    $mech->get($args->{list_uri});
+    $mech->content_like(qr{$args->{object_uri}}, "$args->{object} exists");
+    $mech->submit_form_ok({
+        form_name => $args->{form_prefix} . $args->{object_id},
+    }, "delete the $args->{object}");
+    $mech->content_unlike(qr{$args->{object_uri}}, "$args->{object} no longer exists");
+}
+
+
+sub add_new_object_ok {
+    my ($args) = @_;
+    $mech->get($args->{list_uri});
+    $mech->submit_form_ok({
+        form_name => $args->{form_name},
+        fields    => $args->{form_args},
+    }, "add new $args->{object}");
+    my $new_uri = $mech->uri;
+    like $new_uri, qr{$args->{page_uri_re}},
+        qq{got new $args->{object}'s edit page};
+    return $new_uri;
 }
