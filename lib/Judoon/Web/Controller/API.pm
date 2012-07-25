@@ -17,7 +17,9 @@ Catalyst Controller.
 =cut
 
 
-=head2 index
+=head2 base / index
+
+Basically Nothing
 
 =cut
 
