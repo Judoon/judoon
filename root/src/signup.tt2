@@ -4,30 +4,34 @@
 
 [%- INCLUDE 'components/notification.tt2' -%]
 
+<style type="text/css">
+.small { font-size: 90%; color: #999; }
+</style>
+
 <form name="signup_form" id="signup_form" action="[% c.uri_for_action('/user/signup') %]" method="post" class="form-vertical">
 
   <label>
-    Username<span class="required">*</span>
+    Username <span class="small">(required)</span>
     <input type="text" form="signup_form" class="span3" name="user.username">
   </label>
 
   <label>
-    Password<span class="required">*</span>
+    Password <span class="small">(required, at least 8 characters)</span>
     <input type="password" form="signup_form" class="span3" name="user.password">
   </label>
 
   <label>
-    Confirm Password<span class="required">*</span>
+    Confirm Password <span class="small">(required)</span>
     <input type="password" form="signup_form" class="span3" name="user.confirm_password">
   </label>
 
   <label>
-    Email<span class="required">*</span>
+    Email <span class="small">(required)</span>
     <input type="text" form="signup_form" class="span3" name="user.email_address">
   </label>
 
   <label>
-    Name<span class="required">*</span>
+    Name <span class="small">(required)</span>
     <input type="text" form="signup_form" class="span3" name="user.name">
   </label>
 
