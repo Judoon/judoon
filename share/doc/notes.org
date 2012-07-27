@@ -331,3 +331,88 @@ May be needed in the future.  Demo interface:
 #     to_version   => 1,
 #     template     => $template,
 # });
+* API
+** Current Conundrum:
+
+I have a couple of different locations for endpoints, none of which is
+canonical, none of which is tested for API-fulness.
+
+  /API/Dataset
+     provides a jsony searchable endpoint for dataset data searching
+  /Page
+     provides a non restful (just resty looking) enpoint for view
+     public pages and lists of pages
+  /RPC/*
+     Most resty, but untested for anything but html.  implements the
+     full suite of {list,object}x{GET,POST,PUT,DELETE}, but isn't
+     great. Could probably have better default implementations. All
+     controllers have all methods, even ones they don't need. Takes
+     advantage of REST::ForBrowsers.
+
+** Ideas for resolving:
+*** /API/Dataset is misnamed. Should be DatasetData.
+This solves issues with combining its search params with that of Dataset.
+However, it stil currently uses the weird JQDataTables search params.
+*** /Page and /RPC/Page could be merged.
+visitor:
+  GET list: public list (HTML / JSON)
+  GET object: datatable view
+    HTML: show JQDataTable
+    JSON: merge data into template, return.
+    Maybe we need Page{,Column,Data} like Dataset{,Column,Data}?
+owner:
+  GET list: show public + owned
+    JSON: can filter with query params (?owner=me,owner=!me)
+    HTML: switch with js and action buttons
+          [Show All] [Show Public] [Show mine]
+  GET object:
+    HTML:
+      if page.owner != me: show preview
+      else               : show edit
+    JSON:
+      {title: $title, preamble: $preamble, postamble: $postamble}
+
+** Next steps
+*** ::Controller::REST vs. Controller::DBIC::API
+- DBIC::API does CRUD for me
+  REST, I have to write my own (buggy)
+  but DBIC::API may not work, have to override.
+- Does DBIC::API work with REST::ForBrowsers?
+- can DBIC::API show different based on owner/visitor?
+- I like the REST status methods (status_found(), status_not_found())
+- I like the simplicity of ::REST
+*** Need to create a DatasetData class
+- does it need to be DBIC-backed?
+- If not, can it work with DBIC::API?
+*** Need to add to_JSONs to our DBIC classes?
+*** if I change classes, that will require a *lot* of updates to templates
+uri_for_action('/rpc/$') will need to change (currently 35, not so bad)
+*** need to change chaining, too.
+Dataset, Page, Template all become top level.
+*** literature issues:
+A lot has been written on REST
+- future api needs:
+http://www.zemanta.com/fruitblog/so-you-want-to-offer-a-public-api/
+http://news.ycombinator.com/item?id=4290244 - HN on previous
+  throttling, to prevent abuse
+  related: quotas?
+  documentation
+  tools to keep track
+- HATEOAS
+http://blog.steveklabnik.com/posts/2011-07-03-nobody-understands-rest-or-http
+http://blog.steveklabnik.com/posts/2011-08-07-some-people-understand-rest-and-http
+
+Make heavy use of HTTP Headers
+Accept: application/vnd.judoon-v1+json
+Link: </page?page=1, rel="prev">, </page?page=3, rel="next">
+Accept-type: vs. extensions: honor accept-type first
+after create, return Location, don't duplicate in response
+
+Related from Steve Klabnik:
+http://designinghypermediaapis.com/
+https://rstat.us/users/getsomerestbook  
+*** Where do we store it?
+Should we have an /api just for api stuff?
+I Don't like this, it feels weird and I'm afraid it'll result in work duplication
+How do others do it?
+  Github uses api subdomain, but you can get stuff throught the regular website, too
