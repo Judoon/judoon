@@ -51,6 +51,7 @@ requires 'MooseX::NonMoose';
 requires 'MooseX::Storage';
 requires 'namespace::autoclean';
 requires 'Pod::Usage';
+requires 'Regexp::Grammars';
 requires 'Spreadsheet::Read';
 requires 'Spreadsheet::ParseExcel';
 requires 'Spreadsheet::WriteExcel';

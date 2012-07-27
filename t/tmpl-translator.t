@@ -102,18 +102,17 @@ subtest 'translation test' => sub {
             url => {
                 varstring_type    => 'static',
                 text_segments     => ['foo','bar',],
-                variable_segments => ['baz',],
+                variable_segments => ['baz','',],
             },
             label => {
                 varstring_type    => 'static',
                 text_segments     => ['foo','bar',],
-                variable_segments => ['baz',],
+                variable_segments => ['baz','',],
             },
         }),
     );
 
     for my $dialect ($translator->dialects()) {
-        next if ($dialect eq 'JQueryTemplate'); # no parse for JQueryTemplate yet.
         ok my $tmpl = $translator->from_objects(
             to => $dialect, objects => \@test_objects
         ), "$dialect can build a template from objects";
