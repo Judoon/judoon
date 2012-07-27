@@ -217,8 +217,12 @@ Can convert from class to html or template?
 ** Dialect::WebWidgets [0/1]
 *** TODO [#B] move widget-format-target into its own hidden with name widget-link-null
 need to update WebWidgets.pm && library.tt
-** Dialect::JQueryTemplate [0/1]
-*** TODO need to write a parser
+** Dialect::JQueryTemplate [1/2]
+*** DONE need to write a parser
+CLOSED: [2012-07-27 Fri 09:11]
+*** TODO why are varstrings variable / static?
+Can't we determine that from the existence of variable_segments?
+Dialect::JQ currently assumes that they are static.  Should we change?
 * Judoon::Spreadsheet::Importer
 ** TODO [#B] move code from J:DB::U::S::R::U::import_data() into here
 * Judoon::SiteLinker [0/4]
