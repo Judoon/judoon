@@ -8,7 +8,7 @@ BEGIN { extends qw/Judoon::Web::ControllerBase::REST/; }
 
 __PACKAGE__->config(
     # Define parent chain action and partpath
-    action                  =>  { setup => { PathPart => 'datasets', Chained => '/api/rest/rest_base' } },
+    action                  =>  { setup => { PathPart => 'dataset', Chained => '/api/rest/rest_base' } },
     # DBIC result class
     class                   =>  'User::Dataset',
     # Columns required to create
@@ -25,7 +25,6 @@ __PACKAGE__->config(
     list_prefetch_allows    =>  [
         [qw/ds_columns/], {  'ds_columns' => [qw//] },
 		[qw/pages/], {  'pages' => [qw/page_columns/] },
-		
     ],
 
     # Order of generated list
@@ -35,8 +34,30 @@ __PACKAGE__->config(
         qw/id user_id name notes original data permission/,
         { 'ds_columns' => [qw/id dataset_id name sort is_accession accession_type is_url url_root shortname/] },
 		{ 'pages' => [qw/id dataset_id title preamble postamble permission/] },
-		
-    ],);
+    ],
+
+    return_object => 1,
+);
+
+
+
+use Judoon::Spreadsheet;
+before validate_object => sub {
+    my ($self, $c, $obj) = @_;
+
+    my ($object, $params) = @$obj;
+    if (my $file = delete $params->{file}) {
+        my $fh = $c->req->upload('dataset.file')->fh;
+        (my $extension = $file) =~ s/.*\.//;
+        my $ds_hash = Judoon::Spreadsheet::read_spreadsheet($fh, $extension);
+        $ds_hash->{data} = encode_json($ds_hash->{data});
+        $ds_hash->{user_id} = $c->user->id;
+        while (my ($k, $v) = each %$ds_hash) {
+            $params->{$k} = $v;
+        }
+    }
+};
+
 
 =head1 NAME
 

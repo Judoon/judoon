@@ -1,0 +1,22 @@
+[%- WRAPPER inc/wrapper.tt2
+  title = "View the &quot;$dataset.object.name&quot; Dataset"
+-%]
+
+[%- WRAPPER 'components/breadcrumbs.tt2' -%]
+[%- INCLUDE 'components/breadcrumbs/dataset.tt2' -%]
+[%- END -%]
+[%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
+
+<h2>Your Datasets</h2>
+<ul>
+  [% FOREACH dataset_obj IN dataset.list %]
+  <li>[% dataset_obj.name %]</li>
+  [% END %]
+</ul>
+
+<pre>
+[% debuggit %]
+</pre>
+
+[%- END -%]

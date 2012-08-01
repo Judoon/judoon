@@ -60,7 +60,11 @@ having to retype the Chained/PathPart/Args attributes.
 =cut
 
 sub base      : Chained('fixme') PathPart('fixme') CaptureArgs(0) { shift->private_base(        @_); }
-sub list      : Chained('base')  PathPart('')      Args(0)        :ActionClass('REST') {}
+sub list      : Chained('base')  PathPart('')      Args(0)        :ActionClass('REST') {
+    my ($self, $c) = @_;
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/objects_no_id");
+}
 sub id        : Chained('base')  PathPart(''  )    CaptureArgs(1) { shift->private_id(          @_); }
 sub object    : Chained('id')    PathPart('')      Args(0)        :ActionClass('REST') {}
 
@@ -72,7 +76,20 @@ put here.  Does nothing by default.
 
 =cut
 
-sub private_base :Private {}
+sub private_base :Private {
+    my ($self, $c) = @_;
+    Catalyst::Controller::DBIC::API::Request->meta->apply($c->req)
+          unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request');
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/deserialize");
+
+    # we namespace our form params with $key.$field
+    # DBIC::API want's them all to be top level.
+    my $req_data = $c->req->request_data;
+    if ($req_data && exists $req_data->{$key}) {
+        $c->req->_set_request_data($req_data->{$key});
+    }
+}
 
 
 =head2 list_GET
@@ -86,8 +103,9 @@ list.  Default template is C<$template_dir/list.tt2>.
 
 sub list_GET :Private {
     my ($self, $c) = @_;
-    my $key                 = $self->rpc->{stash_key};
-    $c->stash->{$key}{list} = $self->get_list($c);
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/list_objects");
+    $c->stash->{$key}{list} = $c->stash->{response}{list};
     $c->stash->{template}   = $self->rpc->{template_dir} . '/list.tt2';
 }
 
@@ -105,7 +123,8 @@ list.  When done, redirects back to C<L</list_GET>>.
 
 sub list_PUT :Private {
     my ($self, $c) = @_;
-    $self->manage_list($c);
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/update_or_create_objects");
     $self->go_relative($c, 'list');
 }
 
@@ -123,8 +142,9 @@ back to the new object, i.e. C<L</object_GET>>.
 
 sub list_POST :Private {
     my ($self, $c) = @_;
-    my $params = $self->munge_add_params($c);
-    my $object = $self->add_object($c, $params);
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/update_or_create_objects");
+    my $object = $c->req->get_object(0)->[0];
     $self->go_relative($c, 'object', [@{$c->req->captures}, $object->id]);
 }
 
@@ -138,9 +158,8 @@ C<L</validate_id>>, then C<L</get_object>>.
 
 sub private_id :Private {
     my ($self, $c, $id) = @_;
-    my $key                   = $self->rpc->{stash_key};
-    $c->stash->{$key}{id}     = $self->validate_id($c, $id);
-    $c->stash->{$key}{object} = $self->get_object($c);
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/object_with_id");
 }
 
 
@@ -154,7 +173,10 @@ of a resource. Default template is C<$template_dir/edit.tt2>.
 
 sub object_GET :Private {
     my ($self, $c) = @_;
-    $c->stash->{template}   = $self->rpc->{template_dir} . '/edit.tt2';
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/list_one_object");
+    $c->stash->{$key}{object} = $c->stash->{response}{data};
+    $c->stash->{template} = $self->rpc->{template_dir} . '/edit.tt2';
 }
 
 
@@ -170,9 +192,8 @@ C<L</edit_object>>.  Redirects back to the object_GET by default.
 
 sub object_PUT :Private {
     my ($self, $c) = @_;
-    my $params                = $self->munge_edit_params($c);
-    my $key                   = $self->rpc->{stash_key};
-    $c->stash->{$key}{object} = $self->edit_object($c, $params);
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/update_or_create_one_object");
     $self->go_relative($c, 'object');
 }
 
@@ -189,7 +210,8 @@ enable it.  Redirects back to C<L</list_GET>> by default.
 
 sub object_DELETE :Private {
     my ($self, $c) = @_;
-    $self->delete_object($c);
+    my $key = $self->rpc->{stash_key};
+    $c->forward("/api/rest/$key/delete_one_object");
     my @captures = @{$c->req->captures};
     pop @captures;
     $self->go_relative($c, 'list', \@captures);

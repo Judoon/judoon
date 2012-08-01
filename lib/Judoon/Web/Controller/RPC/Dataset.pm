@@ -38,10 +38,10 @@ Send user to their overview page.
 
 =cut
 
-override list_GET => sub {
-    my ($self, $c) = @_;
-    $self->go_here($c, '/user/edit');
-};
+# override list_GET => sub {
+#     my ($self, $c) = @_;
+#     $self->go_here($c, '/user/edit');
+# };
 
 
 =head2 add_object
@@ -63,49 +63,6 @@ override add_object => sub {
 };
 
 
-=head2 get_object
-
-Grab the dataset with the given id
-
-=cut
-
-override get_object => sub {
-    my ($self, $c) = @_;
-    return $c->stash->{user}{object}->datasets_rs
-        ->find({id => $c->stash->{dataset}{id}});
-};
-
-
-=head2 private_id (after)
-
-Unpack the dataset's headers and rows into the stash.
-
-=cut
-
-after private_id => sub {
-    my ($self, $c) = @_;
-    my $dataset = $c->stash->{dataset}{object};
-    $c->stash->{dataset}{object}{headers} = [map {$_->name} $dataset->ds_columns];
-    $c->stash->{dataset}{object}{rows}    = $dataset->data;
-};
-
-
-=head2 edit_object
-
-Update the dataset, setting name and notes to '' if unset.
-
-=cut
-
-override edit_object => sub {
-    my ($self, $c, $params) = @_;
-    return $c->stash->{dataset}{object}->update({
-        name  => ($params->{'dataset.name'}  // ''),
-        notes => ($params->{'dataset.notes'} // ''),
-        permission => ($params->{'dataset.permission'} // ''),
-    });
-};
-
-
 =head2 object_GET (after)
 
 Add the dataset's first page to the stash.
@@ -115,7 +72,11 @@ Add the dataset's first page to the stash.
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my $dataset = $c->stash->{dataset}{object};
+
+    my $dataset = $c->req->get_object(0)->[0]; # $c->stash->{dataset}{object};
+    # $c->stash->{dataset}{object}{headers} = [map {$_->name} $dataset->ds_columns];
+    # $c->stash->{dataset}{object}{rows}    = $dataset->data;
+
     (my $name = $dataset->name) =~ s/\W/_/g;
     $name =~ s/__+/_/g;
     $name =~ s/(?:^_+|_+$)//g;
@@ -138,23 +99,12 @@ after object_GET => sub {
         $c->forward('Judoon::Web::View::Download::Plain');
     }
 
-    if (my ($page) = $c->stash->{dataset}{object}->pages) {
+    if (my ($page) = $dataset->pages) {
         $c->stash->{dataset}{object}{has_page} = 1;
         $c->stash->{dataset}{object}{page}     = $page;
     }
 };
 
-
-=head2 delete_object
-
-delete the dataset
-
-=cut
-
-override delete_object => sub {
-    my ($self, $c) = @_;
-    $c->stash->{dataset}{object}->delete;
-};
 
 
 =head2 object_DELETE (after)

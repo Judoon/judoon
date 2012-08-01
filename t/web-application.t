@@ -233,13 +233,15 @@ subtest 'Dataset' => sub {
     login('testuser');
 
     # GET dataset/list
-    redirects_to_ok('/user/testuser/dataset','/user/testuser');
+    #redirects_to_ok('/user/testuser/dataset','/user/testuser');
+    $mech->get_ok('/user/testuser/dataset','can get dataset list');
 
     # POST dataset/list
+    $mech->get('/user/testuser');
     my $dataset_uri = add_new_object_ok({
         object => 'dataset', list_uri => '/user/testuser',
         form_name => 'add_dataset', form_args => {
-            dataset => [$spreadsheets{basic}],
+            'dataset.file' => [$spreadsheets{basic}],
         }, page_uri_re => qr{/user/testuser/dataset/\d+},
     });
 
@@ -271,7 +273,7 @@ subtest 'DatasetColumns' => sub {
     $mech->submit_form_ok({
         form_name => 'add_dataset',
         fields => {
-            dataset => [$spreadsheets{basic}],
+            'dataset.file' => [$spreadsheets{basic}],
         },
     }, 'Can upload a dataset', );
 
