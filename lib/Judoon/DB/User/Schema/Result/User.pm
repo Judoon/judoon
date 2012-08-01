@@ -188,8 +188,6 @@ __PACKAGE__->add_columns(
 );
 
 
-use Spreadsheet::Read ();
-
 =head2 B<C<change_password( $password )>>
 
 Validates and sets password
@@ -212,58 +210,14 @@ into the database.
 
 =cut
 
+use Judoon::Spreadsheet;
+
 sub import_data {
     my ($self, $fh) = @_;
     die 'import_data() needs a filehandle' unless ($fh);
-
-    my $ref  = Spreadsheet::Read::ReadData($fh, parser => 'xls');
-
-    my $ds   = $ref->[1];
-    my $data = $self->pivot_data($ds->{cell}, $ds->{maxrow}, $ds->{maxcol});
-
-    my $headers = shift @$data;
-    my $dataset = $self->create_related('datasets', {
-        name => $ds->{label}, original => q{},
-        data => $data, notes => q{},
-    });
-
-    my $sort = 1;
-    for my $header (@$headers) {
-        $dataset->create_related('ds_columns', {
-            name => ($header // ''), sort => $sort++,
-            accession_type => q{},   url_root => q{},
-        });
-    }
-
+    my $ds_hash = Judoon::Spreadsheet::read_spreadsheet($fh);
+    my $dataset = $self->create_related('datasets', $ds_hash);
     return $dataset;
-}
-
-
-=head2 pivot_data( $data, $maxrow, $maxcol )
-
-C<pivot_data()> takes an arrayref of arrayrefs as C<$data> and pivots
-it to be row-major instead of colulmn-major.  It also removes the
-empty leading entries L<Spreadsheet::Read> adds so that it is
-zero-indexed instead of one-indexed.
-
-C<$maxrow> and C<$maxcol> are the maximum number of rows and columns
-respectively.  While these could be calculated dynamically,
-L<Spreadsheet::Read> provides them, and requiring them simplifies the
-code.
-
-=cut
-
-sub pivot_data {
-    my ($self, $data, $maxrow, $maxcol) = @_;
-
-    my $pivoted = [];
-    for my $row_idx (0..$maxrow-1) {
-        for my $col_idx (0..$maxcol-1) {
-            $pivoted->[$row_idx][$col_idx] = $data->[$col_idx+1][$row_idx+1];
-        }
-    }
-
-    return $pivoted;
 }
 
 
