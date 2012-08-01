@@ -43,7 +43,7 @@ subtest 'Result::User' => sub {
     like exception { $user->import_data(); },
         qr{import_data\(\) needs a filehandle}i, 'import_data() dies w/o fh';
 
-    open my $TEST_XLS, '<', 't/etc/data/test1.xls'
+    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
         or die "Can't open test spreadsheet: $!";
     is_result $user->import_data($TEST_XLS);
     close $TEST_XLS;
@@ -114,7 +114,7 @@ subtest 'Result::Dataset' => sub {
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
-    open my $TEST_XLS, '<', 't/etc/data/test1.xls'
+    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
         or die "Can't open test spreadsheet: $!";
     my $mutable_ds = $user->import_data($TEST_XLS);
     close $TEST_XLS;
@@ -193,7 +193,7 @@ subtest 'Result::DatasetColumn' => sub {
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
-    open my $TEST_XLS, '<', 't/etc/data/test1.xls'
+    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
         or die "Can't open test spreadsheet: $!";
     my $mutable_ds = $user->import_data($TEST_XLS);
     close $TEST_XLS;

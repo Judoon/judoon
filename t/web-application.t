@@ -43,8 +43,8 @@ my %users = (
     },
 );
 my %spreadsheets = (
-    basic       => 't/etc/data/test1.xls',
-    troublesome => 't/etc/data/test1.xls',
+    basic       => 't/etc/data/basic.xls',
+    troublesome => 't/etc/data/troublesome.xls',
 );
 fixtures_ok( sub {
     my ($schema) = @_;
