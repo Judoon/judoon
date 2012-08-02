@@ -8,7 +8,7 @@ BEGIN { extends qw/Judoon::Web::ControllerBase::REST/; }
 
 __PACKAGE__->config(
     # Define parent chain action and partpath
-    action                  =>  { setup => { PathPart => 'pages', Chained => '/api/rest/rest_base' } },
+    action                  =>  { setup => { PathPart => 'page', Chained => '/api/rest/dataset/chainpoint' } },
     # DBIC result class
     class                   =>  'User::Page',
     # stash namespace
@@ -22,11 +22,9 @@ __PACKAGE__->config(
     # Columns that list returns
     list_returns            =>  [qw/id dataset_id title preamble postamble permission/],
 
-
     # Every possible prefetch param allowed
     list_prefetch_allows    =>  [
         [qw/page_columns/], {  'page_columns' => [qw//] },
-		
     ],
 
     # Order of generated list
@@ -35,8 +33,29 @@ __PACKAGE__->config(
     list_search_exposes     => [
         qw/id dataset_id title preamble postamble permission/,
         { 'page_columns' => [qw/id page_id title template/] },
-		
-    ],);
+    ],
+
+);
+
+
+around generate_rs => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+    my $rs = $self->$orig($c);
+    return $rs->for_dataset($c->req->get_chained_object(-1)->[0]);
+};
+
+
+before 'validate_object' => sub {
+    my ($self, $c, $obj) = @_;
+    my ($object, $params) = @$obj;
+
+    $params->{title}      //= q{};
+    $params->{preamble}   //= q{};
+    $params->{postamble}  //= q{};
+    $params->{dataset_id} //= $c->req->get_chained_object(-1)->[0]->id;
+};
 
 =head1 NAME
 

@@ -25,52 +25,16 @@ use Data::Printer;
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/rpc/dataset/id', PathPart => 'page', },
+        base => { Chained => '/rpc/dataset/chainpoint', PathPart => 'page', },
     },
     rpc => {
         template_dir => 'page',
         stash_key    => 'page',
+        api_path     => 'page',
     },
 );
 
 
-=head2 add_object
-
-Add a new page linked to the parent dataset.
-
-=cut
-
-override add_object => sub {
-    my ($self, $c, $params) = @_;
-    return $c->stash->{dataset}{object}->create_related('pages', {
-        title => '', preamble => '', postamble => '',
-    });
-};
-
-
-=head2 get_object
-
-Fetch a page from the database.
-
-=cut
-
-override get_object => sub {
-    my ($self, $c) = @_;
-    return $c->stash->{dataset}{object}->pages_rs->find({id => $c->stash->{page}{id}});
-};
-
-
-=head2 edit_object
-
-Update the page in the database.
-
-=cut
-
-override edit_object => sub {
-    my ($self, $c, $params) = @_;
-    my %valid = $self->extract_params('page', $params);
-    return $c->stash->{page}{object}->update(\%valid);
-};
 
 
 =head2 object_GET (after)
@@ -83,7 +47,7 @@ page will need.
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my @page_columns = $c->stash->{page}{object}->page_columns;
+    my @page_columns = $c->req->get_object(0)->[0]->page_columns;
     $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
@@ -103,7 +67,7 @@ after object_GET => sub {
     }
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $c->stash->{dataset}{object}->ds_columns;
+    }} $c->req->get_chained_object(0)->[0]->ds_columns;
     $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 
