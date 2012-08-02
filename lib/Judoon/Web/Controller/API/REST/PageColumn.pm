@@ -11,6 +11,8 @@ __PACKAGE__->config(
     action                  =>  { setup => { PathPart => 'page_columns', Chained => '/api/rest/rest_base' } },
     # DBIC result class
     class                   =>  'User::PageColumn',
+    # stash namespace
+    stash_namespace         => 'page_column',
     # Columns required to create
     create_requires         =>  [qw/page_id template title/],
     # Additional non-required columns that create allows

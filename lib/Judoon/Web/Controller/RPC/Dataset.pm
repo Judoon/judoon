@@ -28,6 +28,7 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'dataset',
         stash_key    => 'dataset',
+        api_path     => 'dataset',
     },
 );
 

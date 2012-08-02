@@ -11,6 +11,8 @@ __PACKAGE__->config(
     action                  =>  { setup => { PathPart => 'pages', Chained => '/api/rest/rest_base' } },
     # DBIC result class
     class                   =>  'User::Page',
+    # stash namespace
+    stash_namespace         => 'page',
     # Columns required to create
     create_requires         =>  [qw/dataset_id permission postamble preamble title/],
     # Additional non-required columns that create allows

@@ -26,5 +26,16 @@ sub ordinal_position_for {
 }
 
 
+=head2 B<C<for_dataset( $dataset_id )>>
+
+Filter C<DatasetColumn> to those belonging to a particular C<Dataset>.
+
+=cut
+
+sub for_dataset {
+    my ($self, $dataset) = @_;
+    return $self->search_rs({dataset_id => $dataset->id});
+}
+
 1;
 __END__

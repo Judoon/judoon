@@ -291,8 +291,8 @@ subtest 'DatasetColumns' => sub {
 
     # PUT datatsetcolumn/object
     puts_ok('dataset_column', $dscol_uri, {
-        'column.is_url'   => '1',
-        'column.url_root' => 'http://www.google.com/',
+        'ds_column.is_url'   => '1',
+        'ds_column.url_root' => 'http://www.google.com/',
     });
     $mech->get($dscol_list_uri);
     $mech->content_like(qr{url: http://www.google.com/},
