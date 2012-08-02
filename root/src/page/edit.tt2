@@ -62,6 +62,9 @@
     </div>
 
 
+  </fieldset>
+</form>
+
     <div class="row-fluid">
 
       <div class="span8">
@@ -115,9 +118,6 @@
       </div>
 
     </div>
-
-  </fieldset>
-</form>
 
 <ul class="nav nav-pills">
   <li class="active"><a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
