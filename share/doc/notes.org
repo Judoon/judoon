@@ -381,6 +381,26 @@ owner:
 - can DBIC::API show different based on owner/visitor?
 - I like the REST status methods (status_found(), status_not_found())
 - I like the simplicity of ::REST
+- what about both?
+use DBIC::API to build the update code and provide the /api interface
+::REST dispatches to /api/rest/object/method/?
+What does ::REST do in this scenario?
+   * Dataset
+     after list_GET: redirection to /user/edit (this goes away)
+     after object_GET: download views
+   * DatasetColumn:
+     edit_object: remove multiple columns (NYI)
+     object_GET: add sitelinker data to stash
+     object_PUT: go back to list
+   * Page:
+     add_object: create object from parent dataset
+     after object_GET: much stash munging
+   * PageColumn:
+     add_object: set default template
+     after object_GET: much stash munging (sitelinker, sample_data, webwidgets)
+     munge_edit_param: translation of template
+   html-specific stuff?
+do I then support /api/(.*) and /$1?
 *** Need to create a DatasetData class
 - does it need to be DBIC-backed?
 - If not, can it work with DBIC::API?
