@@ -8,7 +8,7 @@ BEGIN { extends qw/Judoon::Web::ControllerBase::REST/; }
 
 __PACKAGE__->config(
     # Define parent chain action and partpath
-    action                  =>  { setup => { PathPart => 'page_columns', Chained => '/api/rest/rest_base' } },
+    action                  =>  { setup => { PathPart => 'page_column', Chained => '/api/rest/page/chainpoint' } },
     # DBIC result class
     class                   =>  'User::PageColumn',
     # stash namespace
@@ -22,12 +22,9 @@ __PACKAGE__->config(
     # Columns that list returns
     list_returns            =>  [qw/id page_id title template/],
 
-
     # Every possible prefetch param allowed
     list_prefetch_allows    =>  [
         [qw/datasets/], {  'datasets' => [qw/ds_columns pages/] },
-		[qw/user_roles/], {  'user_roles' => [qw//] },
-		
     ],
 
     # Order of generated list
@@ -35,8 +32,26 @@ __PACKAGE__->config(
     # columns that can be searched on via list
     list_search_exposes     => [
         qw/id page_id title template/,
-        
-    ],);
+    ],
+
+);
+
+around generate_rs => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+    my $rs = $self->$orig($c);
+    return $rs->for_page($c->req->get_chained_object(-1)->[0]);
+};
+
+
+before 'validate_object' => sub {
+    my ($self, $c, $obj) = @_;
+    my ($object, $params) = @$obj;
+
+    $params->{template} //= q{};
+    $params->{page_id}  //= $c->req->get_chained_object(-1)->[0]->id;
+};
 
 =head1 NAME
 
