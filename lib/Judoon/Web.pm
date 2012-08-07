@@ -21,6 +21,7 @@ use Catalyst qw/
     Static::Simple
     Authentication
     Authorization::Roles
+    ErrorCatcher
     Session
     Session::Store::Memcached
     Session::State::Cookie
@@ -85,6 +86,20 @@ __PACKAGE__->config(
         flash_to_stash => 1,
     },
     'Plugin::Static::Simple' => { dirs => ['static',], },
+    'Plugin::ErrorCatcher' => {
+        enable             => 1,
+        context            => 5,
+        always_log         => 1,
+        include_session    => 1,
+        user_identified_by => 'username',
+        emit_module        => 'Catalyst::Plugin::ErrorCatcher::Email',
+    },
+   'Plugin::ErrorCatcher::Email' => {
+       to       => 'felliott@virginia.edu',
+       from     => 'felliott@virginia.edu',
+       subject  => 'Judoon Error Report in %F, line %l',
+       use_tags => 1,
+   },
 );
 
 
