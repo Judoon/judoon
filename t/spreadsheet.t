@@ -7,6 +7,7 @@ use autodie;
 use Test::More;
 use Test::Fatal;
 
+use IO::File;
 use Judoon::Spreadsheet;
 
 subtest 'pivot_data' => sub {
@@ -60,7 +61,7 @@ subtest 'read_spreadsheet' => sub {
         # file              type    data
         ['basic.xls',       undef,  $basic, ],
         ['basic.xls',       'xls',  $basic, ],
-#        ['basic.xlsx',      'xlsx', $basic, ],
+        ['basic.xlsx',      'xlsx', $basic, ],
         ['basic.csv',       'csv',  {%$basic,name=>'IO'}, ],
         ['troublesome.xls', '',     undef,   ],
     );
@@ -69,7 +70,7 @@ subtest 'read_spreadsheet' => sub {
     for my $test (@tests) {
         my ($file, $type, $expected) = @$test;
 
-        open my $TEST_XLS, '<', "t/etc/data/$file";
+        my $TEST_XLS = IO::File->new("t/etc/data/$file", 'r');
         ok my $data = Judoon::Spreadsheet::read_spreadsheet($TEST_XLS, $type),
             "can read spreadsheet $file";
 
