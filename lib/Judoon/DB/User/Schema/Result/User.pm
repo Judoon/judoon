@@ -213,9 +213,9 @@ into the database.
 use Judoon::Spreadsheet;
 
 sub import_data {
-    my ($self, $fh) = @_;
+    my ($self, $fh, $ext) = @_;
     die 'import_data() needs a filehandle' unless ($fh);
-    my $ds_hash = Judoon::Spreadsheet::read_spreadsheet($fh);
+    my $ds_hash = Judoon::Spreadsheet::read_spreadsheet($fh, $ext);
     my $dataset = $self->create_related('datasets', $ds_hash);
     return $dataset;
 }

@@ -53,8 +53,11 @@ return the dataset object.
 
 override add_object => sub {
     my ($self, $c, $params) = @_;
+
+    my $filename = $c->req->param('dataset');
+    (my $ext = $filename) =~ s/.*\.//;
     my $upload = $c->req->upload('dataset');
-    my $dataset = $c->stash->{user}{object}->import_data($upload->fh);
+    my $dataset = $c->stash->{user}{object}->import_data($upload->fh, $ext);
     $dataset->create_basic_page();
     return $dataset;
 };
