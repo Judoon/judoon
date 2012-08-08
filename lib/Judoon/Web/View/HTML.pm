@@ -1,14 +1,15 @@
 package Judoon::Web::View::HTML;
 
-use strict;
-use warnings;
+use Moose;
+use namespace::autoclean;
 
-use base 'Catalyst::View::TT';
+extends 'Catalyst::View::TT';
 
 __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
     render_die => 1,
 );
+
 
 =head1 NAME
 
@@ -33,4 +34,5 @@ it under the same terms as Perl itself.
 
 =cut
 
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 1;
