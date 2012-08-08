@@ -86,19 +86,6 @@ after object_DELETE => sub {
 };
 
 
-=head2 delete_object
-
-delete the page
-
-=cut
-
-override delete_object => sub {
-    my ($self, $c) = @_;
-    $c->stash->{page}{object}->delete;
-};
-
-
-
 __PACKAGE__->meta->make_immutable;
 
 1;
