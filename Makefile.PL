@@ -10,6 +10,7 @@ requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'autodie';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Action::REST';
+requires 'Catalyst::ActionRole::DetachOnDie';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::Model::DBIC::Schema';
 requires 'Catalyst::Plugin::Authentication';
