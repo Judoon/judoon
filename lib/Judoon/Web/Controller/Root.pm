@@ -13,6 +13,8 @@ use Data::Printer;
 #
 __PACKAGE__->config(namespace => '');
 
+with 'Judoon::Web::Controller::Role::GoHere';
+
 =pod
 
 =encoding utf8

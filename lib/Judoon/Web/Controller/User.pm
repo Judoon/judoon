@@ -14,7 +14,10 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
-with qw(Judoon::Web::Controller::Role::ExtractParams);
+with qw(
+    Judoon::Web::Controller::Role::ExtractParams
+    Judoon::Web::Controller::Role::GoHere
+);
 
 use Try::Tiny;
 

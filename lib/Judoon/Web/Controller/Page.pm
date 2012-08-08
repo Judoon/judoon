@@ -15,6 +15,8 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
 
+with 'Judoon::Web::Controller::Role::GoHere';
+
 
 =head2 base
 
