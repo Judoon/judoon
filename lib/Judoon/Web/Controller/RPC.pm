@@ -230,68 +230,6 @@ sub object_DELETE :Private {
 }
 
 
-=head2 hook subs
-
-Theses are the subs an inheriting subclass should implement
-
-=head3 get_list($c)
-
-Takes a context object, returns an arrayref of object resources.
-
-=head3 manage_list($c)
-
-Takes a context object, updates the list of object resources. Returns
-nothing. Default sub is a no-op;
-
-=head3 munge_add_params($c)
-
-Takes a context object, returns a hashref of params, suitable for
-passing to C<create()>.
-
-=head3 add_object($c, $params)
-
-Takes a context object and hashref of params. Should create object and
-return it.  Does nothing by default.
-
-=head3 validate_id($c, $id)
-
-Takes a context object and the id.  Should return a validated id or
-die. Passes through C<$id> by default.
-
-=head3 get_object($c)
-
-Takes a context object and returns the object with the id in
-C<< $stash->{$stash_key}{id} >>.  Is a no-op by default.
-
-=head3 munge_edit_params($c)
-
-Takes context object, return a hashref of parameters suitable for
-feeding to C<< $dbic_row->update() >>.
-
-=head3 edit_object($c, $params)
-
-Takes context object and params from C<L</munge_edit_params>>, updates
-the row object in C<< $c->stash->{$stash_key}{object} >>. Returns the
-object.
-
-=head3 delete_object($c)
-
-Takes a context object, deletes the object in C<<
-$c->stash->{$stash_key}{object} >>, returns nothing. Unimplemented by
-default.
-
-=cut
-
-sub get_list          :Private { return [];    }
-sub manage_list       :Private { return; }
-sub munge_add_params  :Private { return $_[1]->req->params; }
-sub add_object        :Private { return undef; }
-sub validate_id       :Private { return $_[2]; }
-sub get_object        :Private { return undef; }
-sub munge_edit_params :Private { return $_[1]->req->params; }
-sub edit_object       :Private { return undef; }
-sub delete_object     :Private { return;       }
-
 
 __PACKAGE__->meta->make_immutable;
 
