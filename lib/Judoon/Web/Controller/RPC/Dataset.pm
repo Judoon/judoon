@@ -45,25 +45,6 @@ Send user to their overview page.
 # };
 
 
-=head2 add_object
-
-Import the dataset from the given filehandle, create a basic page,
-return the dataset object.
-
-=cut
-
-override add_object => sub {
-    my ($self, $c, $params) = @_;
-
-    my $filename = $c->req->param('dataset');
-    (my $ext = $filename) =~ s/.*\.//;
-    my $upload = $c->req->upload('dataset');
-    my $dataset = $c->stash->{user}{object}->import_data($upload->fh, $ext);
-    $dataset->create_basic_page();
-    return $dataset;
-};
-
-
 =head2 object_GET (after)
 
 Add the dataset's first page to the stash.
