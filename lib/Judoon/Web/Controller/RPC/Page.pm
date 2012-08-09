@@ -57,7 +57,8 @@ page will need.
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my @page_columns = $c->req->get_object(0)->[0]->page_columns;
+    my $page = $c->req->get_object(0)->[0];
+    my @page_columns = $page->page_columns;
     $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
