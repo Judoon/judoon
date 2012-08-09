@@ -29,7 +29,7 @@
       judoon_dt_bootstrap_init();
 
       $('#demo_page').dataTable({
-          "sAjaxSource" : "[% c.uri_for_action('/api/dataset/object', [page.object.dataset.id]) %]",
+          "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",
           "fnServerData" : function ( sSource, aoData, fnCallback ) {
             $.ajax( {
                 "dataType": "json",

@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::API::Dataset;
+package Judoon::Web::Controller::API::DatasetData;
 use Moose;
 use namespace::autoclean;
 
@@ -8,7 +8,7 @@ use List::AllUtils qw();
 
 =head1 NAME
 
-Judoon::Web::Controller::API::Dataset - Catalyst Controller
+Judoon::Web::Controller::API::DatasetData - Catalyst Controller
 
 =head1 DESCRIPTION
 
@@ -23,7 +23,7 @@ Catalyst Controller.
 
 =cut
 
-sub base : Chained('/api/base') PathPart('dataset')  CaptureArgs(0) {}
+sub base : Chained('/api/base') PathPart('datasetdata')  CaptureArgs(0) {}
 sub index :Chained('base')  PathPart('')    Args(0) {
     my ($self, $c) = @_;
     $c->res->body('got here');
