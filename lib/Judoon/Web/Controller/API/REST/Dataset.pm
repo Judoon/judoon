@@ -8,7 +8,7 @@ BEGIN { extends qw/Judoon::Web::ControllerBase::REST/; }
 
 __PACKAGE__->config(
     # Define parent chain action and partpath
-    action                  =>  { setup => { PathPart => 'dataset', Chained => '/api/rest/rest_base' } },
+    action                  =>  { setup => { PathPart => 'dataset', Chained => '/api/rest_base' } },
     # DBIC result class
     class                   =>  'User::Dataset',
     # stash namespace
