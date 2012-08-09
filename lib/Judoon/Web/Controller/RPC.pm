@@ -152,6 +152,7 @@ sub private_id :Private {
     $c->forward("/api/rest/$api_path/list_one_object");
     my $key = $self->rpc->{stash_key};
     $c->stash->{$key}{object} = $c->stash->{response}{data};
+    $c->stash->{$key}{id}     =  $c->stash->{$key}{object}{id};
 }
 
 sub private_chainpoint :Private {
