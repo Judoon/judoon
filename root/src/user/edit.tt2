@@ -35,15 +35,15 @@
     [% FOREACH dataset_obj IN dataset.list %]
     <tr>
       <td>[% loop.count %]<a name="dataset_[%- dataset_obj.id -%]"></td>
-      <td>[% dataset_url = c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) %]
+      <td>[% dataset_url = c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]) %]
         <p>
           <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows
           <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#dataset_info_[% loop.count %]">Show more</button></span>
         </p>
         <section>
-          [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ dataset_obj.id -%]
-          [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/private/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
         </section>
         <section id="dataset_info_[% loop.count %]" class="collapse">
           [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
@@ -81,14 +81,14 @@
     [% FOREACH page_obj IN page.list %]
     <tr>
       <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
-      <td>[% page_url = c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
+      <td>[% page_url = c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
         <p>
           <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
           <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_info_[% loop.count %]">Show more</button></span>
         </p>
         <section>
-          [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
-          [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ page_obj.id -%]
+          [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
+          [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ page_obj.id -%]
         </section>
         <section id="page_info_[% loop.count %]" class="collapse">
           [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]
@@ -120,7 +120,7 @@
     [% FOREACH dataset_obj IN dataset.list %]
     <tr>
       <td>[% loop.count %]</td>
-      <td>[% dataset_url = c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset_obj.id]) %]
+      <td>[% dataset_url = c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]) %]
         <p><a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</p>
         [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
         <p><strong>Download:</strong> <a href="[% dataset_url _ '?view=raw' %]">raw</a>, <a href="[% dataset_url _ '?view=csv' %]">CSV</a>, <a href="[% dataset_url _ '?view=xls' %]">Excel</a></p>

@@ -7,7 +7,7 @@
 [%- END -%]
 [%- INCLUDE 'components/notification.tt2'
     alert.warning = 'This is just a preview. You need to publish it before others can see it. <a href="'
-                  _ c.uri_for_action('/rpc/page/object', c.req.captures)
+                  _ c.uri_for_action('/private/page/object', c.req.captures)
                   _ '">Go back and edit</a>.'
  -%]
 [%- INCLUDE 'components/identification.tt2' -%]

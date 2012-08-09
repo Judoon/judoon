@@ -8,7 +8,7 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form name="dscolumn_edit" id="dscolumn_edit" action="[% c.uri_for_action('/rpc/datasetcolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
+<form name="dscolumn_edit" id="dscolumn_edit" action="[% c.uri_for_action('/private/datasetcolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Annotate column "[% ds_column.object.name %]"</legend>
 
@@ -83,7 +83,7 @@
 
       [% INCLUDE 'components/forms/form_submit.tt2'
          submit_type = 'update'
-         return_url  = c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures.slice(0,-2))
+         return_url  = c.uri_for_action('/private/datasetcolumn/list', c.req.captures.slice(0,-2))
          return_page = 'column list'
          form_name   = 'dscolumn_edit'
       %]

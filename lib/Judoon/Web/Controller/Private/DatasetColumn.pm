@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::RPC::DatasetColumn;
+package Judoon::Web::Controller::Private::DatasetColumn;
 
 =pod
 
@@ -6,26 +6,26 @@ package Judoon::Web::Controller::RPC::DatasetColumn;
 
 =head1 NAME
 
-Judoon::Web::Controller::RPC::DatasetColumn - dataset column actions
+Judoon::Web::Controller::Private::DatasetColumn - dataset column actions
 
 =head1 DESCRIPTION
 
 The RESTful controller for managing actions on one or more dataset
-columns.  Chains off of L</Judoon::Web::Controller::RPC::Dataset>.
+columns.  Chains off of L</Judoon::Web::Controller::Private::Dataset>.
 
 =cut
 
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 use Data::Printer;
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/rpc/dataset/chainpoint', PathPart => 'column', },
+        base => { Chained => '/private/dataset/chainpoint', PathPart => 'column', },
     },
     rpc => {
         template_dir => 'ds_column',

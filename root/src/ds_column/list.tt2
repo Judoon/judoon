@@ -39,9 +39,9 @@
             [% END %]
           </td>
           <td class="metadata center">[% column.metadata | html %]</td>
-          <td class="annotate center">[%- INCLUDE 'components/action_button.tt2' label="Annotate" url=c.uri_for_action('/rpc/datasetcolumn/object', c.req.captures.merge([column.id]))  -%]</td>
+          <td class="annotate center">[%- INCLUDE 'components/action_button.tt2' label="Annotate" url=c.uri_for_action('/private/datasetcolumn/object', c.req.captures.merge([column.id]))  -%]</td>
           <td class="delete center">
-            [% INCLUDE 'components/forms/action_form.tt2'   label="Delete"    url=c.uri_for_action('/rpc/datasetcolumn/object', [user.object.username, dataset.object.id, column.id]),  method="DELETE" form_name="delete_dataset_column_" _ column.id -%]
+            [% INCLUDE 'components/forms/action_form.tt2'   label="Delete"    url=c.uri_for_action('/private/datasetcolumn/object', [user.object.username, dataset.object.id, column.id]),  method="DELETE" form_name="delete_dataset_column_" _ column.id -%]
           </td>
         </tr>
         [% END %]

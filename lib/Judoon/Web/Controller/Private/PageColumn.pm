@@ -1,9 +1,9 @@
-package Judoon::Web::Controller::RPC::PageColumn;
+package Judoon::Web::Controller::Private::PageColumn;
 
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 
@@ -17,7 +17,7 @@ sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/rpc/page/chainpoint', PathPart => 'column', },
+        base => { Chained => '/private/page/chainpoint', PathPart => 'column', },
     },
     rpc => {
         template_dir => 'page_column',
@@ -96,7 +96,7 @@ after object_DELETE => sub {
     my ($self, $c) = @_;
     my $captures = $c->req->captures;
     pop @$captures;
-    $self->go_here($c, '/rpc/page/object', $captures);
+    $self->go_here($c, '/private/page/object', $captures);
 };
 
 __PACKAGE__->meta->make_immutable;

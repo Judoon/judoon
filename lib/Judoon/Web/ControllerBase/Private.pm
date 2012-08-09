@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::RPC;
+package Judoon::Web::ControllerBase::Private;
 
 =pod
 
@@ -6,13 +6,13 @@ package Judoon::Web::Controller::RPC;
 
 =head1 NAME
 
-Judoon::Web::Controller::RPC - base controller for RESTish HTML controllers
+Judoon::Web::ControllerBase::Private - base class for RESTish HTML controllers
 
 =head1 DESCRIPTION
 
-This is the poorly-named base controller for our RESTish web
-controllers (C<RPC::Dataset>, C<RPC::DatasetColumn>, C<RPC::Page>,
-C<RPC::PageColumn>).  It uses L<Catalyst::Action::REST> to provide
+This is the poorly-named base class for our RESTish web controllers
+(C<Private::Dataset>, C<Private::DatasetColumn>, C<Private::Page>,
+C<Private::PageColumn>).  It uses L<Catalyst::Action::REST> to provide
 REST-like dispatch.
 
 Why RESTish?  This controller is actually an interface to the B<real>
@@ -63,12 +63,12 @@ with 'Judoon::Web::Controller::Role::GoHere';
 
 =head2 C<rpc>
 
-This is the config attribute for C<::RPC>.  Set the C<template_dir>,
-C<stash_key>, and C<api_path> keys. C<template_dir> gives the name of
-the directory under C</root/src/> where the templates can be
-found. C<stash_key> is where in the stash the object, id, or object
-list should be stored.  C<api_path> is the action path to the
-corresponding C<API::REST> class.
+This is the config attribute for C<ControllerBase::Private>.  Set the
+C<template_dir>, C<stash_key>, and C<api_path> keys. C<template_dir>
+gives the name of the directory under C</root/src/> where the
+templates can be found. C<stash_key> is where in the stash the object,
+id, or object list should be stored.  C<api_path> is the action path
+to the corresponding C<API::REST> class.
 
 Consuming classes should set up their path namespace by setting the
 C<action> key in C<< __PACKAGE__->config() >>. Ex:
@@ -104,7 +104,7 @@ paths.  C<base> is the base for all of the other actions. C<id> is
 responsible for pulling C<$id> out of the path and sticking it in the
 stash.  C<list> is for actions that apply to the set of objects.
 C<object> applies to one particular object. C<chainpoint> is an action
-for other C<RPC>-based controllers to chain from.
+for other C<Private>-based controllers to chain from.
 
 All of these methods (except C<list>) call private subs to do the
 actual work.  This allows subclasses to override / modify the actual

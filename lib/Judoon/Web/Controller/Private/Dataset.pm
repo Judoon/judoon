@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::RPC::Dataset;
+package Judoon::Web::Controller::Private::Dataset;
 
 =pod
 
@@ -6,7 +6,7 @@ package Judoon::Web::Controller::RPC::Dataset;
 
 =head1 NAME
 
-Judoon::Web::Controller::RPC::Dataset - dataset actions
+Judoon::Web::Controller::Private::Dataset - dataset actions
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ The RESTful controller for managing actions on one or more datasets.
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 
 use Data::Printer;
 

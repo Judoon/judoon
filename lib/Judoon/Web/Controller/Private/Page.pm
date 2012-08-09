@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::RPC::Page;
+package Judoon::Web::Controller::Private::Page;
 
 =pod
 
@@ -6,26 +6,26 @@ package Judoon::Web::Controller::RPC::Page;
 
 =head1 NAME
 
-Judoon::Web::Controller::RPC::Page - page actions
+Judoon::Web::Controller::Private::Page - page actions
 
 =head1 DESCRIPTION
 
 The RESTful controller for managing actions on one or more pages.
-Currently chains off of ::RPC::Dataset, but this may be changed later.
+Currently chains off of ::Private::Dataset, but this may be changed later.
 
 =cut
 
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 use Data::Printer;
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/rpc/dataset/chainpoint', PathPart => 'page', },
+        base => { Chained => '/private/dataset/chainpoint', PathPart => 'page', },
     },
     rpc => {
         template_dir => 'page',
@@ -49,7 +49,7 @@ override list_GET => sub {
 
 =head2 object_GET (after)
 
-After L<RPC/object_GET>, set up the stash parameters the page's edit
+After L<Private/object_GET>, set up the stash parameters the page's edit
 page will need.
 
 =cut
