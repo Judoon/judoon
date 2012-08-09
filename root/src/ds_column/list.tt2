@@ -8,7 +8,6 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form name="dscolumn_list" id="dscolumn_list" action="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures) %]" method="post" accept-charset="utf-8">
   <fieldset>
     <legend>[% dataset.object.name %] dataset columns</legend>
 
@@ -50,6 +49,6 @@
     </table>
 
   </fieldset>
-</form>
+
 
 [% END %]
