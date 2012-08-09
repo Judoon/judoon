@@ -19,8 +19,6 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 
-use Data::Printer;
-
 __PACKAGE__->config(
     action => {
         base => { Chained => '/user/logged_in', PathPart => 'dataset', },
@@ -55,9 +53,6 @@ after object_GET => sub {
     my ($self, $c) = @_;
 
     my $dataset = $c->req->get_object(0)->[0]; # $c->stash->{dataset}{object};
-    # $c->stash->{dataset}{object}{headers} = [map {$_->name} $dataset->ds_columns];
-    # $c->stash->{dataset}{object}{rows}    = $dataset->data;
-
     (my $name = $dataset->name) =~ s/\W/_/g;
     $name =~ s/__+/_/g;
     $name =~ s/(?:^_+|_+$)//g;

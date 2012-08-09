@@ -21,7 +21,7 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
-use Data::Printer;
+use JSON::XS qw(decode_json);
 
 __PACKAGE__->config(
     action => {
@@ -56,7 +56,6 @@ after list_GET => sub {
     my ($self, $c) = @_;
 
     my $columns = $c->stash->{ds_column}{list};
-    use JSON::XS;
     my $rows    = decode_json($c->stash->{dataset}{object}{data});
     for my $idx (0..scalar(@$columns)-1) {
         my $sample_count = 3;

@@ -5,8 +5,6 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::Controller' }
 
 
-use Data::Printer;
-
 #
 # Sets the actions in this controller to be registered with no prefix
 # so they function identically to actions created in MyApp.pm

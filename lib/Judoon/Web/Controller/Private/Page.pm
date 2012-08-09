@@ -21,8 +21,6 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
-use Data::Printer;
-
 __PACKAGE__->config(
     action => {
         base => { Chained => '/private/dataset/chainpoint', PathPart => 'page', },
