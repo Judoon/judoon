@@ -45,7 +45,7 @@
     [% INCLUDE 'components/forms/form_submit.tt2'
        submit_type = 'update'
        allow_reset = 1
-       return_url  = c.uri_for_action('/rpc/dataset/object', [user.object.username, page.object.dataset.id])
+       return_url  = c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset.id])
        return_page = 'dataset'
        form_name   = 'page_edit'
     %]
