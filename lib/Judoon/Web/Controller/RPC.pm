@@ -118,25 +118,6 @@ sub list_GET :Private {
 }
 
 
-=head2 list_PUT
-
-This method is called when a PUT request is made to
-C<$chained/$stash_key/>.  I haven't decided what the exact semantics
-of this is, but I'm currently use it to modify the contents of the
-list, i.e. delete members.  Calls C<L</manage_list>> to manipulate the
-list.  When done, redirects back to C<L</list_GET>>.
-
-=cut
-
-
-sub list_PUT :Private {
-    my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/update_or_create_objects");
-    $self->go_relative($c, 'list');
-}
-
-
 =head2 list_POST
 
 This method is called when a POST request is made to
