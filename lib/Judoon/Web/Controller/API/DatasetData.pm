@@ -42,7 +42,6 @@ sub object_GET {
     my ($self, $c) = @_;
 
     my @real_data = @{$c->stash->{dataset}{object}->data};
-    shift @real_data;
     my $filtered = my $total = @real_data;
 
     # filter data by search param
