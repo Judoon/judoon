@@ -54,7 +54,6 @@ Add the dataset's first page to the stash.
 after object_GET => sub {
     my ($self, $c) = @_;
 
-
     my $dataset = $c->req->get_object(0)->[0]; # $c->stash->{dataset}{object};
     # $c->stash->{dataset}{object}{headers} = [map {$_->name} $dataset->ds_columns];
     # $c->stash->{dataset}{object}{rows}    = $dataset->data;
@@ -66,18 +65,18 @@ after object_GET => sub {
     if ($view eq 'raw') {
         $c->res->headers->header( "Content-Type" => "text/tab-separated-values" );
         $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.tab" );
-        $c->stash->{plain}{data} = $c->stash->{dataset}{object}->as_raw;
+        $c->stash->{plain}{data} = $dataset->as_raw;
         $c->forward('Judoon::Web::View::Download::Plain');
     }
     elsif ($view eq 'csv') {
-        $c->stash->{csv}{data} = $c->stash->{dataset}{object}->data_table;
         $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.csv" );
+        $c->stash->{csv}{data} = $dataset->data_table;
         $c->forward('Judoon::Web::View::Download::CSV');
     }
     elsif ($view eq 'xls') {
         $c->res->headers->header( "Content-Type" => "application/vnd.ms-excel" );
         $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.xls" );
-        $c->res->body($c->stash->{dataset}{object}->as_excel);
+        $c->res->body($dataset->as_excel);
         $c->forward('Judoon::Web::View::Download::Plain');
     }
 
