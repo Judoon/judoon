@@ -98,19 +98,6 @@ after object_GET => sub {
 };
 
 
-=head2 object_PUT (after)
-
-Redirect to dataset columns
-
-=cut
-
-after object_PUT => sub {
-    my ($self, $c) = @_;
-    my $captures = $c->req->captures;
-    pop @$captures;
-    $self->go_relative($c, 'list', $captures);
-};
-
 __PACKAGE__->meta->make_immutable;
 
 1;
