@@ -45,8 +45,11 @@
   [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset.object.id]) -%]
   [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset.object.id]), method="POST" form_name="add_page_" _ loop.count -%]
   [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset.object.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
+</section>
 
+<br>
 
+<section id="pages">
   <h4>Pages</h4>
   <ul>
     [%- FOREACH page IN page.list -%]
