@@ -5,7 +5,7 @@ use namespace::autoclean;
 
 BEGIN { extends qw/Catalyst::Controller/; }
 
-sub rest_base : Chained('/api/api_base') PathPart('rest') CaptureArgs(0) {
+sub rest_base : Chained('/api/api_base') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
 }
 
