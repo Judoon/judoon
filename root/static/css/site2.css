@@ -31,6 +31,15 @@ footer p {
 #getstarted a.btn:visited { color: #fff; }
 
 
+/*
+  Action forms are used to enable button-like controls for
+  POST/PUT/DELETEs.
+*/
+.action-form {
+    display: inline-block;
+    margin-bottom: 0;  /* override the default bootstrap form styling */
+}
+
 /* for template edit page */
 
 /* We make heavy use of appended buttons on the page column edit
