@@ -49,11 +49,11 @@
 
   <h4>Pages</h4>
   <ul>
-    [%- FOREACH page IN dataset.object.pages -%]
+    [%- FOREACH page IN page.list -%]
     <li>
-      <a href="[%- c.uri_for_action('/rpc/page/object', [c.user.username, dataset.id, page.id]) -%]">[%- page.title -%]</a>
-      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.id, page.id], {view => 'preview'}) -%]
-      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.id, page.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+      <a href="[%- c.uri_for_action('/rpc/page/object', [c.user.username, dataset.object.id, page.id]) -%]">[%- page.title || '(untitled)' -%]</a>
+      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.object.id, page.id], {view => 'preview'}) -%]
+      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.object.id, page.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
     </li>
     [%- END -%]
   </ul>

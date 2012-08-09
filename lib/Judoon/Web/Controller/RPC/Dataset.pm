@@ -80,9 +80,10 @@ after object_GET => sub {
         $c->forward('Judoon::Web::View::Download::Plain');
     }
 
-    if (my ($page) = $dataset->pages) {
-        $c->stash->{dataset}{object}{has_page} = 1;
-        $c->stash->{dataset}{object}{page}     = $page;
+    if (my (@pages) = $dataset->pages) {
+        $c->stash->{page}{list} = [
+            map {{ $_->get_columns }} @pages
+        ];
     }
 };
 
