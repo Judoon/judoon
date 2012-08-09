@@ -177,6 +177,10 @@ sub private_chainpoint :Private {
     my ($self, $c) = @_;
     my $api_path = $self->rpc->{api_path};
     $c->forward("/api/rest/$api_path/chainpoint");
+
+    my $key = $self->rpc->{stash_key};
+    $c->stash->{$key}{object} = {$c->req->get_chained_object(-1)->[0]->get_columns};
+    $c->stash->{$key}{id}     = $c->stash->{$key}{object}{id};
 }
 
 

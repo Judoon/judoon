@@ -69,9 +69,6 @@ after object_GET => sub {
         $c->detach();
     }
 
-    $c->stash->{dataset}{object} = { $page->dataset->get_columns };
-    $c->stash->{dataset}{id}     = $c->stash->{dataset}{object}{id};
-
     my %used;
     for my $page_col (@page_columns) {
         for my $node (map {$_->decompose} $page_col->template_to_objects()) {
