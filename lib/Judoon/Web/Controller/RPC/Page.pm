@@ -35,6 +35,16 @@ __PACKAGE__->config(
 );
 
 
+=head2 list_GET
+
+Send user to their overview page.
+
+=cut
+
+override list_GET => sub {
+    my ($self, $c) = @_;
+    $self->go_here($c, '/user/edit', [$c->req->captures->[0]]);
+};
 
 
 =head2 object_GET (after)
