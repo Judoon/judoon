@@ -62,15 +62,22 @@ having to retype the Chained/PathPart/Args attributes.
 
 =cut
 
-sub base      : Chained('fixme') PathPart('fixme') CaptureArgs(0) { shift->private_base(        @_); }
-sub list      : Chained('base')  PathPart('')      Args(0)        :ActionClass('REST') {
+sub base : Chained('fixme') PathPart('fixme') CaptureArgs(0) {
+    shift->private_base(@_);
+}
+sub list : Chained('base') PathPart('') Args(0) ActionClass('REST') {
     my ($self, $c) = @_;
     my $api_path = $self->rpc->{api_path};
     $c->forward("/api/rest/$api_path/objects_no_id");
 }
-sub id        : Chained('base')  PathPart(''  )    CaptureArgs(1) { shift->private_id(          @_); }
-sub chainpoint : Chained('id') PathPart('') CaptureArgs(0) { shift->private_chainpoint(@_); }
-sub object    : Chained('id')    PathPart('')      Args(0)        :ActionClass('REST') {}
+sub id : Chained('base') PathPart('') CaptureArgs(1) {
+    shift->private_id(@_);
+}
+sub chainpoint : Chained('id') PathPart('') CaptureArgs(0) {
+    shift->private_chainpoint(@_);
+}
+sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
+
 
 
 =head2 private_base
