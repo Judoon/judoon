@@ -43,7 +43,7 @@ object.
 sub read_spreadsheet {
     my ($fh, $parser) = @_;
 
-    Judoon::Error::Fatal->throw({'read_spreadsheet() needs a filehandle'})
+    Judoon::Error::Fatal->throw({message => 'read_spreadsheet() needs a filehandle'})
           unless ($fh);
     $parser ||= 'xls';
     $parser = lc($parser);

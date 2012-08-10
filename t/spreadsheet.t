@@ -80,6 +80,8 @@ subtest 'read_spreadsheet' => sub {
         }
     }
 
+    like exception {Judoon::Spreadsheet::read_spreadsheet();},
+        qr{needs a filehandle}, 'dies without filehandle';
 };
 
 done_testing();
