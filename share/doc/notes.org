@@ -391,7 +391,6 @@ What does ::REST do in this scenario?
    * DatasetColumn:
      edit_object: remove multiple columns (NYI)
      object_GET: add sitelinker data to stash
-     object_PUT: go back to list
    * Page:
      add_object: create object from parent dataset
      after object_GET: much stash munging
@@ -401,6 +400,38 @@ What does ::REST do in this scenario?
      munge_edit_param: translation of template
    html-specific stuff?
 do I then support /api/(.*) and /$1?
+**** After adding ::DBIC::API and updating ::RPC to use it:
+- Dataset:
+  after object_GET:
+    handle tabular views
+    add pages to stash
+  after object_DELETE:
+    redir to /user/edit
+- DatasetColumn:
+  after list_GET:
+    set up sample data in stash
+    set column annotations
+  after object_GET:
+    add sitelinker accession groups to stash
+  after object_PUT:
+    go back to dataset columns (remove this, it's inconsistent)
+- Page:
+  after object_GET:
+    add page_columns to stash
+    add templates to stash if view==preview
+    set stash->{template} if view==preview
+    set up headers_used stash var 
+  after object_DELETE:
+    go to /user/edit
+- PageColumn:
+  after object_GET:
+    set up many support stash variables (link_site-json ds_column_json sitelink_sites sample_data)
+    translate template to webwidgets
+  before object_PUT
+    translate webwidgets to native
+  after object_DELETE
+    go to Page::object_GET
+    
 *** Need to create a DatasetData class
 - does it need to be DBIC-backed?
 - If not, can it work with DBIC::API?
@@ -436,3 +467,32 @@ Should we have an /api just for api stuff?
 I Don't like this, it feels weird and I'm afraid it'll result in work duplication
 How do others do it?
   Github uses api subdomain, but you can get stuff throught the regular website, too
+*** So you've decided to split /api and /everything_else, Now what?
+**** DONE get RPC working fully.
+CLOSED: [2012-08-09 Thu 16:36]
+- some data isn't being set in stash
+- we're using hashrefs instead of objects now
+- fix that, son.
+**** DONE move API/Dataset
+CLOSED: [2012-08-09 Thu 16:36]
+- change to DatasetData.pm
+- fix path in preview page
+**** DONE re-base /api/rest/*/ to be at /api/*
+CLOSED: [2012-08-09 Thu 16:37]
+**** DONE get rid of API::REST.pm
+CLOSED: [2012-08-09 Thu 16:49]
+- move rest_base to API.pm
+**** DONE Should I move ControllerBase/REST?
+CLOSED: [2012-08-09 Thu 17:43]
+- Hold on, I'm dumb
+- ControllerBase lives outside Controller/ so seems to get away with all sorts of shit.
+- Maybe RPC should be in ControllerBase?
+- Then update RPC::* to user ControllerBase/RPC
+**** Time to merge /Page and /RPC/Page?
+- bothers me.
+- I feel like it might make a unified controller too complicated
+- maybe RPC::Page becomes Private::Page and Page becomes Public::Page
+- ControllerBase::Public like RPC?
+- try and see, if most work is delegated to API/*, shouldn't be too hard to merge later?
+- You're gonna regret this, Fitz.
+
