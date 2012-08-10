@@ -212,7 +212,38 @@ CLOSED: [2012-05-15 Tue 16:14]
 - Create J::Tmpl::Widget class
 J::Tmpl::Widget::Text, J::Tmpl::Widget::Data, etc.
 Can convert from class to html or template?
-** Node [/]
+** Node [0/2]
+*** TODO don't use abstract base class, use role instead.
+[10:45am] melo: I've read M::Manual::Roles the bit about Abstract base classes… Are they considered evil, to be avoided, in Moose?
+[10:46am] mst: roles obsolete abstract base classes
+[10:46am] rjbs: They're just not really very useful with roles around.
+[10:46am] melo: not quite. Sure they provide most of the same stuff, but your final class is no longer isa('AbstractBaseClass')
+[10:47am] mst: erm, and?
+[10:47am] melo: mind you, this is not a problem I'm having, more of a crisis of faith
+[10:47am] mst: your fincal class ->does('NameOfRole')
+[10:47am] melo: yeah...
+[10:47am] mst: it isn't really an isa relationship anyway
+[10:47am] melo: old habits I guess
+[10:47am] mst: you're basically saying "your solution is not complete because an implementation detail becomes very very slightly different"
+[10:47am] mst: I find this an unconvincing argument 
+[10:48am] melo: the use case I was envisioning can also be solved with roles
+[10:48am] melo:
+[10:48am] melo: just for a minute, let's say it would make sense to have an abstract class, just as a though exercise...
+[10:49am] melo: I guess at meta it would be a subclass of Moose::Meta::Class that would forbid the creation of instances.
+[10:50am] melo: And also at role composition, it would take all unsatisfied requires and make them their own, and force them to be satisfied by extends on the final class...
+[10:50am] rjbs: MooseX::ABC exists, but there are problems because of Perl.
+[10:52am] melo: rjbs: thx, searching for Moose abstract on metacpan it barely makes the suggestion list, so I didn't find it.
+[10:52am] amiri left the chat room. (Read error: Connection reset by peer)
+[10:52am] melo: anyway, just a idle though, cary on...
+[10:53am] amiri joined the chat room.
+[10:53am] rjbs: I had wanted them myself in the past for different reasons, but eventually I gave up.
+[10:53am] rjbs: how I learned to stop worrying and love traits
+[10:54am] amiri left the chat room. (Read error: Connection reset by peer)
+[10:55am] melo: yeah. I was planning on using them to group several roles into a single abstract class as a "suggested combination" but its even better as a role that composes other roles… So it's not even the best solution in my case.
+[10:57am] PerlStalker joined the chat room.
+[10:58am] amiri joined the chat room.
+[11:04am] rjbs:
+[11:05am] 
 ** Dialect::WebWidgets [0/2]                           :_Dialect_WebWidgets:
 *** TODO [#B] move widget-format-target into its own hidden with name widget-link-null
 need to update WebWidgets.pm && library.tt
