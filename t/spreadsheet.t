@@ -28,6 +28,11 @@ subtest 'pivot_data' => sub {
         [[[[1,2],[3,4]],2,undef], qr{'maxcol' parameter .+ is not of type Int}i, q{maxcol not defined}],
         [[[[1,2],[3,4]],2,'moo'], qr{'maxcol' parameter .+ is not of type Int}i, q{maxcol is wrong type}],
         [[[[1,2],[3,4]],2,0],     qr{maxcol must be greater than 0}i, q{maxcol less than 1}],
+
+        [[[[1]],1,1,1], qr{too many arguments},        q{too many args}],
+        [[],            qr{missing required argument}, q{not enough args}],
+        [[[[1]]],       qr{missing required argument}, q{not enough args}],
+        [[[[1]],1],     qr{missing required argument}, q{not enough args}],
     );
 
     for my $fatal (@fatals) {
@@ -35,7 +40,6 @@ subtest 'pivot_data' => sub {
         like exception { Judoon::Spreadsheet::pivot_data(@$args); },
             $error, $descr;
     }
-
 };
 
 
