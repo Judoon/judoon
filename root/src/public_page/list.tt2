@@ -3,6 +3,7 @@
 -%]
 
 [%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
 
 <section id="pages">
   <h4>Publicly Available Pages</h4>
