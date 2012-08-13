@@ -94,18 +94,18 @@ __PACKAGE__->config(
         user_identified_by => 'username',
         emit_module        => 'Catalyst::Plugin::ErrorCatcher::Email',
     },
-   'Plugin::ErrorCatcher::Email' => {
-       to       => 'felliott@virginia.edu',
-       from     => 'felliott@virginia.edu',
-       subject  => 'Judoon Error Report in %F, line %l',
-       use_tags => 1,
-   },
+    'Plugin::ErrorCatcher::Email' => {
+        to       => 'felliott@virginia.edu',
+        from     => 'felliott@virginia.edu',
+        subject  => 'Judoon Error Report in %F, line %l',
+        use_tags => 1,
+    },
 );
+
 
 
 # Start the application
 __PACKAGE__->setup();
-
 
 =head1 NAME
 

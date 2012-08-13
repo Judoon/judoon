@@ -283,7 +283,6 @@ sub object_DELETE :Private {
 }
 
 
-
 __PACKAGE__->meta->make_immutable;
 
 1;
