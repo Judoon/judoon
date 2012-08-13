@@ -15,71 +15,22 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
 
-with 'Judoon::Web::Controller::Role::GoHere';
+with qw(
+    Judoon::Web::Controller::Role::PublicDirectory
+);
 
 
-=head2 base
+__PACKAGE__->config(
+    action => {
+        base => { Chained => '/base', PathPart => 'page', },
+    },
 
-The base action for this controller.  All actions will pass through
-here
-
-=cut
-
-sub base : Chained('/') PathPart('page') CaptureArgs(0) {
-    my ($self, $c) = @_;
-}
-
-=head2 list
-
-List all public pages.
-
-=cut
-
-sub list : Chained('base') PathPart('') Args() {
-    my ($self, $c) = @_;
-    my @public_pages = $c->model('User::Page')->public()->all;
-    $c->stash->{page}{list} = \@public_pages;
-    $c->stash->{template} = 'public_page/list.tt2';
-}
-
-=head2 id
-
-Get the id for a specific public page
-
-=cut
-
-sub id : Chained('base') PathPart('') CaptureArgs(1) {
-    my ($self, $c, $id) = @_;
-
-    my $page = $c->model('User::Page')->public->find({id => $id});
-    if (not $page) {
-        $c->flash->{alert}{error} = q{Couldn't find that page};
-        $self->go_here($c, '/page/list', []);
-        $c->detach();
-    }
-
-    $c->stash->{page}{id} = $id;
-    $c->stash->{page}{object} = $page;
-}
-
-
-=head2 view
-
-Display a particular table
-
-=cut
-
-sub view : Chained('id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    my @page_columns = $c->stash->{page}{object}->page_columns;
-    $c->stash->{page_column}{list} = \@page_columns;
-    $c->stash->{page_column}{templates}
-        = [map {$_->template_to_jquery} @page_columns];
-    $c->stash->{template} = 'public_page/view.tt2';
-}
+    resultset_class => 'User::Page',
+    stash_key       => 'page',
+    template_dir    => 'public_page',
+);
 
 
 __PACKAGE__->meta->make_immutable;
-
 1;
 __END__
