@@ -21,7 +21,7 @@ BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/user/logged_in', PathPart => 'dataset', },
+        base => { Chained => '/user/id', PathPart => 'dataset', },
     },
     rpc => {
         template_dir => 'dataset',

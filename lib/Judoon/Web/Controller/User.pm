@@ -198,16 +198,6 @@ sub edit : Chained('id') PathPart('') Args(0) {
 }
 
 
-sub logged_in : Chained('id') PathPart('') CaptureArgs(0) {
-    my ($self, $c) = @_;
-    $c->forward('/login/required');
-
-    if (not $c->stash->{user}{is_owner}) {
-        $c->detach('/denied');
-    }
-}
-
-
 __PACKAGE__->meta->make_immutable;
 
 1;
