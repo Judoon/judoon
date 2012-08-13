@@ -45,6 +45,16 @@ has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
 sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 
+before private_base => sub {
+    my ($self, $c) = @_;
+    if (not $c->stash->{user}{is_owner}) {
+        $c->flash->{alert}{error} = 'You must be the owner to see this page';
+        $self->go_here($c, '/login/login', []);
+        $c->detach;
+    }
+};
+
+
 =head2 list_GET (after)
 
 Do some postprocessing on the dataset data to get sample data and set

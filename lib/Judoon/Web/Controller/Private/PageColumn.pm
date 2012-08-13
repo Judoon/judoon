@@ -30,6 +30,16 @@ has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 
 sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 
+before private_base => sub {
+    my ($self, $c) = @_;
+    if (not $c->stash->{user}{is_owner}) {
+        $c->flash->{alert}{error} = 'You must be the owner to see this page';
+        $self->go_here($c, '/login/login', []);
+        $c->detach;
+    }
+};
+
+
 after object_GET => sub {
     my ($self, $c) = @_;
 
