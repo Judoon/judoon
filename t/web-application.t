@@ -409,9 +409,15 @@ subtest 'Permissions' => sub {
     );
     my $ds_id = ($ds_link->url =~ m{/dataset/(\d+)});
     $mech->get_ok("/user/testuser/dataset/$ds_id", "public can see public dataset");
+    redirects_to_ok("/user/testuser/dataset/$ds_id/column", "/login");
+    $mech->post("/user/testuser/dataset/$ds_id", {'x-tunneled-method' => 'PUT',},);
+    like $mech->uri, qr{login}, 'public not allowed to PUT on dataset, redired to login';
 
     login('newuser');
     $mech->get_ok("/user/testuser/dataset/$ds_id", "newuser can see testuser's dataset");
+    redirects_to_ok("/user/testuser/dataset/$ds_id/column", "/user/newuser");
+    $mech->post("/user/testuser/dataset/$ds_id", {'x-tunneled-method' => 'PUT',},);
+    like $mech->uri, qr{/user/newuser}, 'other user not allowed to PUT on dataset, redired to their page';
 };
 
 
