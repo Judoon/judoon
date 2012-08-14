@@ -12,6 +12,7 @@ requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Action::REST';
 requires 'Catalyst::ActionRole::DetachOnDie';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
+requires 'Catalyst::Controller::DBIC::API';
 requires 'Catalyst::Model::DBIC::Schema';
 requires 'Catalyst::Plugin::Authentication';
 requires 'Catalyst::Plugin::Authorization::Roles';
