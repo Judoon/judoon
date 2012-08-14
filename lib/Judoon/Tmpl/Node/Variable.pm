@@ -3,8 +3,8 @@ package Judoon::Tmpl::Node::Variable;
 use Moose;
 use namespace::autoclean;
 
-extends 'Judoon::Tmpl::Node';
 with qw(
+    Judoon::Tmpl::Node::Role::Base
     Judoon::Tmpl::Node::Role::Formatting
 );
 

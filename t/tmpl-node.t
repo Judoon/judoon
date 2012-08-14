@@ -7,7 +7,6 @@ use Test::More;
 use Test::Fatal;
 
 use Judoon::Tmpl::Factory;
-use Judoon::Tmpl::Node;
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
 use Judoon::Tmpl::Node::Newline;
@@ -42,12 +41,6 @@ subtest '::Factory' => sub {
 
     like exception { build_node({type => 'moo'}); }, qr/unrecognized node type/i,
         'build_node() dies w/ unknown node type';
-};
-
-subtest '::Node' => sub {
-    ok my $node = Judoon::Tmpl::Node->new, 'can create plain Node';
-    like exception { $node->type },      $yada_yada_error, '->type on a plain Node dies';
-    like exception { $node->decompose }, $yada_yada_error, '->decompose on a plain Node dies';
 };
 
 subtest '::Node::Text' => sub {
