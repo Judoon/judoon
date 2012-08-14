@@ -70,7 +70,7 @@ after object_GET => sub {
     $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
-    if ($view eq 'preview') {
+    if (!$c->stash->{user}{is_owner} || $view eq 'preview') {
         $c->stash->{page_column}{templates}
             = [map {$_->template_to_jquery} @page_columns];
         $c->stash->{template} = 'page/preview.tt2';
