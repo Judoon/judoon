@@ -8,7 +8,6 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form name="dscolumn_list" id="dscolumn_list" action="[% c.uri_for_action('/rpc/datasetcolumn/list', c.req.captures) %]" method="post" accept-charset="utf-8">
   <fieldset>
     <legend>[% dataset.object.name %] dataset columns</legend>
 
@@ -40,22 +39,16 @@
             [% END %]
           </td>
           <td class="metadata center">[% column.metadata | html %]</td>
-          <td class="annotate center"><a class="btn btn-mini" href="[% c.uri_for_action('/rpc/datasetcolumn/object', c.req.captures.merge([column.id])) %]">Annotate</a></td>
-          <td class="delete center"><input type="checkbox" form="dscolumn_list" name="columns.delete" value="[% column.id %]" /></td>
+          <td class="annotate center">[%- INCLUDE 'components/action_button.tt2' label="Annotate" url=c.uri_for_action('/private/datasetcolumn/object', c.req.captures.merge([column.id]))  -%]</td>
+          <td class="delete center">
+            [% INCLUDE 'components/forms/action_form.tt2'   label="Delete"    url=c.uri_for_action('/private/datasetcolumn/object', [user.object.username, dataset.object.id, column.id]),  method="DELETE" form_name="delete_dataset_column_" _ column.id -%]
+          </td>
         </tr>
         [% END %]
       </tbody>
     </table>
 
-    <input type="hidden" form="dscolumn_list" name="x-tunneled-method" value="PUT">
-    [% INCLUDE 'components/forms/form_submit.tt2'
-       submit_type = 'update'
-       return_url  = c.uri_for_action('/user/edit', [user.object.username]),
-       return_page = 'dataset'
-       form_name   = 'dscolumn_list'
-    %]
-
   </fieldset>
-</form>
+
 
 [% END %]

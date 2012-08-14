@@ -9,11 +9,11 @@
 [%- INCLUDE 'components/identification.tt2' -%]
 
 <ul class="nav nav-pills">
-  <li class="active"><a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
 </ul>
 
 
-<form name="page_edit" id="page_edit" action="[% c.uri_for_action('/rpc/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
+<form name="page_edit" id="page_edit" action="[% c.uri_for_action('/private/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
   <fieldset>
     <legend>Page Layout</legend>
 
@@ -45,14 +45,14 @@
     [% INCLUDE 'components/forms/form_submit.tt2'
        submit_type = 'update'
        allow_reset = 1
-       return_url  = c.uri_for_action('/rpc/dataset/object', [user.object.username, page.object.dataset.id])
+       return_url  = c.uri_for_action('/private/dataset/object', [user.object.username, dataset.id])
        return_page = 'dataset'
        form_name   = 'page_edit'
     %]
   </fieldset>
 </form>
 
-<form name="add_page_column_form" id="add_page_column_form" action="[% c.uri_for_action('/rpc/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
+<form name="add_page_column_form" id="add_page_column_form" action="[% c.uri_for_action('/private/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Table Layout</legend>
 
@@ -61,6 +61,9 @@
       <button type="submit" class="btn" form="add_page_column_form"><i class="icon-plus"></i>Add page column</button>
     </div>
 
+
+  </fieldset>
+</form>
 
     <div class="row-fluid">
 
@@ -78,10 +81,10 @@
                 [% column.template_to_jquery %]
               </div>
               <div>
-                [%- INCLUDE 'components/action_button.tt2' label='<i class="icon-plus"></i> Edit' url=c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])) -%]
+                [%- INCLUDE 'components/action_button.tt2' label='<i class="icon-plus"></i> Edit' url=c.uri_for_action('/private/pagecolumn/object', c.req.captures.merge([column.id])) -%]
                 [%- INCLUDE 'components/forms/action_form.tt2'
                       label='<i class="icon-trash"></i> Delete',
-                      url=c.uri_for_action('/rpc/pagecolumn/object', c.req.captures.merge([column.id])),
+                      url=c.uri_for_action('/private/pagecolumn/object', c.req.captures.merge([column.id])),
                       method="DELETE", form_name="delete_page_column_" _ column.id
                 -%]
               </div>
@@ -116,11 +119,8 @@
 
     </div>
 
-  </fieldset>
-</form>
-
 <ul class="nav nav-pills">
-  <li class="active"><a href="[% c.uri_for_action('/rpc/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
 </ul>
 
 [% END %]

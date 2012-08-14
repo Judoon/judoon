@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::RPC::Page;
+package Judoon::Web::Controller::Private::Page;
 
 =pod
 
@@ -6,76 +6,58 @@ package Judoon::Web::Controller::RPC::Page;
 
 =head1 NAME
 
-Judoon::Web::Controller::RPC::Page - page actions
+Judoon::Web::Controller::Private::Page - page actions
 
 =head1 DESCRIPTION
 
 The RESTful controller for managing actions on one or more pages.
-Currently chains off of ::RPC::Dataset, but this may be changed later.
+Currently chains off of ::Private::Dataset, but this may be changed later.
 
 =cut
 
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
-
-use Data::Printer;
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/rpc/dataset/id', PathPart => 'page', },
+        base => { Chained => '/private/dataset/chainpoint', PathPart => 'page', },
     },
     rpc => {
         template_dir => 'page',
         stash_key    => 'page',
+        api_path     => 'page',
     },
 );
 
 
-=head2 add_object
-
-Add a new page linked to the parent dataset.
-
-=cut
-
-override add_object => sub {
-    my ($self, $c, $params) = @_;
-    return $c->stash->{dataset}{object}->create_related('pages', {
-        title => '', preamble => '', postamble => '',
-    });
-};
-
-
-=head2 get_object
-
-Fetch a page from the database.
-
-=cut
-
-override get_object => sub {
+before private_base => sub {
     my ($self, $c) = @_;
-    return $c->stash->{dataset}{object}->pages_rs->find({id => $c->stash->{page}{id}});
+    if (!$c->stash->{user}{is_owner} and $c->req->method ne 'GET') {
+        $c->flash->{alert}{error} = 'You must be the owner to do this';
+        $self->go_here($c, '/login/login', []);
+        $c->detach;
+    }
 };
 
 
-=head2 edit_object
+=head2 list_GET
 
-Update the page in the database.
+Send user to their overview page.
 
 =cut
 
-override edit_object => sub {
-    my ($self, $c, $params) = @_;
-    my %valid = $self->extract_params('page', $params);
-    return $c->stash->{page}{object}->update(\%valid);
+override list_GET => sub {
+    my ($self, $c) = @_;
+    $self->go_here($c, '/user/edit', [$c->req->captures->[0]]);
 };
 
 
 =head2 object_GET (after)
 
-After L<RPC/object_GET>, set up the stash parameters the page's edit
+After L<Private/object_GET>, set up the stash parameters the page's edit
 page will need.
 
 =cut
@@ -83,11 +65,12 @@ page will need.
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my @page_columns = $c->stash->{page}{object}->page_columns;
+    my $page = $c->req->get_object(0)->[0];
+    my @page_columns = $page->page_columns;
     $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
-    if ($view eq 'preview') {
+    if (!$c->stash->{user}{is_owner} || $view eq 'preview') {
         $c->stash->{page_column}{templates}
             = [map {$_->template_to_jquery} @page_columns];
         $c->stash->{template} = 'page/preview.tt2';
@@ -103,7 +86,7 @@ after object_GET => sub {
     }
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $c->stash->{dataset}{object}->ds_columns;
+    }} $c->req->get_chained_object(0)->[0]->ds_columns;
     $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 
@@ -120,19 +103,6 @@ after object_DELETE => sub {
     pop @captures; pop @captures;
     $self->go_here($c, '/user/edit', \@captures);
 };
-
-
-=head2 delete_object
-
-delete the page
-
-=cut
-
-override delete_object => sub {
-    my ($self, $c) = @_;
-    $c->stash->{page}{object}->delete;
-};
-
 
 
 __PACKAGE__->meta->make_immutable;

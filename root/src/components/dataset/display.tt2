@@ -1,34 +1,24 @@
-<h2>[% page.object.title %]</h2>
+<h2>[% dataset.object.title %]</h2>
 
-<br>
-[% page.object.preamble %]
-<br>
 
-<table id="demo_page" class="display data_table table table-striped table-condensed table-border">
+<table id="demo_dataset" class="display data_table table table-striped table-condensed table-border">
   <thead>
-    [% FOREACH p_column IN page_column.list %]
-    <th>[% p_column.title %]</th>
+    [% FOREACH d_column IN dataset_column.list %]
+    <th>[% d_column.name %]</th>
     [% END %]
   </thead>
   <tbody>
   </tbody>
 </table>
 
-<br>
-<p>[% page.object.postamble %]</p>
-
-[% FOREACH template IN page_column.templates %]
-<script id="column_tmpl_[% loop.count %]" type="text/x-jquery-tmpl">
-[% template %]
-</script>
-[% END %]
-
 
 <script>
   $(document).ready(function() {
       judoon_dt_bootstrap_init();
 
-      $('#demo_page').dataTable({
+      var columnNames = [% column_names_json %];
+
+      $('#demo_dataset').dataTable({
           "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",
           "fnServerData" : function ( sSource, aoData, fnCallback ) {
             $.ajax( {
@@ -40,11 +30,10 @@
                      function(data) {
                         var new_data = [];
                         for (var i = 0; i < data.tmplData.length; i++) {
-                            new_data[i] = [
-                                [% FOREACH p_column IN page_column.list %]
-                                $('#column_tmpl_[% loop.count %]').render(data.tmplData[i])[% UNLESS loop.last %],[% END%]
-                                [% END %]
-                            ];
+                            new_data.push([]);
+                            for (var j = 0; j < columnNames.length; j++) {
+                                new_data[i].push(data.tmplData[i][columnNames[j]]);
+                            }
                         }
                         data.aaData = new_data;
                      },
@@ -57,7 +46,7 @@
           "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
           "sPaginationType": "bootstrap",
           "oLanguage": {
-              "sLengthMenu": "_MENU_ records per page"
+              "sLengthMenu": "_MENU_ records per dataset"
           }
       });
   });

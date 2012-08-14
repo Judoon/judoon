@@ -1,0 +1,39 @@
+[%- WRAPPER inc/wrapper.tt2
+  title = 'Public Datasets'
+-%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
+
+<section id="datasets">
+  <h4>Publicly Available Datasets</h4>
+  [% IF dataset.list.size %]
+  <table class="table table-striped table-condensed" id="dataset_list">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Dataset</th>
+        <th>Columns / Rows</th>
+        <th>About</th>
+        <th>Owner</th>
+      </tr>
+    </thead>
+    <tbody>
+      [%- FOREACH dataset_obj IN dataset.list -%]
+      <tr>[% dataset_owner = dataset_obj.user %]
+        <td>[%- loop.count -%]<a name="dataset_[%- dataset_obj.id -%]"></a></td>
+        <td><a href="[%- c.uri_for_action('/private/dataset/object', [dataset_owner.username, dataset_obj.id]) -%]">[%- dataset_obj.name -%]</a></td>
+        <td>[%- dataset_obj.nbr_columns -%] / [%- dataset_obj.nbr_rows -%]</td>
+        <td>[%- '-' -%]</td>
+        <td>[%- dataset_owner.username -%]</td>
+      </tr>
+      [%- END -%]
+    </tbody>
+  </table>
+  [%- ELSE -%]
+  <p>Sorry, no datasets are available at this time.</p>
+  [%- END -%]
+</section>
+
+
+[%- END -%]

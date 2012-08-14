@@ -3,6 +3,7 @@
 -%]
 
 [%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
 
 <section id="pages">
   <h4>Publicly Available Pages</h4>
@@ -19,12 +20,12 @@
     </thead>
     <tbody>
       [%- FOREACH page_obj IN page.list -%]
-      <tr>
+      <tr>[% page_dataset = page_obj.dataset %][% page_owner = page_dataset.user %]
         <td>[%- loop.count -%]<a name="page_[%- page_obj.id -%]"></a></td>
-        <td><a href="[%- c.uri_for_action('/page/view', [page_obj.id]) -%]">[%- page_obj.title -%]</a></td>
+        <td><a href="[%- c.uri_for_action('/private/page/object', [page_owner.username, page_dataset.id, page_obj.id]) -%]">[%- page_obj.title -%]</a></td>
         <td>[%- page_obj.nbr_columns -%] / [%- page_obj.nbr_rows -%]</td>
         <td>[%- '-' -%]</td>
-        <td>[%- page_obj.dataset.user.username -%]</td>
+        <td>[%- page_owner.username -%]</td>
       </tr>
       [%- END -%]
     </tbody>

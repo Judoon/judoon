@@ -1,4 +1,4 @@
-package Judoon::Web::Controller::Page;
+package Judoon::Web::Controller::Dataset;
 
 =pod
 
@@ -6,7 +6,7 @@ package Judoon::Web::Controller::Page;
 
 =head1 NAME
 
-Judoon::Web::Controller::Page - display public pages
+Judoon::Web::Controller::Dataset - display public datasets
 
 =cut
 
@@ -22,12 +22,12 @@ with qw(
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/base', PathPart => 'page', },
+        base => { Chained => '/base', PathPart => 'dataset', },
     },
 
-    resultset_class => 'User::Page',
-    stash_key       => 'page',
-    template_dir    => 'public_page',
+    resultset_class => 'User::Dataset',
+    stash_key       => 'dataset',
+    template_dir    => 'public_dataset',
 );
 
 

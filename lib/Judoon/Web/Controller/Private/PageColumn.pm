@@ -1,9 +1,9 @@
-package Judoon::Web::Controller::RPC::PageColumn;
+package Judoon::Web::Controller::Private::PageColumn;
 
 use Moose;
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller::RPC'; }
+BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 
@@ -17,11 +17,12 @@ sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/rpc/page/id', PathPart => 'column', },
+        base => { Chained => '/private/page/chainpoint', PathPart => 'column', },
     },
     rpc => {
         template_dir => 'page_column',
         stash_key    => 'page_column',
+        api_path     => 'pagecolumn',
     },
 );
 
@@ -29,23 +30,21 @@ has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 
 sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 
-override add_object => sub {
-    my ($self, $c, $params) = @_;
-    my %valid = $self->extract_params('page_column', $params);
-    $valid{template} = q{};
-    return $c->stash->{page}{object}->create_related('page_columns', \%valid);
+before private_base => sub {
+    my ($self, $c) = @_;
+    if (not $c->stash->{user}{is_owner}) {
+        $c->flash->{alert}{error} = 'You must be the owner to see this page';
+        $self->go_here($c, '/login/login', []);
+        $c->detach;
+    }
 };
 
-override get_object => sub {
-    my ($self, $c) = @_;
-    return $c->stash->{page}{object}->page_columns_rs
-        ->find({id => $c->stash->{page_column}{id}});
-};
 
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my @ds_columns = $c->stash->{dataset}{object}->ds_columns;
+    my $dataset = $c->req->get_chained_object(-2)->[0];
+    my @ds_columns = $dataset->ds_columns;
     $c->stash->{ds_column}{list} = \@ds_columns;
     $c->stash->{url_columns} = [grep {$_->is_url} @ds_columns];
     my @acc_columns = grep {$_->is_accession} @ds_columns;
@@ -69,7 +68,7 @@ after object_GET => sub {
 
     # copied & pasted from DataSetColumn
     # need to factor this out.
-    my $rows = $c->stash->{dataset}{object}->data;
+    my $rows = $dataset->data;
     my @sample_data;
     for my $idx (0..$#ds_columns) {
       ROW_SEARCH:
@@ -84,42 +83,30 @@ after object_GET => sub {
     @sample_data{map {$_->shortname} @ds_columns} = @sample_data;
     $c->stash->{sample_data} = encode_json( \%sample_data );
 
-    my $page_column = $c->stash->{page_column}{object};
-    if (my $template = $page_column->template) {
-        $page_column->{webwidgets} = $page_column->template_to_webwidgets();
+    my $page_column = $c->req->get_object(0)->[0];
+    if ($page_column->template) {
+        $c->stash->{page_column}{object}{webwidgets}
+            = $page_column->template_to_webwidgets();
     }
 };
 
-override edit_object => sub {
-    my ($self, $c, $params) = @_;
-    return $c->stash->{page_column}{object}->update($params);
-};
-
-override munge_edit_params => sub {
+before object_PUT => sub {
     my ($self, $c) = @_;
 
-    my $params        = $c->req->params;
-    my $template_html = $params->{'page_column.template'};
+    my $params        = $c->req->get_object(0)->[1];
+    my $template_html = $params->{template};
     my $template      = $self->translator->translate(
         from => 'WebWidgets', to => 'Native', template => $template_html,
     );
-    $params->{'page_column.template'} = $template;
-
-    my %valid = $self->extract_params('page_column', $params);
-    return \%valid;;
+    $params->{'template'} = $template;
 };
 
-
-override delete_object => sub {
-    my ($self, $c) = @_;
-    $c->stash->{page_column}{object}->delete;
-};
 
 after object_DELETE => sub {
     my ($self, $c) = @_;
     my $captures = $c->req->captures;
     pop @$captures;
-    $self->go_here($c, '/rpc/page/object', $captures);
+    $self->go_here($c, '/private/page/object', $captures);
 };
 
 __PACKAGE__->meta->make_immutable;

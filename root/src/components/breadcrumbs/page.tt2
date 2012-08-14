@@ -1,2 +1,2 @@
 [% INCLUDE 'components/breadcrumbs/dataset.tt2' divider=1 active=1 %]
-<li>[% UNLESS active %]Page: [% page.object.title %][% ELSE %]<a href="[% c.uri_for_action('/rpc/page/object', [user.id, dataset.id, page.id]) %]">Page: [% page.object.title %]</a>[% IF divider %] <span class="divider">/</span>[% END %][% END %]</li>
+<li>[% UNLESS active %]Page: [% page.object.title %][% ELSE %]<a href="[% c.uri_for_action('/private/page/object', [user.id, dataset.id, page.id]) %]">Page: [% page.object.title %]</a>[% IF divider %] <span class="divider">/</span>[% END %][% END %]</li>

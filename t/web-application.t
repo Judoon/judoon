@@ -233,13 +233,15 @@ subtest 'Dataset' => sub {
     login('testuser');
 
     # GET dataset/list
-    redirects_to_ok('/user/testuser/dataset','/user/testuser');
+    #redirects_to_ok('/user/testuser/dataset','/user/testuser');
+    $mech->get_ok('/user/testuser/dataset','can get dataset list');
 
     # POST dataset/list
+    $mech->get('/user/testuser');
     my $dataset_uri = add_new_object_ok({
         object => 'dataset', list_uri => '/user/testuser',
         form_name => 'add_dataset', form_args => {
-            dataset => [$spreadsheets{basic}],
+            'dataset.file' => [$spreadsheets{basic}],
         }, page_uri_re => qr{/user/testuser/dataset/\d+},
     });
 
@@ -271,7 +273,7 @@ subtest 'DatasetColumns' => sub {
     $mech->submit_form_ok({
         form_name => 'add_dataset',
         fields => {
-            dataset => [$spreadsheets{basic}],
+            'dataset.file' => [$spreadsheets{basic}],
         },
     }, 'Can upload a dataset', );
 
@@ -289,8 +291,8 @@ subtest 'DatasetColumns' => sub {
 
     # PUT datatsetcolumn/object
     puts_ok('dataset_column', $dscol_uri, {
-        'column.is_url'   => '1',
-        'column.url_root' => 'http://www.google.com/',
+        'ds_column.is_url'   => '1',
+        'ds_column.url_root' => 'http://www.google.com/',
     });
     $mech->get($dscol_list_uri);
     $mech->content_like(qr{url: http://www.google.com/},
@@ -406,10 +408,16 @@ subtest 'Permissions' => sub {
         url_regex => qr{/user/testuser/dataset/\d+}
     );
     my $ds_id = ($ds_link->url =~ m{/dataset/(\d+)});
-    redirects_to_ok("/user/testuser/dataset/$ds_id", "/login");
+    $mech->get_ok("/user/testuser/dataset/$ds_id", "public can see public dataset");
+    redirects_to_ok("/user/testuser/dataset/$ds_id/column", "/login");
+    $mech->post("/user/testuser/dataset/$ds_id", {'x-tunneled-method' => 'PUT',},);
+    like $mech->uri, qr{login}, 'public not allowed to PUT on dataset, redired to login';
 
     login('newuser');
-    redirects_to_ok("/user/testuser/dataset/$ds_id", "/user/newuser");
+    $mech->get_ok("/user/testuser/dataset/$ds_id", "newuser can see testuser's dataset");
+    redirects_to_ok("/user/testuser/dataset/$ds_id/column", "/user/newuser");
+    $mech->post("/user/testuser/dataset/$ds_id", {'x-tunneled-method' => 'PUT',},);
+    like $mech->uri, qr{/user/newuser}, 'other user not allowed to PUT on dataset, redired to their page';
 };
 
 

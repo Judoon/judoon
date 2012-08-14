@@ -14,7 +14,10 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
-with qw(Judoon::Web::Controller::Role::ExtractParams);
+with qw(
+    Judoon::Web::Controller::Role::ExtractParams
+    Judoon::Web::Controller::Role::GoHere
+);
 
 use Try::Tiny;
 
@@ -191,16 +194,6 @@ sub edit : Chained('id') PathPart('') Args(0) {
         my @datasets = $c->stash->{user}{object}->datasets_rs()->public();
         $c->stash->{dataset}{list} = \@datasets;
         $c->stash->{page}{list}    = [map {$_->pages_rs->public} @datasets];
-    }
-}
-
-
-sub logged_in : Chained('id') PathPart('') CaptureArgs(0) {
-    my ($self, $c) = @_;
-    $c->forward('/login/required');
-
-    if (not $c->stash->{user}{is_owner}) {
-        $c->detach('/denied');
     }
 }
 

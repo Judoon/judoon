@@ -8,7 +8,7 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form name="dataset_edit" id="dataset_edit" action="[% c.uri_for_action('/rpc/dataset/object', c.req.captures) %]" method="post" accept-charset="utf-8" class="form-horizontal">
+<form name="dataset_edit" id="dataset_edit" action="[% c.uri_for_action('/private/dataset/object', c.req.captures) %]" method="post" accept-charset="utf-8" class="form-horizontal">
   <fieldset>
     <legend>Dataset Properties</legend>
 
@@ -42,18 +42,21 @@
 
 <section id="actions">
   <h4>Actions</h4>
-  [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/rpc/datasetcolumn/list', [user.object.username, dataset.object.id]) -%]
-  [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/rpc/page/list', [user.object.username, dataset.object.id]), method="POST" form_name="add_page_" _ loop.count -%]
-  [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/rpc/dataset/object', [user.object.username, dataset.object.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
+  [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset.object.id]) -%]
+  [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]), method="POST" form_name="add_page_" _ loop.count -%]
+  [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/private/dataset/object', [user.object.username, dataset.object.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
+</section>
 
+<br>
 
+<section id="pages">
   <h4>Pages</h4>
   <ul>
-    [%- FOREACH page IN dataset.object.pages -%]
+    [%- FOREACH page IN page.list -%]
     <li>
-      <a href="[%- c.uri_for_action('/rpc/page/object', [c.user.username, dataset.id, page.id]) -%]">[%- page.title -%]</a>
-      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.id, page.id], {view => 'preview'}) -%]
-      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/rpc/page/object', [user.object.username, dataset.id, page.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+      <a href="[%- c.uri_for_action('/private/page/object', [c.user.username, dataset.object.id, page.id]) -%]">[%- page.title || '(untitled)' -%]</a>
+      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/private/page/object', [user.object.username, dataset.object.id, page.id], {view => 'preview'}) -%]
+      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', [user.object.username, dataset.object.id, page.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
     </li>
     [%- END -%]
   </ul>

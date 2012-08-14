@@ -8,7 +8,7 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form id="pagecol_form" name="pagecol_form" action="[% c.uri_for_action('/rpc/pagecolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
+<form id="pagecol_form" name="pagecol_form" action="[% c.uri_for_action('/private/pagecolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
     <legend>Page Column</legend>
 
@@ -89,7 +89,7 @@
     
     [% INCLUDE 'components/forms/form_submit.tt2'
        submit_type = 'update'
-       return_url  = c.uri_for_action('/rpc/page/object', c.req.captures.slice(0,-2))
+       return_url  = c.uri_for_action('/private/page/object', c.req.captures.slice(0,-2))
        return_page = 'page'
        form_name   = 'pagecol_form'
     %]

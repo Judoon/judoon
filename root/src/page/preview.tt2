@@ -2,14 +2,18 @@
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 
-[%- WRAPPER 'components/breadcrumbs.tt2' -%]
-[%- INCLUDE 'components/breadcrumbs/page.tt2' active=1 -%]
+[%- IF user.is_owner -%]
+  [%- WRAPPER 'components/breadcrumbs.tt2' -%]
+  [%- INCLUDE 'components/breadcrumbs/page.tt2' active=1 -%]
+  [%- END -%]
+  [%- INCLUDE 'components/notification.tt2'
+      alert.warning = 'This is just a preview. You need to publish it before others can see it. <a href="'
+                    _ c.uri_for_action('/private/page/object', c.req.captures)
+                    _ '">Go back and edit</a>.'
+   -%]
+[%- ELSE -%]
+  [%- INCLUDE 'components/notification.tt2' -%]
 [%- END -%]
-[%- INCLUDE 'components/notification.tt2'
-    alert.warning = 'This is just a preview. You need to publish it before others can see it. <a href="'
-                  _ c.uri_for_action('/rpc/page/object', c.req.captures)
-                  _ '">Go back and edit</a>.'
- -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
 [%- INCLUDE 'components/page/display.tt2' -%]

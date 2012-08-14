@@ -29,6 +29,14 @@ sub index :Chained('base')  PathPart('')    Args(0) {
     $c->res->body('got here');
 }
 
+sub api_base : Chained('/') PathPart('api') CaptureArgs(0) {
+    my ( $self, $c ) = @_;
+}
+
+sub rest_base : Chained('api_base') PathPart('') CaptureArgs(0) {
+    my ($self, $c) = @_;
+}
+
 =head1 AUTHOR
 
 Fitz Elliott
