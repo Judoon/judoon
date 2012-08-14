@@ -1,10 +1,5 @@
 package Judoon::SiteLinker;
 
-use Moo;
-use MooX::Types::MooseLike::Base qw(HashRef ArrayRef);
-
-use List::AllUtils qw(zip);
-
 =pod
 
 =encoding utf8
@@ -15,17 +10,34 @@ Judoon::SiteLinker - Utility class for mapping accessions to websites
 
 =head1 SYNOPSIS
 
+ use Judoon::SiteLinker;
+
+ my $sitelinker = Judoon::SiteLinker->new;
+
+ my $mapping = $sitelinker->mapping->{site}{pfam}{uniprot_acc}
+ # $mapping->{prefix} == 'http://pfam.sanger.ac.uk/protein?acc='
+
 =head1 DESCRIPTION
+
+This module simply provides a bunch of data structures to map
+accessions to websites and vice-versa.
 
 =cut
 
+use Moo;
+use MooX::Types::MooseLike::Base qw(HashRef ArrayRef);
 
-=head2 _build_sites
+use List::AllUtils qw(zip);
 
-sites is a hashref of website properties keyed off the website
+=head1 ATTRIBUTES
+
+=head2 C<B<sites / _build_sites>>
+
+C<sites> is a hashref of website properties keyed off the website
 identifier.  The properties have the following structure:
 
  {name => $website_id, label => $descriptive_name}
+ e.g. {name => 'gene', label => 'Entrez Gene',}
 
 =cut
 
@@ -53,12 +65,13 @@ sub _build_sites {
 }
 
 
-=head2 _build_accessions
+=head2 B<C<accessions / _build_accessions>>
 
-accessions is a hashref of accession properties keyed off the
+C<accessions> is a hashref of accession properties keyed off the
 accession identifier.  The property structure is:
 
  {name => $acc_id, label => $descriptive_name, example => $example_accession}
+ e.g. {name => 'uniprot_id', label => 'UniprotID', example => 'TLN1_HUMAN',}
 
 =cut
 
@@ -88,7 +101,7 @@ sub _build_accessions {
 }
 
 
-=head2 mapping
+=head2 B<C<mapping / _build_mapping>>
 
 C<mapping> holds the specific properties of how to link a particular
 accession to a particular website.  It's a hashref with two subkeys,
@@ -105,6 +118,36 @@ The resulting link properties have the following structure:
   prefix => $link_prefix, postfix => $link_postfix,
   exact => 1, one_to_many => 0,
  }
+ e.g. for ->mapping->{site}{pfam}{uniprot_acc}
+ {
+  prefix      => 'http://www.ncbi.nlm.nih.gov/unigene/',
+  postfix     => '',
+  exact       => 1,
+  one_to_many => 0,
+ }
+
+The current property list is:
+
+=over
+
+=item C<prefix> / C<postfix>
+
+C<prefix> and C<postfix> are strings which when prepended and appended
+to the accession, will produce a valid link to the website.
+
+=item C<exact>
+
+C<exact> is a boolean flag that when true implies that this accession
+will link to an exact record in the mapped website.  If C<exact> is
+false, the url may produce zero, one, or more records.
+
+=item C<one_to_many>
+
+C<one_to_many> implies that the given accession / site mapping will
+produce a url that links to multiple resources. e.g. linking Entrez
+Protein with an Entrez Gene id.
+
+=back
 
 =cut
 
@@ -142,6 +185,31 @@ sub _build_mapping {
     return \%mappings;
 }
 
+
+=head2 B<C<accession_groups / _build_accession_groups>>
+
+C<accession_groups> categorizes accession types for use in HTML select
+boxes.
+
+The resulting groups have the following structure:
+
+ {
+  group_label => $label, types => [{}],
+ }
+ e.g.
+ {
+  group_label => 'Uniprot',
+  types => [
+    {name => 'uniprot_id', ...},
+    {name => 'uniprot_acc', ...},
+  ],
+ }
+
+The C<types> key contains a list of accessions in the group as fetched
+from the C<L</accessions>> attribute.
+
+=cut
+
 has accession_groups => (is => 'lazy', isa => ArrayRef,);
 sub _build_accession_groups {
     my ($self) = @_;
@@ -160,6 +228,7 @@ sub _build_accession_groups {
 
     return \@return;
 }
+
 
 1;
 __END__
