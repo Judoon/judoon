@@ -51,6 +51,32 @@ sub object_GET {
         $filtered = @real_data;
     }
 
+    # order data
+    # iSortingCols: # of columns to sort by
+    # sSortDir_#: asc/ desc
+    # iSortCol_#: sort column number
+    my $nbr_sort_cols = +($params->{iSortingCols} // 1);
+    my $max_cols = $c->stash->{dataset}{object}->nbr_columns;
+    $nbr_sort_cols = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
+    my @sorts;
+    for my $i (0..$nbr_sort_cols-1) {
+        push @sorts, [$params->{"iSortCol_$i"}, $params->{"sSortDir_$i"}];
+    }
+    my $sort_func = sub {
+        my ($left, $right) = @_;
+
+        my $retval;
+        for my $sort (@sorts) {
+            my $idx = $sort->[0];
+            $retval = $sort->[1] eq 'asc' ? ($left->[$idx]  cmp $right->[$idx])
+                    :                       ($right->[$idx] cmp $left->[$idx] );
+            last if ($retval);
+        }
+        return $retval;
+    };
+    @real_data = sort {$sort_func->($a, $b)} @real_data;
+
+
     # paginate data
     my ($start, $end) = (0, $#real_data);
     my $len = $params->{iDisplayLength};
