@@ -1,7 +1,7 @@
 package Judoon::SiteLinker;
 
-use Moose;
-use namespace::autoclean;
+use Moo;
+use MooX::Types::MooseLike::Base qw(HashRef ArrayRef);
 
 use List::AllUtils qw(zip);
 
@@ -29,7 +29,7 @@ identifier.  The properties have the following structure:
 
 =cut
 
-has sites      => (is => 'ro', isa => 'HashRef', lazy_build => 1);
+has sites => (is => 'lazy', isa => HashRef,);
 sub _build_sites {
     my ($self) = @_;
 
@@ -62,7 +62,7 @@ accession identifier.  The property structure is:
 
 =cut
 
-has accessions => (is => 'ro', isa => 'HashRef', lazy_build => 1);
+has accessions => (is => 'lazy', isa => HashRef,);
 sub _build_accessions {
     my ($self) = @_;
 
@@ -108,7 +108,7 @@ The resulting link properties have the following structure:
 
 =cut
 
-has mapping => (is => 'ro', isa => 'HashRef', lazy_build => 1);
+has mapping => (is => 'lazy', isa => HashRef,);
 sub _build_mapping {
     my ($self) = @_;
 
@@ -142,7 +142,7 @@ sub _build_mapping {
     return \%mappings;
 }
 
-has accession_groups => (is => 'ro', isa => 'ArrayRef', lazy_build => 1);
+has accession_groups => (is => 'lazy', isa => ArrayRef,);
 sub _build_accession_groups {
     my ($self) = @_;
 
@@ -160,8 +160,6 @@ sub _build_accession_groups {
 
     return \@return;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__

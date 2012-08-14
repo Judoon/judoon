@@ -48,6 +48,7 @@ requires 'List::AllUtils';
 requires 'Method::Signatures';
 requires 'Module::Pluggable';
 requires 'Moo';
+requires 'MooX::Types::MooseLike';
 requires 'Moose';
 requires 'MooseX::MarkAsMethods';
 requires 'MooseX::MethodAttributes::Role';
