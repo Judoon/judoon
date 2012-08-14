@@ -408,10 +408,10 @@ subtest 'Permissions' => sub {
         url_regex => qr{/user/testuser/dataset/\d+}
     );
     my $ds_id = ($ds_link->url =~ m{/dataset/(\d+)});
-    redirects_to_ok("/user/testuser/dataset/$ds_id", "/login");
+    $mech->get_ok("/user/testuser/dataset/$ds_id", "public can see public dataset");
 
     login('newuser');
-    redirects_to_ok("/user/testuser/dataset/$ds_id", "/user/newuser");
+    $mech->get_ok("/user/testuser/dataset/$ds_id", "newuser can see testuser's dataset");
 };
 
 

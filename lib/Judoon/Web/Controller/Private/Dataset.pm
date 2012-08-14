@@ -19,6 +19,8 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 
+use JSON qw(encode_json);
+
 __PACKAGE__->config(
     action => {
         base => { Chained => '/user/id', PathPart => 'dataset', },
@@ -62,11 +64,21 @@ Add the dataset's first page to the stash.
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my $dataset = $c->req->get_object(0)->[0]; # $c->stash->{dataset}{object};
+    my $dataset = $c->req->get_object(0)->[0];
+
+    my $view = $c->req->param('view') // '';
+    if (!$c->stash->{user}{is_owner} || $view eq 'preview') {
+        my @ds_columns = $dataset->ds_columns;
+        $c->stash->{dataset_column}{list} = \@ds_columns;
+        $c->stash->{column_names_json} = encode_json([map {$_->shortname} @ds_columns]);
+        $c->stash->{template} = 'dataset/preview.tt2';
+        $c->detach();
+    }
+
     (my $name = $dataset->name) =~ s/\W/_/g;
     $name =~ s/__+/_/g;
     $name =~ s/(?:^_+|_+$)//g;
-    my $view = $c->req->param('view') // '';
+
     if ($view eq 'raw') {
         $c->res->headers->header( "Content-Type" => "text/tab-separated-values" );
         $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.tab" );
