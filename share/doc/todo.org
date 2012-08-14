@@ -3,7 +3,7 @@
 #+TODO: TODO | DONE WONT
 
 * Judoon::Web                                                    :Judoon_Web:
-** General / Misc [7/22]
+** General / Misc [8/17]
 *** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
@@ -27,6 +27,8 @@ CLOSED: [2012-07-19 Thu 16:16]
 CLOSED: [2012-07-20 Fri 07:49]
 *** DONE [#A] PageColumn does not support link prefix?
 CLOSED: [2012-07-23 Mon 20:01]
+*** DONE [#A] permissions: protect visitors from edit pages
+CLOSED: [2012-08-14 Tue 13:33]
 *** TODO [#B] Need 2 type of publish, access-restricted, public release :feature:
 *** TODO [#A] quick deployment
 user downloads tarball or zip
@@ -39,13 +41,25 @@ arrayref in stash->{tabular}{data}, the format in ->{tabular}{format},
 and create / dispatch based on that.
 Maybe we can do this already by patching C::V::Download?
 *** TODO [#A] Add raw/csv/dataset downloads for page (maybe create RPC::Role::TabularView)
-*** TODO [#A] permissions: protect visitors from edit pages
 *** TODO [#B] switch to passing only Hashrefs to templates
 Need to go through and audit controllers / templates figure out where
 we can simplify
 *** TODO [#A] Signup page always shows not-logged-in sidebar because user.is_owner is never set
 I guess we need to do the user check in the base controller?
-** Interface [5/9]
+*** TODO [#B] rewrite Web::Controller::Role::GoHere as a Catalyst Plugin
+*** TODO [#B] root/src/user/edit.tt2 -should be two templates, one for owners, one for visitors
+*** TODO [#C] splash page decorations                               :feature:
+When a visitor visits a user page (e.g. /user/cellmigration), give
+cellmigration user option to decorate with welcome message,
+description of self, etc.  It probably shouldn't be a fully functional
+website, but maybe just a couple of blurbs and a logo image.  Maybe
+other properties like: Org Name, website, contact email, affiliation,
+collab policy, etc.
+
+Page blurbs could maybe be stored in Markdown, so we don't end up
+having to scrub/parse HTML?  Is there a tinymce-like control for Markdown?
+
+** Interface [7/10]
 *** DONE [#B] lessen gray border, way too wide
 CLOSED: [2012-07-09 Mon 17:46]
 *** DONE [#A] make 'Get Started' not get :visited coloration
@@ -57,14 +71,16 @@ CLOSED: [2012-07-09 Mon 17:47]
 No formatting, no annotation, dead simple.
 *** DONE [#A] pages should generally use components notification
 CLOSED: [2012-07-19 Thu 21:32]
+*** DONE [#A] how do visitors see deep urls /user/notme/dataset/1/column/4?
+CLOSED: [2012-08-14 Tue 13:32]
+visitors aren't allowed to see it
+*** DONE [#B] Add hierarchical nav at the top of edit pages
+CLOSED: [2012-08-14 Tue 13:33]
+From Page Column, it would be nice to get to:
+<Overview> <Dataset> <Dataset Columns> <Page>
 *** TODO [#A] make front page fit without scrolling
 *** TODO [#A] Integrate color scheme with bootstrap
 *** TODO [#A] maybe center the page? the splash screen looks weirdly off-center
-*** TODO [#A] how do visitors see deep urls /user/notme/dataset/1/column/4?
-*** TODO [#B] Add hierarchical nav at the top of edit pages
-From Page Column, it would be nice to get to:
-<Overview> <Dataset> <Dataset Columns> <Page>
-
 ** User [1/9]
 *** DONE [#A] Need delete button for datasets
 CLOSED: [2012-07-17 Tue 11:29]
@@ -75,7 +91,12 @@ CLOSED: [2012-07-17 Tue 11:29]
 *** TODO [#A] settings/profile: don't allow user to unset email
 *** TODO [#B] add how to contact field to model
 Whe user publicizes page, need a "Contact me by: .." blurb.
-** Page::edit [0/4]
+** Page::edit [2/5]
+*** DONE [#B] Page edit can go back to dataset, but not overview
+CLOSED: [2012-08-14 Tue 13:32]
+*** DONE [#A] Add column submit button submits to wrong form
+CLOSED: [2012-08-14 Tue 13:32]
+I think I need to add form ids to submit butons
 *** TODO [#A] add a "how to cite" field to Pages / Datasets
 *** TODO [#A] New layout idea
 GET page/object has page form, button "Edit columns", underneath is
@@ -87,19 +108,15 @@ blurb about where title / preamble / postamble / attribution go (w/ example)
 "Postamble"
 
 The "Edit Columns" button goes to GET pagecolumns/list
-
-*** TODO [#B] Page edit can go back to dataset, but not overview
-*** TODO [#A] Add column submit button submits to wrong form
-I think I need to add form ids to submit butons
 *** TODO [#B] Page::edit: add option for advanced (i.e. TinyMCE) {pre,post}amble editor
-
 ** Dataset::edit [1/2]
 *** DONE [#A] Allow multiple pages per ds
 CLOSED: [2012-07-17 Tue 11:30]
 User may want to create multiple views of a complex dataset
 *** TODO [#C] no edit data, save column metadata, reload from excel :feature:vague:
-** DatasetColumn::list [0/1]
-*** TODO [#B] replace delete list with delete button?      :interface:eval:
+** DatasetColumn::list [1/1]
+*** DONE [#B] replace delete list with delete button?      :interface:eval:
+CLOSED: [2012-08-14 Tue 13:31]
 ** DatasetColumn::edit [1/2]
 *** DONE [#A] accession lost on re-annotation                         :bug:
 CLOSED: [2012-07-19 Thu 15:25]
@@ -109,6 +126,21 @@ some columns may need to be mapped to real accessions
 e.g. gene_symbols => gene_ids. For these during annotation, if user
 sets field as accession, create virtual column e.g.: {gene_symbol} =>
 {__annotation_gene_symbol_to_gene_id}
+** Private [2/4]
+*** WONT [#A] update munge_*_params to do basic parameter unpacking
+CLOSED: [2012-08-14 Tue 13:29]
+can call ExtractParams::extract_params()
+RPC::*.pm will need to be updated.
+OBSOLETE: Private now dispatches to API::REST to do the work
+
+*** WONT [#A] Are subclasses using the default behaviors? Should we implement/remove them?
+CLOSED: [2012-08-14 Tue 13:29]
+add_object -> create($params);
+get_object -> find(id => $id);
+OBSOLETE: Private dispatches to API::REST to do the work
+*** TODO [#B] update ::Private::*.pm to return 'Unsupported' unsupported actions
+e.g. most don't support list_PUT.
+*** TODO [#A] finish pod-ing
 ** Login [4/6]
 *** DONE [#A] update Login to use proper users, i.e. from db
 CLOSED: [2012-07-17 Tue 11:28]
@@ -124,17 +156,12 @@ CLOSED: [2012-07-19 Thu 18:53]
 *** TODO [#B] implement roles and acls                            :feature:
 admin privileges
 *** TODO [#A] What happens when a logged-in user hits /signup?
-
-** RPC [0/4]
-*** TODO [#A] update munge_*_params to do basic parameter unpacking
-can call ExtractParams::extract_params()
-RPC::*.pm will need to be updated.
-*** TODO [#B] update ::RPC::*.pm to return 'Unsupported' unsupported actions
-e.g. most don't support list_PUT.
-*** TODO [#A] finish pod-ing
-*** TODO [#A] Are subclasses using the default behaviors? Should we implement/remove them?
-add_object -> create($params);
-get_object -> find(id => $id);
+** API [0/2]
+*** TODO [#A] NEEDS TESTS!
+Especially for permissions
+*** TODO [#B] make it HATEOASy
+That's a thing, right?  Basically, I need to add a bunch of stuff
+based on the Headers, and return apropos Link headers.  See notes.org: API
 ** Tests [0/2]
 *** TODO web-application.t needs some refactoring [0/4]
 **** TODO probably should reset fixtures between subtests
@@ -152,20 +179,9 @@ what page did we get?
 *** TODO need to write some subjective stress tests
 how does judoon perform with large datasets?
 ** modules for evaluation:
-*** Catalyst::Controller::DBIC::API::REST
 *** Catalyst::Plugin::StatusMessage
-*** Catalyst::Plugin::ErrorCatcher
-After new catalyst is released
-
 *** DBIx::Class::UnicornLogger 
-*** Catalyst::Controller::REST::ForBrowsers?
-most of our actions are pretty basic
-HTML5 allows multiple forms
-wierd paths:
-   Page/preview  => could be /?view=preview or accept-type?
-   Dataset/postadd => not sure I'm still using this
 *** HTTP::Throwable
-*** Catalyst::Role::DetachOnDie
 *** Catalyst::Controller::Accessors
 * Judoon::DB::User::Schema                            :Judoon_DB_User_Schema:
 ** General / Misc [/]
@@ -261,16 +277,18 @@ CLOSED: [2012-07-27 Fri 09:11]
 *** TODO why are varstrings variable / static?
 Can't we determine that from the existence of variable_segments?
 Dialect::JQ currently assumes that they are static.  Should we change?
-* Judoon::Spreadsheet [1/8]                              :Judoon_Spreadsheet:
+* Judoon::Spreadsheet [2/8]                              :Judoon_Spreadsheet:
 ** DONE [#B] move code from J:DB::U::S::R::U::import_data() into here
 CLOSED: [2012-08-01 Wed 14:20]
+** DONE [#A] dies when given an XLSX
+CLOSED: [2012-08-14 Tue 13:34]
+Complains about 'zip archive'
+Needs an IO::File, which open my $IN isn't
 ** TODO [#A] make J::Spreadsheet an object
 This module is currently terribly designed.  It just has a couple of
 functions with no flexibility.  It should probably be an object that
 actually stores the returned Spreadsheet::Read structure in case we need it later.
 J::DB::User::S::R::Dataset can then get what it needs from the object.
-** TODO [#A] dies when given an XLSX
-Complains about 'zip archive'
 ** TODO [#B] needs support for tab-delimited files
 ** TODO [#B] should probably take filename & handle, to help guess $parser
 ** TODO [#A] Can we use google docs to process our spreadsheets?
