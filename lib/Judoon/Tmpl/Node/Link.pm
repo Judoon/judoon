@@ -14,7 +14,7 @@ use Judoon::Tmpl::Node::VarString;
 use Method::Signatures;
 use Moose::Util::TypeConstraints qw(subtype as coerce from via);
 
-sub type { return 'link'; }
+has '+type' => (default => 'link',);
 
 subtype 'VarStringNode',
     as 'Judoon::Tmpl::Node::VarString';

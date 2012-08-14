@@ -11,7 +11,7 @@ with qw(
 
 use Method::Signatures;
 
-sub type { return 'newline'; }
+has '+type' => (default => 'newline',);
 
 method decompose { return $self->make_text_node("<br>"); }
 

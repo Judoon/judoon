@@ -32,37 +32,26 @@ use namespace::autoclean;
 
 with Storage(format => 'JSON');
 
-=head1 METHODS / ATTRIBUTES
-
-=head2 C<pack>
-
-=cut
-
-around 'pack' => sub {
-    my $orig = shift;
-    my $self = shift;
-
-    my $return = $self->$orig();
-    $return->{type} = $self->type;
-    return $return;
-};
-
+=head1 ATTRIBUTES
 
 =head2 C<type>
 
-This method simply returns a string that describes the node type.
-This is a virtual method that must be implemented by subclasses.
+This attribute describes the type of the node. Since it is required
+but unset, consuming classes must set a value for this by:
+
+ has '+type' => (default => 'typename',);
 
 =cut
 
-requires 'type';
+has type => (is => 'ro', isa => 'Str', required => 1,);
 
+
+=head1 METHODS
 
 =head2 C<decompose>
 
-This method takes a node and returns a simpler representation of it
-comprised only of Text and Variable nodes.  This is a virtual method
-that must be implemented by subclasses.
+This method returns a simpler representation of the node comprised
+only of C<Text> and C<Variable> nodes.
 
 =cut
 

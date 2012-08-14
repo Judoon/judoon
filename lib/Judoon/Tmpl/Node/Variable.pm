@@ -10,7 +10,7 @@ with qw(
 
 use Method::Signatures;
 
-sub type { return 'variable'; }
+has '+type' => (default => 'variable',);
 has name => (is => 'ro', isa => 'Str', required => 1,);
 
 method decompose() { return $self; }

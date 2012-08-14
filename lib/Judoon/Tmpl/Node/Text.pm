@@ -10,7 +10,7 @@ with qw(
 
 use Method::Signatures;
 
-sub type { return 'text'; }
+has '+type' => (default => 'text',);
 has value => (is => 'ro', isa => 'Str', required => 1,);
 
 method decompose() { return $self; }

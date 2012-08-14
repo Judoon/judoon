@@ -16,7 +16,7 @@ use Moose::Util::TypeConstraints qw(enum);
 
 enum 'VarStringType', [qw(static variable accession)];
 
-sub type { return 'varstring'; }
+has '+type' => (default => 'varstring',);
 has varstring_type    => (is => 'ro', isa => 'VarStringType', required => 1, );
 has text_segments     => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
 has variable_segments => (is => 'ro', isa => 'ArrayRef[Str]', required => 1, );
