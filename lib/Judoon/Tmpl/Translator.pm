@@ -1,10 +1,8 @@
 package Judoon::Tmpl::Translator;
 
-our $VERSION = '0.001';
-use Moose;
-use namespace::autoclean;
+use Moo;
+use MooX::Types::MooseLike::Base qw(HashRef);
 
-use Data::Printer;
 use Judoon::Tmpl::Translator::Dialect::Native;
 use Judoon::Tmpl::Translator::Dialect::WebWidgets;
 use Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
@@ -29,11 +27,7 @@ Instantiated ::Tmpl::Dialect objects
 
 =cut
 
-has dialect_objects => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy_build => 1,
-);
+has dialect_objects => (is => 'lazy', isa => HashRef,);
 sub _build_dialect_objects {
     my ($self) = @_;
     my %dialects;
@@ -84,8 +78,6 @@ method from_objects(:$to!, :$objects!) {
     return $self->dialect_objects->{$to}->produce($objects);
 }
 
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__
