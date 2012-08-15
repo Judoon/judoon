@@ -2,23 +2,31 @@
 #+STARTUP: indent
 #+TODO: TODO | DONE WONT
 
-* General [0/3]
-** TODO [#C] get rid of lazy_build from Moose classes
+* General [3/4]
+** DONE [#C] don't make abstract base classes w/ Moose (Moo)
+CLOSED: [2012-08-15 Wed 11:23]
+An ABC is really an interface which is really a Role
+- [X] ::Tmpl::Node
+- [X] ::Tmpl::Translator::Dialect
+** DONE [#C] convert Moosey modules to Moo
+CLOSED: [2012-08-15 Wed 16:25]
+This may not always be possible.
+- [X] ::SiteLinker
+- [X] ::Judoon::DB::User::Schema
+- [X] ::Tmpl::Translator
+- [X] ::Tmpl::Translator::Dialect*
+- [ ] ::Error - *Nope* uses Throwable
+- [ ] ::Tmpl::Node - *Nope* use MooseX::Storage
+** DONE [#C] get rid of lazy_build from Moose classes
+CLOSED: [2012-08-15 Wed 16:41]
 lazy & builder are preferred, lazy_build give automatic predicate and
 clearer, which are rarely needed.  Also, lazy + build are Moo-compliant.
 See: https://metacpan.org/module/Moose::Manual::BestPractices#Avoid-lazy_build
-** TODO [#C] don't make abstract base classes w/ Moose (Moo)
-An ABC is really an interface which is really a Role
-- [X] ::Tmpl::Node
-** TODO [#C] convert Moosey modules to Moo
-This may not always be possible.
-- [ ] ::Tmpl::Translator
-- [X] ::SiteLinker
-- [ ] ::Judoon::DB::User::Schema
-- [ ] ::Error - uses Throwable
-- [ ] ::Tmpl::Node - use MooseX::Storage
+** TODO [#C] should there be a Dataset Template?
+Similar to Music, it could be an object that provides validation /
+annotation, for ensuring that spreadsheets conform to a particular model
 * Judoon::Web                                                    :Judoon_Web:
-** General / Misc [8/18]
+** General / Misc [8/21]
 *** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
@@ -76,6 +84,12 @@ having to scrub/parse HTML?  Is there a tinymce-like control for Markdown?
 
 *** TODO [#A] why do we have site.css AND site2.css
 get rid of site.css, rename site2, yes?
+*** TODO [#A] default page_column.template should be []                 :bug:
+Otherwise, breaks on malformed-JSON error
+*** TODO [#A] need better error message on cursor fail
+*** TODO [#C] update datatable pages (preview / display.tt2) to load column titles from API
+May be these pages should just take enough data to know how to fetch
+the column titles, data, and templates
 ** Interface [7/10]
 *** DONE [#B] lessen gray border, way too wide
 CLOSED: [2012-07-09 Mon 17:46]
