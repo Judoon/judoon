@@ -9,6 +9,14 @@ They can add structure to the data
 They can retrieve their data
 They can build a webpage that displays their data
 
+* Components
+** Web app (Judoon::Web)
+** Spreadsheet Parsing (Judoon::Spreadsheet)
+** Templating Engine (Judoon::Tmpl)
+** Ontology Mapper (Judoon::SiteLinker)
+** User Management (Judoon::DB::User::Schema)
+** Data Management (<unnamed>)
+** App Exporter (<unnamed>)
 * Link HTML
 <div class="input-prepend"><span class="add-on">&#x1f517;</span></div>
 
