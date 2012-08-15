@@ -529,7 +529,7 @@ function pbuild_add_formatter(widget) {
         );
         widget_dd.find('.widget-action-delete').on(
             'click', function() {
-                pbuild_delete_widget('#'+widget_id_str);
+                pbuild_delete_widget('#'+widget.attr('id'));
             }
         );
     }
