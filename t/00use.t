@@ -9,6 +9,8 @@ BEGIN {
     my @modules = qw(
         Judoon::DB::User::Schema
         Judoon::Tmpl::Translator
+        Judoon::SiteLinker
+        Judoon::Spreadsheet
         Judoon::Web
     );
 
