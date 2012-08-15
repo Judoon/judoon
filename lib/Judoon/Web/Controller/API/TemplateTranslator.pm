@@ -21,7 +21,8 @@ Catalyst Controller.
 has template_translator => (
     is => 'ro',
     isa => 'Judoon::Tmpl::Translator',
-    lazy_build => 1,
+    lazy => 1,
+    builder => '_build_template_translator',
 );
 sub _build_template_translator {
     return Judoon::Tmpl::Translator->new;

@@ -41,7 +41,7 @@ what we know about linking accessions to websites.
 
 =cut
 
-has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
+has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy => 1, builder => '_build_sitelinker');
 sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 

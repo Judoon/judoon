@@ -12,7 +12,7 @@ use Judoon::SiteLinker;
 use Judoon::Tmpl::Translator;
 use List::AllUtils ();
 
-has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
+has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy => 1, builder => '_build_sitelinker',);
 sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 __PACKAGE__->config(
@@ -26,7 +26,7 @@ __PACKAGE__->config(
     },
 );
 
-has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 1,);
+has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy => 1, builder => '_build_translator',);
 sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 
