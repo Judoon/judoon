@@ -1,8 +1,8 @@
 <h2>[% page.object.title %]</h2>
 
-<br>
-[% page.object.preamble %]
-<br>
+<section id="preamble">
+[% page.object.preamble | html_para %]
+</section>
 
 <table id="demo_page" class="display data_table table table-striped table-condensed table-border">
   <thead>
@@ -14,8 +14,9 @@
   </tbody>
 </table>
 
-<br>
-<p>[% page.object.postamble %]</p>
+<section id="postamble">
+[% page.object.postamble | html_para %]
+</section>
 
 [% FOREACH template IN page_column.templates %]
 <script id="column_tmpl_[% loop.count %]" type="text/x-jquery-tmpl">

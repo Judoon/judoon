@@ -76,6 +76,25 @@ footer p {
 .column_container div input { display: block; }
 
 
+/* for Page / Dataset previews */
+
+#notes, #preamble {
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border-bottom: thin lightgray solid;
+}
+
+#postamble {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border-top: thin lightgray solid;
+}
+
 /* for DataTables */
 div.dataTables_length label {
 	float: left;

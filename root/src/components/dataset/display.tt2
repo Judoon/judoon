@@ -1,6 +1,11 @@
 <h2>[% dataset.object.title %]</h2>
 
 
+<section id="notes">
+[% dataset.object.notes | html_para %]
+</section>
+
+
 <table id="demo_dataset" class="display data_table table table-striped table-condensed table-border">
   <thead>
     [% FOREACH d_column IN dataset_column.list %]
