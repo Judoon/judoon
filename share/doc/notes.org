@@ -319,7 +319,7 @@ tt_permissions (pk, type)
 
 permissions_field
 
-* templates
+* Tmpl::templates
 ** versioning
 May be needed in the future.  Demo interface:
 
