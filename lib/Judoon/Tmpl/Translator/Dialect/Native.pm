@@ -1,12 +1,10 @@
 package Judoon::Tmpl::Translator::Dialect::Native;
 
-use Moose;
-use namespace::autoclean;
+use Moo;
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
 use Judoon::Tmpl::Factory;
-use Data::Printer;
 use JSON qw(encode_json decode_json);
 use Method::Signatures;
 
@@ -21,8 +19,6 @@ method produce(\@native_objects) {
     return encode_json(\@output);
 }
 
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__

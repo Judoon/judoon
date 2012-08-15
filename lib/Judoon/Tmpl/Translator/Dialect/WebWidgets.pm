@@ -1,18 +1,16 @@
 package Judoon::Tmpl::Translator::Dialect::WebWidgets;
 
-use Moose;
-use namespace::autoclean;
+use Moo;
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
 
-use Data::Printer;
 use HTML::TreeBuilder;
 use Judoon::Tmpl::Factory;
 use Method::Signatures;
 use Template;
 
-has tt => (is => 'ro', isa => 'Template', lazy_build => 1);
+has tt => (is => 'lazy',); # isa => 'Template'
 sub _build_tt { return Template->new; }
 
 
@@ -20,14 +18,12 @@ method parse($input) {
     $input //= '';
     my $root = HTML::TreeBuilder->new_from_content($input);
     my @widgets = $root->look_down(qw(_tag div class), qr/widget-object/);
-    # warn "Widgets is: " . p(@widgets);
     my @nodes = $self->munge_widgets(\@widgets);
-    # warn "Nodes is: " . p(@nodes);
     return @nodes;
 }
 
-method produce(\@nodes) {
 
+method produce(\@nodes) {
     my ($count, $output) = 0;
     for my $node (@nodes) {
         my $method = 'produce_' . $node->type . '_tmpl';
@@ -71,9 +67,7 @@ method process_text($widget) {
 
 method process_data($widget) {
     my $select = $widget->look_down(qw(_tag select));
-    #warn "Select is: " . p($select);
     my $option = $select->look_down(qw(_tag option selected), qr/^\S/);
-    #warn "Option is: " . p($option);
     my $field  = $option->attr('value');
     my $field_classes = $select->attr('class');
     my @formatting = ($field_classes =~ m/widget-formatting-(\w+)/g);
@@ -121,7 +115,7 @@ method process_newline($widget) {
 
 # producer methods
 
-has produce_text_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
+has produce_text_tmpl => (is => 'lazy',); # isa => 'Str'
 sub _build_produce_text_tmpl {
     return <<'EOT';
 <div class="widget-object widget-type-text widget-inline input-append dropdown">
@@ -131,7 +125,7 @@ EOT
 }
 
 
-has produce_variable_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
+has produce_variable_tmpl => (is => 'lazy',); # isa => 'Str'
 sub _build_produce_variable_tmpl {
 # empty
 #  <div class="widget-object widget-type-data widget-inline btn-group">
@@ -163,7 +157,7 @@ EOT
 }
 
 
-has produce_link_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
+has produce_link_tmpl => (is => 'lazy',); # isa => 'Str',
 sub _build_produce_link_tmpl {
     return <<'EOT';
 [% IF ! node %][% placeholder_text = 'Click here to edit link' %][% ELSE %]
@@ -187,7 +181,7 @@ EOT
 }
 
 
-has produce_newline_tmpl => (is => 'ro', isa => 'Str', lazy_build => 1);
+has produce_newline_tmpl => (is => 'lazy',); # isa => 'Str',
 sub _build_produce_newline_tmpl {
     return <<'EOT';
 <div class="widget-object widget-type-newline-icon"><i class="icon-arrow-down"></i></div>
@@ -195,8 +189,6 @@ sub _build_produce_newline_tmpl {
 EOT
 }
 
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 

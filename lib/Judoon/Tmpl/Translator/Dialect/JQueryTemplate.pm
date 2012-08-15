@@ -1,16 +1,14 @@
 package Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
 
-use Moose;
-use namespace::autoclean;
+use Moo;
 use feature ':5.10';
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
-use Data::Printer;
 use Judoon::Tmpl::Factory qw(build_node);
 use Method::Signatures;
 
-has parser => (is => 'ro', isa => 'Regexp', lazy_build => 1);
+has parser => (is => 'lazy',); # isa => 'Regexp',
 sub _build_parser {
     my ($self) = @_;
 
@@ -112,7 +110,7 @@ method produce(\@native_objects) {
     my $template = q{};
     while (my $node = shift @objects) {
 
-        if ($node->meta->does_role('Judoon::Tmpl::Node::Role::Composite')) {
+        if ($node->does('Judoon::Tmpl::Node::Role::Composite')) {
             unshift @objects, $node->decompose();
             next;
         }
@@ -136,8 +134,6 @@ method produce(\@native_objects) {
     return $template;
 }
 
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 __END__

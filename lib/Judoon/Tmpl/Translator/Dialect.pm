@@ -1,8 +1,6 @@
 package Judoon::Tmpl::Translator::Dialect;
 
-use Moose::Role;
-
-use Judoon::Tmpl::Factory;
+use Moo::Role;
 
 requires 'parse';
 requires 'produce';
