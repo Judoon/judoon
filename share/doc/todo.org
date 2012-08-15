@@ -2,8 +2,23 @@
 #+STARTUP: indent
 #+TODO: TODO | DONE WONT
 
+* General [0/3]
+** TODO [#C] get rid of lazy_build from Moose classes
+lazy & builder are preferred, lazy_build give automatic predicate and
+clearer, which are rarely needed.  Also, lazy + build are Moo-compliant.
+See: https://metacpan.org/module/Moose::Manual::BestPractices#Avoid-lazy_build
+** TODO [#C] don't make abstract base classes w/ Moose (Moo)
+An ABC is really an interface which is really a Role
+- [X] ::Tmpl::Node
+** TODO [#C] convert Moosey modules to Moo
+This may not always be possible.
+- [ ] ::Tmpl::Translator
+- [X] ::SiteLinker
+- [ ] ::Judoon::DB::User::Schema
+- [ ] ::Error - uses Throwable
+- [ ] ::Tmpl::Node - use MooseX::Storage
 * Judoon::Web                                                    :Judoon_Web:
-** General / Misc [8/17]
+** General / Misc [8/18]
 *** DONE [#A] URL widgets                                         :feature:
 CLOSED: [2012-05-15 Tue 16:03]
 Finish this feature
@@ -59,6 +74,8 @@ collab policy, etc.
 Page blurbs could maybe be stored in Markdown, so we don't end up
 having to scrub/parse HTML?  Is there a tinymce-like control for Markdown?
 
+*** TODO [#A] why do we have site.css AND site2.css
+get rid of site.css, rename site2, yes?
 ** Interface [7/10]
 *** DONE [#B] lessen gray border, way too wide
 CLOSED: [2012-07-09 Mon 17:46]
@@ -228,8 +245,9 @@ CLOSED: [2012-05-15 Tue 16:14]
 - Create J::Tmpl::Widget class
 J::Tmpl::Widget::Text, J::Tmpl::Widget::Data, etc.
 Can convert from class to html or template?
-** Node [0/2]
-*** TODO don't use abstract base class, use role instead.
+** Node [2/2]
+*** DONE don't use abstract base class, use role instead.
+CLOSED: [2012-08-14 Tue 17:50]
 [10:45am] melo: I've read M::Manual::Roles the bit about Abstract base classes… Are they considered evil, to be avoided, in Moose?
 [10:46am] mst: roles obsolete abstract base classes
 [10:46am] rjbs: They're just not really very useful with roles around.
@@ -260,6 +278,8 @@ Can convert from class to html or template?
 [10:58am] amiri joined the chat room.
 [11:04am] rjbs:
 [11:05am] 
+*** DONE maybe 'type' should be an attribute?
+CLOSED: [2012-08-14 Tue 17:50]
 ** Dialect::WebWidgets [0/2]                           :_Dialect_WebWidgets:
 *** TODO [#B] move widget-format-target into its own hidden with name widget-link-null
 need to update WebWidgets.pm && library.tt
@@ -312,9 +332,11 @@ Then, the uniprot_acc to gene map could convert to gene_id, and use that mapping
 Namespace it!
 ** TODO [#B] have it build the webwidgets.
 See Judoon::Tmpl/Dialect::WebWidgets todo entry
-* deployment [0/1]                                               :deployment:
+* deployment [0/2]                                               :deployment:
 ** TODO add deployment deps
 - [ ] Starman
 - [ ] Server::Starter
 - [ ] Net::Server::SS::PreFork
 - [X] DBIx::Class::Migration
+** TODO questionable deps
+- [ ] JSON::Any
