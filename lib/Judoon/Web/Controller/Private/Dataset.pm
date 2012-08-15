@@ -55,6 +55,20 @@ override list_GET => sub {
 };
 
 
+
+=head1 list_POST
+
+Create a basic page for the user after creating the dataset
+
+=cut
+
+after list_POST => sub {
+    my ($self, $c) = @_;
+    my $dataset = $c->req->get_object(0)->[0];
+    $dataset->create_basic_page();
+};
+
+
 =head2 object_GET (after)
 
 Add the dataset's first page to the stash.
