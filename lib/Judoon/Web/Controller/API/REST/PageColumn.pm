@@ -49,7 +49,7 @@ before 'validate_object' => sub {
     my ($self, $c, $obj) = @_;
     my ($object, $params) = @$obj;
 
-    $params->{template} //= q{};
+    $params->{template} //= q{[]};
     $params->{page_id}  //= $c->req->get_chained_object(-1)->[0]->id;
 };
 
