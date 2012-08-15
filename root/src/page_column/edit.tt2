@@ -98,7 +98,7 @@
 </form>
 
 
-<div class="" style="display: none;">
+<div class="">
   [% INCLUDE 'components/forms/library.tt2' %]
 </div>
 
