@@ -1,11 +1,7 @@
 use utf8;
 package Judoon::DB::User::Schema;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
-use Moose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Schema';
 
 __PACKAGE__->load_namespaces;
@@ -27,5 +23,4 @@ to work
 
 our $VERSION = 5;
 
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 1;

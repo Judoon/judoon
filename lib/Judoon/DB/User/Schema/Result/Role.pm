@@ -10,12 +10,7 @@ Judoon::DB::User::Schema::Result::Role
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Core';
 
 =head1 TABLE: C<roles>
@@ -110,5 +105,4 @@ __PACKAGE__->many_to_many("users", "user_roles", "user");
 
 =cut
 
-__PACKAGE__->meta->make_immutable;
 1;

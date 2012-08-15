@@ -10,12 +10,7 @@ Judoon::DB::User::Schema::Result::Page
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Core';
 
 =head1 TABLE: C<pages>
@@ -152,5 +147,5 @@ sub nbr_rows {
     return scalar @$data;
 }
 
-__PACKAGE__->meta->make_immutable;
+
 1;

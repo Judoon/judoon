@@ -1,8 +1,6 @@
 package Judoon::DB::User::Schema::Role::Result::HasPermissions;
 
-use Moose::Role;
-use namespace::autoclean;
-
+use Moo::Role;
 
 =pod
 

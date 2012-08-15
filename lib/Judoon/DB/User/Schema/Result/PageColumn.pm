@@ -10,12 +10,7 @@ Judoon::DB::User::Schema::Result::PageColumn
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Core';
 
 =head1 TABLE: C<page_columns>
@@ -103,7 +98,7 @@ __PACKAGE__->belongs_to(
 
 
 use Judoon::Tmpl::Translator;
-has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy_build => 1);
+has translator => (is => 'lazy',); # isa => 'Judoon::Tmpl::Translator',);
 sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 sub template_to_jquery {
@@ -135,5 +130,4 @@ sub set_template {
 }
 
 
-__PACKAGE__->meta->make_immutable;
 1;

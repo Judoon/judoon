@@ -1,21 +1,13 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::User;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::User
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Core';
 
 =head1 TABLE: C<users>
@@ -222,5 +214,4 @@ sub import_data {
 
 
 
-__PACKAGE__->meta->make_immutable;
 1;

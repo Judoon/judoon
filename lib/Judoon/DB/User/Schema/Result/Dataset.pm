@@ -10,12 +10,7 @@ Judoon::DB::User::Schema::Result::Dataset
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Core';
 
 =head1 TABLE: C<datasets>
@@ -297,5 +292,5 @@ sub delete_data_columns {
     $self->update;
 }
 
-__PACKAGE__->meta->make_immutable;
+
 1;

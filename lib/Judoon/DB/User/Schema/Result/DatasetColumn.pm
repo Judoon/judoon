@@ -10,12 +10,7 @@ Judoon::DB::User::Schema::Result::DatasetColumn
 
 =cut
 
-use strict;
-use warnings;
-
-use Moose;
-use MooseX::NonMoose;
-use MooseX::MarkAsMethods autoclean => 1;
+use Moo;
 extends 'DBIx::Class::Core';
 
 =head1 TABLE: C<dataset_columns>
@@ -138,8 +133,7 @@ __PACKAGE__->belongs_to(
 
 =cut
 
-# from MooseX::NonMoose, lets us preprocess the args to new()
-sub FOREIGNBUILDARGS {
+sub BUILDARGS {
     my ($class, $args) = @_;
 
     if (not $args->{shortname}) {
@@ -147,10 +141,10 @@ sub FOREIGNBUILDARGS {
     }
 
     return $args;
-}
+};
 
 use Judoon::SiteLinker;
-has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy_build => 1);
+has sitelinker => (is => 'lazy',); # isa => 'Judoon::SiteLinker',);
 sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 
@@ -220,5 +214,4 @@ sub ordinal_position {
 }
 
 
-__PACKAGE__->meta->make_immutable;
 1;
