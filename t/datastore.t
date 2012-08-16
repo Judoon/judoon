@@ -6,6 +6,8 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
+use DBI;
+
 my $datastore_tmp_dir;
 BEGIN {
     $datastore_tmp_dir = File::Temp->newdir();
@@ -22,11 +24,17 @@ subtest 'making new user datastore' => sub {
 
     my $datastore = Judoon::DataStore::SQLite->new({owner => $owner});;
     ok !$datastore->exists, 'datastore does not yet exist';
-    ok $datastore->init, 'can create new datastore';
+    ok !exception { $datastore->init }, 'can create new datastore';
     ok $datastore->exists, 'datastore now exists';
 
     like exception { $datastore->init; }, qr/datastore already exists/i,
       q{can't re-init datastore};
+
+    my $dsn = $datastore->my_dsn;
+    ok my $dbh = DBI->connect(@$dsn), 'can connect to new database';
+
+    ok -f $datastore->db_path, 'see db in filesystem';
+
 
 };
 
