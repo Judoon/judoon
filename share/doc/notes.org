@@ -553,3 +553,121 @@ CLOSED: [2012-08-14 Tue 12:54]
 CLOSED: [2012-08-14 Tue 12:43]
 ****** DONE no visitors can do PUT POST DELETE
 CLOSED: [2012-08-14 Tue 12:43]
+* Schema separation
+** DESCRIPTION
+How do we separate dataset data from the actual datasets?
+Serializing it in the 'data' field will not work for large datasets.
+DBIC will hold it in memory once it's loaded.
+** APPROACHES
+*** How to separate data?
+**** Separate schemas for each user
+***** Postgres
+There is a 'user' schema.  Each new user gets a new schema when they signup.
+Ex: user.user {felliott,$pass}  => creates felliott schema
+felliott.datasets, felliott.pages
+then also, felliott.<$dataset_name>_data
+ data is kept in there.
+***** Sqlite
+No schema support in sqlite.  Instead newusers get a dir and dbs.
+share/db/
+  judoon-user.db:  << contains 'felliott', 'cellmigration' >>
+  felliott/
+    master.db
+    $dataset1.db
+    $dataset2.db
+  cellmigration/
+    master.db
+    $dataset1.db
+    $dataset2.db
+**** One schema for user
+I'm not going to create new pg users for each web user (I Think)
+So what benefit does separate schemas provide?
+  Easier export?
+  Namespacing
+But no permission protections.
+  Only get that w/ users
+Names:
+  ${owner}_${uniq_tbl_name}
+
+***** everybody under main schema
+- simple
+- convenient?
+***** separate 'data' schema for datasets
+- less likely to take up needed space for main schema
+-
+*** How to connect?
+**** use DBIx::Class
+- [ ] searching: get DBIC searches, a big plus
+- [X] resources: DBIC might be heavy if lots are instantiated at once
+- [ ] connections: prob. don't need to manage connections, but may need to expire destroy
+**** raw DBI
+- [X] searching: need to write own searching code, I think (maybe SQLA or Data::Query can help?)
+- [ ] resources: dbh's are pretty lightweight, I think (need to profile)
+- [X] connections: need to manage connections (DBIx::Connector may help)
+*** Where to split?
+**** master db keeps dataset/ds_columns/pages/p_columns
+- [X] intuitive structure: seems like inappropriate separation of concerns
+- [ ] schema upgrades: are simpler, just run over master
+- [ ] searching: easy, all datasets / pages are in one table
+- [X] exporting: harder, must copy over ds/page tables to exported db
+**** user db gets dataset/ds_columns/pages/p_columns
+- [ ] intuitive structure: seems more apropos, user info all located in one place
+- [X] schema upgrades: must be deployed across all databases
+- [X] searching: hard, looking for public datasets requires querying all user dbs
+- [ ] exporting: easier, don't need to filter out other users id / info, etc. 
+**** possible compromise: records in master, replicate to user_db
+- copy over records to user_db
+- It's duplication, but maybe just don't provide interface to user version
+*** How to deploy?
+**** Generate per-user DBIC::Schemas, use those to deploy
+store in share/lib/Judoon/DataStore/Schema/<$user>/Schema/*
+use SQL::Translator?
+  SQLT has Parser::Excel & Parser::xSV
+      (only works with ParseExcel currently, but maybe I write Parser::Spreadsheet?)
+  DBIC has SQLT::Producer::DBIC::File
+**** Directly issue commands via DBI
+
+** QUESTIONS
+*** how to manage connections?
+presumably we can't keep all connections open at all times
+*** where to keep dataset/ds_column/page/page_column?
+In user db?  Or $user db?
+*** How to administrate?
+*** Annotating data columns
+Being able to search lexically vs. numerically.
+** PROCEED
+*** DONE start with sqlite and directories
+CLOSED: [2012-08-27 Mon 10:28]
+*** DONE write module to encapsulate db creation, deploy
+CLOSED: [2012-08-27 Mon 10:28]
+*** Note: the DB is king!
+We have three ways to define our data: actual running db, DBIC Schema, SQL.
+Translation between the ways:
+ DB          ==( DBIC::Schema::Loader )==> DBIC Schema
+ DBIC Schema ==( ->deploy()           )==> DB
+ SQL         ==( SQLT                 )==> DBIC Schema
+ DBIC Schema ==( create_ddl_dir       )==> SQL
+ SQL         ==( psql                 )==> DB
+ DB          ==( pg_dump              )==> SQL
+
+In my case, the DB is king b/c DBIC and SQL only define the schema,
+but don't containt data (not strictly true, of course, but data
+storage is not their forte)
+
+Ergo, my DataStore module needs to operate on the database directly.
+We can always generate a DBIC Schema later via Schema::Loader, but
+don't worry about that until we actually need it.
+
+This means that DBIC is probably largely unnecessary to this process,
+though I think I'll use my template schema + deploy() to initialize
+it. Everything after that should probably be done through SQL +
+DBIx::RunSQL + $schema->storage->dbh.
+*** Using the deployed db
+Who will use it?
+  API/DatasetData.
+*** One schema approach:
+**** Build Judoon::DB::Data.pm
+***** connect w/ DBIx::Connector
+***** use SQLA to build queries
+**** Judoon::Web:Model::Data (using Cat::Mod::Adaptor)
+**** update API::DatasetData to use
