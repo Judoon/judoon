@@ -56,15 +56,24 @@ my %ET_to_ST  = (
 # -------------------------------------------------------------------
 sub parse {
     my ($tr, $data) = @_;
-    $DB::single = 1;
-    my $args        = $tr->parser_args;
-    my $filename    = $tr->filename || return;
-    my $wb          = ReadData( $filename, cells => 0, attr => 1 );
+
+    my $args = $tr->parser_args;
+
+    my $wb;
+    if ($args->{spreadsheet_ref}) {
+        $wb = $args->{spreadsheet_ref};
+    }
+    else {
+        my $filename = $tr->filename || return;
+        $wb          = ReadData( $filename, cells => 0, attr => 1 );
+    }
+
     my $schema      = $tr->schema;
     my $table_no    = 0;
 
     my $wb_count = $wb->[0]->{'sheets'} || 0;
     for my $num ( 1 .. $wb_count ) {
+        last unless (exists $wb->[$num]);
         $table_no++;
         my $ws         = $wb->[$num];
         my $table_name = normalize_name( $ws->{'label'} || "Table$table_no" );
@@ -78,7 +87,8 @@ sub parse {
         for my $col ( $cols[0] .. $cols[1] ) {
             my $cell      = $ws->{cell}[$col][1];
             my $col_name  = normalize_name( $cell );
-            my $data_type = ET_to_ST( $ws->{attr}[$col][1]{type} );
+            my $data_type = @{$ws->{attr}} ? ET_to_ST( $ws->{attr}[$col][1]{type} )
+                          :                  'VARCHAR';
             push @field_names, $col_name;
 
             my $field = $table->add_field(
