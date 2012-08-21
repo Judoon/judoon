@@ -22,90 +22,106 @@ that spreadsheet.
 
 =cut
 
-use strict;
-use warnings;
+use Moo;
+use MooX::Types::MooseLike::Base qw(Str ArrayRef HashRef);
 
-use Judoon::Error::Fatal;
-use Method::Signatures;
+use Clone qw(clone);
 use Spreadsheet::Read ();
+
+
+=head1 ATTRIBUTES
+
+=cut
+
+has filename   => (is => 'ro',);
+has filehandle => (is => 'ro',);
+has filetype   => (is => 'ro',);
+has content    => (is => 'ro',);
+
+around BUILDARGS => sub {
+    my ($orig, $class, @args) = @_;
+
+    my $args = $class->$orig(@args);
+    my $count = grep {exists $args->{$_}} qw(filename filehandle content);
+    my $failure = $count < 1 ? "One of 'filename','filehandle','content' is required in constructor to Judoon::Spreadsheet"
+        : $count > 1 ? "Only one of 'filename','filehandle','content' is allowed in constructor to Judoon::Spreadsheet"
+            : q{};
+    die $failure if ($failure);
+
+    return $args;
+};
+
+has spreadsheet_read_args => (is => 'lazy', isa => HashRef,);
+sub _build_spreadsheet_read_args {
+    my ($self) = @_;
+    return {attr => 1, clip =>1,};
+}
+
+has spreadsheet => (is => 'lazy', isa => ArrayRef,);
+sub _build_spreadsheet {
+    my ($self) = @_;
+
+    my @source_args;
+    if ($self->filename) {
+        push @source_args, $self->filename;
+    }
+    elsif ($self->content) {
+        push @source_args, $self->content;
+    }
+    else {
+        push @source_args, $self->filehandle, 'parser',
+            ($self->filetype // 'xls');
+    }
+
+    return Spreadsheet::Read::ReadData(
+        @source_args, %{$self->spreadsheet_read_args},
+    ) or die "Unable to read spreadsheet: $!";
+}
+
+
+has orig_data => (is => 'lazy', isa => ArrayRef[ArrayRef],);
+sub _build_orig_data {
+    my ($self) = @_;
+    return [Spreadsheet::Read::rows($self->spreadsheet->[1])];
+}
+
+has workbook_meta => (is => 'lazy', isa => HashRef,);
+sub _build_workbook_meta {
+    my ($self) = @_;
+    return $self->spreadsheet->[0];
+}
+
+
+has data    => (is => 'ro', isa => ArrayRef[ArrayRef], predicate => 1, init_arg => undef, lazy => 1, builder => '_build_data_and_headers',);
+has headers => (is => 'ro', isa => ArrayRef,           predicate => 1, init_arg => undef, lazy => 1, builder => '_build_data_and_headers',);
+sub _build_data_and_headers {
+    my ($self) = @_;
+    my $data = clone($self->orig_data);
+    my $headers = shift @$data;
+    $self->{headers} = $headers;
+    $self->{data}    = $data;
+}
+
 
 =head1 METHODS
 
-=head2 read_spreadsheet( $filehandle, $parser )
-
-C<read_spreadsheet()> takes in a filehandle arg and attempts to read
-it with L<Spreadsheet::Read>.  It will then munge the data and return
-a data structure compatible with a C<Judoon::DB::User::Schema::Result::Dataset>
-object.
-
 =cut
 
-sub read_spreadsheet {
-    my ($fh, $parser) = @_;
-
-    Judoon::Error::Fatal->throw({message => 'read_spreadsheet() needs a filehandle'})
-          unless ($fh);
-    $parser ||= 'xls';
-    $parser = lc($parser);
-
-    my $ref  = Spreadsheet::Read::ReadData($fh, parser => $parser);
-
-    my $ds   = $ref->[1];
-    my $data = pivot_data($ds->{cell}, $ds->{maxrow}, $ds->{maxcol});
-
-    my $headers = shift @$data;
-    my $dataset = {
-        name => $ds->{label}, original => q{},
-        data => $data, notes => q{},
-        ds_columns => [],
-    };
-
-    my $sort = 1;
-    for my $header (@$headers) {
-        push @{$dataset->{ds_columns}}, {
-            name => ($header // ''), sort => $sort++,
-            accession_type => q{},   url_root => q{},
-        };
-    }
-
-    return $dataset;
+sub worksheet_name {
+    my ($self) = @_;
+    return $self->spreadsheet->[1]{label};
 }
 
 
-=head2 pivot_data( $data, $maxrow, $maxcol )
-
-C<pivot_data()> takes an arrayref of arrayrefs as C<$data> and pivots
-it to be row-major instead of colulmn-major.  It also removes the
-empty leading entries L<Spreadsheet::Read> adds so that it is
-zero-indexed instead of one-indexed.
-
-C<$maxrow> and C<$maxcol> are the maximum number of rows and columns
-respectively.  While these could be calculated dynamically,
-L<Spreadsheet::Read> provides them, and requiring them simplifies the
-code.
-
-=cut
-
-func pivot_data(ArrayRef[ArrayRef] $data, Int $maxrow, Int $maxcol) {
-    for my $vars (['$maxrow',$maxrow],['$maxcol',$maxcol]) {
-        my $error = q{};
-        if ($vars->[1] < 1) {
-            $error = "$vars->[0] must be greater than 0! got: **$vars->[1]**";
-        }
-        Judoon::Error::Fatal->throw({message => $error}) if ($error);
-    }
-
-    my $pivoted = [];
-    for my $row_idx (0..$maxrow-1) {
-        for my $col_idx (0..$maxcol-1) {
-            $pivoted->[$row_idx][$col_idx] = $data->[$col_idx+1][$row_idx+1];
-        }
-    }
-
-    return $pivoted;
+sub nbr_rows {
+    my ($self) = @_;
+    return scalar @{$self->data};
 }
 
-
+sub nbr_columns {
+    my ($self) = @_;
+    return scalar @{$self->data->[0]};
+}
 
 1;
 __END__

@@ -148,6 +148,39 @@ __PACKAGE__->register_permissions;
 
 =encoding utf8
 
+=cut
+
+
+sub new {
+    my ($class, $args) = @_;
+
+    if (exists $args->{spreadsheet}) {
+        my $spreadsheet = delete $args->{spreadsheet};
+        die q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'}
+            unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
+        $args->{name} //= $spreadsheet->worksheet_name;
+        $args->{original} //= q{};
+        $args->{data}     //= $spreadsheet->data;
+        $args->{notes}    //= q{};
+        if (not exists $args->{ds_columns}) {
+            my @cols;
+            my $sort = 1;
+            for my $header (@{$spreadsheet->headers}) {
+                push @cols, {
+                    name => ($header // ''), sort => $sort++,
+                    accession_type => q{},   url_root => q{},
+                };
+            }
+
+            $args->{ds_columns} = \@cols;
+        }
+    }
+
+    return $class->next::method($args);
+};
+
+
+
 =head2 B<C<create_basic_page()>>
 
 Turn a dataset into a simple page with a one-to-one mapping between

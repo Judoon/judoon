@@ -9,8 +9,8 @@ use Test::DBIx::Class {
 };
 use Test::Fatal;
 
-
 use Data::Printer;
+use Judoon::Spreadsheet;
 use Judoon::Tmpl::Factory ();
 use Spreadsheet::Read;
 
@@ -31,8 +31,6 @@ subtest 'Result::User' => sub {
     ok $user->check_password('testuser'), 'password successfully set';
     like exception { $user->change_password('moo'); }, qr{invalid password}i,
         'Cant set invalid password';
-
-
 
     # import_data()
     like exception { $user->import_data(); },
@@ -103,10 +101,29 @@ subtest 'Result::Dataset' => sub {
     is $dataset->nbr_columns, 3, 'nbr_columns is three';
     is $dataset->nbr_rows, 5, 'nbr_rows is five';
 
+    # test importing from spreadsheets
+    my $xls_ds_data = [
+        ['Va Bene', 14, 'female'],
+        ['Chloe',    2, 'female'],
+        ['Grover',   8, 'male'  ],
+        ['Chewie',   5, 'male'  ],
+        ['Goochie',  1, 'female'],
+    ];
+    my $xls_cols = [
+        {name => 'Name',   sort => 1, accession_type => q{}, url_root => q{},},
+        {name => 'Age',    sort => 2, accession_type => q{}, url_root => q{},},
+        {name => 'Gender', sort => 3, accession_type => q{}, url_root => q{},},
+    ];
+    my $spreadsheet = Judoon::Spreadsheet->new({filename => 't/etc/data/basic.xls'});
+    ok my $ds_from_xls = ResultSet('Dataset')->new_result({spreadsheet => $spreadsheet}),
+       'can create new Dataset from spreadsheet';
+    is $ds_from_xls->name, 'Sheet1', '  ..and name is correct';
+    is_deeply $ds_from_xls->data, $xls_ds_data, '  ..and got correct data';
+
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
     open my $TEST_XLS, '<', 't/etc/data/basic.xls'
-        or die "Can't open test spreadsheet: $!";
+         or die "Can't open test spreadsheet: $!";
     my $mutable_ds = $user->import_data($TEST_XLS);
     close $TEST_XLS;
 
