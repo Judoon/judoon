@@ -55,9 +55,12 @@ sub exists { return -d $_[0]->owner_dir; }
 sub init {
     my ($self) = @_;
     $self->owner_dir->mkpath;
-    $self->deploy_schema();
+    $self->create_db();
 }
 
+sub sqlt_producer_class { return 'SQLite'; }
+
+sub sqlt_producer_args { return {no_transaction => 1,}; }
 
 1;
 __END__

@@ -15,14 +15,14 @@ BEGIN {
     use Judoon::DataStore::SQLite;
 }
 
+my $owner = 'cellmigration';
 
 subtest 'making new user datastore' => sub {
-    my $owner = 'cellmigration';
 
     like exception { Judoon::DataStore::SQLite->new(); },
         qr{missing required arg}i, q{Can't create datastore w/o owner};
 
-    my $datastore = Judoon::DataStore::SQLite->new({owner => $owner});;
+    my $datastore = Judoon::DataStore::SQLite->new({owner => $owner});
     ok !$datastore->exists, 'datastore does not yet exist';
     ok !exception { $datastore->init }, 'can create new datastore';
     ok $datastore->exists, 'datastore now exists';
@@ -34,11 +34,17 @@ subtest 'making new user datastore' => sub {
     ok my $dbh = DBI->connect(@$dsn), 'can connect to new database';
 
     ok -f $datastore->db_path, 'see db in filesystem';
-
-
 };
 
 
+subtest 'adding new data tables' => sub {
+    my $datastore = Judoon::DataStore::SQLite->new({owner => $owner});
+    ok $datastore->exists, 'db persists after creating object is out of scope';
+
+    $datastore->add_dataset('t/etc/data/basic.xls');
+    $datastore->add_dataset('t/etc/data/basic2.xls');
+
+};
 
 done_testing();
 
