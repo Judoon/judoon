@@ -151,7 +151,9 @@ __PACKAGE__->register_permissions;
 =cut
 
 
-sub new {
+has dummy => (is => 'ro', default => sub {1},);
+
+sub BUILDARGS {
     my ($class, $args) = @_;
 
     if (exists $args->{spreadsheet}) {
@@ -176,8 +178,8 @@ sub new {
         }
     }
 
-    return $class->next::method($args);
-};
+    return $args;
+}
 
 
 
