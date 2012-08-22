@@ -5,6 +5,8 @@ use MooX::Types::MooseLike::Base qw(Str HashRef);
 
 use DBI;
 use Judoon::DB::DataStore::Schema;
+use Judoon::Spreadsheet;
+use List::AllUtils qw(first);
 use Path::Class::Dir;
 use SQL::Translator;
 
@@ -68,9 +70,7 @@ sub create_db {
 sub add_dataset {
     my ($self, $filename) = @_;
 
-    use Judoon::Spreadsheet;
     my $spreadsheet = Judoon::Spreadsheet->new(filename => $filename);
-
     my $sqlt = SQL::Translator->new(
         parser_args => {
             scan_fields     => 0,
@@ -78,30 +78,35 @@ sub add_dataset {
         },
 
         producer_args => { %{$self->sqlt_producer_args}, },
+
+        filters => [
+            sub { $self->check_table_name(shift); },
+        ],
     );
+
     my $sql = $sqlt->translate(
         from => 'Spreadsheet',
         to   => $self->sqlt_producer_class,
     ) or die $sqlt->error;
 
-
     $self->dbh->do($sql);
+    return;
 }
 
 
+sub check_table_name {
+    my ($self, $schema) = @_;
 
-# sub add_dataset {
-#     my ($self, $dataset) = @_;
-#     die '$dataset is not a Dataset object'
-#         unless (ref $dataset eq m/Judoon::DB::User::Result::Dataset/);
-# 
-#     my $table_name = $self->gen_table_name($dataset->name);
-# }
+    my ($table) = $schema->get_tables();
+    my $table_name = $table->name;
+    $table->name($self->gen_table_name($table_name));
+    return;
+}
 
 sub gen_table_name {
     my ($self, $table_name) = @_;
 
-    $table_name =~ s/[^a-z_0-9]+/_/g;
+    $table_name =~ s/[^a-z_0-9]+/_/gi;
     return $table_name unless ($self->table_exists($table_name));
 
     my $new_name = first {not $self->table_exists($_)}
@@ -116,9 +121,7 @@ sub gen_table_name {
 
 sub table_exists {
     my ($self, $name) = @_;
-
-    my $dbh = $self->template_schema->storage->dbh;
-    my $sth = $dbh->table_info(undef, '%', $name, "TABLE");
+    my $sth = $self->dbh->table_info(undef, '%', $name, "TABLE");
     my $ary = $sth->fetchall_arrayref();
     return @$ary;
 }
