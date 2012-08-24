@@ -13,9 +13,7 @@ use Path::Class::Dir ();
 has storage_dir => (is => 'lazy',); # isa => Str,);
 sub _build_storage_dir {
     my ($self) = @_;
-    return Path::Class::Dir->new(
-        $ENV{JUDOON_DATASTORE_DATA_DIR} // 'share/dbs'
-    );
+    return Path::Class::Dir->new('share/dbs');
 }
 
 has owner_dir => (is => 'lazy',); # isa => Str,);
