@@ -51,7 +51,6 @@ sub _build_sqlt_producer_args { return {}; }
 requires 'exists';
 requires 'init';
 requires 'my_dsn';
-requires 'db_name';
 requires 'sqlt_producer_class';
 
 before 'init' => sub {
