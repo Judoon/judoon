@@ -73,6 +73,7 @@ test_requires 'Test::More' => '0.88';
 test_requires 'Test::Fatal';
 test_requires 'Test::Pod';
 test_requires 'Test::Pod::Coverage';
+test_requires 'Test::postgresql';
 test_requires 'Test::WWW::Mechanize::Catalyst';
 
 WriteAll(meta => 0);
