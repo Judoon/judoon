@@ -66,7 +66,8 @@ after list_GET => sub {
     my ($self, $c) = @_;
 
     my $columns = $c->stash->{ds_column}{list};
-    my $rows    = decode_json($c->stash->{dataset}{object}{data});
+    my $dataset = $c->req->get_chained_object(0)->[0];
+    my $rows    = $dataset->data;
     for my $idx (0..scalar(@$columns)-1) {
         my $sample_count = 3;
         $columns->[$idx]{samples} = [];

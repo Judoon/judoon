@@ -49,9 +49,8 @@ sub create_user {
     Judoon::Error->throw($errmsg) if ($errmsg);
 
     $valid{active} //= 1;
-
-    my $thing = $self->create(\%valid);
-    return $thing;
+    my $new_user = $self->create(\%valid);
+    return $new_user;
 }
 
 

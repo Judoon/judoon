@@ -160,6 +160,8 @@ __PACKAGE__->many_to_many("roles", "user_roles", "role");
 # Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SzGqoNkBtKX9SumB+vTVCw
 
+use Judoon::Spreadsheet;
+
 =pod
 
 =encoding utf8
@@ -202,8 +204,6 @@ into the database.
 
 =cut
 
-use Judoon::Spreadsheet;
-
 sub import_data {
     my ($self, $fh, $ext) = @_;
     die 'import_data() needs a filehandle' unless ($fh);
@@ -211,10 +211,12 @@ sub import_data {
     my $spreadsheet = Judoon::Spreadsheet->new(
         filehandle => $fh, filetype => $ext,
     );
-
-    return $self->create_related('datasets', {
-        spreadsheet => $spreadsheet,
+    my $dataset = $self->create_related('datasets',{
+        map({$_ => q{}} qw(name tablename original notes)),
+        map({$_ => 0}   qw(nbr_rows nbr_columns)),
     });
+    $dataset->import_from_spreadsheet($spreadsheet);
+    return $dataset;
 }
 
 

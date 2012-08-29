@@ -66,8 +66,12 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 0 },
   "original",
   { data_type => "text", is_nullable => 0 },
-  "data",
+  "tablename",
   { data_type => "text", is_nullable => 0 },
+  "nbr_rows",
+  { data_type => "integer", is_nullable => 0 },
+  "nbr_columns",
+  { data_type => "integer", is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -133,13 +137,12 @@ __PACKAGE__->belongs_to(
 # Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-07-12 12:56:24
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JrQ45OumPMbWAMAGmA8KHg
 
-__PACKAGE__->load_components('InflateColumn::Serializer');
-__PACKAGE__->add_column('+data' => { serializer_class => 'JSON', });
-
 use DateTime;
 use Judoon::Error;
 use Judoon::Tmpl::Factory;
+use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
+use SQL::Translator;
 
 with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
@@ -148,39 +151,38 @@ __PACKAGE__->register_permissions;
 
 =encoding utf8
 
+=head1 METHODS
+
+=head2 B<C<import_from_spreadsheet>>
+
 =cut
 
+sub import_from_spreadsheet {
+    my ($self, $spreadsheet) = @_;
+    die q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'}
+        unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
-has dummy => (is => 'ro', default => sub {1},);
+    my $sqlt_table = $self->_store_data($spreadsheet);
+    $self->name($spreadsheet->worksheet_name);
+    (my $tablename = $sqlt_table->name) =~ s/^data\.//; # get rid of schema
+    $self->tablename($tablename);
+    $self->nbr_rows($spreadsheet->nbr_rows);
+    $self->nbr_columns($spreadsheet->nbr_columns);
+    $self->notes(q{});
+    $self->original(q{});
+    $self->update;
 
-sub BUILDARGS {
-    my ($class, $args) = @_;
-
-    if (exists $args->{spreadsheet}) {
-        my $spreadsheet = delete $args->{spreadsheet};
-        die q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'}
-            unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
-        $args->{name} //= $spreadsheet->worksheet_name;
-        $args->{original} //= q{};
-        $args->{data}     //= $spreadsheet->data;
-        $args->{notes}    //= q{};
-        if (not exists $args->{ds_columns}) {
-            my @cols;
-            my $sort = 1;
-            for my $header (@{$spreadsheet->headers}) {
-                push @cols, {
-                    name => ($header // ''), sort => $sort++,
-                    accession_type => q{},   url_root => q{},
-                };
-            }
-
-            $args->{ds_columns} = \@cols;
-        }
+    my $sort = 1;
+    my $it = each_arrayref $spreadsheet->headers, [$sqlt_table->get_fields];
+    while (my ($header, $sqlt_field) = $it->()) {
+        $self->create_related('ds_columns', {
+            name => ($header // ''), shortname => $sqlt_field->name,
+            sort => $sort++, accession_type => q{},   url_root => q{},
+        });
     }
 
-    return $args;
+    return $self;
 }
-
 
 
 =head2 B<C<create_basic_page()>>
@@ -218,31 +220,6 @@ EOS
     }
 
     return $page;
-}
-
-=head2 nbr_columns
-
-Number of columns in this dataset.
-
-=cut
-
-sub nbr_columns {
-    my ($self) = @_;
-    my $data = $self->data;
-    return scalar @{$data->[0]};
-}
-
-
-=head2 nbr_rows
-
-Number of rows in this dataset.
-
-=cut
-
-sub nbr_rows {
-    my ($self) = @_;
-    my $data = $self->data;
-    return scalar @$data;
 }
 
 
@@ -325,6 +302,100 @@ sub delete_data_columns {
     }
     $self->data($data);
     $self->update;
+}
+
+
+sub data {
+    my ($self) = @_;
+
+    my $dbh = $self->result_source->storage->dbh;
+    my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
+        $self->ds_columns;
+    my $select = join ', ', @columns;
+    my $table  = 'data.' . $self->tablename;
+    my $sth = $dbh->prepare("SELECT $select FROM $table");
+    $sth->execute;
+    return $sth->fetchall_arrayref();
+}
+
+
+sub _store_data {
+    my ($self, $spreadsheet) = @_;
+    die 'arg must be a Judoon::Spreadsheet'
+        unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
+
+    my $sqlt = SQL::Translator->new(
+        parser_args => {
+            scan_fields     => 0,
+            spreadsheet_ref => $spreadsheet->spreadsheet,
+        },
+
+        producer_args => { no_transaction => 1, },
+
+        filters => [
+            sub { $self->_check_table_name(shift); },
+        ],
+    );
+
+    my $dbic_schema = $self->result_source->schema;
+    my $dbh         = $dbic_schema->storage->dbh;
+
+    # translate to sql
+    my $sql = $sqlt->translate(
+        from => 'Spreadsheet',
+        to   => $dbic_schema->storage->sqlt_type,
+    ) or die $sqlt->error;
+
+    # create table
+    $dbh->do($sql);
+
+    # populate table
+    my ($table)    = $sqlt->schema->get_tables;
+    my $table_name = $table->name;
+    my @fields     = map {$_->name} $table->get_fields;
+    my $field_list = join ', ', @fields;
+    my $join_list  = join ', ', (('?') x @fields);
+    my $sth_insert = $dbh->prepare_cached(
+        "INSERT INTO $table_name ($field_list) VALUES ($join_list)"
+    );
+    $sth_insert->execute(@$_) for (@{$spreadsheet->data});
+
+    return $table;
+}
+
+sub _check_table_name {
+    my ($self, $sqlt_schema) = @_;
+
+    my ($table)    = $sqlt_schema->get_tables();
+    my $table_name = $table->name;
+    my $new_name   = 'data.' . $self->_gen_table_name($table_name);
+    $table->name($new_name);
+    return;
+}
+
+sub _gen_table_name {
+    my ($self, $table_name) = @_;
+
+    $table_name =~ s/[^a-z_0-9]+/_/gi;
+    $table_name = $self->user->username . '_' . $table_name;
+    return $table_name unless ($self->_table_exists($table_name));
+
+    my $new_name = List::AllUtils::first {not $self->_table_exists($_)}
+        map { "${table_name}_${_}" } (1..10);
+    return $new_name if ($new_name);
+
+    $new_name = $table_name . '_' . time();
+    die "Unable to find suitable name for table: $table_name"
+        if ($self->_table_exists($new_name));
+    return $new_name;
+}
+
+sub _table_exists {
+    my ($self, $name) = @_;
+    my $sth = $self->result_source->storage->dbh
+        ->table_info(undef, '%', $name, "TABLE");
+    my $ary = $sth->fetchall_arrayref();
+    return @$ary;
 }
 
 
