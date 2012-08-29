@@ -7,7 +7,6 @@ use Test::More;
 
 BEGIN {
     my @modules = qw(
-        Judoon::DB::DataStore::Schema
         Judoon::DB::User::Schema
         Judoon::Tmpl::Translator
         Judoon::SiteLinker
