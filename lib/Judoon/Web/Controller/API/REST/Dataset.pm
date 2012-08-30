@@ -14,11 +14,11 @@ __PACKAGE__->config(
     # stash namespace
     stash_namespace         => 'dataset',
     # Columns required to create
-    create_requires         =>  [qw/data name notes original permission user_id/],
+    create_requires         =>  [qw/name notes original permission user_id/],
     # Additional non-required columns that create allows
     create_allows           =>  [qw//],
     # Columns that update allows
-    update_allows           =>  [qw/data name notes original permission user_id/],
+    update_allows           =>  [qw/name notes original permission user_id/],
     # Columns that list returns
     list_returns            =>  [qw/id user_id name notes original data permission/],
 
@@ -33,7 +33,7 @@ __PACKAGE__->config(
     list_ordered_by         => [qw/id/],
     # columns that can be searched on via list
     list_search_exposes     => [
-        qw/id user_id name notes original data permission/,
+        qw/id user_id name notes original nbr_rows nbr_columns tablename permission/,
         { 'ds_columns' => [qw/id dataset_id name sort is_accession accession_type is_url url_root shortname/] },
         { 'pages'      => [qw/id dataset_id title preamble postamble permission/] },
     ],
@@ -50,7 +50,8 @@ around 'update_or_create_objects' => sub {
     if (my $file = $c->req->params->{'dataset.file'}) {
         my $fh = $c->req->upload('dataset.file')->fh;
         (my $extension = $file) =~ s/.*\.//;
-        my $dataset = $c->user->import_data($fh, $extension);
+        my $dataset = $c->user->obj->import_data($fh, $extension);
+        $dataset->insert;
         $c->req->clear_objects();
         $c->req->add_object([$dataset, {}]);
     }

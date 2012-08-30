@@ -133,16 +133,6 @@ __PACKAGE__->belongs_to(
 
 =cut
 
-sub BUILDARGS {
-    my ($class, $args) = @_;
-
-    if (not $args->{shortname}) {
-        ($args->{shortname} = lc($args->{name} || 'nothing')) =~ s/[^0-9a-z_]/_/g;
-    }
-
-    return $args;
-};
-
 use Judoon::SiteLinker;
 has sitelinker => (is => 'lazy',); # isa => 'Judoon::SiteLinker',);
 sub _build_sitelinker { return Judoon::SiteLinker->new; }

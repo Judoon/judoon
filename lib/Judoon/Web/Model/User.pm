@@ -5,13 +5,18 @@ use base 'Catalyst::Model::DBIC::Schema';
 
 __PACKAGE__->config(
     schema_class => 'Judoon::DB::User::Schema',
-    
     connect_info => {
         dsn => 'dbi:SQLite:dbname=share/judoon-db-user-schema.db',
         user => '',
         password => '',
-    }
+        on_connect_do => [
+            q{ATTACH DATABASE 'share/judoon-datastore.db' AS }
+                . datastore_name() . q{;},
+        ],
+    },
 );
+
+sub datastore_name { 'data'; }
 
 =head1 NAME
 

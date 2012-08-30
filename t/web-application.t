@@ -7,6 +7,11 @@ use Test::More;
 use Test::DBIx::Class {
     schema_class => 'Judoon::DB::User::Schema',
     connect_info => ['dbi:SQLite:dbname=t/var/testdb.sqlite','',''],
+    connect_opts => {
+        on_connect_do => [
+            q{ATTACH DATABASE ':memory:' AS data;}
+        ],
+    },
 };
 use Test::WWW::Mechanize::Catalyst;
 

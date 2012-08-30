@@ -143,8 +143,7 @@ Number of rows in this dataset.
 
 sub nbr_rows {
     my ($self) = @_;
-    my $data = $self->dataset->data;
-    return scalar @$data;
+    return $self->dataset->nbr_rows;
 }
 
 

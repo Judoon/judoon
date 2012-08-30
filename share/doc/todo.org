@@ -311,7 +311,7 @@ CLOSED: [2012-07-27 Fri 09:11]
 *** TODO why are varstrings variable / static?
 Can't we determine that from the existence of variable_segments?
 Dialect::JQ currently assumes that they are static.  Should we change?
-* Judoon::Spreadsheet [2/8]                              :Judoon_Spreadsheet:
+* Judoon::Spreadsheet [2/9]                              :Judoon_Spreadsheet:
 ** DONE [#B] move code from J:DB::U::S::R::U::import_data() into here
 CLOSED: [2012-08-01 Wed 14:20]
 ** DONE [#A] dies when given an XLSX
@@ -333,6 +333,8 @@ weird encoding issues in encoding.xls
 empty columns in emptycol.xls
 etc. etc.
 make a bunch of spreadsheets that each demonstrate one particular problem
+** TODO [#A] Spreadsheet::Read::rows seems t be the same as pivot data
+Use that instead?
 * Judoon::SiteLinker [0/4]                                :Judoon_SiteLinker:
 ** TODO Needs a lot more maps
 ** TODO Can use Uniprot ID mapper to convert ids
@@ -354,3 +356,8 @@ See Judoon::Tmpl/Dialect::WebWidgets todo entry
 - [X] DBIx::Class::Migration
 ** TODO questionable deps
 - [ ] JSON::Any
+* external code
+** possibly troublesome modules
+*** SQL::Translator
+*** Spreadsheet::Read
+*** Spreasheet::XLSX

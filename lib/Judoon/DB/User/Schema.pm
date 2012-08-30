@@ -21,6 +21,6 @@ to work
 
 =cut
 
-our $VERSION = 5;
+our $VERSION = 6;
 
 1;

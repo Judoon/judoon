@@ -5,6 +5,7 @@ use namespace::autoclean;
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 use List::AllUtils qw();
+use SQL::Abstract;
 
 =head1 NAME
 
@@ -41,60 +42,49 @@ sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 sub object_GET {
     my ($self, $c) = @_;
 
-    my @real_data = @{$c->stash->{dataset}{object}->data};
-    my $filtered = my $total = @real_data;
+    my $dataset  = $c->stash->{dataset}{object};
+    my $model    = $c->model('User');
+    my $tbl_name = $model->datastore_name . '.' . $dataset->tablename;
+    my $dbh      = $model->schema->storage->dbh;
+    my $params   = $c->req->params();
+    my @fields   = map {$_->shortname} $dataset->ds_columns;
+    my $total    = $dataset->nbr_rows;
 
-    # filter data by search param
-    my $params = $c->req->params();
+    # filter data
+    #   sSearch: the search string
+    my %where;
     if (my $search = $params->{sSearch}) {
-        @real_data = grep {List::AllUtils::any(sub {m/$search/i}, @$_)} @real_data;
-        $filtered = @real_data;
+        %where = ('-or' => {map {$_ => {-like => '%'.$search.'%'}} @fields});
     }
 
     # order data
-    # iSortingCols: # of columns to sort by
-    # sSortDir_#: asc/ desc
-    # iSortCol_#: sort column number
+    #   iSortingCols: # of columns to sort by
+    #   sSortDir_#: asc/ desc
+    #   iSortCol_#: sort column number
+    my @order_by;
     my $nbr_sort_cols = +($params->{iSortingCols} // 1);
-    my $max_cols = $c->stash->{dataset}{object}->nbr_columns;
-    $nbr_sort_cols = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
-    my @sorts;
+    my $max_cols      = @fields;
+    $nbr_sort_cols    = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
     for my $i (0..$nbr_sort_cols-1) {
-        push @sorts, [$params->{"iSortCol_$i"}, $params->{"sSortDir_$i"}];
+        my ($colnum, $direction) = @{$params}{("iSortCol_$i", "sSortDir_$i")};
+        push @order_by, {"-$direction" => $fields[$colnum]};
     }
-    my $sort_func = sub {
-        my ($left, $right) = @_;
 
-        my $retval;
-        for my $sort (@sorts) {
-            my $idx = $sort->[0];
-            $retval = $sort->[1] eq 'asc' ? ($left->[$idx]  cmp $right->[$idx])
-                    :                       ($right->[$idx] cmp $left->[$idx] );
-            last if ($retval);
-        }
-        return $retval;
-    };
-    @real_data = sort {$sort_func->($a, $b)} @real_data;
-
+    # build and execute query
+    my $sqla = SQL::Abstract->new;
+    my ($stmt, @bind) = $sqla->select($tbl_name, \@fields, \%where, \@order_by);
+    my $sth = $dbh->prepare($stmt);
+    $sth->execute(@bind);
+    my $results = $sth->fetchall_arrayref({});
+    my $filtered = %where ? @$results : $total;
 
     # paginate data
-    my ($start, $end) = (0, $#real_data);
-    my $len = $params->{iDisplayLength};
-    if ($len && $len < $#real_data && $len > 0) {
-        my $start_p = $params->{iDisplayStart};
-        if ($start_p > $start && $start_p < $end) {
-            $start = $start_p;
-        }
-        if ($start + $len < $#real_data) {
-            $end = $start + $len - 1;
-        }
-    }
-    @real_data = @real_data[$start..$end];
+    #   iDisplayLength: number to show
+    #   iDisplayStart: offset to start at
+    my ($limit, $offset) = @{$params}{qw(iDisplayLength iDisplayStart)};
+    my @tmpl_data = grep {defined} @{$results}[$offset..$offset+$limit];
 
-    # turn 2D data array into list of hashrefs
-    my @column_names = map {$_->shortname} @{$c->stash->{ds_column}{list}};
-    my @tmpl_data = map {{ List::AllUtils::zip @column_names, @$_ }} @real_data;
-
+    # return results
     $self->status_ok($c,
         entity => {
             tmplData             => \@tmpl_data,
@@ -103,6 +93,12 @@ sub object_GET {
         },
     );
 }
+
+
+
+
+
+
 
 =head1 AUTHOR
 
