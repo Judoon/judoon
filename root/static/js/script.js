@@ -52,11 +52,6 @@ function pbuild_copy_canvas_to_input() {
 }
 
 
-function translate_column_template() {
-    $('#page_column.template').attr('value', 'new_template');
-}
-
-
 /* ========================================
 
    Link Builder Modal functions
