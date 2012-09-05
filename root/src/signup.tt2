@@ -8,44 +8,42 @@
 .small { font-size: 90%; color: #999; }
 </style>
 
-<form name="signup_form" id="signup_form" action="[% c.uri_for_action('/user/signup') %]" method="post" class="form-vertical">
+<form name="signup_form" id="signup_form" action="[% c.uri_for_action('/user/signup') %]" method="post" class="">
 
   <label>
     Username <span class="small">(required)</span>
-    <input type="text" form="signup_form" class="span3" name="user.username">
   </label>
+  <input type="text" form="signup_form" class="span3" name="user.username">
 
   <label>
     Password <span class="small">(required, at least 8 characters)</span>
-    <input type="password" form="signup_form" class="span3" name="user.password">
   </label>
+  <input type="password" form="signup_form" class="span3" name="user.password">
 
   <label>
     Confirm Password <span class="small">(required)</span>
-    <input type="password" form="signup_form" class="span3" name="user.confirm_password">
   </label>
-
+  <input type="password" form="signup_form" class="span3" name="user.confirm_password">
+  
   <label>
     Email <span class="small">(required)</span>
-    <input type="text" form="signup_form" class="span3" name="user.email_address">
   </label>
+  <input type="text" form="signup_form" class="span3" name="user.email_address">
 
   <label>
     Name <span class="small">(required)</span>
-    <input type="text" form="signup_form" class="span3" name="user.name">
   </label>
+  <input type="text" form="signup_form" class="span3" name="user.name">
 
-  <label>
-    Phone Number
-    <input type="text" form="signup_form" class="span3" name="user.phone_number">
-  </label>
+  <label>Phone Number</label>
+  <input type="text" form="signup_form" class="span3" name="user.phone_number">
 
-  <label>
-    Mailing Address
-    <input type="text" form="signup_form" class="span3" name="user.mail_address">
-  </label>
+  <label>Mailing Address</label>
+  <input type="text" form="signup_form" class="span3" name="user.mail_address">
 
-  <button type="submit" form="signup_form" class="btn btn-primary">Submit</button>
+  <div class="form-actions">
+    <button type="submit" form="signup_form" class="btn btn-primary">Submit</button>
+  </div>
 </form>
 
 

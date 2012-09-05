@@ -62,11 +62,11 @@
             </div>
             <div class="row-fluid"><div class="span8"><h6>&nbsp;</h6></div></div>
             <div class="row-fluid">
-              <div class="span6"><h6>Move Cursor</h6></div>
-              <div class="span6"><h6>Actions</h6></div>
+              <div class="span8"><h6>Move Cursor</h6></div>
+              <div class="span4"><h6>Actions</h6></div>
             </div>
             <div class="row-fluid">
-              <div class="span6">
+              <div class="span8">
                 <div class="btn-group">
                   <a class="btn" id="btn_cursor_up"><i class="icon-arrow-up"></i> Up</a>
                   <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i> Down</a>
@@ -74,7 +74,7 @@
                   <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i> Right</a>
                 </div>
               </div>
-              <div class="span6">
+              <div class="span4">
                 <div class="btn-group">
                   <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Backspace</a>
                 </div>
