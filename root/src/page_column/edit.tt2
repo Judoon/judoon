@@ -119,12 +119,12 @@
     $('#btn_add_list').on(   'click', function() {pbuild_add_widget('list');}    );
     $('#btn_add_if').on(     'click', function() {pbuild_add_widget('if');}      );
 
-    $('#btn_cursor_up').on(    'click', function() {pbuild_cursor_up();}    );
-    $('#btn_cursor_down').on(  'click', function() {pbuild_cursor_down();}  );
-    $('#btn_cursor_left').on(  'click', function() {pbuild_cursor_left();}  );
-    $('#btn_cursor_right').on( 'click', function() {pbuild_cursor_right();} );
-
-    $('#btn_backspace').on( 'click', function() {pbuild_backspace();} );
+    var cursor = judoon.canvas.cursor;
+    $('#btn_cursor_up').on(    'click', function() {cursor.move_up();}    );
+    $('#btn_cursor_down').on(  'click', function() {cursor.move_down();}  );
+    $('#btn_cursor_left').on(  'click', function() {cursor.move_left();}  );
+    $('#btn_cursor_right').on( 'click', function() {cursor.move_right();} );
+    $('#btn_backspace').on(    'click', function() {cursor.backspace();}  );
 
     $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
 

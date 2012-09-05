@@ -93,6 +93,7 @@
   <!-- scripts concatenated and minified via build script -->
   <script src="/static/js/plugins.js"></script>
   <script src="/static/js/script.js"></script>
+  <script src="/static/js/judoon.js"></script>
   <script src="/static/js/bootstrap.js"></script>
   <!-- end scripts -->
 
