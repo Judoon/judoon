@@ -233,7 +233,6 @@ subtest 'Result::PageColumn' => sub {
     my $page_column = ResultSet('PageColumn')->first;
 
     ok $page_column->template_to_jquery,     'can produce jquery';
-    ok $page_column->template_to_webwidgets, 'can produce webwidgets';
     ok $page_column->template_to_objects,    'can produce objects';
 
     my $newline = Judoon::Tmpl::Factory::new_newline_node();

@@ -4,7 +4,6 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(HashRef);
 
 use Judoon::Tmpl::Translator::Dialect::Native;
-use Judoon::Tmpl::Translator::Dialect::WebWidgets;
 use Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
 use Method::Signatures;
 
@@ -18,7 +17,7 @@ A list of supported dialects
 
 =cut
 
-sub dialects { return qw(Native WebWidgets JQueryTemplate); }
+sub dialects { return qw(Native JQueryTemplate); }
 
 
 =head2 dialect_objects / _build_dialect_objects

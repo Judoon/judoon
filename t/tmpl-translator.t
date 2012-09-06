@@ -124,20 +124,16 @@ subtest 'translation test' => sub {
     }
 
 
-    my $webwidget_tmpl = get_data_section('webwidgets.html');
-    my $native_tmpl    = get_data_section('native.json');
+    my $jquery_tmpl = get_data_section('jquery.txt');
+    my $native_tmpl = get_data_section('native.json');
 
-    my $native_1 = $translator->translate(
-        from => 'WebWidgets', to => 'Native',
-        template => $webwidget_tmpl,
-    );
     my $jq_tmpl_1 = $translator->translate(
-        from => 'WebWidgets', to => 'JQueryTemplate',
-        template => $webwidget_tmpl,
+        from => 'JQueryTemplate', to => 'JQueryTemplate',
+        template => $jquery_tmpl,
     );
     my $jq_tmpl_2 = $translator->translate(
         from => 'Native', to => 'JQueryTemplate',
-        template => $native_1,
+        template => $native_tmpl,
     );
 
     is $jq_tmpl_1, $jq_tmpl_2, 'equivalent transformation';
@@ -152,7 +148,7 @@ subtest 'translation test' => sub {
 # diag "JQueryTemplate2 is: $jq_tmpl_2";
 
 
-# my @dialects = qw(Native WebWidgets JQueryTemplate);
+# my @dialects = qw(Native JQueryTemplate);
 # my @test_types = qw(
 #     text_only data_only url_only newline_only
 #     combined
@@ -191,86 +187,7 @@ done_testing();
 
 
 __DATA__
-@@ webwidgets.html
-       <div id="widget_id_0" class="widget-object widget-type-text widget-inline btn-group">
-        <input id="widget_format_id_0" class="inner-small span2 w-dropdown widget-format-target widget-formatting-bold" placeholder="Type text here" value="Text" type="text"><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-cog"></i>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="widget-action-bold"><i class="icon-bold"></i>Bold</a></li>
-          <li><a class="widget-action-italic"><i class="icon-italic"></i>Italicize</a></li>
-          <li><a class="widget-action-delete"><i class="icon-trash"></i>Delete</a></li>
-        </ul>
-      </div>
-
-      <div id="widget_id_1" class="widget-object widget-type-data widget-inline btn-group">
-        <select id="widget_format_id_1" class="w-dropdown widget-format-target">
-          
-          <option value="gene_symbol">{Gene Symbol}</option>
-          
-          <option value="protein_name" selected="selected">{Protein Name}</option>
-          
-          <option value="flybase_link">{Flybase Link}</option>
-          
-          <option value="fold_change">{Fold Change}</option>
-          
-          <option value="proposed_function">{Proposed Function}</option>
-          
-          <option value="nearest_mammalian_homolog">{Nearest mammalian homolog}</option>
-          
-          <option value="unigene__human_homolog_">{Unigene (human homolog)}</option>
-          
-        </select><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-cog"></i>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="widget-action-bold"><i class="icon-bold"></i>Bold</a></li>
-          <li><a class="widget-action-italic"><i class="icon-italic"></i>Italicize</a></li>
-          <li><a class="widget-action-delete"><i class="icon-trash"></i>Delete</a></li>
-        </ul>
-      </div>
-
-      <div id="widget_id_2" class="widget-object widget-type-newline-icon"><i class="icon-arrow-down"></i></div>
-
-      <div id="widget_id_3" class="widget-object widget-type-newline"></div>
-
-      <div id="widget_id_4" class="widget-object widget-type-text widget-inline btn-group">
-        <input id="widget_format_id_4" class="inner-small span2 w-dropdown widget-format-target widget-formatting-italic" placeholder="Type text here" value="Link" type="text"><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-cog"></i>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="widget-action-bold"><i class="icon-bold"></i>Bold</a></li>
-          <li><a class="widget-action-italic"><i class="icon-italic"></i>Italicize</a></li>
-          <li><a class="widget-action-delete"><i class="icon-trash"></i>Delete</a></li>
-        </ul>
-      </div>
-
-      <div id="widget_id_5" class="widget-object widget-type-link widget-inline btn-group">
-        <a class="btn btn-edit-link"><i class="icon-pencil"></i> Edit link</a><a class="add-to btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="icon-cog"></i>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="widget-action-bold"><i class="icon-bold"></i>Bold</a></li>
-          <li><a class="widget-action-italic"><i class="icon-italic"></i>Italicize</a></li>
-          <li><a class="widget-action-delete"><i class="icon-trash"></i>Delete</a></li>
-        </ul>
-        <input id="widget_format_id_5" class="widget-link-url-source widget-format-target" value="" type="hidden">
-        <input class="widget-link-url-type" value="accession" type="hidden">
-        <input class="widget-link-url-accession" value="" type="hidden">
-        <input class="widget-link-url-text-segment-1" value="http://www.ncbi.nlm.nih.gov/gene/" type="hidden">
-        <input class="widget-link-url-text-segment-2" value="" type="hidden">
-        <input class="widget-link-url-variable-segment-1" value="protein_name" type="hidden">
-
-        <input class="widget-link-label-type" value="static" type="hidden">
-        <input class="widget-link-label-accession" value="" type="hidden">
-        <input class="widget-link-label-text-segment-1" value="Entrez" type="hidden">
-        <input class="widget-link-label-text-segment-2" value="" type="hidden">
-        <input class="widget-link-label-variable-segment-1" value="" type="hidden">
-      </div>
-
-      <div id="canvas_cursor"></div>
+@@ jquery.txt
+foo
 @@ native.json
-    {
-        'type'  : 'text',
-        'value' : 'foo'
-}
+[{"type" : "text", "value" : "foo"}]
