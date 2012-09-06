@@ -94,9 +94,9 @@ before object_PUT => sub {
     my ($self, $c) = @_;
 
     my $params        = $c->req->get_object(0)->[1];
-    my $template_html = $params->{template};
+    my $template_html = $params->{template} // '[]';
     my $template      = $self->translator->translate(
-        from => 'WebWidgets', to => 'Native', template => $template_html,
+        from => 'Native', to => 'Native', template => $template_html,
     );
     $params->{'template'} = $template;
 };

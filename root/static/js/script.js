@@ -38,17 +38,7 @@ function pbuild_add_widget(type) {
 }
 
 function pbuild_copy_canvas_to_input() {
-    var canvas = $('#column_canvas');
-    canvas.find('input').each(function() {
-        $(this).attr('value', $(this).val());
-    });
-    canvas.find('select option').filter(':selected').each(function() {
-        $(this).attr('selected', 1);
-    });
-    canvas.find('select option').not(':selected').each(function() {
-        $(this).removeAttr('selected');
-    });
-    $('input[name="page_column.template"]').attr('value', canvas.html());
+    $('input[name="page_column.template"]').attr('value', judoon.canvas.serialize());
 }
 
 
