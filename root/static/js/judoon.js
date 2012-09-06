@@ -114,6 +114,72 @@ var judoon = {
 
         }, /* end canvas.cursor */
 
+
+        get_canvas: function() { return $('#column_canvas'); },
+
+        serialize: function() {
+            var judoon_canvas = this;
+            var new_template = [];
+            judoon_canvas.get_canvas().find('div.widget-object').each(function(idx) {
+                var widget_classes = $(this).attr('class');
+                var widget_match   = /widget-type-([\w\-]+)/.exec(widget_classes);
+                var widget_type    = widget_match[1];
+                var node = {};
+                switch (widget_type) {
+                    case 'newline':
+                        node.type = 'newline';
+                        break;
+                    case 'newline-icon':
+                        node.type = null;
+                        break;
+                    case 'text':
+                        node.type = 'text';
+                        node.value = $(this).find('input').val();
+                        node.formatting = judoon_canvas.widget.extract_format($(this));
+                        break;
+                    case 'data':
+                        node.type = 'variable';
+                        node.name = $(this).find('select').val();
+                        node.formatting = judoon_canvas.widget.extract_format($(this));
+                        break;
+                    case 'link':
+                        node.type  = 'link';
+                        node.url   = judoon_canvas.widget.get_link_attr($(this), 'url');
+                        node.label = judoon_canvas.widget.get_link_attr($(this), 'label');
+                        node.formatting = judoon_canvas.widget.extract_format($(this));
+                        break;
+                }
+
+                if (node.type !== null) {
+                    new_template.push(node);
+                }
+            });
+            return $.toJSON(new_template);
+        },
+
+
+        widget: {
+            extract_format: function(widget) {
+                var format_class = widget.find('.widget-format-target').attr('class');
+                var formats = [];
+                var format_matches;
+                var format_re = /widget-formatting-([\w\-]+)/g;
+                while ((format_matches = format_re.exec(format_class)) !== null) {
+                    formats.push(format_matches[1]);
+                }
+                return formats;
+            },
+
+            get_link_attr: function(widget, attr) {
+                var varstring = {varstring_type: '', text_segments: [], variable_segments: []};
+                var attr_prefix = '.widget-link-'+attr+'-';
+                varstring.varstring_type       = widget.find(attr_prefix+'type').val();
+                varstring.text_segments[0]     = widget.find(attr_prefix+'text-segment-1').val();
+                varstring.text_segments[1]     = widget.find(attr_prefix+'text-segment-2').val();
+                varstring.variable_segments[0] = widget.find(attr_prefix+'variable-segment-1').val();
+                return varstring;
+            }
+        } /* end canvas.widget */
     },
 
 
