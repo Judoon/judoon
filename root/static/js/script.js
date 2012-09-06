@@ -338,15 +338,6 @@ function pbuild_write_attrs(widget, attrs, type) {
 }
 
 
-// code taken from:
-//    http://stackoverflow.com/questions/1539367/remove-whitespace-and-line-breaks-between-html-elements-using-jquery
-jQuery.fn.cleanWhitespace = function() {
-    textNodes = this.contents().filter(
-        function() { return (this.nodeType == 3 && !/\S/.test(this.nodeValue)); })
-        .remove();
-    return this;
-}
-
 function pbuild_add_formatter(widget) {
     var format_target = widget.find('.widget-format-target');
     format_target.first().after($('#formatting_menu').html());
@@ -369,6 +360,5 @@ function pbuild_add_formatter(widget) {
             }
         );
     }
-    widget.cleanWhitespace();
 }
 
