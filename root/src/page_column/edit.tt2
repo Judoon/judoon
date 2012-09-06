@@ -125,7 +125,7 @@
     $('#btn_cursor_right').on( 'click', function() {cursor.move_right();} );
     $('#btn_backspace').on(    'click', function() {cursor.backspace();}  );
 
-    $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
+    $('#pagecol_form').on('submit', function() { judoon.canvas.save_to_input(); });
 
     $('#column_canvas').on('click', 'div.widget-type-link .btn-edit-link',
        function(event) {pbuild_open_link_form(event.currentTarget); }

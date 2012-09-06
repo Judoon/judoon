@@ -157,6 +157,9 @@ var judoon = {
             return $.toJSON(new_template);
         },
 
+        save_to_input: function() {
+            $('input[name="page_column.template"]').attr('value', judoon.canvas.serialize());
+        },
 
         widget: {
             remove: function(widget) { 

@@ -25,10 +25,6 @@ function pbuild_add_widget(type) {
     });
 }
 
-function pbuild_copy_canvas_to_input() {
-    $('input[name="page_column.template"]').attr('value', judoon.canvas.serialize());
-}
-
 
 /* ========================================
 
