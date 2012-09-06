@@ -323,13 +323,15 @@ function pbuild_submit_link_form() {
 function pbuild_get_link_props_for_widget(widget) {
     var props = {};
     var components = ['url', 'label'];
+    var attributes = ['type', 'accession', 'text-segment-1', 'text-segment-2', 'variable-segment-1'];
     for (var i in components) {
-        props[components[i]] = {};
-        var class_string = 'widget-link-' + components[i] + '-';
-        widget.find('input[class^="'+class_string+'"]').each(function() {
-            var prop_type = $(this).attr('class').replace(class_string, '');
-            props[components[i]][prop_type] = $(this).val();
-        });
+        var component = components[i];
+        props[component] = {};
+        for (var j in attributes) {
+            var attribute = attributes[j];
+            var data_key = 'widget-link-' + component + '-' + attribute;
+            props[component][attribute] = widget.data(data_key);
+        }
     }
     return props;
 }
@@ -347,18 +349,17 @@ function pbuild_set_link_attrs(attrs, link_source, link_site, url_type) {
 // write the url & label attributes to the canvas as hidden inputs
 function pbuild_write_attrs(widget, attrs, type) {
 
-    // clear previous entries
-    widget.find('input[class^="widget-link-'+type+'-"]').each(function() { $(this).val(""); });
+    // clear previous attributes
+    var attributes = ['type', 'accession', 'text-segment-1', 'text-segment-2', 'variable-segment-1'];
+    for (var j in attributes) {
+        var data_key = 'widget-link-' + type + '-' + attribute;
+        widget.data(data_key, '');
+    }
 
     // amend or append all attributes
     for (var key in attrs) {
-        var attr_input = widget.find('input.widget-link-'+type+'-'+key);
-        if (attr_input.length) {
-            attr_input.val(attrs[key]);
-        }
-        else {
-            widget.append('<input type="hidden" class="widget-link-' + type + '-' + key + '" value="' + attrs[key] + '">');
-        }
+        var data_key = 'widget-link-' + type + '-' + key;
+        widget.data(data_key, attrs[key]);
     }
 }
 

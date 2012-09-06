@@ -172,11 +172,12 @@ var judoon = {
 
             get_link_attr: function(widget, attr) {
                 var varstring = {varstring_type: '', text_segments: [], variable_segments: []};
-                var attr_prefix = '.widget-link-'+attr+'-';
-                varstring.varstring_type       = widget.find(attr_prefix+'type').val();
-                varstring.text_segments[0]     = widget.find(attr_prefix+'text-segment-1').val();
-                varstring.text_segments[1]     = widget.find(attr_prefix+'text-segment-2').val();
-                varstring.variable_segments[0] = widget.find(attr_prefix+'variable-segment-1').val();
+                var attr_prefix = 'widget-link-'+attr+'-';
+                varstring.varstring_type       = widget.data(attr_prefix+'type');
+                varstring.accession            = widget.data(attr_prefix+'accession');
+                varstring.text_segments[0]     = widget.data(attr_prefix+'text-segment-1');
+                varstring.text_segments[1]     = widget.data(attr_prefix+'text-segment-2');
+                varstring.variable_segments[0] = widget.data(attr_prefix+'variable-segment-1');
                 return varstring;
             }
         } /* end canvas.widget */

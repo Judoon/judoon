@@ -157,14 +157,16 @@
                new_widget.find('select').val(widget.name);
                break;
            case 'link':
-               new_widget.append('<input type="hidden" class="widget-link-url-type" value="'+widget.url.varstring_type+'">');
-               new_widget.append('<input type="hidden" class="widget-link-url-text-segment-1" value="'+widget.url.text_segments[0]+'">');
-               new_widget.append('<input type="hidden" class="widget-link-url-text-segment-2" value="'+widget.url.text_segments[1]+'">');
-               new_widget.append('<input type="hidden" class="widget-link-url-variable-segment-1" value="'+widget.url.variable_segments[0]+'">');
-               new_widget.append('<input type="hidden" class="widget-link-label-type" value="'+widget.label.varstring_type+'">');
-               new_widget.append('<input type="hidden" class="widget-link-label-text-segment-1" value="'+widget.label.text_segments[0]+'">');
-               new_widget.append('<input type="hidden" class="widget-link-label-text-segment-2" value="'+widget.label.text_segments[1]+'">');
-               new_widget.append('<input type="hidden" class="widget-link-label-variable-segment-1" value="'+widget.label.variable_segments[0]+'">');
+               new_widget.data("widget-link-url-type",                 widget.url.varstring_type);
+               new_widget.data("widget-link-url-accession",            widget.url.accession);
+               new_widget.data("widget-link-url-text-segment-1",       widget.url.text_segments[0]);
+               new_widget.data("widget-link-url-text-segment-2",       widget.url.text_segments[1]);
+               new_widget.data("widget-link-url-variable-segment-1",   widget.url.variable_segments[0]);
+               new_widget.data("widget-link-label-type",               widget.label.varstring_type);
+               new_widget.data("widget-link-label-accession",          widget.label.accession);
+               new_widget.data("widget-link-label-text-segment-1",     widget.label.text_segments[0]);
+               new_widget.data("widget-link-label-text-segment-2",     widget.label.text_segments[1]);
+               new_widget.data("widget-link-label-variable-segment-1", widget.label.variable_segments[0]);
                break;
            default:
                break;
