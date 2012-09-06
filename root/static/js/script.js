@@ -362,21 +362,6 @@ function pbuild_write_attrs(widget, attrs, type) {
     }
 }
 
-function pbuild_init_stored_widget(widget) {
-    pbuild_init_widget(widget);
-    if (widget.hasClass('widget-type-data')) {
-        var select = widget.find('select');
-        var selected_option =  select.find('option').filter(':selected').detach();
-
-        var col;
-        for (col in ds_columns_dict) {
-            select.append('<option value="'+ds_columns_dict[col].shortname+'">{'+ ds_columns_dict[col].name + '}</option>');
-            if (ds_columns_dict[col].shortname === selected_option.attr('value')) {
-                select.children().last().attr('selected', 1);
-            }
-        }
-    }
-}
 
 function pbuild_init_widget(widget) {
         var widget_id = widget_count++;
