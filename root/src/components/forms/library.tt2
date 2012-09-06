@@ -6,14 +6,14 @@
     <h6>Text widget</h6>
     <div id="text_widget">
       <div class="widget-object widget-type-text widget-inline input-append dropdown">
-        <input type="text" class="input-medium widget-format-target widget-format-sibling" placeholder="Type text here" />
+        <input type="text" class="input-medium widget-format-target" placeholder="Type text here" />
       </div>
     </div>
 
     <h6>Data widget</h6>
     <div id="data_widget">
       <div class="widget-object widget-type-data widget-inline input-append dropdown">
-        <select class="widget-format-target widget-format-sibling">
+        <select class="widget-format-target">
           [% FOREACH column IN ds_column.list %]
           <option value="[% column.shortname %]">{[% column.name | html %]}</option>
           [% END %]
@@ -25,7 +25,7 @@
     <h6>Link widget</h6>
     <div id="link_widget">
       <div class="widget-object widget-type-link widget-inline input-append dropdown">
-        <input type="text" class="input-medium disabled btn-edit-link widget-format-target widget-format-sibling" placeholder="Click here to edit link"  />
+        <input type="text" class="input-medium disabled btn-edit-link widget-format-target" placeholder="Click here to edit link"  />
       </div>
     </div>
 

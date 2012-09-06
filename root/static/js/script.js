@@ -385,8 +385,9 @@ jQuery.fn.cleanWhitespace = function() {
 }
 
 function pbuild_add_formatter(widget) {
-    widget.find('.widget-format-sibling').first().after($('#formatting_menu').html());
-    var widget_format_id = widget.children('.widget-format-target').attr('id');
+    var format_target = widget.find('.widget-format-target');
+    format_target.first().after($('#formatting_menu').html());
+    var widget_format_id = format_target.attr('id');
     var widget_dd = widget.children('ul.dropdown-menu');
     if (widget_dd.length) {
         widget_dd.find('.widget-action-bold').on(
