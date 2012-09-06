@@ -110,7 +110,7 @@ var judoon = {
 
             backspace: function () {
                 this.get_cursor().prev('.widget-object').remove();
-            },
+            }
 
         }, /* end canvas.cursor */
 
@@ -220,6 +220,6 @@ var judoon = {
                 }
             } );
 
-        }, /* end bootstrap_init */
-    },
+        } /* end bootstrap_init */
+    }
 };
