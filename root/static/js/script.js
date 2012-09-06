@@ -6,18 +6,6 @@
 
 var widget_count = 0;
 
-/*
-function pbuild_delete_before_cursor {
-    var del_tgt = $("#canvas_cursor").prev().attr
-    pbuild_delete_widget()
-}
-*/
-
-function pbuild_delete_widget(widget_id) {
-    $(widget_id).remove();
-    return false;
-}
-
 
 function pbuild_toggle_format_bold(widget_id) {
     $(widget_id).toggleClass('widget-formatting-bold');
@@ -403,7 +391,7 @@ function pbuild_add_formatter(widget) {
         );
         widget_dd.find('.widget-action-delete').on(
             'click', function() {
-                pbuild_delete_widget('#'+widget.attr('id'));
+                judoon.canvas.widget.remove(widget);
             }
         );
     }

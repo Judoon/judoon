@@ -159,6 +159,10 @@ var judoon = {
 
 
         widget: {
+            remove: function(widget) { 
+                widget.remove();
+            },
+
             extract_format: function(widget) {
                 var format_class = widget.find('.widget-format-target').attr('class');
                 var formats = [];
