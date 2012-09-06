@@ -111,12 +111,10 @@
   })();
 
   $(document).ready(function () {
-    $('#btn_add_text').on(   'click', function() {pbuild_add_widget('text');}    );
-    $('#btn_add_data').on(   'click', function() {pbuild_add_widget('data');}    );
-    $('#btn_add_link').on(   'click', function() {pbuild_add_widget('link');}    );
-    $('#btn_add_newline').on('click', function() {pbuild_add_widget('newline');} );
-    $('#btn_add_list').on(   'click', function() {pbuild_add_widget('list');}    );
-    $('#btn_add_if').on(     'click', function() {pbuild_add_widget('if');}      );
+    $('#btn_add_text').on(   'click', function() { judoon.canvas.widget.add('text');    } );
+    $('#btn_add_data').on(   'click', function() { judoon.canvas.widget.add('data');    } );
+    $('#btn_add_link').on(   'click', function() { judoon.canvas.widget.add('link');    } );
+    $('#btn_add_newline').on('click', function() { judoon.canvas.widget.add('newline'); } );
 
     var cursor = judoon.canvas.cursor;
     $('#btn_cursor_up').on(    'click', function() {cursor.move_up();}    );
@@ -146,7 +144,7 @@
     for (var i in widgets) {
        var widget = widgets[i];
        var widget_type = widget.type === 'variable' ? 'data' : widget.type;
-       pbuild_add_widget(widget_type);
+       judoon.canvas.widget.add(widget_type);
        var new_widget = judoon.canvas.cursor.get_cursor().prev();
 
        switch (widget.type) {

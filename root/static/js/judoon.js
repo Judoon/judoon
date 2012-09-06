@@ -162,6 +162,24 @@ var judoon = {
         },
 
         widget: {
+            count: 0,
+
+            add: function(type) {
+                var judoon_widget = this;
+                $("#"+type+"_widget").children().each(function() {
+                    var widget = $(this).clone();
+                    var widget_id = judoon_widget.count++;
+                    var widget_id_str = 'widget_id_' + widget_id;
+                    widget.attr('id', widget_id_str);
+
+                    var widget_format_id = 'widget_format_id_' + widget_id;
+                    var widget_format_target = widget.children('.widget-format-target')
+                        .attr('id', widget_format_id);
+                    pbuild_add_formatter(widget);
+                    $('#canvas_cursor').before(widget);
+                });
+            },
+
             remove: function(widget) { 
                 widget.remove();
             },

@@ -4,8 +4,6 @@
 
 // "use strict";
 
-var widget_count = 0;
-
 
 function pbuild_toggle_format_bold(widget_id) {
     $(widget_id).toggleClass('widget-formatting-bold');
@@ -15,14 +13,6 @@ function pbuild_toggle_format_bold(widget_id) {
 function pbuild_toggle_format_italic(widget_id) {
     $(widget_id).toggleClass('widget-formatting-italic');
     return false;
-}
-
-function pbuild_add_widget(type) {
-    $("#"+type+"_widget").children().each(function() {
-        var widget = $(this).clone();
-        pbuild_init_widget(widget);
-        $('#canvas_cursor').before(widget);
-    });
 }
 
 
@@ -345,18 +335,6 @@ function pbuild_write_attrs(widget, attrs, type) {
         var data_key = 'widget-link-' + type + '-' + key;
         widget.data(data_key, attrs[key]);
     }
-}
-
-
-function pbuild_init_widget(widget) {
-        var widget_id = widget_count++;
-        var widget_id_str = 'widget_id_' + widget_id;
-        widget.attr('id', widget_id_str);
-
-        var widget_format_id = 'widget_format_id_' + widget_id;
-        var widget_format_target = widget.children('.widget-format-target')
-            .attr('id', widget_format_id);
-        pbuild_add_formatter(widget);
 }
 
 
