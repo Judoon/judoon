@@ -337,28 +337,3 @@ function pbuild_write_attrs(widget, attrs, type) {
     }
 }
 
-
-function pbuild_add_formatter(widget) {
-    var format_target = widget.find('.widget-format-target');
-    format_target.first().after($('#formatting_menu').html());
-    var widget_format_id = format_target.attr('id');
-    var widget_dd = widget.children('ul.dropdown-menu');
-    if (widget_dd.length) {
-        widget_dd.find('.widget-action-bold').on(
-            'click', function() {
-                pbuild_toggle_format_bold('#'+widget_format_id);
-            }
-        );
-        widget_dd.find('.widget-action-italic').on(
-            'click', function() {
-                pbuild_toggle_format_italic('#'+widget_format_id);
-            }
-        );
-        widget_dd.find('.widget-action-delete').on(
-            'click', function() {
-                judoon.canvas.widget.remove(widget);
-            }
-        );
-    }
-}
-

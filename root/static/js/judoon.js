@@ -175,13 +175,38 @@ var judoon = {
                     var widget_format_id = 'widget_format_id_' + widget_id;
                     var widget_format_target = widget.children('.widget-format-target')
                         .attr('id', widget_format_id);
-                    pbuild_add_formatter(widget);
+                    judoon_widget.add_formatter(widget);
                     $('#canvas_cursor').before(widget);
                 });
             },
 
             remove: function(widget) { 
                 widget.remove();
+            },
+
+            add_formatter: function(widget) {
+                var format_target = widget.find('.widget-format-target');
+                format_target.first().after($('#formatting_menu').html());
+                var widget_format_id = format_target.attr('id');
+                var widget_dd = widget.children('ul.dropdown-menu');
+                if (widget_dd.length) {
+                    widget_dd.find('.widget-action-bold').on(
+                        'click', function() {
+                            pbuild_toggle_format_bold('#'+widget_format_id);
+                        }
+                    );
+                    widget_dd.find('.widget-action-italic').on(
+                        'click', function() {
+                            pbuild_toggle_format_italic('#'+widget_format_id);
+                        }
+                    );
+                    widget_dd.find('.widget-action-delete').on(
+                        'click', function() {
+                            judoon.canvas.widget.remove(widget);
+                        }
+                    );
+                }
+
             },
 
             extract_format: function(widget) {
