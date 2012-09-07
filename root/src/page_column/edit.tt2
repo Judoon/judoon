@@ -140,50 +140,9 @@
 
     $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
 
-    var widgets = [% page_column.object.template %];
-    for (var i in widgets) {
-       var widget = widgets[i];
-       var widget_type = widget.type === 'variable' ? 'data' : widget.type;
-       judoon.canvas.widget.add(widget_type);
-       var new_widget = judoon.canvas.cursor.get_cursor().prev();
-
-       switch (widget.type) {
-           case 'text':
-               new_widget.find('input').val(widget.value);
-               break;
-           case 'variable':
-               new_widget.find('select').val(widget.name);
-               break;
-           case 'link':
-               new_widget.data("widget-link-url-type",                 widget.url.varstring_type);
-               new_widget.data("widget-link-url-accession",            widget.url.accession);
-               new_widget.data("widget-link-url-text-segment-1",       widget.url.text_segments[0]);
-               new_widget.data("widget-link-url-text-segment-2",       widget.url.text_segments[1]);
-               new_widget.data("widget-link-url-variable-segment-1",   widget.url.variable_segments[0]);
-               new_widget.data("widget-link-label-type",               widget.label.varstring_type);
-               new_widget.data("widget-link-label-accession",          widget.label.accession);
-               new_widget.data("widget-link-label-text-segment-1",     widget.label.text_segments[0]);
-               new_widget.data("widget-link-label-text-segment-2",     widget.label.text_segments[1]);
-               new_widget.data("widget-link-label-variable-segment-1", widget.label.variable_segments[0]);
-               break;
-           default:
-               break;
-       }
-
-       if (widget.formatting) {
-          for (var j in widget.formatting) {
-              var format = widget.formatting[j];
-              if (format === 'bold') {
-                  judoon.canvas.widget.toggle_bold(new_widget);
-              }
-              else if (format === 'italic') {
-                  judoon.canvas.widget.toggle_italic(new_widget);
-              }
-          }
-       }
-
-    }
-
+    judoon.canvas.build_widgets(
+        [% page_column.object.template %]
+    );
   });
 </script>
 
