@@ -5,17 +5,6 @@
 // "use strict";
 
 
-function pbuild_toggle_format_bold(widget_id) {
-    $(widget_id).toggleClass('widget-formatting-bold');
-    return false;
-}
-
-function pbuild_toggle_format_italic(widget_id) {
-    $(widget_id).toggleClass('widget-formatting-italic');
-    return false;
-}
-
-
 /* ========================================
 
    Link Builder Modal functions

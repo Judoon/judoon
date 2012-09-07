@@ -171,14 +171,13 @@
        }
 
        if (widget.formatting) {
-          var format_target = '#'+new_widget.find('.widget-format-target').attr('id');
           for (var j in widget.formatting) {
               var format = widget.formatting[j];
               if (format === 'bold') {
-                  pbuild_toggle_format_bold(format_target);
+                  judoon.canvas.widget.toggle_bold(new_widget);
               }
               else if (format === 'italic') {
-                  pbuild_toggle_format_italic(format_target);
+                  judoon.canvas.widget.toggle_italic(new_widget);
               }
           }
        }

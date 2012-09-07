@@ -169,12 +169,7 @@ var judoon = {
                 $("#"+type+"_widget").children().each(function() {
                     var widget = $(this).clone();
                     var widget_id = judoon_widget.count++;
-                    var widget_id_str = 'widget_id_' + widget_id;
-                    widget.attr('id', widget_id_str);
-
-                    var widget_format_id = 'widget_format_id_' + widget_id;
-                    var widget_format_target = widget.children('.widget-format-target')
-                        .attr('id', widget_format_id);
+                    widget.attr('id', 'widget_id_' + widget_id);
                     judoon_widget.add_formatter(widget);
                     $('#canvas_cursor').before(widget);
                 });
@@ -187,17 +182,16 @@ var judoon = {
             add_formatter: function(widget) {
                 var format_target = widget.find('.widget-format-target');
                 format_target.first().after($('#formatting_menu').html());
-                var widget_format_id = format_target.attr('id');
                 var widget_dd = widget.children('ul.dropdown-menu');
                 if (widget_dd.length) {
                     widget_dd.find('.widget-action-bold').on(
                         'click', function() {
-                            pbuild_toggle_format_bold('#'+widget_format_id);
+                            judoon.canvas.widget.toggle_bold(widget);
                         }
                     );
                     widget_dd.find('.widget-action-italic').on(
                         'click', function() {
-                            pbuild_toggle_format_italic('#'+widget_format_id);
+                            judoon.canvas.widget.toggle_italic(widget);
                         }
                     );
                     widget_dd.find('.widget-action-delete').on(
@@ -207,6 +201,16 @@ var judoon = {
                     );
                 }
 
+            },
+
+            toggle_bold: function(widget) {
+                var format_target = widget.find('.widget-format-target');
+                format_target.toggleClass('widget-formatting-bold');
+            },
+
+            toggle_italic: function(widget) {
+                var format_target = widget.find('.widget-format-target');
+                format_target.toggleClass('widget-formatting-italic');
             },
 
             extract_format: function(widget) {
