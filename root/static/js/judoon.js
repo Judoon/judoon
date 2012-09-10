@@ -279,7 +279,62 @@ var judoon = {
                 return varstring;
             }
         } /* end canvas.widget */
-    },
+
+    }, /* end canvas */
+
+
+    /***
+     *
+     * Link Builder Modal functions
+     *
+     ***/
+    linkbuilder: {
+        open: function() {},
+        submit: function() {},
+        get_attrs: function(widget, type) {},
+
+        // save the given attributes to the widget's datastore
+        set_attrs: function(widget, type, attrs) {
+            var data_key;
+            for (var i in this.attr_dict) {
+                data_key = 'widget-link-' + type + '-' + this.attr_dict[i];
+                widget.data(data_key, '');
+            }
+
+            // amend or append all attributes
+            for (var key in attrs) {
+                data_key = 'widget-link-' + type + '-' + key;
+                widget.data(data_key, attrs[key]);
+            }
+        },
+        attr_dict: ['type', 'accession', 'text-segment-1', 'text-segment-2', 'variable-segment-1'],
+        util: { zip_segments: function() {} },
+        preview: {
+            update: function() {},
+            update_url: function() {},
+            update_label: function() {}
+        },
+        url: {
+            get_type: function() {},
+            accession: {
+                get_source: function() {},
+                set_source: function() {},
+
+                get_active_sitelist: function() {},
+                set_active_sitelist: function() {},
+
+                get_site: function() {}
+
+            }
+        },
+        label: {
+            get_type: function() {}
+            
+
+        }
+
+
+    }, /* end linkbuilder */
 
 
     /***

@@ -229,7 +229,7 @@ function pbuild_submit_link_form() {
             message : url_type + ' is not a supported url_type'
         };
     }
-    pbuild_write_attrs(widget, url_attrs, 'url');
+    judoon.linkbuilder.set_attrs(widget, 'url', url_attrs);
 
 
     // set label properties
@@ -264,7 +264,7 @@ function pbuild_submit_link_form() {
             message : label_type + ' is not a supported label type'
         };
     }
-    pbuild_write_attrs(widget, label_attrs, 'label');
+    judoon.linkbuilder.set_attrs(widget, 'label', label_attrs);
     
 
     // Update canvas display
@@ -309,20 +309,4 @@ function pbuild_set_link_attrs(attrs, link_source, link_site, url_type) {
     attrs['variable-segment-1'] = link_source;
 }
 
-// write the url & label attributes to the canvas as hidden inputs
-function pbuild_write_attrs(widget, attrs, type) {
-
-    // clear previous attributes
-    var attributes = ['type', 'accession', 'text-segment-1', 'text-segment-2', 'variable-segment-1'];
-    for (var j in attributes) {
-        var data_key = 'widget-link-' + type + '-' + attribute;
-        widget.data(data_key, '');
-    }
-
-    // amend or append all attributes
-    for (var key in attrs) {
-        var data_key = 'widget-link-' + type + '-' + key;
-        widget.data(data_key, attrs[key]);
-    }
-}
 
