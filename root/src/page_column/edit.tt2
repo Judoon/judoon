@@ -101,6 +101,8 @@
   [% INCLUDE 'components/forms/library.tt2' %]
 </div>
 
+<script src="/static/js/libs/jquery.json-2.3.min.js"></script>
+<script src="/static/js/judoon.js"></script>
 <script>
   var delay = (function(){
       var timer = 0;
