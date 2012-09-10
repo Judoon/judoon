@@ -40,7 +40,8 @@ footer p {
     margin-bottom: 0;  /* override the default bootstrap form styling */
 }
 
-/* for template edit page */
+
+/* for Page Column edit page */
 
 #canvas_cursor {
     border: thin #aaa solid;
@@ -62,6 +63,9 @@ footer p {
 
 .column_container { display: inline-block; border: thin black solid; text-align: center; padding: 4px; }
 .column_container div input { display: block; }
+
+#widget_library { display: none; }
+#modal_title { display: none; }
 
 
 /* for Page / Dataset previews */
