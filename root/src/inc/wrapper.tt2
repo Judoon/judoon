@@ -22,7 +22,7 @@
 
   <link rel="stylesheet" href="[% c.uri_for('/static/css/h5bp.css') %]" />
   <link rel="stylesheet" href="[% c.uri_for('/static/css/bootstrap.css') %]" />
-  <link rel="stylesheet" href="[% c.uri_for('/static/css/site2.css') %]" />
+  <link rel="stylesheet" href="[% c.uri_for('/static/css/site.css') %]" />
 
   <!--
       <style type="text/css" title="currentStyle">
