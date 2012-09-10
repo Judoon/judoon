@@ -12,75 +12,6 @@
    ======================================== */
 
 
-// update the link preview panel
-function pbuild_update_preview() {
-    pbuild_update_url_preview();
-    pbuild_update_label_preview();
-}
-
-// this shouldn't be called directly, since a change in url could require
-// a change in label. Use pbuild_update_preview() instead.
-function pbuild_update_url_preview() {
-    var preview_url   = '';
-    var url_type_val = judoon.linkbuilder.url.get_type().filter(':checked').val();
-    switch (url_type_val) {
-        case 'static':
-            preview_url = $('#link_widget_url_static').val();
-            break;
-        case 'variable_simple':
-            preview_url = url_prefixes[$('#link_url_source').val()] +
-                          sample_data[$('#link_url_source').val()];
-            break;
-        case 'variable_complex':
-            var var_sample = sample_data[$('#constructed_url_source').val()];
-            var var_prefix = $('#constructed_url_prefix').val();
-            var var_suffix = $('#constructed_url_suffix').val();
-            preview_url    = judoon.linkbuilder.util.zip_segments([var_prefix, var_suffix],[var_sample]);
-            break;
-        case 'accession':
-            var site_id    = judoon.linkbuilder.url.accession.get_site().val();
-            var accession  = column_acctype[judoon.linkbuilder.url.accession.get_source().val()];
-            var link       = pbuild_links[site_id][accession];
-            var acc_sample = sitelinker_accs[accession].example;
-            preview_url    = judoon.linkbuilder.util.zip_segments([link.prefix, link.postfix], [acc_sample]);
-            break;
-        default:
-            preview_url = 'Something went wrong!';
-    }
-
-    $('#link_widget_url_preview').html(preview_url);
-}
-
-function pbuild_update_label_preview() {
-    var preview_url = $('#link_widget_url_preview').html();
-    var preview_label = '';
-    var label_type_val = judoon.linkbuilder.label.get_type().filter(':checked').val();
-    switch (label_type_val) {
-        case 'default':
-            preview_label = judoon.linkbuilder.url.get_type().filter(':checked').val() === 'accession' ?
-                sitelinker_sites[judoon.linkbuilder.url.accession.get_site().val()].label
-              : 'Link';
-            break;
-        case 'url':
-            preview_label = preview_url;
-            break;
-        case 'variable':
-            var lbl_sample = sample_data[judoon.linkbuilder.label.dynamic.get_source().val()];
-            var lbl_prefix = $('#label_source_prefix').val();
-            var lbl_suffix = $('#label_source_suffix').val();
-            preview_label  = judoon.linkbuilder.util.zip_segments([lbl_prefix, lbl_suffix],[lbl_sample]);
-            break;
-        case 'static':
-            preview_label = $('#link_label_static').val();
-            break;
-        default:
-            preview_label = 'Something went wrong!';
-    }
-
-    $('#link_widget_label_preview').html('<a href="'+preview_url+'" title="'+preview_url+'">'+preview_label+'</a>');
-}
-
-
 // open and initialize the link modal
 function pbuild_open_link_form(link_widget_button) {
     var this_btn = link_widget_button;
@@ -148,7 +79,7 @@ function pbuild_open_link_form(link_widget_button) {
         // do nothing.
     }
 
-    pbuild_update_preview();
+    judoon.linkbuilder.preview.update();
 
     // show the modal
     $('#linkModal').modal();

@@ -129,14 +129,15 @@
        function(event) {pbuild_open_link_form(event.currentTarget); }
     );
 
-    $('#link_source').on('change', function() {judoon.linkbuilder.url.accession.set_active_sitelist(); pbuild_update_preview();});
-    $('#link_widget_url_form').on( 'change', 'input', function() {pbuild_update_preview();} );
-    $('#link_widget_url_form').on( 'change', 'select', function() {pbuild_update_preview();} );
-    $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_preview();}, 200);} );
+    var judoon_preview = judoon.linkbuilder.preview;
+    $('#link_source').on('change', function() {judoon.linkbuilder.url.accession.set_active_sitelist(); judoon_preview.update();});
+    $('#link_widget_url_form').on( 'change', 'input', function() {judoon_preview.update();} );
+    $('#link_widget_url_form').on( 'change', 'select', function() {judoon_preview.update();} );
+    $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update();}, 200);} );
 
-    $('#link_widget_label_form').on( 'change', 'input', function() {pbuild_update_label_preview();} );
-    $('#link_widget_label_form').on( 'change', 'select', function() {pbuild_update_label_preview();} );
-    $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_label_preview();}, 200);} );
+    $('#link_widget_label_form').on( 'change', 'input', function() {judoon_preview.update_label();} );
+    $('#link_widget_label_form').on( 'change', 'select', function() {judoon_preview.update_label();} );
+    $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update_label();}, 200);} );
 
     $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
 
