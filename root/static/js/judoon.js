@@ -3,6 +3,7 @@
  *
  */
 
+/*global $:false, jQuery:false */
 // "use strict";
 
 var judoon = {
@@ -43,7 +44,6 @@ var judoon = {
                     cursor.detach().insertAfter(p.next());
                 }
                 else {
-                    alert('Not sure how to move cursor right!');
                     return this.do_nothing();
                 }
 
@@ -665,7 +665,7 @@ var judoon = {
                         var iListLength = 5;
                         var oPaging = oSettings.oInstance.fnPagingInfo();
                         var an = oSettings.aanFeatures.p;
-                        var i, j, sClass, iStart, iEnd, iHalf=Math.floor(iListLength/2);
+                        var i, j, sClass, iStart, iEnd, iLen, iHalf=Math.floor(iListLength/2);
 
                         if ( oPaging.iTotalPages < iListLength) {
                             iStart = 1;
@@ -682,6 +682,11 @@ var judoon = {
                             iEnd = iStart + iListLength - 1;
                         }
 
+                        var paging_click_event = function (e) {
+                            e.preventDefault();
+                            oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
+                            fnDraw( oSettings );
+                        };
                         for ( i=0, iLen=an.length ; i<iLen ; i++ ) {
                             // Remove the middle elements
                             $('li:gt(0)', an[i]).filter(':not(:last)').remove();
@@ -691,11 +696,7 @@ var judoon = {
                                 sClass = (j==oPaging.iPage+1) ? 'class="active"' : '';
                                 $('<li '+sClass+'><a href="#">'+j+'</a></li>')
                                     .insertBefore( $('li:last', an[i])[0] )
-                                    .bind('click', function (e) {
-                                        e.preventDefault();
-                                        oSettings._iDisplayStart = (parseInt($('a', this).text(),10)-1) * oPaging.iLength;
-                                        fnDraw( oSettings );
-                                    } );
+                                    .bind('click', paging_click_event);
                             }
 
                             // Add / remove disabled classes from the static elements
