@@ -221,10 +221,14 @@ function pbuild_submit_link_form() {
         url_attrs['text-segment-2']     = $('#constructed_url_suffix').val();
     }
     else if (url_type === 'accession') {
-        url_attrs.type = 'accession';
         var link_source_val = $('#link_source').val();
         var link_site_val   = pbuild_get_selected_link_site().val();
-        pbuild_set_link_attrs(url_attrs, link_source_val, link_site_val);
+        var acc_type        = column_acctype[link_source_val];
+        url_attrs.type                  = 'accession';
+        url_attrs.accession             = link_site_val;
+        url_attrs['text-segment-1']     = pbuild_links[link_site_val][acc_type].prefix;
+        url_attrs['text-segment-2']     = pbuild_links[link_site_val][acc_type].postfix;
+        url_attrs['variable-segment-1'] = link_source_val;
     }
     else {
         throw {
@@ -281,17 +285,4 @@ function pbuild_submit_link_form() {
         link_display += display_label + ' (' + display_url + ')';
     }
     widget.find('.btn-edit-link').first().attr('placeholder',link_display);
-
 }
-
-
-// for urls & labels of type 'accession', lookup the segment properties
-// in the property dictionaries
-function pbuild_set_link_attrs(attrs, link_source, link_site, url_type) {
-    attrs.accession = link_site;
-    var acc_type = column_acctype[link_source];
-    attrs['text-segment-1'] = pbuild_links[link_site][acc_type].prefix;
-    attrs['text-segment-2'] = pbuild_links[link_site][acc_type].postfix;
-    attrs['variable-segment-1'] = link_source;
-}
-
