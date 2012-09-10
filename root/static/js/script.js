@@ -12,16 +12,6 @@
    ======================================== */
 
 
-function pbuild_set_link_source(source_key) {
-    $('#link_source').val(source_key);
-    pbuild_update_link_sites();
-}
-
-function pbuild_update_link_sites() {
-    judoon.linkbuilder.url.accession.get_active_sitelist().removeClass('link_site_active');
-    $("#link_site_" + $('#link_source').val()).addClass('link_site_active');
-}
-
 // zip a text list and variable list into a string
 // the text list always goes first
 function pbuild_zip_segments(text_segs, data_segs) {
@@ -61,7 +51,7 @@ function pbuild_update_url_preview() {
             break;
         case 'accession':
             var site_id    = judoon.linkbuilder.url.accession.get_site().val();
-            var accession  = column_acctype[$('#link_source').val()];
+            var accession  = column_acctype[judoon.linkbuilder.url.accession.get_source().val()];
             var link       = pbuild_links[site_id][accession];
             var acc_sample = sitelinker_accs[accession].example;
             preview_url    = pbuild_zip_segments([link.prefix, link.postfix], [acc_sample]);
@@ -119,8 +109,8 @@ function pbuild_open_link_form(link_widget_button) {
     var url_radio = judoon.linkbuilder.url.get_type();
     if (props.url.type === 'accession') {
         url_radio.val(['accession']);
-        pbuild_set_link_source(props.url['variable-segment-1']);
-        judoon.linkbuilder.url.accession.get_active_sitelist().val(props.url.accession);
+        judoon.linkbuilder.url.accession.set_source(props.url['variable-segment-1']);
+        judoon.linkbuilder.url.accession.set_site(props.url.accession);
         default_label = sitelinker_sites[props.url.accession].label;
     }
     else if (props.url.type === 'variable') {
@@ -203,7 +193,7 @@ function pbuild_submit_link_form() {
         url_attrs['text-segment-2']     = $('#constructed_url_suffix').val();
     }
     else if (url_type === 'accession') {
-        var link_source_val = $('#link_source').val();
+        var link_source_val = judoon.linkbuilder.url.accession.get_source().val();
         var link_site_val   = judoon.linkbuilder.url.accession.get_site().val();
         var acc_type        = column_acctype[link_source_val];
         url_attrs.type                  = 'accession';

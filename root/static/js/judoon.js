@@ -330,16 +330,29 @@ var judoon = {
                 return $('input[name="url_type"]');
             },
             accession: {
-                get_source: function() {},
-                set_source: function() {},
+                // get+set the accession column source dropdown
+                get_source: function() { return $('#link_source'); },
+                set_source: function(source_key) {
+                    this.get_source().val(source_key);
+                    this.set_active_sitelist();
+                },
 
+                // get+set the sitelist (changes depending on which source
+                // is selected)
                 get_active_sitelist: function() {
                     return $("#link_widget_url_source select.link_site_active");
                 },
-                set_active_sitelist: function() {},
+                set_active_sitelist: function() {
+                    this.get_active_sitelist().removeClass('link_site_active');
+                    $("#link_site_" + this.get_source().val()).addClass('link_site_active');
+                },
 
+                // get+set the site to be linked to
                 get_site: function() {
                     return this.get_active_sitelist().children("option:selected");
+                },
+                set_site: function(accession) {
+                    this.get_active_sitelist().val(accession);
                 }
             }
         },

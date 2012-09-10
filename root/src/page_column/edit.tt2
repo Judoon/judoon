@@ -129,7 +129,7 @@
        function(event) {pbuild_open_link_form(event.currentTarget); }
     );
 
-    $('#link_source').on('change', function() {pbuild_update_link_sites(); pbuild_update_preview();});
+    $('#link_source').on('change', function() {judoon.linkbuilder.url.accession.set_active_sitelist(); pbuild_update_preview();});
     $('#link_widget_url_form').on( 'change', 'input', function() {pbuild_update_preview();} );
     $('#link_widget_url_form').on( 'change', 'select', function() {pbuild_update_preview();} );
     $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_preview();}, 200);} );
