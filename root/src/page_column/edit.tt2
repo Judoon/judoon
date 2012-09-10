@@ -126,7 +126,7 @@
     $('#pagecol_form').on('submit', function() { judoon.canvas.save_to_input(); });
 
     $('#column_canvas').on('click', 'div.widget-type-link .btn-edit-link',
-       function(event) {pbuild_open_link_form(event.currentTarget); }
+       function(event) {judoon.linkbuilder.open(event.currentTarget); }
     );
 
     var judoon_preview = judoon.linkbuilder.preview;
@@ -139,7 +139,7 @@
     $('#link_widget_label_form').on( 'change', 'select', function() {judoon_preview.update_label();} );
     $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update_label();}, 200);} );
 
-    $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
+    $('#linkModal_save_changes').on('click', function() {judoon.linkbuilder.submit();});
 
     judoon.canvas.build_widgets(
         [% page_column.object.template %]
