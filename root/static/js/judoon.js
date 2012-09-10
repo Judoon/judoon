@@ -3,6 +3,8 @@
  *
  */
 
+// "use strict";
+
 var judoon = {
     canvas: {
         cursor: {

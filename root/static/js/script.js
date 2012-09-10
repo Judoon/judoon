@@ -68,8 +68,8 @@ function pbuild_update_url_preview() {
             preview_url = $('#link_widget_url_static').val();
             break;
         case 'variable_simple':
-            preview_url = url_prefixes[$('#link_url_source').val()]
-                        + sample_data[$('#link_url_source').val()];
+            preview_url = url_prefixes[$('#link_url_source').val()] +
+                          sample_data[$('#link_url_source').val()];
             break;
         case 'variable_complex':
             var var_sample = sample_data[$('#constructed_url_source').val()];
