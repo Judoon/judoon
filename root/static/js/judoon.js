@@ -326,21 +326,32 @@ var judoon = {
             update_label: function() {}
         },
         url: {
-            get_type: function() {},
+            get_type: function() {
+                return $('input[name="url_type"]');
+            },
             accession: {
                 get_source: function() {},
                 set_source: function() {},
 
-                get_active_sitelist: function() {},
+                get_active_sitelist: function() {
+                    return $("#link_widget_url_source select.link_site_active");
+                },
                 set_active_sitelist: function() {},
 
-                get_site: function() {}
-
+                get_site: function() {
+                    return this.get_active_sitelist().children("option:selected");
+                }
             }
         },
         label: {
-            get_type: function() {}
-            
+            get_type: function() {
+                return $('#link_widget_label_form input[name="label_type"]');
+            },
+
+            dynamic: {
+                // get the dropdown to use dataset columns as labels
+                get_source: function() { return $('#label_source'); }
+            }
 
         }
 

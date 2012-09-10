@@ -11,17 +11,6 @@
 
    ======================================== */
 
-function pbuild_get_url_type() {
-    return $('input[name="url_type"]');
-}
-
-function pbuild_get_active_link_site() {
-    return $("#link_widget_url_source select.link_site_active");
-}
-
-function pbuild_get_selected_link_site() {
-    return pbuild_get_active_link_site().children("option:selected");
-}
 
 function pbuild_set_link_source(source_key) {
     $('#link_source').val(source_key);
@@ -29,16 +18,9 @@ function pbuild_set_link_source(source_key) {
 }
 
 function pbuild_update_link_sites() {
-    pbuild_get_active_link_site().removeClass('link_site_active');
+    judoon.linkbuilder.url.accession.get_active_sitelist().removeClass('link_site_active');
     $("#link_site_" + $('#link_source').val()).addClass('link_site_active');
 }
-
-function pbuild_get_label_type() {
-    return $('#link_widget_label_form input[name="label_type"]');
-}
-
-// get the dropdown to use dataset columns as labels
-function pbuild_get_label_source() { return $('#label_source'); }
 
 // zip a text list and variable list into a string
 // the text list always goes first
@@ -62,7 +44,7 @@ function pbuild_update_preview() {
 // a change in label. Use pbuild_update_preview() instead.
 function pbuild_update_url_preview() {
     var preview_url   = '';
-    var url_type_val = pbuild_get_url_type().filter(':checked').val();
+    var url_type_val = judoon.linkbuilder.url.get_type().filter(':checked').val();
     switch (url_type_val) {
         case 'static':
             preview_url = $('#link_widget_url_static').val();
@@ -78,7 +60,7 @@ function pbuild_update_url_preview() {
             preview_url = pbuild_zip_segments([var_prefix, var_suffix],[var_sample]);
             break;
         case 'accession':
-            var site_id    = pbuild_get_selected_link_site().val();
+            var site_id    = judoon.linkbuilder.url.accession.get_site().val();
             var accession  = column_acctype[$('#link_source').val()];
             var link       = pbuild_links[site_id][accession];
             var acc_sample = sitelinker_accs[accession].example;
@@ -94,18 +76,18 @@ function pbuild_update_url_preview() {
 function pbuild_update_label_preview() {
     var preview_url = $('#link_widget_url_preview').html();
     var preview_label = '';
-    var label_type_val = pbuild_get_label_type().filter(':checked').val();
+    var label_type_val = judoon.linkbuilder.label.get_type().filter(':checked').val();
     switch (label_type_val) {
         case 'default':
-            preview_label = pbuild_get_url_type().filter(':checked').val() === 'accession' ?
-                sitelinker_sites[pbuild_get_selected_link_site().val()].label
+            preview_label = judoon.linkbuilder.url.get_type().filter(':checked').val() === 'accession' ?
+                sitelinker_sites[judoon.linkbuilder.url.accession.get_site().val()].label
               : 'Link';
             break;
         case 'url':
             preview_label = preview_url;
             break;
         case 'variable':
-            var lbl_sample = sample_data[pbuild_get_label_source().val()];
+            var lbl_sample = sample_data[judoon.linkbuilder.label.dynamic.get_source().val()];
             var lbl_prefix = $('#label_source_prefix').val();
             var lbl_suffix = $('#label_source_suffix').val();
             preview_label = pbuild_zip_segments([lbl_prefix, lbl_suffix],[lbl_sample]);
@@ -134,11 +116,11 @@ function pbuild_open_link_form(link_widget_button) {
 
     // initialize url form values
     var default_label = 'Link';
-    var url_radio = pbuild_get_url_type();
+    var url_radio = judoon.linkbuilder.url.get_type();
     if (props.url.type === 'accession') {
         url_radio.val(['accession']);
         pbuild_set_link_source(props.url['variable-segment-1']);
-        pbuild_get_active_link_site().val(props.url.accession);
+        judoon.linkbuilder.url.accession.get_active_sitelist().val(props.url.accession);
         default_label = sitelinker_sites[props.url.accession].label;
     }
     else if (props.url.type === 'variable') {
@@ -164,13 +146,13 @@ function pbuild_open_link_form(link_widget_button) {
     }
 
     // initialize label form values
-    var label_radio = pbuild_get_label_type();
+    var label_radio = judoon.linkbuilder.label.get_type();
     if (props.label.type === "accession") {
         label_radio.val(['url']);
     }
     else if (props.label.type === "variable") {
         label_radio.val(['variable']);
-        pbuild_get_label_source().val(props.label['variable-segment-1']);
+        judoon.linkbuilder.label.dynamic.get_source().val(props.label['variable-segment-1']);
         $('#label_source_prefix').val(props.label['text-segment-1']);
         $('#label_source_suffix').val(props.label['text-segment-2']);
     }
@@ -204,7 +186,7 @@ function pbuild_submit_link_form() {
 
     // set link url properties
     var url_attrs = {};
-    var url_type  = pbuild_get_url_type().filter(':checked').val();
+    var url_type  = judoon.linkbuilder.url.get_type().filter(':checked').val();
     if (url_type === 'static') {
         url_attrs.type = 'static';
         url_attrs['text-segment-1'] = $('#link_widget_url_static').val();
@@ -222,7 +204,7 @@ function pbuild_submit_link_form() {
     }
     else if (url_type === 'accession') {
         var link_source_val = $('#link_source').val();
-        var link_site_val   = pbuild_get_selected_link_site().val();
+        var link_site_val   = judoon.linkbuilder.url.accession.get_site().val();
         var acc_type        = column_acctype[link_source_val];
         url_attrs.type                  = 'accession';
         url_attrs.accession             = link_site_val;
@@ -240,7 +222,7 @@ function pbuild_submit_link_form() {
 
 
     // set label properties
-    var label_type = pbuild_get_label_type().filter(':checked').val();
+    var label_type = judoon.linkbuilder.label.get_type().filter(':checked').val();
     var label_attrs = {};
     if (label_type === 'default') {
         if (url_attrs.type === 'static' || url_attrs.type === 'variable') {
