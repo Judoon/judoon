@@ -12,18 +12,6 @@
    ======================================== */
 
 
-// zip a text list and variable list into a string
-// the text list always goes first
-function pbuild_zip_segments(text_segs, data_segs) {
-    var maxlen = Math.max(text_segs.length, data_segs.length);
-    var retstring = '';
-    for (var i = 0; i < maxlen; i++) {
-        retstring += text_segs[i] || '';
-        retstring += data_segs[i] || '';
-    }
-    return retstring;
-}
-
 // update the link preview panel
 function pbuild_update_preview() {
     pbuild_update_url_preview();
@@ -47,14 +35,14 @@ function pbuild_update_url_preview() {
             var var_sample = sample_data[$('#constructed_url_source').val()];
             var var_prefix = $('#constructed_url_prefix').val();
             var var_suffix = $('#constructed_url_suffix').val();
-            preview_url = pbuild_zip_segments([var_prefix, var_suffix],[var_sample]);
+            preview_url    = judoon.linkbuilder.util.zip_segments([var_prefix, var_suffix],[var_sample]);
             break;
         case 'accession':
             var site_id    = judoon.linkbuilder.url.accession.get_site().val();
             var accession  = column_acctype[judoon.linkbuilder.url.accession.get_source().val()];
             var link       = pbuild_links[site_id][accession];
             var acc_sample = sitelinker_accs[accession].example;
-            preview_url    = pbuild_zip_segments([link.prefix, link.postfix], [acc_sample]);
+            preview_url    = judoon.linkbuilder.util.zip_segments([link.prefix, link.postfix], [acc_sample]);
             break;
         default:
             preview_url = 'Something went wrong!';
@@ -80,7 +68,7 @@ function pbuild_update_label_preview() {
             var lbl_sample = sample_data[judoon.linkbuilder.label.dynamic.get_source().val()];
             var lbl_prefix = $('#label_source_prefix').val();
             var lbl_suffix = $('#label_source_suffix').val();
-            preview_label = pbuild_zip_segments([lbl_prefix, lbl_suffix],[lbl_sample]);
+            preview_label  = judoon.linkbuilder.util.zip_segments([lbl_prefix, lbl_suffix],[lbl_sample]);
             break;
         case 'static':
             preview_label = $('#link_label_static').val();

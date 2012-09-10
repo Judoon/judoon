@@ -319,7 +319,20 @@ var judoon = {
             }
         },
         attr_dict: ['type', 'accession', 'text-segment-1', 'text-segment-2', 'variable-segment-1'],
-        util: { zip_segments: function() {} },
+        util: {
+
+            // zip a text list and variable list into a string
+            // the text list always goes first
+            zip_segments: function(text_segs, data_segs) {
+                var maxlen = Math.max(text_segs.length, data_segs.length);
+                var retstring = '';
+                for (var i = 0; i < maxlen; i++) {
+                    retstring += text_segs[i] || '';
+                    retstring += data_segs[i] || '';
+                }
+                return retstring;
+            }
+        },
         preview: {
             update: function() {},
             update_url: function() {},
