@@ -176,16 +176,20 @@ var judoon = {
                         new_widget.find('select').val(widget.name);
                         break;
                     case 'link':
-                        new_widget.data("widget-link-url-type",                 widget.url.varstring_type);
-                        new_widget.data("widget-link-url-accession",            widget.url.accession);
-                        new_widget.data("widget-link-url-text-segment-1",       widget.url.text_segments[0]);
-                        new_widget.data("widget-link-url-text-segment-2",       widget.url.text_segments[1]);
-                        new_widget.data("widget-link-url-variable-segment-1",   widget.url.variable_segments[0]);
-                        new_widget.data("widget-link-label-type",               widget.label.varstring_type);
-                        new_widget.data("widget-link-label-accession",          widget.label.accession);
-                        new_widget.data("widget-link-label-text-segment-1",     widget.label.text_segments[0]);
-                        new_widget.data("widget-link-label-text-segment-2",     widget.label.text_segments[1]);
-                        new_widget.data("widget-link-label-variable-segment-1", widget.label.variable_segments[0]);
+                        judoon.linkbuilder.set_attrs(new_widget, 'url', {
+                            "type":                 widget.url.varstring_type,
+                            "accession":            widget.url.accession,
+                            "text-segment-1":       widget.url.text_segments[0],
+                            "text-segment-2":       widget.url.text_segments[1],
+                            "variable-segment-1":   widget.url.variable_segments[0]
+                        });
+                        judoon.linkbuilder.set_attrs(new_widget, 'label', {
+                            "type":                 widget.label.varstring_type,
+                            "accession":            widget.label.accession,
+                            "text-segment-1":       widget.label.text_segments[0],
+                            "text-segment-2":       widget.label.text_segments[1],
+                            "variable-segment-1":   widget.label.variable_segments[0]
+                        });
                         break;
                     default:
                         break;
@@ -269,13 +273,13 @@ var judoon = {
             },
 
             get_link_attr: function(widget, attr) {
-                var varstring = {varstring_type: '', text_segments: [], variable_segments: []};
-                var attr_prefix = 'widget-link-'+attr+'-';
-                varstring.varstring_type       = widget.data(attr_prefix+'type');
-                varstring.accession            = widget.data(attr_prefix+'accession');
-                varstring.text_segments[0]     = widget.data(attr_prefix+'text-segment-1');
-                varstring.text_segments[1]     = widget.data(attr_prefix+'text-segment-2');
-                varstring.variable_segments[0] = widget.data(attr_prefix+'variable-segment-1');
+                var attrs = judoon.linkbuilder.get_attrs(widget, attr);
+                var varstring = {
+                    varstring_type:    attrs.type,
+                    accession:         attrs.accession,
+                    text_segments:     [attrs["text-segment-1"], attrs["text-segment-2"]],
+                    variable_segments: [attrs["variable-segment-1"]]
+                };
                 return varstring;
             }
         } /* end canvas.widget */
