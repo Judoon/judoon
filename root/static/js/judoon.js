@@ -291,7 +291,18 @@ var judoon = {
     linkbuilder: {
         open: function() {},
         submit: function() {},
-        get_attrs: function(widget, type) {},
+
+        // for a given link widget, fetch the attributes for the given type
+        // and stick them in a data struct
+        get_attrs: function(widget, type) {
+            var attrs = {};
+            for (var i in this.attr_dict) {
+                var attr_name = this.attr_dict[i];
+                var data_key = 'widget-link-' + type + '-' + attr_name;
+                attrs[attr_name] = widget.data(data_key);
+            }
+            return attrs;
+        },
 
         // save the given attributes to the widget's datastore
         set_attrs: function(widget, type, attrs) {

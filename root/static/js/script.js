@@ -127,7 +127,10 @@ function pbuild_open_link_form(link_widget_button) {
     var widget   = $(this_btn).parent();
     $('#linkModal').data('widget_id', widget.attr('id'));
 
-    var props = pbuild_get_link_props_for_widget(widget);
+    var props = {
+        url:   judoon.linkbuilder.get_attrs(widget, 'url'),
+        label: judoon.linkbuilder.get_attrs(widget, 'label')
+    };
 
     // initialize url form values
     var default_label = 'Link';
@@ -281,23 +284,6 @@ function pbuild_submit_link_form() {
 
 }
 
-// for a given link widget, fetch the url and label props
-// and stick them in a data struct
-function pbuild_get_link_props_for_widget(widget) {
-    var props = {};
-    var components = ['url', 'label'];
-    var attributes = ['type', 'accession', 'text-segment-1', 'text-segment-2', 'variable-segment-1'];
-    for (var i in components) {
-        var component = components[i];
-        props[component] = {};
-        for (var j in attributes) {
-            var attribute = attributes[j];
-            var data_key = 'widget-link-' + component + '-' + attribute;
-            props[component][attribute] = widget.data(data_key);
-        }
-    }
-    return props;
-}
 
 // for urls & labels of type 'accession', lookup the segment properties
 // in the property dictionaries
@@ -308,5 +294,4 @@ function pbuild_set_link_attrs(attrs, link_source, link_site, url_type) {
     attrs['text-segment-2'] = pbuild_links[link_site][acc_type].postfix;
     attrs['variable-segment-1'] = link_source;
 }
-
 
