@@ -67,6 +67,12 @@ footer p {
 #widget_library { display: none; }
 #modal_title { display: none; }
 
+/*
+  override for bootstrap bug: input-append sets font-size to 0px,
+  so that our dropdown labels aren't showing up
+*/
+.input-append .dropdown-menu { font-size: 14px; }
+
 
 /* for Page / Dataset previews */
 
