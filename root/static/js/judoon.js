@@ -190,6 +190,7 @@ var judoon = {
                             "text-segment-2":       widget.label.text_segments[1],
                             "variable-segment-1":   widget.label.variable_segments[0]
                         });
+                        new_widget.attr('placeholder', judoon.linkbuilder.widget_label(new_widget));
                         break;
                     default:
                         break;
@@ -308,57 +309,61 @@ var judoon = {
             // initialize url form values
             var default_label = 'Link';
             var url_radio = this.url.get_type();
-            if (props.url.type === 'accession') {
-                url_radio.val(['accession']);
-                this.url.accession.set_source(props.url['variable-segment-1']);
-                this.url.accession.set_site(props.url.accession);
-                default_label = sitelinker_sites[props.url.accession].label;
-            }
-            else if (props.url.type === 'variable') {
-                var not_empty = /\S/;
-                if (not_empty.test(props.url['text-segment-1'])) {
-                    url_radio.val(['variable_complex']);
-                    $('#constructed_url_source').val(props.url['variable-segment-1']);
-                    $('#constructed_url_prefix').val(props.url['text-segment-1']);
-                    $('#constructed_url_suffix').val(props.url['text-segment-2']);
-                }
-                else {
-                    url_radio.val(['variable_simple']);
-                    $('#link_url_source').val(props.url['variable-segment-1']);
-                }
-            }
-            else if (props.url.type === 'static') {
-                url_radio.val(['static']);
-                $('#link_widget_url_static').val(props.url['text-segment-1']);
-            }
-            else {
-                // do what?
-                // do nothing.
+            switch (props.url.type) {
+                case 'accession':
+                    url_radio.val(['accession']);
+                    this.url.accession.set_source(props.url['variable-segment-1']);
+                    this.url.accession.set_site(props.url.accession);
+                    default_label = sitelinker_sites[props.url.accession].label;
+                    break;
+                case 'variable':
+                    var not_empty = /\S/;
+                    if (not_empty.test(props.url['text-segment-1'])) {
+                        url_radio.val(['variable_complex']);
+                        $('#constructed_url_source').val(props.url['variable-segment-1']);
+                        $('#constructed_url_prefix').val(props.url['text-segment-1']);
+                        $('#constructed_url_suffix').val(props.url['text-segment-2']);
+                    }
+                    else {
+                        url_radio.val(['variable_simple']);
+                        $('#link_url_source').val(props.url['variable-segment-1']);
+                    }
+                    break;
+                case 'static':
+                    url_radio.val(['static']);
+                    $('#link_widget_url_static').val(props.url['text-segment-1']);
+                    break;
+                default:
+                    // do what?
+                    // do nothing.
+                    break;
             }
 
             // initialize label form values
             var label_radio = this.label.get_type();
-            if (props.label.type === "accession") {
-                label_radio.val(['url']);
-            }
-            else if (props.label.type === "variable") {
-                label_radio.val(['variable']);
-                this.label.dynamic.get_source().val(props.label['variable-segment-1']);
-                $('#label_source_prefix').val(props.label['text-segment-1']);
-                $('#label_source_suffix').val(props.label['text-segment-2']);
-            }
-            else if (props.label.type === "static") {
-                if (props.label['text-segment-1'] === default_label) {
-                    label_radio.val(['default']);
-                }
-                else {
-                    label_radio.val(['static']);
-                    $('#link_label_static').val(props.label['text-segment-1']);
-                }
-            }
-            else {
-                // do what?
-                // do nothing.
+            switch (props.label.type) {
+                case 'accession':
+                    label_radio.val(['url']);
+                    break;
+                case 'variable':
+                    label_radio.val(['variable']);
+                    this.label.dynamic.get_source().val(props.label['variable-segment-1']);
+                    $('#label_source_prefix').val(props.label['text-segment-1']);
+                    $('#label_source_suffix').val(props.label['text-segment-2']);
+                    break;
+                case 'static':
+                    if (props.label['text-segment-1'] === default_label) {
+                        label_radio.val(['default']);
+                    }
+                    else {
+                        label_radio.val(['static']);
+                        $('#link_label_static').val(props.label['text-segment-1']);
+                    }
+                    break;
+                default:
+                    // do what?
+                    // do nothing.
+                    break;
             }
 
             this.preview.update();
@@ -378,84 +383,79 @@ var judoon = {
             // set link url properties
             var url_attrs = {};
             var url_type  = this.url.get_type().filter(':checked').val();
-            if (url_type === 'static') {
-                url_attrs.type = 'static';
-                url_attrs['text-segment-1'] = $('#link_widget_url_static').val();
-            }
-            else if (url_type === 'variable_simple') {
-                url_attrs.type = 'variable';
-                url_attrs['text-segment-1']     = url_prefixes[$('#link_url_source').val()];
-                url_attrs['variable-segment-1'] = $('#link_url_source').val();
-            }
-            else if (url_type === 'variable_complex') {
-                url_attrs.type = 'variable';
-                url_attrs['variable-segment-1'] = $('#constructed_url_source').val();
-                url_attrs['text-segment-1']     = $('#constructed_url_prefix').val();
-                url_attrs['text-segment-2']     = $('#constructed_url_suffix').val();
-            }
-            else if (url_type === 'accession') {
-                var link_source_val             = this.url.accession.get_source().val();
-                var link_site_val               = this.url.accession.get_site().val();
-                var acc_type                    = column_acctype[link_source_val];
-                url_attrs.type                  = 'accession';
-                url_attrs.accession             = link_site_val;
-                url_attrs['text-segment-1']     = pbuild_links[link_site_val][acc_type].prefix;
-                url_attrs['text-segment-2']     = pbuild_links[link_site_val][acc_type].postfix;
-                url_attrs['variable-segment-1'] = link_source_val;
-            }
-            else {
-                throw {
-                    name : 'InvalidFieldError',
-                    message : url_type + ' is not a supported url_type'
-                };
+            switch (url_type) {
+                case 'static':
+                    url_attrs.type = 'static';
+                    url_attrs['text-segment-1'] = $('#link_widget_url_static').val();
+                    break;
+                case 'variable_simple':
+                    url_attrs.type = 'variable';
+                    url_attrs['text-segment-1']     = url_prefixes[$('#link_url_source').val()];
+                    url_attrs['variable-segment-1'] = $('#link_url_source').val();
+                    break;
+                case 'variable_complex':
+                    url_attrs.type = 'variable';
+                    url_attrs['variable-segment-1'] = $('#constructed_url_source').val();
+                    url_attrs['text-segment-1']     = $('#constructed_url_prefix').val();
+                    url_attrs['text-segment-2']     = $('#constructed_url_suffix').val();
+                    break;
+                case 'accession':
+                    var link_source_val             = this.url.accession.get_source().val();
+                    var link_site_val               = this.url.accession.get_site().val();
+                    var acc_type                    = column_acctype[link_source_val];
+                    url_attrs.type                  = 'accession';
+                    url_attrs.accession             = link_site_val;
+                    url_attrs['text-segment-1']     = pbuild_links[link_site_val][acc_type].prefix;
+                    url_attrs['text-segment-2']     = pbuild_links[link_site_val][acc_type].postfix;
+                    url_attrs['variable-segment-1'] = link_source_val;
+                    break;
+                default:
+                    throw {
+                        name : 'InvalidFieldError',
+                        message : url_type + ' is not a supported url_type'
+                    };
             }
             this.set_attrs(widget, 'url', url_attrs);
 
             // set label properties
             var label_type = this.label.get_type().filter(':checked').val();
             var label_attrs = {};
-            if (label_type === 'default') {
-                if (url_attrs.type === 'static' || url_attrs.type === 'variable') {
+            switch (label_type) {
+                case 'default':
+                    if (url_attrs.type === 'static' || url_attrs.type === 'variable') {
+                        label_attrs.type = 'static';
+                        label_attrs['text-segment-1'] = 'Link';
+                    }
+                    else {
+                        label_attrs.type = 'static';
+                        label_attrs['text-segment-1'] = sitelinker_sites[url_attrs.accession].label;
+                    }
+                    break;
+                case 'url':
+                    label_attrs = url_attrs;
+                    break;
+                case 'static':
+                    label_attrs['text-segment-1'] = $('#link_label_static').val();
                     label_attrs.type = 'static';
-                    label_attrs['text-segment-1'] = 'Link';
-                }
-                else {
-                    label_attrs.type = 'static';
-                    label_attrs['text-segment-1'] = sitelinker_sites[url_attrs.accession].label;
-                }
-            }
-            else if (label_type === 'url') {
-                label_attrs = url_attrs;
-            }
-            else if (label_type === 'static') {
-                label_attrs['text-segment-1'] = $('#link_label_static').val();
-                label_attrs.type = 'static';
-            }
-            else if (label_type === 'variable') {
-                label_attrs['text-segment-1']     = $('#label_source_prefix').val();
-                label_attrs['variable-segment-1'] = $('#label_source').val();
-                label_attrs['text-segment-2']     = $('#label_source_suffix').val();
-                label_attrs.type = 'variable';
-            }
-            else {
-                throw {
-                    name : 'InvalidFieldError',
-                    message : label_type + ' is not a supported label type'
-                };
+                    break;
+                case 'variable':
+                    label_attrs['text-segment-1']     = $('#label_source_prefix').val();
+                    label_attrs['variable-segment-1'] = $('#label_source').val();
+                    label_attrs['text-segment-2']     = $('#label_source_suffix').val();
+                    label_attrs.type = 'variable';
+                    break;
+                default:
+                    throw {
+                        name : 'InvalidFieldError',
+                        message : label_type + ' is not a supported label type'
+                    };
             }
             this.set_attrs(widget, 'label', label_attrs);
     
             // Update canvas display
-            var display_label = $('#link_widget_label_preview').text();
             var display_url   = $('#link_widget_url_preview').text();
-            var link_display  = "Link to: ";
-            if (display_label === display_url) {
-                link_display += display_url;
-            }
-            else {
-                link_display += display_label + ' (' + display_url + ')';
-            }
-            widget.find('.btn-edit-link').first().attr('placeholder',link_display);
+            var display_label = $('#link_widget_label_preview').text();
+            this.set_widget_placeholder(widget, display_url, display_label);
         },
 
         // for a given link widget, fetch the attributes for the given type
@@ -499,6 +499,70 @@ var judoon = {
                 return retstring;
             }
         },
+
+        widget_label: function(widget) {
+            var props = {
+                url:   this.get_attrs(widget, 'url'),
+                label: this.get_attrs(widget, 'label')
+            };
+
+            var url_holder, label_holder;
+            switch (props.url.type) {
+                case 'static':
+                    url_holder = props.url['text-segment-1'];
+                    break;
+                case 'variable':
+                    url_holder = this.util.zip_segments(
+                        [props.url["text-segment-1"], props.url["text-segment-2"]],
+                        [sample_data[props.url["variable-segment-1"]]]
+                    );
+                    break;
+                case 'accession':
+                    url_holder = this.util.zip_segments(
+                        [props.url["text-segment-1"], props.url["text-segment-2"]],
+                        [sitelinker_accs[props.url.accession].example]
+                    );
+                    default_label = sitelinker_sites[props.url.accession].label;
+                    break;
+                default:
+                    // do what?
+                    // do nothing.
+                    break;
+            }
+
+            switch (props.label.type) {
+                case 'static':
+                    label_holder = props.label['text-segment-1'];
+                    break;
+                case 'variable':
+                    label_holder = this.util.zip_segments(
+                        [props.label["text-segment-1"], props.label["text-segment-2"]],
+                        [sample_data[props.label["variable-segment-1"]]]
+                    );
+                    break;
+                case 'accession':
+                    label_holder = url_holder;
+                    break;
+                default:
+                    // do what?
+                    // do nothing.
+                    break;
+            }
+
+            this.set_widget_placeholder(widget, url_holder, label_holder);
+        },
+
+        set_widget_placeholder: function(widget, display_url, display_label) {
+            var link_display  = "Link to: ";
+            if (display_label === display_url) {
+                link_display += display_url;
+            }
+            else {
+                link_display += display_label + ' (' + display_url + ')';
+            }
+            widget.find('.btn-edit-link').first().attr('placeholder',link_display);
+        },
+
         preview: {
 
             // update the link preview panel
