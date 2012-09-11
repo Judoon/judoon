@@ -103,7 +103,7 @@
                       </label>
                       </div>
                     </div>
-                    <div id="link_widget_url_source" class="accordion-body collapse in">
+                    <div id="link_widget_url_source" class="accordion-body collapse">
                       <div class="accordion-inner">
                         <p class="help-block">Which column should the link be based off of?</p>
                         <select name="link_source" id="link_source">
@@ -132,7 +132,7 @@
                       </label>
                       </div>
                     </div>
-                    <div id="link_widget_url_variable_simple" class="accordion-body collapse [% IF !acc_columns.size && url_columns.size %]in[% END %]">
+                    <div id="link_widget_url_variable_simple" class="accordion-body collapse">
                       <div class="accordion-inner">
                         <select name="link_url_source" id="link_url_source">
                           [% FOREACH url_column IN url_columns %]<option value="[% url_column.shortname %]">[% url_column.name %]</option>[% END %]
@@ -151,7 +151,7 @@
                       </label>
                       </div>
                     </div>
-                    <div id="link_widget_url_variable_complex" class="accordion-body collapse [% IF !acc_columns.size && !url_columns.size %]in[% END %]">
+                    <div id="link_widget_url_variable_complex" class="accordion-body collapse">
                       <div class="accordion-inner">
                         <label>URL prefix: <input type="text" class="input-large" id="constructed_url_prefix" placeholder="usually http://..."></label>
                         <select name="constructed_url_source" id="constructed_url_source">

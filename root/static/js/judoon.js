@@ -301,6 +301,30 @@ var judoon = {
             var widget   = $(this_btn).parent();
             $('#linkModal').data('widget_id', widget.attr('id'));
 
+            // reset form
+            // clear inputs
+            $('#linkModal input[type=text]').val("");
+            // reset <selects> to first element
+            $('#linkModal select').each( function(idx) {
+                $(this).val( $(this).prop('defaultSelected') );
+            });
+            // reset radios to first element
+            $('#linkModal input[type="radio"]').removeAttr('checked');
+            $('#linkModal input:radio[name=url_type]:first').attr('checked', true);
+            $('#linkModal input:radio[name=label_type]:first').attr('checked', true);
+            // reset url accordian collapsed state
+            //   This turns out to be tricky, b/c Collapse has issues when
+            //   invoked via the data-toggle attribute. To get around this,
+            //   really clean out the collapse element. data('collapse') can
+            //   cause the data-toggle to stop working. class 'in' can make
+            //   the element display when it shouldn't, and the collapse js
+            //   will add inline style elements which must be removed.
+            $('#link_widget_url_accordion .accordion-body').each( function() {
+                $(this).removeData('collapse');
+                $(this).removeClass('in');
+                $(this).removeAttr('style');
+            } );
+
             var props = {
                 url:   this.get_attrs(widget, 'url'),
                 label: this.get_attrs(widget, 'label')
@@ -311,6 +335,7 @@ var judoon = {
             var url_radio = this.url.get_type();
             switch (props.url.type) {
                 case 'accession':
+                    this.reveal_collapsed($('#link_widget_url_source'));
                     url_radio.val(['accession']);
                     this.url.accession.set_source(props.url['variable-segment-1']);
                     this.url.accession.set_site(props.url.accession);
@@ -319,23 +344,25 @@ var judoon = {
                 case 'variable':
                     var not_empty = /\S/;
                     if (not_empty.test(props.url['text-segment-1'])) {
+                        this.reveal_collapsed($('#link_widget_url_variable_complex'));
                         url_radio.val(['variable_complex']);
                         $('#constructed_url_source').val(props.url['variable-segment-1']);
                         $('#constructed_url_prefix').val(props.url['text-segment-1']);
                         $('#constructed_url_suffix').val(props.url['text-segment-2']);
                     }
                     else {
+                        this.reveal_collapsed($('#link_widget_url_variable_simple'));
                         url_radio.val(['variable_simple']);
                         $('#link_url_source').val(props.url['variable-segment-1']);
                     }
                     break;
                 case 'static':
+                    this.reveal_collapsed($('#link_widget_url_provided'));
                     url_radio.val(['static']);
                     $('#link_widget_url_static').val(props.url['text-segment-1']);
                     break;
                 default:
-                    // do what?
-                    // do nothing.
+                    this.reveal_collapsed($('#link_widget_url_accordion .accordion-body').filter(':first'));
                     break;
             }
 
@@ -371,6 +398,8 @@ var judoon = {
             // show the modal
             $('#linkModal').modal();
         },
+
+        reveal_collapsed: function(widget) { widget.addClass('in'); },
 
         // Runs when user clicks 'submit' on the link modal.
         // Responsible for reading the modal forms and writing
