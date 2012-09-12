@@ -108,13 +108,6 @@ sub template_to_jquery {
     );
 }
 
-sub template_to_webwidgets {
-    my ($self) = @_;
-    return $self->translator->translate(
-        from => 'Native', to => 'WebWidgets', template => $self->template
-    );
-}
-
 sub template_to_objects {
     my ($self) = @_;
     return $self->translator->to_objects(

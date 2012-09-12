@@ -25,7 +25,6 @@
       <label class="control-label" for="page_column.template">Cell Layout:</label>
       <div class="controls">
         <div id="column_canvas" class="well" style="height: 8em; width: 50em;">
-          [% page_column.object.webwidgets %]
           <div id="canvas_cursor"></div>
         </div>
         <input type="hidden" form="pagecol_form" name="page_column.template" />
@@ -102,6 +101,8 @@
   [% INCLUDE 'components/forms/library.tt2' %]
 </div>
 
+<script src="/static/js/libs/jquery.json-2.3.min.js"></script>
+<script src="/static/js/judoon.js"></script>
 <script>
   var delay = (function(){
       var timer = 0;
@@ -112,38 +113,39 @@
   })();
 
   $(document).ready(function () {
-    $('#btn_add_text').on(   'click', function() {pbuild_add_widget('text');}    );
-    $('#btn_add_data').on(   'click', function() {pbuild_add_widget('data');}    );
-    $('#btn_add_link').on(   'click', function() {pbuild_add_widget('link');}    );
-    $('#btn_add_newline').on('click', function() {pbuild_add_widget('newline');} );
-    $('#btn_add_list').on(   'click', function() {pbuild_add_widget('list');}    );
-    $('#btn_add_if').on(     'click', function() {pbuild_add_widget('if');}      );
+    $('#btn_add_text').on(   'click', function() { judoon.canvas.widget.add('text');    } );
+    $('#btn_add_data').on(   'click', function() { judoon.canvas.widget.add('data');    } );
+    $('#btn_add_link').on(   'click', function() { judoon.canvas.widget.add('link');    } );
+    $('#btn_add_newline').on('click', function() { judoon.canvas.widget.add('newline'); } );
 
-    $('#btn_cursor_up').on(    'click', function() {pbuild_cursor_up();}    );
-    $('#btn_cursor_down').on(  'click', function() {pbuild_cursor_down();}  );
-    $('#btn_cursor_left').on(  'click', function() {pbuild_cursor_left();}  );
-    $('#btn_cursor_right').on( 'click', function() {pbuild_cursor_right();} );
+    var cursor = judoon.canvas.cursor;
+    $('#btn_cursor_up').on(    'click', function() {cursor.move_up();}    );
+    $('#btn_cursor_down').on(  'click', function() {cursor.move_down();}  );
+    $('#btn_cursor_left').on(  'click', function() {cursor.move_left();}  );
+    $('#btn_cursor_right').on( 'click', function() {cursor.move_right();} );
+    $('#btn_backspace').on(    'click', function() {cursor.backspace();}  );
 
-    $('#btn_backspace').on( 'click', function() {pbuild_backspace();} );
-
-    $('#pagecol_form').on('submit', function() {pbuild_copy_canvas_to_input();});
+    $('#pagecol_form').on('submit', function() { judoon.canvas.save_to_input(); });
 
     $('#column_canvas').on('click', 'div.widget-type-link .btn-edit-link',
-       function(event) {pbuild_open_link_form(event.currentTarget); }
+       function(event) {judoon.linkbuilder.open(event.currentTarget); }
     );
 
-    $('#link_source').on('change', function() {pbuild_update_link_sites(); pbuild_update_preview();});
-    $('#link_widget_url_form').on( 'change', 'input', function() {pbuild_update_preview();} );
-    $('#link_widget_url_form').on( 'change', 'select', function() {pbuild_update_preview();} );
-    $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_preview();}, 200);} );
+    var judoon_preview = judoon.linkbuilder.preview;
+    $('#link_source').on('change', function() {judoon.linkbuilder.url.accession.set_active_sitelist(); judoon_preview.update();});
+    $('#link_widget_url_form').on( 'change', 'input', function() {judoon_preview.update();} );
+    $('#link_widget_url_form').on( 'change', 'select', function() {judoon_preview.update();} );
+    $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update();}, 200);} );
 
-    $('#link_widget_label_form').on( 'change', 'input', function() {pbuild_update_label_preview();} );
-    $('#link_widget_label_form').on( 'change', 'select', function() {pbuild_update_label_preview();} );
-    $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {pbuild_update_label_preview();}, 200);} );
+    $('#link_widget_label_form').on( 'change', 'input', function() {judoon_preview.update_label();} );
+    $('#link_widget_label_form').on( 'change', 'select', function() {judoon_preview.update_label();} );
+    $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update_label();}, 200);} );
 
-    $('#linkModal_save_changes').on('click', function() {pbuild_submit_link_form();});
+    $('#linkModal_save_changes').on('click', function() {judoon.linkbuilder.submit();});
 
-    $('#column_canvas .widget-object').each( function() {pbuild_init_stored_widget($(this));} );
+    judoon.canvas.build_widgets(
+        [% page_column.object.template %]
+    );
   });
 </script>
 

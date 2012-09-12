@@ -82,21 +82,15 @@ after object_GET => sub {
     my %sample_data;
     @sample_data{map {$_->shortname} @ds_columns} = @sample_data;
     $c->stash->{sample_data} = encode_json( \%sample_data );
-
-    my $page_column = $c->req->get_object(0)->[0];
-    if ($page_column->template) {
-        $c->stash->{page_column}{object}{webwidgets}
-            = $page_column->template_to_webwidgets();
-    }
 };
 
 before object_PUT => sub {
     my ($self, $c) = @_;
 
     my $params        = $c->req->get_object(0)->[1];
-    my $template_html = $params->{template};
+    my $template_html = $params->{template} // '[]';
     my $template      = $self->translator->translate(
-        from => 'WebWidgets', to => 'Native', template => $template_html,
+        from => 'Native', to => 'Native', template => $template_html,
     );
     $params->{'template'} = $template;
 };

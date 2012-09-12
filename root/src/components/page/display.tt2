@@ -25,9 +25,10 @@
 [% END %]
 
 
+<script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
-      judoon_dt_bootstrap_init();
+      judoon.datatables.bootstrap_init();
 
       $('#demo_page').dataTable({
           "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",

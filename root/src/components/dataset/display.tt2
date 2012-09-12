@@ -17,9 +17,10 @@
 </table>
 
 
+<script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
-      judoon_dt_bootstrap_init();
+      judoon.datatables.bootstrap_init();
 
       var columnNames = [% column_names_json %];
 

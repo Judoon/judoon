@@ -1,206 +1,145 @@
-/*
- Primary Color:
- #00A876 #207E62 #006D4C #35D4A4 #5FD4B1
-
- Secondary Color A:
- #0D56A6 #274F7D #04356C #4186D3 #689AD3
-
- Secondary Color B:
- #4DDE00 #55A62A #329000 #7AEE3C #99EE6B
-
- Complementary Color:
- #FF5900 #BF6230 #A63A00 #FF8240 #FFA473
-*/
-
 body {
     background-color: #eee;
-    padding: 20px;
-    font-family: verdana, sans-serif;
+    padding: 5px;
 }
-#header {
-    margin: 0 0 3px 0;
+
+header {
     padding: 0.5em 3em;
     background: #35D4A4;
     color: #006D4C;
+    margin-bottom: 3px;
 }
-#footer {
-    margin: 0;
+header a:visited { color: #006D4C; }
+footer {
     padding: 5px;
     background: none repeat scroll 0% 0% rgb(104, 154, 211);
     color: rgb(4, 53, 108);
     border-color: rgb(13, 86, 166);
 }
-#footer p {
-    margin: 0;
+footer p {
     padding: 2px;
-    font-size: 80%;
 }
+
 #middle {
     margin: 0 0 3px 0;
-    padding: 2em 10em;
-    background-color: #fff;
-}
-#login_form {
-    width: 30%;
-    margin: 1em auto;
-}
-#sidebar {
-    float: right;
-    border: thin solid #006D4C;
-    padding: 2px;
-}
-#sidebar h4 { margin: 0; font-size: 13px; }
-#sidebar ul {
-    list-style-type: square;
-    color: rgb(13, 86, 166);
-    font-size: 11px;
-    margin: 0;
-    padding-left: 2em;
-}
-#sidebar a {
-    color: rgb(0, 168, 118);
-}
-
-
-.dataset_list {
-    empty-cells: show;
-    border-spacing: 0;
-}
-
-.dataset_list a {
-    color: #006d4c;
-}
-
-.dataset_list thead th, tbody td { border-bottom: thin solid white; }
-.dataset_list thead th {
-    padding: 2px 1em;
-}
-.dataset_list tbody td {
-    padding: 2px 1em;
-}
-
-.dataset_list thead tr {
-    background-color: #329000;
-    color: #fefefe;
-}
-.dataset_list tbody tr:nth-child(odd) {
-    background: #DDFFAF; /* #99EE6B; */ 
-}
-.dataset_list tbody tr:nth-child(even) {
-    background: #99EE6B; /* #55A62A; */ 
-}
-.dataset_list tfoot {
-    text-align: right;
+    padding-top: 2em;
+    padding-bottom: 2em;
     background-color: #fff;
 }
 
-
-#data_upload_form {
-
-}
-label {
-    font-size: 13px;
-}
-.note {
-    font-size: 12px;
-    color: #04356C;
-}
-
-.note h6 { margin: 3px 0; }
-
-dl {
-    margin: 0 0 0 auto;
-    padding: 1;
-    width: 45%;
-    overflow:hidden;
-    background:#eee;
-}
-dt {
-    margin: 0 1px 1px 0;
-    padding: 0 1px 0 0;
-    float:left;
-    width:49%; /* adjust the width; make sure the total of both is 100% */
-}
-dd {
-    margin: 0 0 1px 0;
-    padding: 0 1px 0 0;
-    float:left;
-    width:49%; /* adjust the width; make sure the total of both is 100% */
-}
-
-dt:nth-of-type(odd)  { background-color: #FFF; /*#4186D3;*/ } 
-dd:nth-of-type(odd)  { background-color: #FFF; /*#4186D3;*/ } 
-dt:nth-of-type(even) { color: #fff; background-color: #4186D3; /*#274F7D;*/ } 
-dd:nth-of-type(even) { color: #fff; background-color: #4186D3; /*#274F7D;*/ } 
+/* for frontpage */
+#getstarted a.btn:visited { color: #fff; }
 
 
-.spinner {
-    border: thin solid #4DDE00;
-    height: 200px;
-    width: 200px;
-}
-.loading {
-    background: url(/static/images/spinner.gif) no-repeat center center;
-} 
-
-
-.action_list {
-    list-style-type: none;
-}
-.action_list li {
 /*
-    border: thin solid #04356C;
-    background: #35D4A4;
+  Action forms are used to enable button-like controls for
+  POST/PUT/DELETEs.
 */
+.action-form {
     display: inline-block;
-    margin: 1em 0.5em;
-    padding: 2px;
-    font-size: 12px;
-    font-weight: bold;
+    margin-bottom: 0;  /* override the default bootstrap form styling */
 }
-.action_list li a {
+
+
+/* for Page Column edit page */
+
+#canvas_cursor {
+    border: thin #aaa solid;
+    height: 1em;
+    width: 0.5em;
+    display: inline-block;
+}
+
+.widget-object { margin-right: 3px; margin-top: 3px; }
+.widget-type-text { display: inline-block; }
+.widget-type-data { display: inline-block; }
+.widget-type-link { display: inline-block; }
+.widget-type-newline { display: block; }
+.widget-type-newline-icon { display: inline-block; }
+
+
+.widget-formatting-bold { font-weight: bold; }
+.widget-formatting-italic { font-style: italic; }
+
+.column_container { display: inline-block; border: thin black solid; text-align: center; padding: 4px; }
+.column_container div input { display: block; }
+
+#widget_library { display: none; }
+#modal_title { display: none; }
+
 /*
-    color: #006D4C;
-    text-decoration: none;
+  override for bootstrap bug: input-append sets font-size to 0px,
+  so that our dropdown labels aren't showing up
 */
+.input-append .dropdown-menu { font-size: 14px; }
+
+
+/* for Page / Dataset previews */
+
+#notes, #preamble {
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border-bottom: thin lightgray solid;
 }
 
-
-table.data_table {
-    margin: 0 auto;
-    clear: both;
-    width: 100%;
+#postamble {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border-top: thin lightgray solid;
 }
 
-table.data_table thead th {
-	padding: 3px 18px 3px 10px;
-	border-bottom: 1px solid black;
-	font-weight: bold;
+/* for DataTables */
+div.dataTables_length label {
+	float: left;
+	text-align: left;
+}
+
+div.dataTables_length select {
+	width: 75px;
+}
+
+div.dataTables_filter label {
+	float: right;
+}
+
+div.dataTables_info {
+	padding-top: 8px;
+}
+
+div.dataTables_paginate {
+	float: right;
+	margin: 0;
+}
+
+table.table {
+	clear: both;
+	margin-bottom: 6px !important;
+}
+
+table.table thead .sorting,
+table.table thead .sorting_asc,
+table.table thead .sorting_desc,
+table.table thead .sorting_asc_disabled,
+table.table thead .sorting_desc_disabled {
 	cursor: pointer;
-	* cursor: hand;
+	*cursor: hand;
 }
 
-table.data_table tfoot th {
-	padding: 3px 18px 3px 10px;
-	border-top: 1px solid black;
-	font-weight: bold;
-}
-table.data_table td {
-    padding: 3px 10px;
+table.table thead .sorting { background: url('../images/sort_both.png') no-repeat center right; }
+table.table thead .sorting_asc { background: url('../images/sort_asc.png') no-repeat center right; }
+table.table thead .sorting_desc { background: url('../images/sort_desc.png') no-repeat center right; }
+
+table.table thead .sorting_asc_disabled { background: url('../images/sort_asc_disabled.png') no-repeat center right; }
+table.table thead .sorting_desc_disabled { background: url('../images/sort_desc_disabled.png') no-repeat center right; }
+
+table.dataTable th:active {
+	outline: none;
 }
 
-table.data_table td.center {
-    text-align: center;
-}
-
-table.data_table tr.odd {
-    background-color: #99EE6B;
-}
-
-table.data_table tr.even {
-    background-color: white;
-}
-
-.sample_data .odd  { color: #4186D3; }
-.sample_data .even { color: #04356C; }
-.sample_data .none { color: #ddd; }
+#link_widget_url_source select.link_site { display: none;  }
+#link_widget_url_source select.link_site.link_site_active  { display: block; }

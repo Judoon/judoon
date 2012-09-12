@@ -27,14 +27,14 @@
     <div class="control-group">
       <label class="control-label" for="page.preamble">Preamble: </label>
       <div class="controls">
-        <textarea form="page_edit" class="tinymce" name="page.preamble">[% page.object.preamble %]</textarea>
+        <textarea form="page_edit" name="page.preamble">[% page.object.preamble %]</textarea>
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.postamble">Postamble:</label>
       <div class="controls">
-        <textarea form="page_edit" class="tinymce" name="page.postamble">[% page.object.postamble %]</textarea>
+        <textarea form="page_edit" name="page.postamble">[% page.object.postamble %]</textarea>
       </div>
     </div>
 

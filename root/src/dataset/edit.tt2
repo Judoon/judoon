@@ -22,7 +22,7 @@
     <div class="control-group">
       <label class="control-label" for="dataset.notes">Notes</label>
       <div class="controls">
-        <textarea class="tinymce" style="width: 34em;" form="dataset_edit" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
+        <textarea style="width: 34em;" form="dataset_edit" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
       </div>
     </div>
 

@@ -43,7 +43,7 @@ requires 'FindBin';
 requires 'Getopt::Long';
 requires 'HTML::TreeBuilder';
 requires 'JSON';
-requires 'JSON::Any';
+requires 'JSON::XS';
 requires 'List::AllUtils';
 requires 'Method::Signatures';
 requires 'Module::Pluggable';
