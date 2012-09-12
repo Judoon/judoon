@@ -1,5 +1,7 @@
+[% extra_js = BLOCK %][% INCLUDE 'components/pagecolumn/edit_js.tt2' %][% END %]
 [% WRAPPER components/wrapper.tt2
   title = "Add column to page for &quot;$dataset.object.name&quot;"
+  extra_javascript = extra_js
 %]
 
 [%- WRAPPER 'components/breadcrumbs.tt2' -%]
@@ -100,54 +102,5 @@
 <div class="">
   [% INCLUDE 'components/forms/library.tt2' %]
 </div>
-
-<script src="/static/js/vendor/jquery.json-2.3.min.js"></script>
-<script src="/static/js/judoon.js"></script>
-<script>
-  var delay = (function(){
-      var timer = 0;
-      return function(callback, ms){
-          clearTimeout (timer);
-          timer = setTimeout(callback, ms);
-      };
-  })();
-
-  $(document).ready(function () {
-    $('#btn_add_text').on(   'click', function() { judoon.canvas.widget.add('text');    } );
-    $('#btn_add_data').on(   'click', function() { judoon.canvas.widget.add('data');    } );
-    $('#btn_add_link').on(   'click', function() { judoon.canvas.widget.add('link');    } );
-    $('#btn_add_newline').on('click', function() { judoon.canvas.widget.add('newline'); } );
-
-    var cursor = judoon.canvas.cursor;
-    $('#btn_cursor_up').on(    'click', function() {cursor.move_up();}    );
-    $('#btn_cursor_down').on(  'click', function() {cursor.move_down();}  );
-    $('#btn_cursor_left').on(  'click', function() {cursor.move_left();}  );
-    $('#btn_cursor_right').on( 'click', function() {cursor.move_right();} );
-    $('#btn_backspace').on(    'click', function() {cursor.backspace();}  );
-
-    $('#pagecol_form').on('submit', function() { judoon.canvas.save_to_input(); });
-
-    $('#column_canvas').on('click', 'div.widget-type-link .btn-edit-link',
-       function(event) {judoon.linkbuilder.open(event.currentTarget); }
-    );
-
-    var judoon_preview = judoon.linkbuilder.preview;
-    $('#link_source').on('change', function() {judoon.linkbuilder.url.accession.set_active_sitelist(); judoon_preview.update();});
-    $('#link_widget_url_form').on( 'change', 'input', function() {judoon_preview.update();} );
-    $('#link_widget_url_form').on( 'change', 'select', function() {judoon_preview.update();} );
-    $('#link_widget_url_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update();}, 200);} );
-
-    $('#link_widget_label_form').on( 'change', 'input', function() {judoon_preview.update_label();} );
-    $('#link_widget_label_form').on( 'change', 'select', function() {judoon_preview.update_label();} );
-    $('#link_widget_label_form').on( 'keyup', 'input', function() {delay( function() {judoon_preview.update_label();}, 200);} );
-
-    $('#linkModal_save_changes').on('click', function() {judoon.linkbuilder.submit();});
-
-    judoon.canvas.build_widgets(
-        [% page_column.object.template %]
-    );
-  });
-</script>
-
 
 [% END %]

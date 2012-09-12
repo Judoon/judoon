@@ -1,5 +1,7 @@
+[% extra_js = BLOCK %][% INCLUDE 'components/dataset/display_js.tt2' %][% END %]
 [% WRAPPER components/wrapper.tt2
   title = "View Dataset for &quot;$dataset.object.name&quot;"
+  extra_javascript = extra_js
 %]
 
 [%- IF user.is_owner -%]

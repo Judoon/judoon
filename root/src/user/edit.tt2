@@ -1,5 +1,7 @@
+[% extra_js = BLOCK %][% INCLUDE 'components/forms/upload_dataset_js.tt2' %][% END %]
 [% WRAPPER components/wrapper.tt2
   title = user.object.name || user.object.username
+  extra_javascript = extra_js
 %]
 
 [%- WRAPPER 'components/breadcrumbs.tt2' -%]

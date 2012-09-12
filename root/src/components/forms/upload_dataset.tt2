@@ -13,11 +13,6 @@
       <dt>.csv</dt><dd><abbr title="comma-separated values">CSV</abbr></dd>
     </dl>
   </section>
-  <script type="text/javascript">
-    $('input[id=dataset]').change(function() {
-    $('#dataset_fake').val($(this).val());
-    }); 
-  </script>
 </form>
 
 

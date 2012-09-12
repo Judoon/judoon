@@ -1,0 +1,5 @@
+  <script type="text/javascript">
+    $('input[id=dataset]').change(function() {
+    $('#dataset_fake').val($(this).val());
+    }); 
+  </script>

@@ -242,13 +242,3 @@
         <a href="#" class="btn" data-dismiss="modal">Close</a>
       </div>
     </div>
-
-<script>
-  var pbuild_links     = [% link_site_json %];
-  var ds_columns_dict  = [% ds_column_json %];
-  var sitelinker_sites = [% sitelinker_sites %];
-  var sitelinker_accs  = [% sitelinker_accs %];
-  var column_acctype   = [% column_acctype %];
-  var sample_data      = [% sample_data %];
-  var url_prefixes     = [% url_prefixes %];
-</script>
