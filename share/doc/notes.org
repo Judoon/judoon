@@ -51,6 +51,31 @@ dbicm upgrade
 - accession: variable_source: {gene_id} target_site: "Entrez Gene"  label_type: default label_value:  url_postfix: '?filter=boo'
   scheme: [textseg],[varseg is {gene_id}],[url-postfix]
 
+** LinkBuilder modal
+*** components:
+url (key is url_type)
+  from_accession:
+    #link_source: the ds_col that is an accession
+    #link_site_$shortname: the site to link to 
+  from_url:
+    #link_url_source: the ds_col that is a url
+  manual_url:
+    #constructed_url_prefix: 
+    #constructed_url_source: ds_col to use
+    #constructed_url_postfix:
+  static:
+    #link_widget_url_static
+label (key is label_type)
+  default: (deps on url)
+  from_url: (deps on url)
+  static:
+    #link_label_static: label to use
+  from_data:
+    #label_source_prefix
+    #label_source:         ds_col to use
+    #label_source_postfix
+
+
 * Accessions
 ** Judoon::Accession::Roles::IsCanonical
 for Entrez::GeneId, Uniprot::UniprotId, etc.
@@ -79,8 +104,6 @@ Segments
   id
   text
   order
-
-
 
 
 
@@ -209,7 +232,6 @@ Access Control:
   Owner:
     /settings => /settings
     
-
 
 * existing data
 ** Genetic Approaches
