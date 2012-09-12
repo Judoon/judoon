@@ -1,4 +1,4 @@
-[% WRAPPER inc/wrapper.tt2
+[% WRAPPER components/wrapper.tt2
   title = "Add column to page for &quot;$dataset.object.name&quot;"
 %]
 

@@ -1,4 +1,4 @@
-[% WRAPPER inc/wrapper.tt2
+[% WRAPPER components/wrapper.tt2
   title = "View Page for &quot;$dataset.object.name&quot;"
 %]
 

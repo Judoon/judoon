@@ -1,4 +1,4 @@
-[% WRAPPER inc/wrapper.tt2
+[% WRAPPER components/wrapper.tt2
   title = "Annotate $ds_column.object.name for dataset &quot;$dataset.object.name&quot;"
 %]
 
