@@ -6,6 +6,7 @@ BEGIN {
         $ENV{JUDOON_WEB_DEBUG} = 1;
         $ENV{DBIC_TRACE} = 1;
         $ENV{DBIC_TRACE_PROFILE} = 'console_monochrome';
+        $ENV{CARP_ALWAYS} = 1;
     }
 }
 
