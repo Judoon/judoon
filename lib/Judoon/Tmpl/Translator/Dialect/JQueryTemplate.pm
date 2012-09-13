@@ -69,6 +69,7 @@ sub _build_parser {
 method parse($input) {
     die "Cannot parse undef input as JQueryTemplate"
         if (not defined $input);
+    return () if ($input eq '');
     die "Cannot parse $input as JQueryTemplate, which shouldn't be possible"
         if ($input !~ $self->parser);
 

@@ -123,31 +123,31 @@ subtest 'translation test' => sub {
             '  ...and the object set is the same';
     }
 
-
-    my $jquery_tmpl = get_data_section('jquery.txt');
-    my $native_tmpl = get_data_section('native.json');
-
-    my $jq_tmpl_1 = $translator->translate(
-        from => 'JQueryTemplate', to => 'JQueryTemplate',
-        template => $jquery_tmpl,
+    my @comparisons = (
+        ['JQueryTemplate', get_data_section('jquery.txt'), 'Native', get_data_section('native.json'), 'complex',],
+        ['JQueryTemplate', q{}, 'Native', '[]', 'empty'],
     );
-    my $jq_tmpl_2 = $translator->translate(
-        from => 'Native', to => 'JQueryTemplate',
-        template => $native_tmpl,
-    );
-    is $jq_tmpl_1, $jq_tmpl_2, 'equivalent transformation (JQT->JQT)==(N->JQT)';
+    for my $compare (@comparisons) {
+        my ($dialect1, $input1, $dialect2, $input2, $descr) = @$compare;
 
-    my $native_1 = $translator->translate(
-        from => 'Native', to => 'Native',
-        template => $native_tmpl,
-    );
-    my $native_2 = $translator->translate(
-        from => 'JQueryTemplate', to => 'Native',
-        template => $jquery_tmpl,
-    );
-    is $native_1, $native_2, 'equivalent transformation (N->N)==(JQT->N)';
+        my $d1_to_d1 = $translator->translate(
+            from => $dialect1, to => $dialect1, template => $input1,
+        );
+        my $d2_to_d1 = $translator->translate(
+            from => $dialect2, to => $dialect1, template => $input2,
+        );
+        is $d1_to_d1, $d2_to_d1,
+            "equivalent transformation ($dialect1->$dialect1)==($dialect2->$dialect1) for $descr input";
 
-
+        my $d2_to_d2 = $translator->translate(
+            from => $dialect2, to => $dialect2, template => $input2,
+        );
+        my $d1_to_d2 = $translator->translate(
+            from => $dialect1, to => $dialect2, template => $input1,
+        );
+        is $d2_to_d2, $d1_to_d2,
+            "equivalent transformation ($dialect2->$dialect2)==($dialect1->$dialect2) for $descr input";
+    }
 
     like exception { $translator->translate(
         from => 'JQueryTemplate', to => 'JQueryTemplate', template => undef,
