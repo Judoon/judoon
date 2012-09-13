@@ -14,7 +14,7 @@ sub _build_parser {
 
     my $parser = do {
         use Regexp::Grammars;
-        return qr{
+        qr{
             <nocontext:>
             (?: <[Nodes=Node]> )+
 
@@ -67,7 +67,9 @@ sub _build_parser {
 
 
 method parse($input) {
-    die "Unable to parse as JQueryTemplate: $input"
+    die "Cannot parse undef input as JQueryTemplate"
+        if (not defined $input);
+    die "Cannot parse $input as JQueryTemplate, which shouldn't be possible"
         if ($input !~ $self->parser);
 
     my @objects;
@@ -92,8 +94,16 @@ method parse($input) {
                 }
                 $jnode = {
                     type => 'link',
-                    url => {type => 'varstring', varstring_type => 'static', %{$segs->{url}}},
-                    label => {type => 'varstring',  varstring_type => 'static', %{$segs->{label}}},
+                    url  => {
+                        type           => 'varstring',
+                        varstring_type => $self->_varstring_type($segs->{url}),
+                        %{$segs->{url}},
+                    },
+                    label => {
+                        type           => 'varstring',
+                        varstring_type => $self->_varstring_type($segs->{label}),
+                        %{$segs->{label}},
+                    },
                 };
             }
         }
@@ -134,6 +144,12 @@ method produce(\@native_objects) {
     return $template;
 }
 
+
+method _varstring_type($varstring) {
+    return (exists($varstring->{variable_segments})
+        && grep {m/\S/} @{$varstring->{variable_segments}})
+            ? 'variable' : 'static';
+}
 
 1;
 __END__

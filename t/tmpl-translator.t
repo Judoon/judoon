@@ -101,11 +101,11 @@ subtest 'translation test' => sub {
         new_link_node({
             url => {
                 varstring_type    => 'static',
-                text_segments     => ['foo','bar',],
-                variable_segments => ['baz','',],
+                text_segments     => ['foo',],
+                variable_segments => ['',],
             },
             label => {
-                varstring_type    => 'static',
+                varstring_type    => 'variable',
                 text_segments     => ['foo','bar',],
                 variable_segments => ['baz','',],
             },
@@ -135,52 +135,25 @@ subtest 'translation test' => sub {
         from => 'Native', to => 'JQueryTemplate',
         template => $native_tmpl,
     );
+    is $jq_tmpl_1, $jq_tmpl_2, 'equivalent transformation (JQT->JQT)==(N->JQT)';
 
-    is $jq_tmpl_1, $jq_tmpl_2, 'equivalent transformation';
+    my $native_1 = $translator->translate(
+        from => 'Native', to => 'Native',
+        template => $native_tmpl,
+    );
+    my $native_2 = $translator->translate(
+        from => 'JQueryTemplate', to => 'Native',
+        template => $jquery_tmpl,
+    );
+    is $native_1, $native_2, 'equivalent transformation (N->N)==(JQT->N)';
+
+
+
+    like exception { $translator->translate(
+        from => 'JQueryTemplate', to => 'JQueryTemplate', template => undef,
+    ); }, qr/cannot parse undef input/i, 'JQuery dies on undef input';
+
 };
-
-
-
-# diag "Native: $native_1";
-# diag "";
-# diag "JQueryTemplate1 is: $jq_tmpl_1";
-# diag "";
-# diag "JQueryTemplate2 is: $jq_tmpl_2";
-
-
-# my @dialects = qw(Native JQueryTemplate);
-# my @test_types = qw(
-#     text_only data_only url_only newline_only
-#     combined
-# );
-# 
-# my %templates;
-# for my $dialect (@dialects) {
-#     for my $test_type (@test_types) {
-#         $templates{$dialect}->{$test_type}
-#             = get_data_section( lc($dialect) . '-' . $test_type )
-#                 or die "Unable to find test template for $dialect / $test_type";
-#     }
-# }
-# 
-# 
-# my @comparisons = map {my $orig = $_; map {[$orig, $_]} @dialects;} @dialects;
-# for my $comparison (@comparisons) {
-#     my ($from_dialect, $to_dialect) = @_;
-# 
-#     subtest "Translating $from_dialect => $to_dialect" => sub {
-#         for my $test (@test_types) {
-#             my $output = $translator->translate({
-#                 from     => $from_dialect,
-#                 to       => $to_dialect,
-#                 template => $templates{$from_dialect}->{$test},
-#             });
-#             is $output, $templates{$to_dialect}{$test}, "translated $test ok";
-#         }
-#     };
-# }
-
-
 
 
 done_testing();
@@ -188,6 +161,23 @@ done_testing();
 
 __DATA__
 @@ jquery.txt
-foo
+foo{{=bar}}<br><a href="pre{{=baz}}post">quux</a>
 @@ native.json
-[{"type" : "text", "value" : "foo"}]
+[
+ {"type" : "text", "value" : "foo"},
+ {"type" : "variable", "name" : "bar"},
+ {"type" : "newline"},
+ {
+   "type" : "link",
+   "url"  : {
+     "varstring_type"    : "variable",
+     "text_segments"     : ["pre","post"],
+     "variable_segments" : ["baz",""]
+   },
+   "label" : {
+     "varstring_type"    : "static",
+     "text_segments"     : ["quux"],
+     "variable_segments" : [""]
+   }
+ }
+]
