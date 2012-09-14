@@ -89,15 +89,9 @@
             </p>
           </section>
 
+          <br><br>
+
           <table id="datatable" class="display data_table table table-striped table-condensed table-border">
-            <thead>
-              <th>Gene</th>
-              <th>Description</th>
-              <th>Nearest mammalian (Human) homolog</th>
-              <th>Fold Change</th>
-            </thead>
-            <tbody>
-            </tbody>
           </table>
 
           <section id="postamble">
@@ -122,14 +116,23 @@
         </div> <!-- /container -->
 
 
+        <script>
+          var columns = [
+          {"sTitle":"Gene"},
+          {"sTitle":"Description"},
+          {"sTitle":"Nearest mammalian (Human) homolog"},
+          {"sTitle":"Fold Change"}
+          ];
+        </script>
+
         <script id="column_tmpl_1" type="text/x-jquery-tmpl">
-          Gene: {{=Gene_Name}}
+          Gene: <a href="http://google.com/?q={{=gene_name}}">{{=protein_name}}<br>Flybase: <a href="http://flybase.org/reports/{{=flybase_link}}.html">{{=flybase_link}}</a>
         </script>
         <script id="column_tmpl_2" type="text/x-jquery-tmpl">
-          {{=description}}
+          {{=proposed_function}}
         </script>
         <script id="column_tmpl_3" type="text/x-jquery-tmpl">
-          
+          Nearest mammalian homolog: {{=nearest_mammalian_homolog}}<br><a href="http://www.ncbi.nlm.nih.gov/UniGene/clust.cgi?UGID={{=unigene_human_homolog}}">Unigene</a>
         </script>
         <script id="column_tmpl_4" type="text/x-jquery-tmpl">
           <strong>{{=fold_change}}</strong>
@@ -138,8 +141,8 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.1.min.js"><\/script>')</script>
         <script src="js/vendor/bootstrap.min.js"></script>
-        <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
-        <script src="/static/js/vendor/jsrender.js"></script>
+        <script src="js/vendor/jquery.dataTables.min.js"></script>
+        <script src="js/vendor/jsrender.js"></script>
 
         <script src="js/plugins.js"></script>
         <script src="js/main.js"></script>

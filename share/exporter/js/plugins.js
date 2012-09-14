@@ -112,7 +112,10 @@ $.extend( $.fn.dataTableExt.oPagination, {
 
 $(document).ready(function() {
 
+    var columnCount = columns.length;
     $('#datatable').dataTable({
+        "aoColumns" : columns,
+        "bAutoWidth": true,
         "sAjaxSource" : "cgi-bin/data.cgi",
         "fnServerData" : function ( sSource, aoData, fnCallback ) {
             $.ajax( {
