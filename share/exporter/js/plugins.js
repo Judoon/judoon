@@ -112,14 +112,29 @@ $.extend( $.fn.dataTableExt.oPagination, {
 
 $(document).ready(function() {
 
+    // cache templates
     var columnCount = columns.length;
     var templates = [];
     for (var k = 1; k <= columnCount; k++) {
         templates.push($('#column_tmpl_'+k));
     }
+
     $('#datatable').dataTable({
+
+        // display
+        "bAutoWidth": false,
+        "bProcessing" : true,
+        "oLanguage": {
+            "sLengthMenu": "_MENU_ records per page"
+        },
+
+        // bootstrap
+        "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+        "sPaginationType": "bootstrap",
+
+        // data source
         "aoColumns" : columns,
-        "bAutoWidth": true,
+        "bServerSide": true,
         "sAjaxSource" : "cgi-bin/data.cgi",
         "fnServerData" : function ( sSource, aoData, fnCallback ) {
             $.ajax( {
@@ -140,15 +155,8 @@ $(document).ready(function() {
                         data.aaData = new_data;
                     },
                     fnCallback
-                ],
+                ]
             } );
-        },
-        "bServerSide": true,
-        "bProcessing" : true,
-        "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-        "sPaginationType": "bootstrap",
-        "oLanguage": {
-            "sLengthMenu": "_MENU_ records per page"
         }
     });
 });
