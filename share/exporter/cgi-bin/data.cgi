@@ -3,11 +3,15 @@
 use strict;
 use warnings;
 
-push @INC, '../cgi-lib/';
+BEGIN {
+    use FindBin qw($Bin);
+    push @INC, "$Bin/../cgi-lib";
+}
 
 use CGI ();
 use JSON qw(encode_json);
 use Tie::File;
+
 
 main: {
     my $cgi = CGI->new();
@@ -36,7 +40,7 @@ main: {
     # iSortingCols: # of columns to sort by
     # sSortDir_#: asc/ desc
     # iSortCol_#: sort column number
-    my $nbr_sort_cols = +($params->{iSortingCols} // 1);
+    my $nbr_sort_cols = +(defined($params->{iSortingCols}) ? $params->{iSortingCols} : 1);
     my $max_cols      = @column_names;
     $nbr_sort_cols    = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
     my @sorts = map {[$params->{"iSortCol_${_}"}, $params->{"sSortDir_${_}"}]}
