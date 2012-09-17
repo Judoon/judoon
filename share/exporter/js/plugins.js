@@ -113,6 +113,10 @@ $.extend( $.fn.dataTableExt.oPagination, {
 $(document).ready(function() {
 
     var columnCount = columns.length;
+    var templates = [];
+    for (var k = 1; k <= columnCount; k++) {
+        templates.push($('#column_tmpl_'+k));
+    }
     $('#datatable').dataTable({
         "aoColumns" : columns,
         "bAutoWidth": true,
@@ -128,8 +132,8 @@ $(document).ready(function() {
                         var i, j, row, new_data = [];
                         for (i = 0; i < data.tmplData.length; i++) {
                             row = [];
-                            for (j = 1; j <= columnCount;  j++) {
-                                row.push($('#column_tmpl_'+j).render(data.tmplData[i]));
+                            for (j = 0; j < columnCount;  j++) {
+                                row.push(templates[j].render(data.tmplData[i]));
                             }
                             new_data.push(row);
                         }
