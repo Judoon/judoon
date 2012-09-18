@@ -3,16 +3,11 @@
 use strict;
 use warnings;
 
+use lib q{t/lib};
+
 use Test::More;
-use Test::DBIx::Class {
-    schema_class => 'Judoon::DB::User::Schema',
-    connect_opts => {
-        on_connect_do => [
-            q{ATTACH DATABASE ':memory:' AS data;}
-        ],
-    },
-};
 use Test::Fatal;
+use t::DB;
 
 use Data::Printer;
 use Judoon::Spreadsheet;
@@ -20,12 +15,8 @@ use Judoon::Tmpl::Factory ();
 use Spreadsheet::Read;
 
 
-fixtures_ok [
-    User => [
-        [qw/username name active email_address password/],
-        ['testuser', 'Test User', 1, 'testuser@example.com', 'testpass'],
-    ],
-], 'installed fixtures';
+sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
+sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
 
 
 subtest 'Result::User' => sub {
