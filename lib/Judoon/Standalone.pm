@@ -73,6 +73,9 @@ sub add_skeleton {
         }
     } );
 
+    # mark data.cgi as executable, so permissions work
+    $self->archive_section->file('cgi-bin/data.cgi')->executable;
+
     # remove plugins.js; download uses minified version
     $self->archive_section->remove_file('js/plugins.js');
 }

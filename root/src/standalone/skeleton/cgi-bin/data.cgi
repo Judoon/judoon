@@ -9,6 +9,7 @@ BEGIN {
 }
 
 use CGI ();
+use Fcntl 'O_RDONLY';
 use JSON qw(encode_json);
 use Tie::File;
 
@@ -17,7 +18,7 @@ main: {
     my $cgi = CGI->new();
     my $params = $cgi->Vars();
 
-    tie my @data, 'Tie::File', 'database.tab'
+    tie my @data, 'Tie::File', 'database.tab', mode => O_RDONLY
         or die "Cannot open database.tab: $!";
 
     my $filtered = my $total = (@data - 1);

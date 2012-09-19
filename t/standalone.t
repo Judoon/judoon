@@ -58,5 +58,8 @@ sub test_contents {
         ok -e File::Spec->catdir($dir, 'judoon', $has), "has $has";
     }
 
+    ok -x File::Spec->catdir($dir, 'judoon/cgi-bin/data.cgi'),
+        'cgi is executable';
+
     return;
 }

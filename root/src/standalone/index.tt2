@@ -97,15 +97,15 @@
 
         <script>
           var columns = [
-            [% FOREACH column IN page.columns %]
+            [% FOREACH column IN page.page_columns %]
             {"sTitle":"[% column.title %]"},
             [% END %]
           ];
         </script>
 
-        [% FOREACH column IN page.columns %]
+        [% FOREACH column IN page.page_columns %]
         <script id="column_tmpl_[%- loop.count -%]" type="text/x-jquery-tmpl">
-          [%- column.template.as_jquery -%]
+          [%- column.template_to_jquery -%]
         </script>
         [%- END -%]
 
