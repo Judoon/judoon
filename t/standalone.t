@@ -12,8 +12,12 @@ use t::DB;
 use Archive::Extract;
 use File::Spec;
 use File::Temp qw(tempdir);
+use HTTP::Request::Common;
 use Judoon::Standalone;
-
+use Plack::App::CGIBin;
+use Plack::App::File;
+use Plack::App::URLMap;
+use Plack::Test;
 
 my $schema = t::DB::get_schema();
 my $page = $schema->resultset('Page')->first();
@@ -60,6 +64,22 @@ sub test_contents {
 
     ok -x File::Spec->catdir($dir, 'judoon/cgi-bin/data.cgi'),
         'cgi is executable';
+
+
+    my $urlmap   = Plack::App::URLMap->new();
+    my $cgi_app  = Plack::App::CGIBin->new(root => File::Spec->catdir($dir,'judoon','cgi-bin'))->to_app;
+    my $root_app = Plack::App::File->new(  root => File::Spec->catdir($dir,'judoon'))->to_app;
+    $urlmap->map('/cgi-bin' => $cgi_app);
+    $urlmap->map('/' => $root_app);
+    test_psgi $urlmap->to_app, sub {
+        my $cb = shift;
+        my $res = $cb->(GET 'index.html');
+        like $res->content(), qr{Cell Migration Consortium}, 'got index page';
+
+        $res = $cb->(GET '/cgi-bin/data.cgi');
+        is $res->content_type, 'application/json', 'got JSON response';
+        like $res->content, qr{Va Bene}, 'found valid data';
+    };
 
     return;
 }
