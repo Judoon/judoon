@@ -11,6 +11,7 @@ BEGIN {
         Judoon::Tmpl::Translator
         Judoon::SiteLinker
         Judoon::Spreadsheet
+        Judoon::Standalone
         Judoon::Web
     );
 

@@ -3,17 +3,10 @@
 use strict;
 use warnings;
 
+use lib q{t/lib};
+
 use Test::More;
-use Test::DBIx::Class {
-    schema_class => 'Judoon::DB::User::Schema',
-    connect_info => ['dbi:SQLite:dbname=t/var/testdb.sqlite','',''],
-    connect_opts => {
-        on_connect_do => [
-            q{ATTACH DATABASE ':memory:' AS data;}
-        ],
-    },
-};
-use Test::WWW::Mechanize::Catalyst;
+use t::DB;
 
 use Config::General;
 use Data::Printer;
@@ -21,27 +14,9 @@ use File::Temp qw(tempdir);
 use FindBin qw($Bin);
 
 
-# set up catalyst test config
-my $TEST_CONF_FILE = "$Bin/../judoon_web_test.conf";
-die "test conf already exists: $TEST_CONF_FILE" if (-e $TEST_CONF_FILE);
-$ENV{'JUDOON_WEB_CONFIG_LOCAL_SUFFIX'} = 'test';
-my $test_config = Config::General->new({
-    'Model::User' => {
-         connect_info => Schema()->storage->connect_info->[0],
-    },
-    'Plugin::Session' => {
-        storage => tempdir(CLEANUP => 1),
-    },
-});
-$test_config->save_file($TEST_CONF_FILE);
-
-
 # install basic fixtures
 my %users = (
-    testuser => {
-        username => 'testuser', password => 'testuser',
-        name => 'Test User', email_address => 'testuser@example.com',
-    },
+    testuser => t::DB::get_testuser(),
     newuser => {
         username => 'newuser', password => 'newuserisme',
         name => 'New User', email_address => 'newuser@example.com',
@@ -51,20 +26,12 @@ my %spreadsheets = (
     basic       => 't/etc/data/basic.xls',
     troublesome => 't/etc/data/troublesome.xls',
 );
-fixtures_ok( sub {
-    my ($schema) = @_;
-    my $user = $schema->resultset('User')->create_user($users{testuser});
-    open my $TEST_XLS, '<', $spreadsheets{basic};
-    my $dataset = $user->import_data($TEST_XLS);
-    close $TEST_XLS;
-    $dataset->create_basic_page;
-} );
-
 
 # start test server
-my $mech = Test::WWW::Mechanize::Catalyst->new(
-    catalyst_app => 'Judoon::Web',
-);
+# my $mech = Test::WWW::Mechanize::Catalyst->new(
+#     catalyst_app => 'Judoon::Web',
+# );
+my $mech = t::DB::new_mech();
 ok $mech, 'created test mech' or BAIL_OUT;
 
 
@@ -81,7 +48,10 @@ subtest 'Basic Tests' => sub {
 subtest 'Login / Logout' => sub {
     redirects_to_ok('/settings/profile', '/login');
 
-    my %credentials = (username => 'testuser', password => 'testuser'),
+    my %credentials = (
+        username => $users{testuser}->{username},
+        password => $users{testuser}->{password},
+    ),
     $mech->get_ok('/login', 'get login page');
 
     # bad login
@@ -446,7 +416,6 @@ subtest 'Complete Coverage' => sub {
 
 done_testing();
 
-END { unlink $TEST_CONF_FILE if (-e $TEST_CONF_FILE); }
 
 
 sub login {

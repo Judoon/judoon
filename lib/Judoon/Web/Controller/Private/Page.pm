@@ -21,6 +21,9 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
+use File::Slurp qw(slurp);
+use Judoon::Standalone;
+
 __PACKAGE__->config(
     action => {
         base => { Chained => '/private/dataset/chainpoint', PathPart => 'page', },
@@ -74,6 +77,23 @@ after object_GET => sub {
         $c->stash->{page_column}{templates}
             = [map {$_->template_to_jquery} @page_columns];
         $c->stash->{template} = 'page/preview.tt2';
+        $c->detach();
+    }
+
+    if ($view eq 'standalone') {
+        my $type = $c->req->param('format') // 'zip';
+        my %allowed = qw(zip 1 tgz 1);
+        $type = $allowed{$type} ? $type : 'zip';
+
+        my $standalone = Judoon::Standalone->new({page => $page});
+        $standalone->build();
+        my $archive_path = $standalone->compress($type);
+
+        $c->res->headers->header( "Content-Type" => "application/$type" );
+        $c->res->headers->header( "Content-Disposition" => "attachment; filename=judoon.$type" );
+        my $archive = slurp($archive_path);
+        $c->res->body($archive);
+        $c->forward('Judoon::Web::View::Download::Plain');
         $c->detach();
     }
 
