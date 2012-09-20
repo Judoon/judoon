@@ -9,6 +9,7 @@ BEGIN {
 }
 
 use CGI ();
+use Fcntl 'O_RDONLY';
 use JSON qw(encode_json);
 use Tie::File;
 
@@ -17,7 +18,7 @@ main: {
     my $cgi = CGI->new();
     my $params = $cgi->Vars();
 
-    tie my @data, 'Tie::File', 'database.tab'
+    tie my @data, 'Tie::File', 'database.tab', mode => O_RDONLY
         or die "Cannot open database.tab: $!";
 
     my $filtered = my $total = (@data - 1);
@@ -43,22 +44,24 @@ main: {
     my $nbr_sort_cols = +(defined($params->{iSortingCols}) ? $params->{iSortingCols} : 1);
     my $max_cols      = @column_names;
     $nbr_sort_cols    = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
-    my @sorts = map {[$params->{"iSortCol_${_}"}, $params->{"sSortDir_${_}"}]}
-        (0..$nbr_sort_cols-1);
-    my $sort_func = sub {
-        my ($left, $right) = @_;
+    my @sorts = grep {defined($_->[0]) && defined($_->[1])}
+        map {[$params->{"iSortCol_${_}"}, $params->{"sSortDir_${_}"}]}
+            (0..$nbr_sort_cols-1);
+    if (@sorts) {
+        my $sort_func = sub {
+            my ($left, $right) = @_;
 
-        my $retval;
-        for my $sort (@sorts) {
-            my $idx = $sort->[0];
-            $retval = $sort->[1] eq 'asc' ? ($left->[$idx]  cmp $right->[$idx])
-                    :                       ($right->[$idx] cmp $left->[$idx] );
-            last if ($retval);
-        }
-        return $retval;
-    };
-    @real_data = sort {$sort_func->($a, $b)} @real_data;
-
+            my $retval;
+            for my $sort (@sorts) {
+                my $idx = $sort->[0];
+                $retval = $sort->[1] eq 'asc' ? ($left->[$idx]  cmp $right->[$idx])
+                        :                       ($right->[$idx] cmp $left->[$idx] );
+                last if ($retval);
+            }
+            return $retval;
+        };
+        @real_data = sort {$sort_func->($a, $b)} @real_data;
+    }
 
     # paginate data
     my ($start, $end) = (0, $#real_data);
