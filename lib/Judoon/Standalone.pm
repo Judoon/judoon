@@ -91,7 +91,7 @@ sub fill_index_template {
 sub export_database {
     my ($self) = @_;
     $self->archive_section->new_file(
-        $self->standalone_db, 'string', $self->page->dataset->as_raw
+        $self->standalone_db, 'string', $self->page->dataset->as_raw({shortname => 1})
     );
 }
 
