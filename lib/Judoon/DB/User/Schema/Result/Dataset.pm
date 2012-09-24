@@ -231,8 +231,11 @@ columns.
 =cut
 
 sub data_table {
-    my ($self) = @_;
-    return [[map {$_->name} $self->ds_columns], @{$self->data}];
+    my ($self, $args) = @_;
+    return [
+        [map {$args->{shortname} ? $_->shortname : $_->name} $self->ds_columns],
+        @{$self->data},
+    ];
 }
 
 
@@ -243,10 +246,10 @@ Return data as a tab-delimited file
 =cut
 
 sub as_raw {
-    my ($self) = @_;
+    my ($self, $args) = @_;
 
     my $raw_file = q{};
-    for my $row (@{$self->data_table}) {
+    for my $row (@{$self->data_table($args)}) {
         $raw_file .= join "\t", @$row;
         $raw_file .= "\n";
     }
