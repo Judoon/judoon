@@ -23,7 +23,6 @@ my $schema = t::DB::get_schema();
 my $page = $schema->resultset('Page')->first();
 ok my $standalone = Judoon::Standalone->new({page => $page}),
     'can create standalone object';
-$standalone->build();
 
 subtest 'save to zip' => sub {
     my $archive_path = $standalone->compress('zip');

@@ -26,7 +26,6 @@ my $schema = t::DB::get_schema();
 my $page = $schema->resultset('Page')->first();
 ok my $standalone = Judoon::Standalone->new({page => $page}),
     'can create standalone object';
-$standalone->build();
 my $archive_path = $standalone->compress('tar.gz');
 my $archive = Archive::Extract->new(archive => $archive_path);
 my $dir = tempdir(CLEANUP => 1);

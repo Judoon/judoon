@@ -85,8 +85,7 @@ after object_GET => sub {
         my %allowed = qw(zip 1 tgz 1);
         $type = $allowed{$type} ? $type : 'zip';
 
-        my $standalone = Judoon::Standalone->new({page => $page});
-        $standalone->build();
+        my $standalone   = Judoon::Standalone->new({page => $page});
         my $archive_path = $standalone->compress($type);
 
         $c->res->headers->header( "Content-Type" => "application/$type" );

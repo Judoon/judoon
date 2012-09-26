@@ -27,10 +27,46 @@ has index_tmpl => (is => 'lazy',);
 sub _build_index_tmpl { return $_[0]->template_dir->file('index.tt2'); }
 
 
+has archive_name => (is => 'lazy',);
+sub _build_archive_name { return 'judoon'; }
 has archive => (is => 'lazy',);
-sub _build_archive { return Archive::Builder->new; }
-has archive_section => (is => 'lazy',);
-sub _build_archive_section { return $_[0]->archive->new_section('judoon'); }
+sub _build_archive {
+    my ($self) = @_;
+    my $archive = Archive::Builder->new;
+    my $archive_section = $archive->new_section($self->archive_name);
+
+    # add static files
+    $self->skeleton_dir->recurse( callback => sub {
+        my ($child) = @_;
+        if (not $child->is_dir) {
+            my $child_path = $child->relative($self->skeleton_dir);
+            $archive_section->new_file(
+                $child_path->stringify, 'file', $child->stringify
+            ) or die "($child_path|$child): " . $archive->errstr;
+        }
+    } );
+
+    # mark data.cgi as executable, so permissions work
+    $archive_section->file('cgi-bin/data.cgi')->executable;
+
+    # remove plugins.js; download uses minified version
+    $archive_section->remove_file('js/plugins.js');
+
+    # add index
+    $archive_section->new_file(
+        'index.html', 'template', $self->tt, $self->index_tmpl->stringify,
+        {page => $self->page},
+    ) or die "Cannot template? " . $archive->errstr;
+
+    # add database
+    $archive_section->new_file(
+        $self->standalone_db, 'string', $self->page->dataset->as_raw({shortname => 1})
+    );
+
+    die $archive->errstr if ($archive->errstr);
+    return $archive;
+}
+
 
 has tt => (is => 'lazy',);
 sub _build_tt { return Template->new; }
@@ -40,60 +76,15 @@ sub _build_tt { return Template->new; }
 
 =cut
 
-sub archive_error { return $_[0]->archive->errstr; }
-
-sub build {
-    my ($self) = @_;
-    $self->add_skeleton();
-    $self->fill_index_template();
-    $self->export_database();
-    die $self->archive_arror if ($self->archive_error);
-    return;
-}
-
 sub compress {
     my ($self, $type) = @_;
     my $archive_compressed = $self->archive->archive($type || 'zip')
-        or die $self->archive_error;
+        or die $self->archive->errstr;
     my ($fh, $filename) = tempfile(SUFFIX => ".$type", UNLINK => 1,);
-    $archive_compressed->save( $filename ) or die $self->archive_error;
+    $archive_compressed->save( $filename ) or die $self->archive->errstr;
     return $filename;
 }
 
-sub add_skeleton {
-    my ($self) = @_;
-
-    $self->skeleton_dir->recurse( callback => sub {
-        my ($child) = @_;
-        if (not $child->is_dir) {
-            my $child_path = $child->relative($self->skeleton_dir);
-            $self->archive_section->new_file(
-                $child_path->stringify, 'file', $child->stringify
-            ) or die "($child_path|$child): " . $self->archive_error;
-        }
-    } );
-
-    # mark data.cgi as executable, so permissions work
-    $self->archive_section->file('cgi-bin/data.cgi')->executable;
-
-    # remove plugins.js; download uses minified version
-    $self->archive_section->remove_file('js/plugins.js');
-}
-
-sub fill_index_template {
-    my ($self) = @_;
-    $self->archive_section->new_file(
-        'index.html', 'template', $self->tt, $self->index_tmpl->stringify,
-        {page => $self->page},
-    ) or die "Cannot template? " . $self->archive->errstr;
-}
-
-sub export_database {
-    my ($self) = @_;
-    $self->archive_section->new_file(
-        $self->standalone_db, 'string', $self->page->dataset->as_raw({shortname => 1})
-    );
-}
 
 1;
 __END__
