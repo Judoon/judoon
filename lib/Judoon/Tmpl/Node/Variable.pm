@@ -10,6 +10,8 @@ with qw(
 
 use Method::Signatures;
 
+our $AUTHORITY = '';
+
 has '+type' => (default => 'variable',);
 has name => (is => 'ro', isa => 'Str', required => 1,);
 
