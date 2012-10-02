@@ -575,6 +575,13 @@ CLOSED: [2012-08-14 Tue 12:54]
 CLOSED: [2012-08-14 Tue 12:43]
 ****** DONE no visitors can do PUT POST DELETE
 CLOSED: [2012-08-14 Tue 12:43]
+** Current Structure
+|            | list |      |     |     | object |      |     |     |
+|            | GET  | POST | PUT | DEL | GET    | POST | PUT | DEL |
+| Dataset    | ?    | O    | -   | -   | O      | -    | O   | O   |
+| DatasetCol | O    | -    | O   | -   | O      | -    | O   | -   |
+| Page       | ?    | O    | -   | -   | O      | -    | O   | O   |
+| PageCol    | -    | O    | -   | -   | O      | -    | O   | O   |
 * Schema separation
 ** DESCRIPTION
 How do we separate dataset data from the actual datasets?
