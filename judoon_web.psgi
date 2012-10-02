@@ -3,11 +3,16 @@ use warnings;
 
 BEGIN {
     if ($ENV{PLACK_ENV} eq 'development') {
-        $ENV{JUDOON_WEB_DEBUG} = 1;
-        $ENV{DBIC_TRACE} = 1;
-        $ENV{DBIC_TRACE_PROFILE} = 'console_monochrome';
-        $ENV{CARP_ALWAYS} = 1;
+        $ENV{JUDOON_WEB_DEBUG}   = 1;
+        $ENV{DBIC_TRACE}         = 1;
+        $ENV{DBIC_TRACE_PROFILE} = 'console';
     }
+    elsif ($ENV{PLACK_ENV} eq 'test_deploy') {
+        $ENV{JUDOON_WEB_DEBUG}   = 1;
+        $ENV{DBIC_TRACE}         = 1;
+        $ENV{DBIC_TRACE_PROFILE} = 'console_monochrome';
+    }
+
 }
 
 use Judoon::Web;
