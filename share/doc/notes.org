@@ -109,14 +109,12 @@ Segments
 
 * Color Scheme
 Color Scheme: http://colorschemedesigner.com/#3861Tw0w0w0w0
-Primary Color:
-00A876	207E62	006D4C	35D4A4	5FD4B1
-Secondary Color A:
-0D56A6	274F7D	04356C	4186D3	689AD3
-Secondary Color B:
-4DDE00	55A62A	329000	7AEE3C	99EE6B
-Complementary Color:
-FF5900	BF6230	A63A00	FF8240	FFA473
+
+                      Main     Darker   Darkest  Lightest Lighter
+Primary Color:        #00A876  #207E62  #006D4C  #35D4A4  #5FD4B1
+Secondary Color A:    #0D56A6  #274F7D  #04356C  #4186D3  #689AD3
+Secondary Color B:    #4DDE00  #55A62A  #329000  #7AEE3C  #99EE6B
+Complementary Color:  #FF5900  #BF6230  #A63A00  #FF8240  #FFA473
 
 * cursor movement
 
