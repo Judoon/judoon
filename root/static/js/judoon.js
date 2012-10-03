@@ -550,7 +550,7 @@ var judoon = {
                 case 'accession':
                     url_holder = this.util.zip_segments(
                         [props.url["text-segment-1"], props.url["text-segment-2"]],
-                        [sitelinker_accs[props.url.accession].example]
+                        [sitelinker_accs[column_acctype[props.url["variable-segment-1"]]].example]
                     );
                     default_label = sitelinker_sites[props.url.accession].label;
                     break;
