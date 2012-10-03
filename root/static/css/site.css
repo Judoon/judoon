@@ -40,6 +40,9 @@ footer p {
     margin-bottom: 0;  /* override the default bootstrap form styling */
 }
 
+/* make "Add Dataset" label on user overview page align w/ form controls */
+.form-inline h4.help-inline { margin-top: 0; }
+
 
 /* for Page Column edit page */
 
