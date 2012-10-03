@@ -308,6 +308,7 @@ var judoon = {
             $('#linkModal select').each( function(idx) {
                 $(this).val( $(this).prop('defaultSelected') );
             });
+            this.url.accession.set_active_sitelist();
             // reset radios to first element
             $('#linkModal input[type="radio"]').removeAttr('checked');
             $('#linkModal input:radio[name=url_type]:first').attr('checked', true);
