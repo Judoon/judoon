@@ -278,36 +278,6 @@ sub as_excel {
 }
 
 
-=head2 C<B<delete_data_columns( @column_numbers )>>
-
-Deletes the given column numbers from the dataset. Is 1-indexed.
-
-=cut
-
-sub delete_data_columns {
-    my ($self, @col_nums) = @_;
-
-    my $nbr_cols = $self->nbr_columns;
-    my $errmsg = (grep {!defined || $_ !~ m/^\d+$/} @col_nums) ? 'received input that was not a positive integer'
-               : (grep {$_ == 0}        @col_nums) ? 'received a column number of 0; columns are 1-indexed'
-               : (grep {$_ > $nbr_cols} @col_nums) ? 'received a number larger than the number of columns'
-               :                                    q{};
-    Judoon::Error->throw({recoverable => 0, message => "delete_data_columns $errmsg"})
-          if ($errmsg);
-
-    # reverse sort, so deleting early index doesn't throw off later count
-    my @ordered_nums = sort {$b <=> $a} @col_nums;
-    my $data = $self->data;
-    for my $row (@$data) {
-        for my $colnum (@ordered_nums) {
-            splice @$row, $colnum-1, 1;
-        }
-    }
-    $self->data($data);
-    $self->update;
-}
-
-
 sub data {
     my ($self) = @_;
 

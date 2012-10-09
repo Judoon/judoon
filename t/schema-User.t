@@ -118,41 +118,24 @@ subtest 'Result::Dataset' => sub {
          or die "Can't open test spreadsheet: $!";
     my $mutable_ds = $user->import_data($TEST_XLS);
     close $TEST_XLS;
-
     is $mutable_ds->name, 'Sheet1', '  ..and name is correct';
 
+    is_deeply $mutable_ds->data, $xls_ds_data,
+        'Data is as expected';
+    is_deeply $mutable_ds->data_table, [["Name", "Age", "Gender"], @$xls_ds_data],
+        'Data table is as expected';
+    is $mutable_ds->as_raw, "Name\tAge\tGender\nVa Bene\t14\tfemale\nChloe\t2\tfemale\nGrover\t8\tmale\nChewie\t5\tmale\nGoochie\t1\tfemale\n", 'Got as Raw';
 
-    my @delete_failures = (
-        [[1,2,'boo'], qr{positive integer}i, 'string', ],
-        [[1,2,undef], qr{positive integer}i, 'undef',  ],
-        [[1,0,2],     qr{1-indexed}i,        'zero',   ],
-        [[100,2,3],   qr{larger than the number of columns}i, 'too big', ],
-    );
-    for my $del_failure (@delete_failures) {
-        my ($cols, $error, $descr) = @$del_failure;
-        like exception { $mutable_ds->delete_data_columns(@$cols); },
-            $error, $descr;
-    }
-
-    # $mutable_ds->delete_data_columns(3,1);
-    # is $mutable_ds->nbr_rows, 5, 'still five rows';
-    # is $mutable_ds->nbr_columns, 1, 'now just 1 row';
-    # is_deeply $mutable_ds->data, [[14],[2],[8],[5],[1]],
-    #     'Data is as expected';
-    # is_deeply $mutable_ds->data_table, [["Name", "Age", "Gender"], [14],[2],[8],[5],[1]],
-    #     'Data table is as expected';
-    # is $mutable_ds->as_raw, "Name\tAge\tGender\n14\n2\n8\n5\n1\n", 'Got as Raw';
-    # 
-    # ok my $excel = $mutable_ds->as_excel, 'can get excel object';
-    # open my $XLS, '<', \$excel;
-    # ok my $xls_data  = Spreadsheet::Read::ReadData($XLS, parser => 'xls'),
-    #     'is a readable xls';
-    # close $XLS;
-    # is $xls_data->[1]{A1}, 'Name', 'Check header value';
-    # is $xls_data->[1]{C1}, 'Gender', 'Check header value';
-    # is $xls_data->[1]{A2}, 14, 'Check data value';
-    # is $xls_data->[1]{A6}, 1, 'Check data value';
-    # is $xls_data->[1]{C3}, undef, 'Check for undef value';
+    ok my $excel = $mutable_ds->as_excel, 'can get excel object';
+    open my $XLS, '<', \$excel;
+    ok my $xls_data  = Spreadsheet::Read::ReadData($XLS, parser => 'xls'),
+        'is a readable xls';
+    close $XLS;
+    is $xls_data->[1]{A1}, 'Name', 'Check header value';
+    is $xls_data->[1]{C1}, 'Gender', 'Check header value';
+    is $xls_data->[1]{A2}, 'Va Bene', 'Check data value';
+    is $xls_data->[1]{A6}, 'Goochie', 'Check data value';
+    is $xls_data->[1]{D3}, undef, 'Check for undef value';
 };
 
 subtest 'Result::DatasetColumn' => sub {
@@ -197,18 +180,6 @@ subtest 'Result::DatasetColumn' => sub {
         or die "Can't open test spreadsheet: $!";
     my $mutable_ds = $user->import_data($TEST_XLS);
     close $TEST_XLS;
-
-    my @ds_cols = $mutable_ds->ds_columns;
-    $ds_cols[0]->delete_column;
-    $mutable_ds->discard_changes;
-    is_deeply $mutable_ds->data_table,
-        [["Age", "Gender"], [14, 'female',],[2, 'female'],[8, 'male'],[5, 'male'],[1, 'female']],
-            'Data table is as expected';
-
-    $ds_cols[2]->delete_column;
-    $mutable_ds->discard_changes;
-    is_deeply $mutable_ds->data_table, [map {[$_]} qw(Age 14 2 8 5 1)],
-        'Data table is as expected';
 };
 
 

@@ -168,26 +168,6 @@ sub linkset {
 }
 
 
-=head2 C<B<delete_column>>
-
-C<delete_column> deletes not just the DatasetColumn itself (which
-actually represents the column header), but the actual column of data
-in the Dataset.
-
-You should probably call this instead of C<delete>, or else your data
-and data headers will be out of sync.  Also, if you have a reference
-to the parent dataset, make sure to call C<< ->discard_changes() >> on
-it, or the column data will be incorrect.
-
-=cut
-
-sub delete_column {
-    my ($self) = @_;
-    my $pos = $self->ordinal_position;
-    $self->dataset->delete_data_columns($pos);
-    return $self->delete;
-}
-
 
 =head2 C<B<ordinal_position>>
 
