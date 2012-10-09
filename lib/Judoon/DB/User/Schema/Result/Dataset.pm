@@ -278,7 +278,8 @@ sub as_excel {
 }
 
 
-sub data {
+has data => (is => 'lazy',);
+sub _build_data {
     my ($self) = @_;
 
     my $dbh = $self->result_source->storage->dbh;
