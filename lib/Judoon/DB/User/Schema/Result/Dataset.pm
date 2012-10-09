@@ -282,14 +282,18 @@ has data => (is => 'lazy',);
 sub _build_data {
     my ($self) = @_;
 
-    my $dbh = $self->result_source->storage->dbh;
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
         $self->ds_columns;
     my $select = join ', ', @columns;
     my $table  = 'data.' . $self->tablename;
-    my $sth = $dbh->prepare("SELECT $select FROM $table");
-    $sth->execute;
-    return $sth->fetchall_arrayref();
+    return $self->result_source->storage->dbh_do(
+        sub {
+            my ($torage, $dbh) = @_;
+            my $sth = $dbh->prepare("SELECT $select FROM $table");
+            $sth->execute;
+            return $sth->fetchall_arrayref();
+        },
+    );
 }
 
 
@@ -311,17 +315,21 @@ sub _store_data {
         ],
     );
 
-    my $dbic_schema = $self->result_source->schema;
-    my $dbh         = $dbic_schema->storage->dbh;
+    my $dbic_storage = $self->result_source->storage;
 
     # translate to sql
     my $sql = $sqlt->translate(
         from => 'Spreadsheet',
-        to   => $dbic_schema->storage->sqlt_type,
+        to   => $dbic_storage->sqlt_type,
     ) or die $sqlt->error;
 
     # create table
-    $dbh->do($sql);
+    $dbic_storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            $dbh->do($sql);
+        },
+    );
 
     # populate table
     my ($table)    = $sqlt->schema->get_tables;
@@ -329,10 +337,16 @@ sub _store_data {
     my @fields     = map {$_->name} $table->get_fields;
     my $field_list = join ', ', @fields;
     my $join_list  = join ', ', (('?') x @fields);
-    my $sth_insert = $dbh->prepare_cached(
-        "INSERT INTO $table_name ($field_list) VALUES ($join_list)"
+
+    $dbic_storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth_insert = $dbh->prepare_cached(
+                "INSERT INTO $table_name ($field_list) VALUES ($join_list)"
+            );
+            $sth_insert->execute(@$_) for (@{$spreadsheet->data});
+        },
     );
-    $sth_insert->execute(@$_) for (@{$spreadsheet->data});
 
     return $table;
 }
@@ -366,10 +380,14 @@ sub _gen_table_name {
 
 sub _table_exists {
     my ($self, $name) = @_;
-    my $sth = $self->result_source->storage->dbh
-        ->table_info(undef, '%', $name, "TABLE");
-    my $ary = $sth->fetchall_arrayref();
-    return @$ary;
+    $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth = $dbh->table_info(undef, '%', $name, "TABLE");
+            my $ary = $sth->fetchall_arrayref();
+            return @$ary;
+        },
+    );
 }
 
 
