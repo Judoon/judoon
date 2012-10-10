@@ -285,8 +285,12 @@ sub _build_data {
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
         $self->ds_columns;
     my $select = join ', ', @columns;
-    my $table  = 'data.' . $self->tablename;
-    return $self->result_source->storage->dbh_do(
+
+    my $dbic_storage = $self->result_source->storage;
+    my $schema_name  = $dbic_storage->sqlt_type eq 'SQLite' ? 'data' :
+        $self->user->username;
+    my $table = $schema_name . '.' . $self->tablename;
+    return $dbic_storage->dbh_do(
         sub {
             my ($torage, $dbh) = @_;
             my $sth = $dbh->prepare("SELECT $select FROM $table");
@@ -355,9 +359,14 @@ sub _check_table_name {
     my ($self, $sqlt_schema) = @_;
 
     my ($table)    = $sqlt_schema->get_tables();
-    my $table_name = $table->name;
-    my $new_name   = 'data.' . $self->_gen_table_name($table_name);
-    $table->name($new_name);
+    my $table_name = $self->_gen_table_name($table->name);
+
+    if ($self->result_source->storage->sqlt_type eq 'SQLite') {
+        $table->name('data.[' . $table_name . ']');
+    }
+    else { # Pg
+        $table->name($self->user->username . '.' . $table_name);
+    }
     return;
 }
 
@@ -365,7 +374,9 @@ sub _gen_table_name {
     my ($self, $table_name) = @_;
 
     $table_name =~ s/[^a-z_0-9]+/_/gi;
-    $table_name = $self->user->username . '_' . $table_name;
+    if ($self->result_source->storage->sqlt_type eq 'SQLite') {
+        $table_name = $self->user->username . '@' . $table_name;
+    }
     return $table_name unless ($self->_table_exists($table_name));
 
     my $new_name = List::AllUtils::first {not $self->_table_exists($_)}
@@ -380,10 +391,14 @@ sub _gen_table_name {
 
 sub _table_exists {
     my ($self, $name) = @_;
-    $self->result_source->storage->dbh_do(
+    my $dbic_storage = $self->result_source->storage;
+    my $schema_name  = $dbic_storage->sqlt_type eq 'SQLite' ? 'data'
+        : $self->user->username;
+
+    $dbic_storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
-            my $sth = $dbh->table_info(undef, '%', $name, "TABLE");
+            my $sth = $dbh->table_info(undef, $schema_name, $name, "TABLE");
             my $ary = $sth->fetchall_arrayref();
             return @$ary;
         },
