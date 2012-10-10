@@ -106,6 +106,22 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<dataset_id_shortname_unique>
+
+=over 4
+
+=item * L</dataset_id>, L</shortname>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint(
+    "dataset_id_shortname_unique", => [qw(dataset_id shortname)],
+);
+
 =head1 RELATIONS
 
 =head2 dataset
