@@ -244,7 +244,8 @@ in the header instead of the original names
 sub data_table {
     my ($self, $args) = @_;
     return [
-        [map {$args->{shortname} ? $_->shortname : $_->name} $self->ds_columns],
+        [map {$args->{shortname} ? $_->shortname : $_->name}
+             sort {$a->sort <=> $b->sort} $self->ds_columns],
         @{$self->data},
     ];
 }
