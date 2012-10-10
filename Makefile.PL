@@ -37,6 +37,7 @@ requires 'DateTime';
 requires 'DBD::SQLite';
 requires 'DBIx::Class';
 requires 'DBIx::Class::Migration';
+requires 'DBIx::Class::Migration::RunScript::Trait::AuthenPassphrase';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'DBIx::Class::Schema::Loader';
 requires 'DBIx::RunSQL';
