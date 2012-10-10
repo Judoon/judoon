@@ -1,9 +1,6 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Dataset;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Dataset
@@ -133,9 +130,6 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
-
-# Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-07-12 12:56:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JrQ45OumPMbWAMAGmA8KHg
 
 use DateTime;
 use Judoon::Error;

@@ -1,9 +1,6 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Page;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Page
@@ -106,10 +103,6 @@ __PACKAGE__->has_many(
   { "foreign.page_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 1 },
 );
-
-
-# Created by DBIx::Class::Schema::Loader v0.07017 @ 2012-02-28 16:31:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Npdwxhg8ICnYH03OCefyVg
 
 
 =pod

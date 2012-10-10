@@ -1,9 +1,6 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Role;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Role
@@ -94,9 +91,6 @@ Composing rels: L</user_roles> -> user
 
 __PACKAGE__->many_to_many("users", "user_roles", "user");
 
-
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:T5405wKoE3oRc5eCloRVlw
 
 
 =pod

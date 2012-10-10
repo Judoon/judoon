@@ -1,9 +1,6 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::UserRole;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::UserRole
@@ -88,9 +85,6 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
-
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XrchGfDp18BCEhxTl0FrZA
 
 
 =pod

@@ -1,9 +1,6 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::PageColumn;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
-
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::PageColumn
@@ -85,9 +82,6 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
-
-# Created by DBIx::Class::Schema::Loader v0.07017 @ 2012-02-28 16:31:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:aX9vDbJcTpDsvGsCsgYoCg
 
 
 =pod

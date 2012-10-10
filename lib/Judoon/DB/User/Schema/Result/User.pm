@@ -157,8 +157,6 @@ Composing rels: L</user_roles> -> role
 __PACKAGE__->many_to_many("roles", "user_roles", "role");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SzGqoNkBtKX9SumB+vTVCw
 
 use Judoon::Spreadsheet;
 
