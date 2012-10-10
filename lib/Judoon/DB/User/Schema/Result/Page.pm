@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Page;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Page
@@ -105,12 +109,7 @@ __PACKAGE__->has_many(
 );
 
 
-=pod
-
-=encoding utf8
-
-=cut
-
+# add permission column / methods to Page
 with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 

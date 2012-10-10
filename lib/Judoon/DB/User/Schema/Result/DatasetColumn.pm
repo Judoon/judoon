@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::DatasetColumn;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::DatasetColumn
@@ -120,9 +124,11 @@ __PACKAGE__->belongs_to(
 );
 
 
-=pod
+=head1 METHODS
 
-=encoding utf8
+=head2 B<C< sitelinker / _build_sitelinker >>
+
+Attribute / accessor for holding the C<L<Judoon::SiteLinker>> utility object.
 
 =cut
 

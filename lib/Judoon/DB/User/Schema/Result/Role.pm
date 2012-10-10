@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Role;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Role
@@ -93,10 +97,5 @@ __PACKAGE__->many_to_many("users", "user_roles", "user");
 
 
 
-=pod
-
-=encoding utf8
-
-=cut
 
 1;

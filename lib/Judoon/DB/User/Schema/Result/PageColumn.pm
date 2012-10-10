@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::PageColumn;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::PageColumn
@@ -83,17 +87,25 @@ __PACKAGE__->belongs_to(
 );
 
 
+=head1 METHODS
 
-=pod
+=head2 B<C< translator / _build_translator >>
 
-=encoding utf8
+Attribute / accessor to hold the C<L<Judoon::Tmpl::Translator>>
+utility object.
 
 =cut
-
 
 use Judoon::Tmpl::Translator;
 has translator => (is => 'lazy',); # isa => 'Judoon::Tmpl::Translator',);
 sub _build_translator { return Judoon::Tmpl::Translator->new; }
+
+
+=head2 B<C< template_to_jquery >>
+
+Translate the stored template into a JQuery template.
+
+=cut
 
 sub template_to_jquery {
     my ($self) = @_;
@@ -102,12 +114,28 @@ sub template_to_jquery {
     );
 }
 
+
+=head2 B<C< template_to_objects >>
+
+Translate the stored template into a list of C<L<Judoon::Tmpl::Node>>
+objects.
+
+=cut
+
 sub template_to_objects {
     my ($self) = @_;
     return $self->translator->to_objects(
         from => 'Native', template => $self->template
     );
 }
+
+
+=head2 B<C< set_template >>
+
+Given a list of C<L<Judoon::Tmpl::Node>>s, save them to the
+L</template> field.
+
+=cut
 
 sub set_template {
     my ($self, @objects) = @_;

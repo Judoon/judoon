@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Dataset;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::Dataset
@@ -45,9 +49,19 @@ __PACKAGE__->table("datasets");
   data_type: 'text'
   is_nullable: 0
 
-=head2 data
+=head2 tablename
 
   data_type: 'text'
+  is_nullable: 0
+
+=head2 nbr_rows
+
+  data_type: 'integer'
+  is_nullable: 0
+
+=head2 nbr_columns
+
+  data_type: 'integer'
   is_nullable: 0
 
 =cut
@@ -138,16 +152,18 @@ use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 use SQL::Translator;
 
+# add permission column / methods to Dataset
 with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
-=pod
-
-=encoding utf8
 
 =head1 METHODS
 
 =head2 B<C<import_from_spreadsheet>>
+
+Update a new C<Dataset> from a C<Judoon::Spreadsheet> object.  Calling this
+will create a new table in the Datastore and store the meta-information in the
+C<Dataset> and C<DatasetColumns>.
 
 =cut
 
@@ -217,10 +233,11 @@ EOS
 }
 
 
-=head2 data_table
+=head2 B<C<data_table( $args )>>
 
 Returns an arrayref of arrayref of the dataset's data with the header
-columns.
+columns. If C<$args->{shortname}> is true, use the column shortnames
+in the header instead of the original names
 
 =cut
 
@@ -233,9 +250,9 @@ sub data_table {
 }
 
 
-=head2 as_raw
+=head2 B<C<as_raw( $args )>>
 
-Return data as a tab-delimited file
+Return data as a tab-delimited string. Passes C<$args> to C<L</data_table>>.
 
 =cut
 
@@ -252,9 +269,9 @@ sub as_raw {
 }
 
 
-=head2 as_excel
+=head2 B<C<as_excel>>
 
-Return data as an Excel spreadsheet
+Return data as an Excel spreadsheet.
 
 =cut
 
@@ -271,6 +288,11 @@ sub as_excel {
     return $output;
 }
 
+=head2 B<C<data / _build_data>>
+
+Accessor for getting at the data stored in the Datastore.
+
+=cut
 
 has data => (is => 'lazy',);
 sub _build_data {
@@ -294,6 +316,16 @@ sub _build_data {
     );
 }
 
+
+=head2 B<C< _store_data( $spreadsheet ) >>
+
+This private method actually creates the new table for the data in the
+Datastore.  It passes the spreadsheet to L<SQL::Translator> to get the
+SQL for creating the table.  It also checks for table name collisions
+and changes the name accordingly.  After creating the table, it
+inserts the data. Returns the new table name.
+
+=cut
 
 sub _store_data {
     my ($self, $spreadsheet) = @_;
@@ -349,6 +381,14 @@ sub _store_data {
     return $table;
 }
 
+
+=head2 B<C< _check_table_name >>
+
+Private method passed to the L<SQL::Translator> filter to create a
+unique table name.
+
+=cut
+
 sub _check_table_name {
     my ($self, $sqlt_schema) = @_;
 
@@ -363,6 +403,15 @@ sub _check_table_name {
     }
     return;
 }
+
+
+=head2 B<C< _gen_table_name >>
+
+Private method to generate a new table name.  This method trys a
+couple different techniques, but will die if it's unable to find a
+unique name.
+
+=cut
 
 sub _gen_table_name {
     my ($self, $table_name) = @_;
@@ -382,6 +431,14 @@ sub _gen_table_name {
         if ($self->_table_exists($new_name));
     return $new_name;
 }
+
+
+=head2 B<C< _table_exists >>
+
+Private method to test whether a particular table name is already in
+use.
+
+=cut
 
 sub _table_exists {
     my ($self, $name) = @_;

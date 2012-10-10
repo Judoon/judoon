@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::UserRole;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::UserRole
@@ -86,11 +90,5 @@ __PACKAGE__->belongs_to(
 );
 
 
-
-=pod
-
-=encoding utf8
-
-=cut
 
 1;
