@@ -415,6 +415,7 @@ unique name.
 sub _gen_table_name {
     my ($self, $table_name) = @_;
 
+    $table_name = lc($table_name);
     $table_name =~ s/[^a-z_0-9]+/_/gi;
     if ($self->result_source->storage->sqlt_type eq 'SQLite') {
         $table_name = $self->user->username . '@' . $table_name;
