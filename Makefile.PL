@@ -34,6 +34,7 @@ requires 'Config::General' => '2.51';
 requires 'Data::Printer';
 requires 'Data::Section::Simple';
 requires 'DateTime';
+requires 'DBD::Pg';
 requires 'DBD::SQLite';
 requires 'DBIx::Class';
 requires 'DBIx::Class::Migration';
@@ -84,6 +85,7 @@ test_requires 'Test::More' => '0.88';
 test_requires 'Test::Fatal';
 test_requires 'Test::Pod';
 test_requires 'Test::Pod::Coverage';
+test_requires 'Test::postgresql';
 test_requires 'Test::WWW::Mechanize::Catalyst';
 
 WriteAll(meta => 0);

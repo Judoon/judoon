@@ -174,7 +174,8 @@ sub import_from_spreadsheet {
 
     my $sqlt_table = $self->_store_data($spreadsheet);
     $self->name($spreadsheet->worksheet_name);
-    (my $tablename = $sqlt_table->name) =~ s/^data\.//; # get rid of schema
+    my $schema_name = $self->schema_name;
+    (my $tablename = $sqlt_table->name) =~ s/^$schema_name\.//; # get rid of schema
     $self->tablename($tablename);
     $self->nbr_rows($spreadsheet->nbr_rows);
     $self->nbr_columns($spreadsheet->nbr_columns);
@@ -303,13 +304,10 @@ sub _build_data {
         $self->ds_columns;
     my $select = join ', ', @columns;
 
-    my $dbic_storage = $self->result_source->storage;
-    my $schema_name  = $dbic_storage->sqlt_type eq 'SQLite' ? 'data' :
-        $self->user->username;
-    my $table = $schema_name . '.' . $self->tablename;
-    return $dbic_storage->dbh_do(
+    my $table = $self->schema_name . '.' . $self->tablename;
+    return $self->result_source->storage->dbh_do(
         sub {
-            my ($torage, $dbh) = @_;
+            my ($storage, $dbh) = @_;
             my $sth = $dbh->prepare("SELECT $select FROM $table");
             $sth->execute;
             return $sth->fetchall_arrayref();
@@ -398,11 +396,10 @@ sub _check_table_name {
     my $table_name = $self->_gen_table_name($table->name);
 
     if ($self->result_source->storage->sqlt_type eq 'SQLite') {
-        $table->name('data.[' . $table_name . ']');
+        $table_name = '[' . $table_name . ']';
     }
-    else { # Pg
-        $table->name($self->user->username . '.' . $table_name);
-    }
+
+    $table->name($self->schema_name . '.' . $table_name);
     return;
 }
 
@@ -444,19 +441,22 @@ use.
 
 sub _table_exists {
     my ($self, $name) = @_;
-    my $dbic_storage = $self->result_source->storage;
-    my $schema_name  = $dbic_storage->sqlt_type eq 'SQLite' ? 'data'
-        : $self->user->username;
-
-    $dbic_storage->dbh_do(
+    return $self->result_source->storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
-            my $sth = $dbh->table_info(undef, $schema_name, $name, "TABLE");
+            my $sth = $dbh->table_info(undef, $self->schema_name, $name, "TABLE");
             my $ary = $sth->fetchall_arrayref();
             return @$ary;
         },
     );
 }
 
+
+has schema_name => (is => 'lazy',);
+sub _build_schema_name {
+    my ($self) = @_;
+    return $self->result_source->storage->sqlt_type eq 'SQLite'
+        ? 'data' : $self->user->username;
+}
 
 1;
