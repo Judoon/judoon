@@ -343,6 +343,7 @@ sub _store_data {
 
         filters => [
             sub { $self->_check_table_name(shift); },
+            ['Names', {fields => 'lc',} ],
         ],
     );
 

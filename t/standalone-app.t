@@ -50,14 +50,14 @@ test_psgi $urlmap->to_app, sub {
 
     my @ages = qw(1 14 2 5 8);
     my @sorted = query_result($cb, {sortby => [[1,'asc'],],});
-    is_deeply [map {$_->{Age}} @sorted], \@ages, 'data is properly sorted';
+    is_deeply [map {$_->{age}} @sorted], \@ages, 'data is properly sorted';
 
     my @rsorted = query_result($cb, {sortby => [[1,'desc'],],});
-    is_deeply [map {$_->{Age}} @rsorted], [reverse @ages],
+    is_deeply [map {$_->{age}} @rsorted], [reverse @ages],
         'data is properly reverse sorted';
 
     my @page = query_result($cb, {sortby => [[0,'asc'],], start => 1, count => 2,});
-    is_deeply [map {$_->{Name}} @page], ['Chloe', 'Goochie',], 'can page corectly';
+    is_deeply [map {$_->{name}} @page], ['Chloe', 'Goochie',], 'can page corectly';
 };
 
 
