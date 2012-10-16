@@ -30,7 +30,7 @@ use Moose::Role;
 use MooseX::Storage;
 use namespace::autoclean;
 
-with Storage(format => 'JSON');
+with Storage(format => [JSONpm => {json_opts => {utf8 => 1}}]);
 
 =head1 ATTRIBUTES
 

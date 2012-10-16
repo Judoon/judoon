@@ -59,6 +59,7 @@ requires 'MooseX::MarkAsMethods';
 requires 'MooseX::MethodAttributes::Role';
 requires 'MooseX::NonMoose';
 requires 'MooseX::Storage';
+requires 'MooseX::Storage::Format::JSONpm';
 requires 'namespace::autoclean';
 requires 'Path::Class';
 requires 'Pod::Usage';
