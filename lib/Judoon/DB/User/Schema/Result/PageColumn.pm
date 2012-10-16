@@ -44,6 +44,11 @@ __PACKAGE__->table("page_columns");
   data_type: 'text'
   is_nullable: 0
 
+=head2 sort
+
+  data_type: 'integer'
+  is_nullable: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -55,6 +60,9 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 0 },
   "template",
   { data_type => "text", is_nullable => 0 },
+  "sort",
+  { data_type => "integer", is_nullable => 0 },
+
 );
 
 =head1 PRIMARY KEY
@@ -85,6 +93,11 @@ __PACKAGE__->belongs_to(
   { id => "page_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
+
+
+__PACKAGE__->load_components(qw(Ordered));
+__PACKAGE__->position_column('sort');
+__PACKAGE__->grouping_column('page_id');
 
 
 =head1 METHODS

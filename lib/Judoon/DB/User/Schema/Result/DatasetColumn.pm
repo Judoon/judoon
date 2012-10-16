@@ -139,6 +139,10 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
+__PACKAGE__->load_components(qw(Ordered));
+__PACKAGE__->position_column('sort');
+__PACKAGE__->grouping_column('dataset_id');
+
 
 =head1 METHODS
 
