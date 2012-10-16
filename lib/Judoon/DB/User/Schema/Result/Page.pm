@@ -1,8 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Page;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -108,16 +109,7 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07017 @ 2012-02-28 16:31:02
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Npdwxhg8ICnYH03OCefyVg
-
-
-=pod
-
-=encoding utf8
-
-=cut
-
+# add permission column / methods to Page
 with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 

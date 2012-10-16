@@ -1,8 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::Dataset;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -48,9 +49,19 @@ __PACKAGE__->table("datasets");
   data_type: 'text'
   is_nullable: 0
 
-=head2 data
+=head2 tablename
 
   data_type: 'text'
+  is_nullable: 0
+
+=head2 nbr_rows
+
+  data_type: 'integer'
+  is_nullable: 0
+
+=head2 nbr_columns
+
+  data_type: 'integer'
   is_nullable: 0
 
 =cut
@@ -134,9 +145,6 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07025 @ 2012-07-12 12:56:24
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JrQ45OumPMbWAMAGmA8KHg
-
 use DateTime;
 use Judoon::Error;
 use Judoon::Tmpl::Factory;
@@ -144,16 +152,18 @@ use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 use SQL::Translator;
 
+# add permission column / methods to Dataset
 with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
-=pod
-
-=encoding utf8
 
 =head1 METHODS
 
 =head2 B<C<import_from_spreadsheet>>
+
+Update a new C<Dataset> from a C<Judoon::Spreadsheet> object.  Calling this
+will create a new table in the Datastore and store the meta-information in the
+C<Dataset> and C<DatasetColumns>.
 
 =cut
 
@@ -164,7 +174,8 @@ sub import_from_spreadsheet {
 
     my $sqlt_table = $self->_store_data($spreadsheet);
     $self->name($spreadsheet->worksheet_name);
-    (my $tablename = $sqlt_table->name) =~ s/^data\.//; # get rid of schema
+    my $schema_name = $self->schema_name;
+    (my $tablename = $sqlt_table->name) =~ s/^$schema_name\.//; # get rid of schema
     $self->tablename($tablename);
     $self->nbr_rows($spreadsheet->nbr_rows);
     $self->nbr_columns($spreadsheet->nbr_columns);
@@ -223,25 +234,27 @@ EOS
 }
 
 
-=head2 data_table
+=head2 B<C<data_table( $args )>>
 
 Returns an arrayref of arrayref of the dataset's data with the header
-columns.
+columns. If C<$args->{shortname}> is true, use the column shortnames
+in the header instead of the original names
 
 =cut
 
 sub data_table {
     my ($self, $args) = @_;
     return [
-        [map {$args->{shortname} ? $_->shortname : $_->name} $self->ds_columns],
+        [map {$args->{shortname} ? $_->shortname : $_->name}
+             sort {$a->sort <=> $b->sort} $self->ds_columns],
         @{$self->data},
     ];
 }
 
 
-=head2 as_raw
+=head2 B<C<as_raw( $args )>>
 
-Return data as a tab-delimited file
+Return data as a tab-delimited string. Passes C<$args> to C<L</data_table>>.
 
 =cut
 
@@ -258,9 +271,9 @@ sub as_raw {
 }
 
 
-=head2 as_excel
+=head2 B<C<as_excel>>
 
-Return data as an Excel spreadsheet
+Return data as an Excel spreadsheet.
 
 =cut
 
@@ -277,50 +290,41 @@ sub as_excel {
     return $output;
 }
 
+=head2 B<C<data / _build_data>>
 
-=head2 C<B<delete_data_columns( @column_numbers )>>
-
-Deletes the given column numbers from the dataset. Is 1-indexed.
+Accessor for getting at the data stored in the Datastore.
 
 =cut
 
-sub delete_data_columns {
-    my ($self, @col_nums) = @_;
-
-    my $nbr_cols = $self->nbr_columns;
-    my $errmsg = (grep {!defined || $_ !~ m/^\d+$/} @col_nums) ? 'received input that was not a positive integer'
-               : (grep {$_ == 0}        @col_nums) ? 'received a column number of 0; columns are 1-indexed'
-               : (grep {$_ > $nbr_cols} @col_nums) ? 'received a number larger than the number of columns'
-               :                                    q{};
-    Judoon::Error->throw({recoverable => 0, message => "delete_data_columns $errmsg"})
-          if ($errmsg);
-
-    # reverse sort, so deleting early index doesn't throw off later count
-    my @ordered_nums = sort {$b <=> $a} @col_nums;
-    my $data = $self->data;
-    for my $row (@$data) {
-        for my $colnum (@ordered_nums) {
-            splice @$row, $colnum-1, 1;
-        }
-    }
-    $self->data($data);
-    $self->update;
-}
-
-
-sub data {
+has data => (is => 'lazy',);
+sub _build_data {
     my ($self) = @_;
 
-    my $dbh = $self->result_source->storage->dbh;
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
         $self->ds_columns;
     my $select = join ', ', @columns;
-    my $table  = 'data.' . $self->tablename;
-    my $sth = $dbh->prepare("SELECT $select FROM $table");
-    $sth->execute;
-    return $sth->fetchall_arrayref();
+
+    my $table = $self->schema_name . '.' . $self->tablename;
+    return $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth = $dbh->prepare("SELECT $select FROM $table");
+            $sth->execute;
+            return $sth->fetchall_arrayref();
+        },
+    );
 }
 
+
+=head2 B<C< _store_data( $spreadsheet ) >>
+
+This private method actually creates the new table for the data in the
+Datastore.  It passes the spreadsheet to L<SQL::Translator> to get the
+SQL for creating the table.  It also checks for table name collisions
+and changes the name accordingly.  After creating the table, it
+inserts the data. Returns the new table name.
+
+=cut
 
 sub _store_data {
     my ($self, $spreadsheet) = @_;
@@ -337,20 +341,25 @@ sub _store_data {
 
         filters => [
             sub { $self->_check_table_name(shift); },
+            ['Names', {fields => 'lc',} ],
         ],
     );
 
-    my $dbic_schema = $self->result_source->schema;
-    my $dbh         = $dbic_schema->storage->dbh;
+    my $dbic_storage = $self->result_source->storage;
 
     # translate to sql
     my $sql = $sqlt->translate(
         from => 'Spreadsheet',
-        to   => $dbic_schema->storage->sqlt_type,
+        to   => $dbic_storage->sqlt_type,
     ) or die $sqlt->error;
 
     # create table
-    $dbh->do($sql);
+    $dbic_storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            $dbh->do($sql);
+        },
+    );
 
     # populate table
     my ($table)    = $sqlt->schema->get_tables;
@@ -358,29 +367,59 @@ sub _store_data {
     my @fields     = map {$_->name} $table->get_fields;
     my $field_list = join ', ', @fields;
     my $join_list  = join ', ', (('?') x @fields);
-    my $sth_insert = $dbh->prepare_cached(
-        "INSERT INTO $table_name ($field_list) VALUES ($join_list)"
+
+    $dbic_storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth_insert = $dbh->prepare_cached(
+                "INSERT INTO $table_name ($field_list) VALUES ($join_list)"
+            );
+            $sth_insert->execute(@$_) for (@{$spreadsheet->data});
+        },
     );
-    $sth_insert->execute(@$_) for (@{$spreadsheet->data});
 
     return $table;
 }
+
+
+=head2 B<C< _check_table_name >>
+
+Private method passed to the L<SQL::Translator> filter to create a
+unique table name.
+
+=cut
 
 sub _check_table_name {
     my ($self, $sqlt_schema) = @_;
 
     my ($table)    = $sqlt_schema->get_tables();
-    my $table_name = $table->name;
-    my $new_name   = 'data.' . $self->_gen_table_name($table_name);
-    $table->name($new_name);
+    my $table_name = $self->_gen_table_name($table->name);
+
+    if ($self->result_source->storage->sqlt_type eq 'SQLite') {
+        $table_name = '[' . $table_name . ']';
+    }
+
+    $table->name($self->schema_name . '.' . $table_name);
     return;
 }
+
+
+=head2 B<C< _gen_table_name >>
+
+Private method to generate a new table name.  This method trys a
+couple different techniques, but will die if it's unable to find a
+unique name.
+
+=cut
 
 sub _gen_table_name {
     my ($self, $table_name) = @_;
 
+    $table_name = lc($table_name);
     $table_name =~ s/[^a-z_0-9]+/_/gi;
-    $table_name = $self->user->username . '_' . $table_name;
+    if ($self->result_source->storage->sqlt_type eq 'SQLite') {
+        $table_name = $self->user->username . '@' . $table_name;
+    }
     return $table_name unless ($self->_table_exists($table_name));
 
     my $new_name = List::AllUtils::first {not $self->_table_exists($_)}
@@ -393,13 +432,32 @@ sub _gen_table_name {
     return $new_name;
 }
 
+
+=head2 B<C< _table_exists >>
+
+Private method to test whether a particular table name is already in
+use.
+
+=cut
+
 sub _table_exists {
     my ($self, $name) = @_;
-    my $sth = $self->result_source->storage->dbh
-        ->table_info(undef, '%', $name, "TABLE");
-    my $ary = $sth->fetchall_arrayref();
-    return @$ary;
+    return $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth = $dbh->table_info(undef, $self->schema_name, $name, "TABLE");
+            my $ary = $sth->fetchall_arrayref();
+            return @$ary;
+        },
+    );
 }
 
+
+has schema_name => (is => 'lazy',);
+sub _build_schema_name {
+    my ($self) = @_;
+    return $self->result_source->storage->sqlt_type eq 'SQLite'
+        ? 'data' : $self->user->username;
+}
 
 1;

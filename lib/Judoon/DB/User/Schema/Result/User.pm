@@ -1,6 +1,10 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::User;
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Judoon::DB::User::Schema::Result::User
@@ -157,16 +161,8 @@ Composing rels: L</user_roles> -> role
 __PACKAGE__->many_to_many("roles", "user_roles", "role");
 
 
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SzGqoNkBtKX9SumB+vTVCw
-
 use Judoon::Spreadsheet;
 
-=pod
-
-=encoding utf8
-
-=cut
 
 __PACKAGE__->load_components('PassphraseColumn');
 __PACKAGE__->add_columns(
@@ -181,6 +177,8 @@ __PACKAGE__->add_columns(
     }
 );
 
+
+=head1 METHODS
 
 =head2 B<C<change_password( $password )>>
 
@@ -198,8 +196,8 @@ sub change_password {
 
 =head2 import_data( $filehandle )
 
-C<import_data()> takes in a filehandle arg and attempts to read it
-with L<Spreadsheet::Read>.  It will then munge the data and insert it
+C<import_data()> takes in a filehandle arg and attempts to turn it into
+a L<Judoon::Spreadsheet>.  It will then munge the data and insert it
 into the database.
 
 =cut

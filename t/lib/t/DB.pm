@@ -18,10 +18,11 @@ sub import {
 
     Test::DBIx::Class->import({
         schema_class => 'Judoon::DB::User::Schema',
+        traits       => 'Testpostgresql',
         connect_opts => {
-            on_connect_do => [
-                q{ATTACH DATABASE ':memory:' AS data;}
-            ],
+            quote_char     => q{"},
+            name_sep       => q{.},
+            pg_enable_utf8 => 1,
         },
     }, qw(Schema));
     $schema = Schema();

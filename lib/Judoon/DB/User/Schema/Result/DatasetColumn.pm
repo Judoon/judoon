@@ -1,8 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::DatasetColumn;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -105,6 +106,22 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<dataset_id_shortname_unique>
+
+=over 4
+
+=item * L</dataset_id>, L</shortname>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint(
+    "dataset_id_shortname_unique", => [qw(dataset_id shortname)],
+);
+
 =head1 RELATIONS
 
 =head2 dataset
@@ -123,13 +140,11 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 21:44:31
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AjdNiBkWSaIe1b1bk6VjNQ
+=head1 METHODS
 
+=head2 B<C< sitelinker / _build_sitelinker >>
 
-=pod
-
-=encoding utf8
+Attribute / accessor for holding the C<L<Judoon::SiteLinker>> utility object.
 
 =cut
 
@@ -167,26 +182,6 @@ sub linkset {
     return \@links;
 }
 
-
-=head2 C<B<delete_column>>
-
-C<delete_column> deletes not just the DatasetColumn itself (which
-actually represents the column header), but the actual column of data
-in the Dataset.
-
-You should probably call this instead of C<delete>, or else your data
-and data headers will be out of sync.  Also, if you have a reference
-to the parent dataset, make sure to call C<< ->discard_changes() >> on
-it, or the column data will be incorrect.
-
-=cut
-
-sub delete_column {
-    my ($self) = @_;
-    my $pos = $self->ordinal_position;
-    $self->dataset->delete_data_columns($pos);
-    return $self->delete;
-}
 
 
 =head2 C<B<ordinal_position>>

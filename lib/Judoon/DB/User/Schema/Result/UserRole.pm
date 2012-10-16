@@ -1,8 +1,9 @@
 use utf8;
 package Judoon::DB::User::Schema::Result::UserRole;
 
-# Created by DBIx::Class::Schema::Loader
-# DO NOT MODIFY THE FIRST PART OF THIS FILE
+=pod
+
+=encoding utf8
 
 =head1 NAME
 
@@ -89,14 +90,5 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07024 @ 2012-05-15 22:15:38
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XrchGfDp18BCEhxTl0FrZA
-
-
-=pod
-
-=encoding utf8
-
-=cut
 
 1;

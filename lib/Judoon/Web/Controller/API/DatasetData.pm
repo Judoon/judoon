@@ -42,19 +42,18 @@ sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 sub object_GET {
     my ($self, $c) = @_;
 
-    my $dataset  = $c->stash->{dataset}{object};
-    my $model    = $c->model('User');
-    my $tbl_name = $model->datastore_name . '.' . $dataset->tablename;
-    my $dbh      = $model->schema->storage->dbh;
-    my $params   = $c->req->params();
-    my @fields   = map {$_->shortname} $dataset->ds_columns;
-    my $total    = $dataset->nbr_rows;
+    my $dataset      = $c->stash->{dataset}{object};
+    my $tbl_name     = $dataset->schema_name . '.' . $dataset->tablename;
+    my $dbic_storage = $dataset->result_source->storage;
+    my $params       = $c->req->params();
+    my @fields       = map {$_->shortname} $dataset->ds_columns;
+    my $total        = $dataset->nbr_rows;
 
     # filter data
     #   sSearch: the search string
     my %where;
     if (my $search = $params->{sSearch}) {
-        %where = ('-or' => {map {$_ => {-like => '%'.$search.'%'}} @fields});
+        %where = ('-or' => {map {$_ => {-ilike => '%'.$search.'%'}} @fields});
     }
 
     # order data
@@ -73,9 +72,14 @@ sub object_GET {
     # build and execute query
     my $sqla = SQL::Abstract->new;
     my ($stmt, @bind) = $sqla->select($tbl_name, \@fields, \%where, \@order_by);
-    my $sth = $dbh->prepare($stmt);
-    $sth->execute(@bind);
-    my $results = $sth->fetchall_arrayref({});
+    my $results = $dbic_storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth = $dbh->prepare($stmt);
+            $sth->execute(@bind);
+            return $sth->fetchall_arrayref({});
+        },
+    );
     my $filtered = %where ? @$results : $total;
 
     # paginate data
