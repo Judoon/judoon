@@ -159,6 +159,19 @@ __PACKAGE__->register_permissions;
 
 =head1 METHODS
 
+
+=head2 B<C<ds_columns_ordered>>
+
+Get DatasetColumns in sorted order
+
+=cut
+
+sub ds_columns_ordered {
+    my ($self) = @_;
+    return $self->ds_columns_rs->search({},{order_by => {-asc => 'sort'}});
+}
+
+
 =head2 B<C<import_from_spreadsheet>>
 
 Update a new C<Dataset> from a C<Judoon::Spreadsheet> object.  Calling this

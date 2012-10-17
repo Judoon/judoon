@@ -114,9 +114,23 @@ with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 
-=head2 nbr_columns
+=head1 METHODS
 
-Number of columns in this dataset.
+=head2 B<C<page_columns_ordered>>
+
+Get this Page's PageColumns in sorted order
+
+=cut
+
+sub page_columns_ordered {
+    my ($self) = @_;
+    return $self->page_columns_rs->search({},{order_by => {-asc => 'sort'}});
+}
+
+
+=head2 B<C<nbr_columns>>
+
+Number of columns in this page.
 
 =cut
 
@@ -127,9 +141,9 @@ sub nbr_columns {
 }
 
 
-=head2 nbr_rows
+=head2 B<C<nbr_rows>>
 
-Number of rows in this dataset.
+Number of rows in this page.
 
 =cut
 
