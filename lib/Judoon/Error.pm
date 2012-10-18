@@ -1,12 +1,9 @@
 package Judoon::Error;
 
-use Moose;
-use namespace::autoclean;
+use Moo;
 extends 'Throwable::Error';
 
-has 'recoverable' => (is => 'ro', isa => 'Bool', default => 1);
-
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+has 'recoverable' => (is => 'ro', default => sub {1},);
 
 1;
 __END__

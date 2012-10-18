@@ -70,7 +70,7 @@ requires 'Spreadsheet::WriteExcel';
 requires 'Spreadsheet::XLSX';
 requires 'SQL::Translator';
 requires 'Template';
-requires 'Throwable::Error';
+requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 
 test_requires 'indirect';
