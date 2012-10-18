@@ -33,6 +33,32 @@ before private_base => sub {
 };
 
 
+=head2 list_GET (after)
+
+Do some postprocessing on the page columns data to get js templates and add
+"dataset columns used" list.
+
+=cut
+
+after list_GET => sub {
+    my ($self, $c) = @_;
+
+    my %used;
+    for my $column (@{$c->stash->{page_column}{list}}) {
+        my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
+        for my $var ($tmpl->get_variables) {
+            push @{$used{$var}}, $column->{title};
+        }
+        $column->{js_template} = $tmpl->to_jstmpl;
+    }
+
+    my @headers_used = map {{
+        title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
+    }} $c->req->get_chained_object(0)->[0]->ds_columns_ordered->all;
+    $c->stash->{dataset}{headers_used} = \@headers_used;
+};
+
+
 after object_GET => sub {
     my ($self, $c) = @_;
 
@@ -102,7 +128,7 @@ after object_DELETE => sub {
     my ($self, $c) = @_;
     my $captures = $c->req->captures;
     pop @$captures;
-    $self->go_here($c, '/private/page/object', $captures);
+    $self->go_here($c, '/private/pagecolumn/list', $captures);
 };
 
 __PACKAGE__->meta->make_immutable;

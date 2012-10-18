@@ -102,16 +102,6 @@ after object_GET => sub {
         $c->res->body($page->dump_to_user);
         $c->forward('Judoon::Web::View::Download::Plain');
     }
-
-    my %used;
-    for my $page_col (@page_columns) {
-        push @{$used{$_}}, $page_col->title
-            for ($page_col->template->get_variables);
-    }
-    my @headers_used = map {{
-        title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $c->req->get_chained_object(0)->[0]->ds_columns_ordered->all;
-    $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 
 
