@@ -124,7 +124,7 @@ Get this Page's PageColumns in sorted order
 
 sub page_columns_ordered {
     my ($self) = @_;
-    return $self->page_columns_rs->search({},{order_by => {-asc => 'sort'}});
+    return $self->page_columns_rs->search_rs({},{order_by => {-asc => 'sort'}});
 }
 
 

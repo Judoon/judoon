@@ -168,7 +168,7 @@ Get DatasetColumns in sorted order
 
 sub ds_columns_ordered {
     my ($self) = @_;
-    return $self->ds_columns_rs->search({},{order_by => {-asc => 'sort'}});
+    return $self->ds_columns_rs->search_rs({},{order_by => {-asc => 'sort'}});
 }
 
 

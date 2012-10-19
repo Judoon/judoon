@@ -137,9 +137,9 @@ subtest 'Result::Dataset' => sub {
     is $xls_data->[1]{A6}, 'Goochie', 'Check data value';
     is $xls_data->[1]{D3}, undef, 'Check for undef value';
 
-    my @ds_cols = $mutable_ds->ds_columns_ordered;
+    my @ds_cols = $mutable_ds->ds_columns_ordered->all;
     $ds_cols[0]->move_next();
-    my @column_names = map {$_->name} $mutable_ds->ds_columns_ordered;
+    my @column_names = map {$_->name} $mutable_ds->ds_columns_ordered->all;
     is_deeply \@column_names, [qw(Age Name Gender)],
         'ds_columns_ordered gets columns in their proper order';
 
@@ -227,9 +227,9 @@ subtest 'Result::Page' => sub {
     is $page->nbr_columns, 3, '::nbr_columns is correct';
     is $page->nbr_rows, 5,    '::nbr_rows is correct';
 
-    my @page_cols = $page->page_columns_ordered;
+    my @page_cols = $page->page_columns_ordered->all;
     $page_cols[0]->move_next();
-    my @column_names = map {$_->title} $page->page_columns_ordered;
+    my @column_names = map {$_->title} $page->page_columns_ordered->all;
     is_deeply \@column_names, [qw(Age Name Gender)],
         'page_columns_ordered gets columns in their proper order';
 };
