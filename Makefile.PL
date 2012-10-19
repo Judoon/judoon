@@ -68,7 +68,7 @@ requires 'Spreadsheet::Read';
 requires 'Spreadsheet::ParseExcel';
 requires 'Spreadsheet::WriteExcel';
 requires 'Spreadsheet::XLSX';
-requires 'SQL::Translator';
+requires 'SQL::Translator' => '0.11016';
 requires 'Template';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
