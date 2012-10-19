@@ -153,4 +153,38 @@ sub nbr_rows {
 }
 
 
+=head2 B<C<clone_from_existing>>
+
+Clone a new page from an existing page
+
+=cut
+
+sub clone_from_existing {
+    my ($self, $other_page) = @_;
+
+    $self->result_source->schema->txn_do(
+        sub {
+
+            # this is not a problem
+            my %page_clone = $other_page->get_columns;
+            delete $page_clone{id};
+            delete $page_clone{dataset_id};
+            $self->set_columns( \%page_clone );
+            $self->insert;
+
+            # need to validate that their page_columns works with our dataset
+            for my $pagecol ($other_page->page_columns_ordered->all) {
+                # $self->validate()
+                my %column_clone = $pagecol->get_columns;
+                delete $column_clone{id};
+                delete $column_clone{page_id};
+                $self->create_related('page_columns', \%column_clone);
+            }
+
+        }
+    );
+
+    return $self;
+}
+
 1;

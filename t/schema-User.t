@@ -142,6 +142,41 @@ subtest 'Result::Dataset' => sub {
     my @column_names = map {$_->name} $mutable_ds->ds_columns_ordered;
     is_deeply \@column_names, [qw(Age Name Gender)],
         'ds_columns_ordered gets columns in their proper order';
+
+    # test page cloning
+    my $first_ds = $user->import_data_by_filename('t/etc/data/clone1.xls');
+    my $first_page = $first_ds->add_to_pages({
+        title     => "IMDB's Top 5 Movies of all time",
+        preamble  => qq{Not gonna lie, these movies are pretty fucking amazing.},
+        postamble => qq{If you haven't seen these, kill yourself.},
+    });
+
+    my @columns = (
+        ['Name / Director', '<a href="{{=link}}">{{=title}}</a><br><strong>Directed By:</strong> {{=director}}'],
+        ['Year',   '{{=year}}',],
+        ['Rating', '{{=rating}}'],
+    );
+
+    my $translator = Judoon::Tmpl::Translator->new;
+    my $i = 1;
+    my @col_structs = map {
+        my $rec = $_;
+        my $tmpl = $translator->translate(
+            from => 'JQueryTemplate', to => 'Native', template => $rec->[1],
+        );
+        {title => $rec->[0], sort => $i++, template => $tmpl,};
+    } @columns;
+    $first_page->add_to_page_columns($_) for (@col_structs);
+
+    my $second_ds   = $user->import_data_by_filename('t/etc/data/clone2.xls');
+    my $second_page = $second_ds->new_related('pages',{})
+        ->clone_from_existing($first_page);
+    $second_page->update({title => "IMDB's Bottom 5 Movies of all time"});
+
+    is $second_page->page_columns_ordered->first->template,
+        $first_page->page_columns_ordered->first->template,
+            'Page and cloned page have identical columns';
+
 };
 
 subtest 'Result::DatasetColumn' => sub {
