@@ -136,8 +136,7 @@ Number of columns in this page.
 
 sub nbr_columns {
     my ($self) = @_;
-    my @columns = $self->page_columns;
-    return scalar @columns;
+    return $self->page_columns_rs->count;
 }
 
 
