@@ -50,10 +50,7 @@ sub get_testuser { return \%testuser; }
 
 sub install_fixtures {
     my $user = get_schema()->resultset('User')->create_user(get_testuser());
-    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
-        or die "Can't open test spreadsheet: $!";
-    my $dataset = $user->import_data($TEST_XLS);
-    close $TEST_XLS;
+    my $dataset = $user->import_data_by_filename('t/etc/data/basic.xls');
     $dataset->create_basic_page();
 }
 

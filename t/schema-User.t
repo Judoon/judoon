@@ -117,10 +117,7 @@ subtest 'Result::Dataset' => sub {
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
-    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
-         or die "Can't open test spreadsheet: $!";
-    my $mutable_ds = $user->import_data($TEST_XLS);
-    close $TEST_XLS;
+    my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
     is $mutable_ds->name, 'Sheet1', '  ..and name is correct';
 
     is_deeply $mutable_ds->data, $xls_ds_data,
@@ -185,10 +182,7 @@ subtest 'Result::DatasetColumn' => sub {
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
-    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
-        or die "Can't open test spreadsheet: $!";
-    my $mutable_ds = $user->import_data($TEST_XLS);
-    close $TEST_XLS;
+    my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
 };
 
 
