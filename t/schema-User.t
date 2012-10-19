@@ -37,6 +37,9 @@ subtest 'Result::User' => sub {
     is_result $user->import_data($TEST_XLS);
     close $TEST_XLS;
 
+    # import_data_by_filename()
+    is_result $user->import_data_by_filename('t/etc/data/basic.xls');
+
 };
 
 subtest 'ResultSet::User' => sub {
