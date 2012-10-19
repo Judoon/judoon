@@ -71,6 +71,13 @@ requires 'Template';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 
+
+# deploy deps
+# Server::Starter => '1.12'
+# Starman => '3.003'
+# nost sure if this is deploy dep: DBIx::Class::Migration
+
+
 test_requires 'indirect';
 test_requires 'multidimensional';
 test_requires 'bareword::filehandles';
