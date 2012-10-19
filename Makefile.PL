@@ -35,7 +35,7 @@ requires 'Data::Printer';
 requires 'Data::Section::Simple';
 requires 'DateTime';
 requires 'DBD::Pg';
-requires 'DBD::SQLite';
+requires 'DBD::SQLite' => '1.27'; # DBIx::Class::Fixtures needs this
 requires 'DBIx::Class';
 requires 'DBIx::Class::Migration';
 requires 'DBIx::Class::Migration::RunScript::Trait::AuthenPassphrase';
