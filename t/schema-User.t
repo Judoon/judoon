@@ -12,8 +12,10 @@ use t::DB;
 use Data::Printer;
 use Judoon::Spreadsheet;
 use Judoon::Tmpl::Factory ();
+use Judoon::Tmpl::Translator;
 use Spreadsheet::Read;
 
+my $translator = Judoon::Tmpl::Translator->new;
 
 sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
 sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
@@ -157,7 +159,6 @@ subtest 'Result::Dataset' => sub {
         ['Rating', '{{=rating}}'],
     );
 
-    my $translator = Judoon::Tmpl::Translator->new;
     my $i = 1;
     my @col_structs = map {
         my $rec = $_;
