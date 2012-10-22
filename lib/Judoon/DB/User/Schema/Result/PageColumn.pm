@@ -158,4 +158,16 @@ sub set_template {
 }
 
 
+=head2 B<C< get_variables >>
+
+Get a list of variable names used in our template.
+
+=cut
+
+sub get_variables {
+    my ($self) = @_;
+    return map {$_->name} grep {$_->type eq 'variable'} map {$_->decompose}
+        $self->template_to_objects;
+}
+
 1;
