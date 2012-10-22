@@ -154,7 +154,7 @@ subtest 'Result::Dataset' => sub {
     });
 
     my @columns = (
-        ['Name / Director', '<a href="{{=link}}">{{=title}}</a><br><strong>Directed By:</strong> {{=director}}'],
+        ['Name / Director', '<a href="{{=imdb}}">{{=title}}</a><br><strong>Directed By:</strong> {{=director}}'],
         ['Year',   '{{=year}}',],
         ['Rating', '{{=rating}}'],
     );
@@ -233,6 +233,34 @@ subtest 'Result::Page' => sub {
     my @column_names = map {$_->title} $page->page_columns_ordered->all;
     is_deeply \@column_names, [qw(Age Name Gender)],
         'page_columns_ordered gets columns in their proper order';
+
+
+    my $movie_ds = ResultSet('Dataset')->find({name => 'IMDB Top 5',});
+    my $movie_page = $movie_ds->create_related(
+        'pages', {qw(title a preamble b postamble c)}
+    );
+    my $good_pcol = $movie_page->create_related(
+        'page_columns', {title => 'Good Column', template => '[]', sort => 1,}
+    );
+    $good_pcol->update;
+    ok !exception { $movie_page->templates_match_dataset },
+        'empty templates match dataset';
+
+    $good_pcol->set_template(
+        $translator->to_objects(from => 'JQueryTemplate', template => '{{=title}}'),
+    );
+    $good_pcol->update;
+    ok !exception { $movie_page->templates_match_dataset },
+        'valid templates match dataset';
+
+    $good_pcol->set_template(
+        $translator->to_objects(from => 'JQueryTemplate', template => '{{=nosuchname}}'),
+    );
+    $good_pcol->update;
+    isa_ok exception { $movie_page->templates_match_dataset },
+        'Judoon::Error::InvalidTemplate',
+            q{invalid templates don't match dataset};
+
 };
 
 
