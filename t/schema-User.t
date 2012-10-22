@@ -118,7 +118,7 @@ subtest 'Result::Dataset' => sub {
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
-    is $mutable_ds->name, 'Sheet1', '  ..and name is correct';
+    is $mutable_ds->name, 'Dog Roster', '  ..and name is correct';
 
     is_deeply $mutable_ds->data, $xls_ds_data,
         'Data is as expected';
