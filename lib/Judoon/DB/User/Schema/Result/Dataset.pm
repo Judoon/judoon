@@ -303,6 +303,13 @@ sub as_excel {
     return $output;
 }
 
+
+
+=head1 DATASTORE
+
+The following methods create and retreive the actual dataset data,
+which is stored in a different schema and table.
+
 =head2 B<C<data / _build_data>>
 
 Accessor for getting at the data stored in the Datastore.
