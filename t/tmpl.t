@@ -8,7 +8,11 @@ use Test::Fatal;
 
 use Judoon::Tmpl;
 
-ok !exception { Judoon::Tmpl->new }, 'Can create a new empty Judoon::Tmpl';
-
+{
+    my $tmpl;
+    ok !exception { $tmpl = Judoon::Tmpl->new },
+        'Can create a new empty Judoon::Tmpl';
+    is_deeply $tmpl->nodes, [], 'initial nodelist is empty';
+}
 
 done_testing();
