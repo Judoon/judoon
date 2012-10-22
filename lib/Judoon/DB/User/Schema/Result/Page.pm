@@ -114,6 +114,8 @@ with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 
+use Judoon::Error::InvalidTemplate;
+
 =head1 METHODS
 
 =head2 B<C<page_columns_ordered>>
@@ -164,26 +166,70 @@ sub clone_from_existing {
     $self->result_source->schema->txn_do(
         sub {
 
-            # this is not a problem
+            # copy their page to ours
             my %page_clone = $other_page->get_columns;
             delete $page_clone{id};
             delete $page_clone{dataset_id};
             $self->set_columns( \%page_clone );
             $self->insert;
 
-            # need to validate that their page_columns works with our dataset
-            for my $pagecol ($other_page->page_columns_ordered->all) {
-                # $self->validate()
+            # make sure their referenced dataset columns are also in our
+            # dataset
+            my @other_page_columns = $other_page->page_columns_ordered->all;
+            $self->templates_match_dataset(@other_page_columns);
+
+            # copy their columns to our page
+            for my $pagecol (@other_page_columns) {
                 my %column_clone = $pagecol->get_columns;
                 delete $column_clone{id};
                 delete $column_clone{page_id};
                 $self->create_related('page_columns', \%column_clone);
             }
-
         }
     );
 
     return $self;
 }
+
+
+=head2 B<C<templates_match_dataset>>
+
+Validate that the C<Tmpl::Node::Variable>s in the PageColumn template
+are valid references to DatasetColumns in the parent Dataset.
+
+=cut
+
+sub templates_match_dataset {
+    my ($self, @page_columns) = @_;
+
+    if (not @page_columns) {
+        @page_columns = $self->page_columns;
+    }
+
+    my %valid_ds_columns = map {$_->shortname => 1}
+        $self->dataset->ds_columns;
+    my @bad_columns;
+    for my $page_column (@page_columns) {
+        my @variables = $page_column->get_variables();
+        if (my @invalid = grep {not $valid_ds_columns{$_}} @variables) {
+            push @bad_columns, {
+                column   => $page_column,
+                template => $page_column->template,
+                invalid  => \@invalid,
+            };
+        }
+    }
+
+    if (@bad_columns) {
+        Judoon::Error::InvalidTemplate->throw({
+            message       => 'Some templates reference non-existing columns in the dataset',
+            templates     => \@bad_columns,
+            valid_columns => [keys %valid_ds_columns],
+        });
+    }
+
+    return 1;
+}
+
 
 1;
