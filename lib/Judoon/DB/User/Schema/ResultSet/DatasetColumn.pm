@@ -34,7 +34,7 @@ Filter C<DatasetColumn> to those belonging to a particular C<Dataset>.
 
 sub for_dataset {
     my ($self, $dataset) = @_;
-    return $self->search_rs({dataset_id => $dataset->id});
+    return $self->search_rs({dataset_id => $dataset->id},{order_by => {-asc => 'sort'}});
 }
 
 1;
