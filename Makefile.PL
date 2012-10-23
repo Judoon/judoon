@@ -60,6 +60,7 @@ requires 'MooseX::MethodAttributes::Role';
 requires 'MooseX::Storage';
 requires 'MooseX::Storage::Format::JSONpm';
 requires 'namespace::autoclean';
+requires 'Params::Validate';
 requires 'Path::Class';
 requires 'Pod::Usage';
 requires 'Regexp::Grammars';

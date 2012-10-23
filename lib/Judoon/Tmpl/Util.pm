@@ -12,10 +12,9 @@ Judoon::Tmpl::Util
 
  use Judoon::Tmpl::Util;
 
+ # translator functions
  my @nodes = jstmpl_to_nodes('{{=varname}}');
-
  my $js_tmpl = nodes_to_jstmpl(@nodes);
-
  my $native = jstmpl_to_native('{{=foo}}');
 
 =cut
@@ -26,12 +25,17 @@ use warnings;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
+    translate to_objects from_objects dialects
+    jstmpl_to_nodes nodes_to_jstmpl native_to_nodes nodes_to_native
 );
 
+use Params::Validate qw(:all);
 
 use Judoon::Tmpl::Translator::Dialect::Native;
 use Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
-use Method::Signatures;
+
+
+=head1 Translator Functions
 
 =head2 dialects
 
@@ -56,9 +60,13 @@ as found in the L<dialects()> sub.
 
 =cut
 
-func translate(:$from!, :$to!, :$template!) {
-    my @native_objects = to_objects(from => $from, template => $template);
-    return $dialects{$to}->produce(\@native_objects);
+sub translate {
+    validate(@_, {from => 1, to => 1, template => 1});
+    my %args = @_;
+    my @native_objects = to_objects(
+        from => $args{from}, template => $args{template},
+    );
+    return from_objects(to => $args{to}, objects => \@native_objects);
 }
 
 
@@ -69,9 +77,11 @@ arrayref of L<Judoon::Tmpl::Node> objects.
 
 =cut
 
-func to_objects(:$from!, :$template!) {
-    die "$from is not a valid dialect" if (not grep {$_ eq $from} dialects());
-    return $dialects{$from}->parse($template);
+sub to_objects {
+    validate(@_, {from => 1, template => 1});
+    my %args = @_;
+    die "$args{from} is not a valid dialect" if (not grep {$_ eq $args{from}} dialects());
+    return $dialects{$args{from}}->parse($args{template});
 }
 
 
@@ -82,25 +92,32 @@ template string in the C<$to> dialect.
 
 =cut
 
-func from_objects(:$to!, :$objects!) {
+sub from_objects {
+    validate(@_, {to => 1, objects => 1});
+    my %args = @_;
+    my $to = $args{to}; my $objects = $args{objects};
     die "$to is not a valid dialect" if (not grep {$_ eq $to} dialects());
     return $dialects{$to}->produce($objects);
 }
 
 
-func jstmpl_to_nodes($template) {
+sub jstmpl_to_nodes {
+    my ($template) = @_;
     return to_objects(from => 'JQueryTemplate', template => $template);
 }
 
-func nodes_to_jstmpl(@nodes) {
+sub nodes_to_jstmpl {
+    my @nodes = @_;
     return from_objects(to => 'JQueryTemplate', objects => \@nodes);
 }
 
-func native_to_nodes($template) {
+sub native_to_nodes {
+    my ($template) = @_;
     return to_objects(from => 'Native', template => $template);
 }
 
-func nodes_to_native(@nodes) {
+sub nodes_to_native {
+    my @nodes = @_;
     return from_objects(to => 'Native', objects => \@nodes);
 }
 
