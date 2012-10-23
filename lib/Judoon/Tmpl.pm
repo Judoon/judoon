@@ -1,12 +1,34 @@
 package Judoon::Tmpl;
 
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Judoon::Tmpl - Object representing a template
+
+=head1 SYNOPSIS
+
+ use Judoon::Tmpl;
+
+ my $template = Judoon::Tmpl->new_from_jstmpl('foo{{=bar}}baz');
+ my @variables = $template->get_variables(); # 'bar'
+ my $serialized = $template->to_native;
+ my $javascript = $template->to_jstmpl;
+
+=cut
+
 use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef ConsumerOf InstanceOf);
 
 use Judoon::Tmpl::Util ();
 
 
-has nodes => (is => 'lazy', isa => ArrayRef[ConsumerOf('Judoon::Tmpl::Node::Base')],);
+has nodes => (
+    is  => 'lazy',
+    isa => ArrayRef[ConsumerOf('Judoon::Tmpl::Node::Base')],
+);
 sub _build_nodes { return []; }
 
 sub get_nodes { return @{ shift->nodes }; }
@@ -45,38 +67,13 @@ sub get_variables {
 
 sub to_jstmpl {
     my ($self) = @_;
-    return Judoon::Tmpl::Util::nodes_to_jquery($self->get_nodes);
+    return Judoon::Tmpl::Util::nodes_to_jstmpl($self->get_nodes);
 }
 
 
-sub add_text {
-    my ($self, $value, $formatting) = @_;
-    push @{$self->nodes}, Judoon::Tmpl::Node::Text->new({
-        value => $value, formatting => ($formatting // []),
-    });
-    return $self;
-}
-
-sub add_variable {
-    my ($self, $name, $formatting) = @_;
-    push @{$self->nodes}, Judoon::Tmpl::Node::Variable->new({
-        name => $name, formatting => ($formatting // []),
-    });
-    return $self;
-}
-
-sub add_newline {
-    my ($self, $name) = @_;
-    push @{$self->nodes}, Judoon::Tmpl::Node::Newline->new();
-    return $self;
-}
-
-sub add_link {
-    my ($self, $link_args, $formatting) = @_;
-    push @{$self->nodes}, Judoon::Tmpl::Node::Variable->new({
-        %$link_args, formatting => ($formatting // []),
-    });
-    return $self;
+sub to_native {
+    my ($self) = @_;
+    return Judoon::Tmpl::Util::nodes_to_native($self->get_nodes);
 }
 
 

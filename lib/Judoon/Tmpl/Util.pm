@@ -92,16 +92,16 @@ func jstmpl_to_nodes($template) {
     return to_objects(from => 'JQueryTemplate', template => $template);
 }
 
-func nodes_to_jstmpl($template) {
-    return from_objects(to => 'JQueryTemplate', template => $template);
+func nodes_to_jstmpl(@nodes) {
+    return from_objects(to => 'JQueryTemplate', objects => \@nodes);
 }
 
 func native_to_nodes($template) {
     return to_objects(from => 'Native', template => $template);
 }
 
-func nodes_to_native($template) {
-    return from_objects(to => 'Native', template => $template);
+func nodes_to_native(@nodes) {
+    return from_objects(to => 'Native', objects => \@nodes);
 }
 
 
