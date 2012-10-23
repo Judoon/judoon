@@ -34,16 +34,6 @@ __PACKAGE__->config(
     },
 );
 
-=head2 sitelinker / _build_sitelinker
-
-C<sitelinker> is a L</Judoon::SiteLinker> object.  This classes stores
-what we know about linking accessions to websites.
-
-=cut
-
-has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy => 1, builder => '_build_sitelinker');
-sub _build_sitelinker { return Judoon::SiteLinker->new; }
-
 
 before private_base => sub {
     my ($self, $c) = @_;
@@ -104,7 +94,7 @@ Add accession types to stash.
 
 after object_GET => sub {
     my ($self, $c) = @_;
-    $c->stash->{accession_types} = $self->sitelinker->accession_groups;
+    $c->stash->{accession_types} = $c->model('SiteLinker')->accession_groups;
 };
 
 

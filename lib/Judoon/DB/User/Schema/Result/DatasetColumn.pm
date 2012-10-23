@@ -146,48 +146,6 @@ __PACKAGE__->grouping_column('dataset_id');
 
 =head1 METHODS
 
-=head2 B<C< sitelinker / _build_sitelinker >>
-
-Attribute / accessor for holding the C<L<Judoon::SiteLinker>> utility object.
-
-=cut
-
-use Judoon::SiteLinker;
-has sitelinker => (is => 'lazy',); # isa => 'Judoon::SiteLinker',);
-sub _build_sitelinker { return Judoon::SiteLinker->new; }
-
-
-=head2 linkset()
-
-Return a list of linkable sites via Judoon::SiteLinker
-
-=cut
-
-sub linkset {
-    my ($self) = @_;
-
-    my @links;
-    if ($self->is_accession) {
-        my $sites = $self->sitelinker->mapping->{accession}{$self->accession_type};
-        for my $site (keys %$sites) {
-            my $site_conf = $self->sitelinker->sites->{$site};
-            push @links, {
-                value   => $site_conf->{name},
-                example => '',
-                text    => $site_conf->{label},
-            };
-        }
-    }
-    elsif ($self->is_url) {
-        @links = 'something else?';
-    }
-
-
-    return \@links;
-}
-
-
-
 =head2 C<B<ordinal_position>>
 
 Get the ordinal position of this column in the set of related columns.

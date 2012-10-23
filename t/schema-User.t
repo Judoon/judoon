@@ -185,8 +185,6 @@ subtest 'Result::DatasetColumn' => sub {
         is_accession => 1, accession_type => q{flybase_id},
         is_url => 0, url_root => q{},
     });
-    #is $new_ds_col->shortname, 'test_column', 'auto shortname works';
-    is $new_ds_col->linkset->[0]{value}, 'flybase', 'linkset works for accession';
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
@@ -195,21 +193,16 @@ subtest 'Result::DatasetColumn' => sub {
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
-    is $new_ds_col2->linkset->[0], 'something else?', 'BOGUS TEST: linkset works for url';
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
         name => q{}, sort => 98, is_accession => 0, accession_type => q{},
         is_url => 0, url_root => q{},
     }), 'can create column w/ empty name';
-    #is $ds_col3->shortname, 'nothing', 'shortname defaulted correctly';
-    is_deeply $ds_col3->linkset, [], 'unannotated column gives empty linkset';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
         name => q{#$*^(}, sort => 97, is_accession => 0, accession_type => q{},
         is_url => 1, url_root => q{http://google.com/?q=},
     }), 'can create column w/ non-ascii name';
-    #is $ds_col4->shortname, '_____', 'shortname defaulted correctly';
-    ok $ds_col4->linkset, 'can get linkset for url';
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;

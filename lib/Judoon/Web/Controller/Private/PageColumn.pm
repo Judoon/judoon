@@ -8,12 +8,8 @@ with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 
 use JSON qw(encode_json);
-use Judoon::SiteLinker;
 use Judoon::Tmpl;
 use List::AllUtils ();
-
-has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy => 1, builder => '_build_sitelinker',);
-sub _build_sitelinker { return Judoon::SiteLinker->new; }
 
 __PACKAGE__->config(
     action => {
@@ -40,24 +36,38 @@ before private_base => sub {
 after object_GET => sub {
     my ($self, $c) = @_;
 
+    my $sitelinker = $c->model('SiteLinker');
     my $dataset = $c->req->get_chained_object(-2)->[0];
     my @ds_columns = $dataset->ds_columns;
     $c->stash->{ds_column}{list} = \@ds_columns;
     $c->stash->{url_columns} = [grep {$_->is_url} @ds_columns];
     my @acc_columns = grep {$_->is_accession} @ds_columns;
     $c->stash->{acc_columns}    = \@acc_columns;
+    for my $acc_column (@acc_columns) {
+        my $sites = $sitelinker->mapping->{accession}{$acc_column->accession_type};
+        my @links;
+        for my $site (keys %$sites) {
+            my $site_conf = $sitelinker->sites->{$site};
+            push @links, {
+                value   => $site_conf->{name},
+                example => '',
+                text    => $site_conf->{label},
+            };
+        }
+        $acc_column->{linkset} = \@links;
+    }
     $c->stash->{column_acctype} = encode_json(
         {map {$_->shortname => $_->accession_type} @acc_columns}
     );
 
     $c->stash->{link_site_json} = encode_json(
-        $self->sitelinker->mapping->{site}
+        $sitelinker->mapping->{site}
     );
     $c->stash->{ds_column_json} = encode_json(
         [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]
     );
-    $c->stash->{sitelinker_sites} = encode_json( $self->sitelinker->sites );
-    $c->stash->{sitelinker_accs}  = encode_json( $self->sitelinker->accessions );
+    $c->stash->{sitelinker_sites} = encode_json( $sitelinker->sites );
+    $c->stash->{sitelinker_accs}  = encode_json( $sitelinker->accessions );
 
     $c->stash->{url_prefixes} = encode_json({
         map {$_->shortname => $_->url_root} @{$c->stash->{url_columns}}
