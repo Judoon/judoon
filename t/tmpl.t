@@ -26,6 +26,12 @@ use Judoon::Tmpl;
     is $nodes[0]->value, 'foo', 'first node has correct value';
     is $nodes[1]->name,  'bar', 'second node has correct name';
     is $nodes[2]->value, 'baz', 'third node has correct value';
+
+
+    is_deeply [$tmpl->get_variables], ['bar'], 'returns correct variables';
+    is $tmpl->to_jstmpl, 'foo{{=bar}}baz', 'produces correct js template';
+    like $tmpl->to_native, qr/CLASS/i, 'can get serialized';
+
 }
 
 
