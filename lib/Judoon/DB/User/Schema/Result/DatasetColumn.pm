@@ -144,21 +144,4 @@ __PACKAGE__->position_column('sort');
 __PACKAGE__->grouping_column('dataset_id');
 
 
-=head1 METHODS
-
-=head2 C<B<ordinal_position>>
-
-Get the ordinal position of this column in the set of related columns.
-The C<sort> column maintains the sort order, but is not necessarily the
-actual ordinal position.
-
-=cut
-
-sub ordinal_position {
-    my ($self) = @_;
-    return $self->result_source->resultset
-        ->ordinal_position_for($self->dataset_id, $self->sort);
-}
-
-
 1;
