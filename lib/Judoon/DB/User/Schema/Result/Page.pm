@@ -203,7 +203,7 @@ sub templates_match_dataset {
     my ($self, @page_columns) = @_;
 
     if (not @page_columns) {
-        @page_columns = $self->page_columns;
+        @page_columns = $self->page_columns_ordered->all;
     }
 
     my %valid_ds_columns = map {$_->shortname => 1}

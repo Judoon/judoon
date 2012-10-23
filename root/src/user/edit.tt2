@@ -95,7 +95,7 @@
         <section id="page_info_[% loop.count %]" class="collapse">
           [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]
           <p><strong>Parent Dataset:</strong> <a href="#dataset_[% page_obj.dataset.id %]">[% page_obj.dataset.name %]</a></p>
-          <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
+          <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns_ordered.all %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
           <p>This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
           <p><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
           <p><strong>Download Standalone App:</strong> <a href="[% page_url _ '?view=standalone&format=zip' %]">zip</a>, <a href="[% page_url _ '?view=standalone&format=tgz' %]">tar.gz</a></p>

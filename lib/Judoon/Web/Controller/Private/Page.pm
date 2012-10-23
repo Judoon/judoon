@@ -69,7 +69,7 @@ after object_GET => sub {
     my ($self, $c) = @_;
 
     my $page = $c->req->get_object(0)->[0];
-    my @page_columns = $page->page_columns;
+    my @page_columns = $page->page_columns_ordered->all;
     $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
