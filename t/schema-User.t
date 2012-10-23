@@ -11,11 +11,8 @@ use t::DB;
 
 use Data::Printer;
 use Judoon::Spreadsheet;
-use Judoon::Tmpl::Factory ();
-use Judoon::Tmpl::Translator;
+use Judoon::Tmpl;
 use Spreadsheet::Read;
-
-my $translator = Judoon::Tmpl::Translator->new;
 
 sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
 sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
@@ -160,22 +157,20 @@ subtest 'Result::Dataset' => sub {
     );
 
     my $i = 1;
-    my @col_structs = map {
-        my $rec = $_;
-        my $tmpl = $translator->translate(
-            from => 'JQueryTemplate', to => 'Native', template => $rec->[1],
-        );
-        {title => $rec->[0], sort => $i++, template => $tmpl,};
-    } @columns;
-    $first_page->add_to_page_columns($_) for (@col_structs);
+    for my $column (@columns) {
+        my $page_col = $first_page->add_to_page_columns({
+            title => $column->[0], sort => $i++,
+            template => Judoon::Tmpl->new_from_jstmpl($column->[1]),
+        });
+    }
 
     my $second_ds   = $user->import_data_by_filename('t/etc/data/clone2.xls');
     my $second_page = $second_ds->new_related('pages',{})
         ->clone_from_existing($first_page);
     $second_page->update({title => "IMDB's Bottom 5 Movies of all time"});
 
-    is $second_page->page_columns_ordered->first->template,
-        $first_page->page_columns_ordered->first->template,
+    is $second_page->page_columns_ordered->first->template->to_jstmpl,
+        $first_page->page_columns_ordered->first->template->to_jstmpl,
             'Page and cloned page have identical columns';
 
 };
@@ -246,16 +241,12 @@ subtest 'Result::Page' => sub {
     ok !exception { $movie_page->templates_match_dataset },
         'empty templates match dataset';
 
-    $good_pcol->set_template(
-        $translator->to_objects(from => 'JQueryTemplate', template => '{{=title}}'),
-    );
+    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{=title}}'));
     $good_pcol->update;
     ok !exception { $movie_page->templates_match_dataset },
         'valid templates match dataset';
 
-    $good_pcol->set_template(
-        $translator->to_objects(from => 'JQueryTemplate', template => '{{=nosuchname}}'),
-    );
+    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{=nosuchname}}'));
     $good_pcol->update;
     isa_ok exception { $movie_page->templates_match_dataset },
         'Judoon::Error::InvalidTemplate',
@@ -267,12 +258,12 @@ subtest 'Result::Page' => sub {
 subtest 'Result::PageColumn' => sub {
     my $page_column = ResultSet('PageColumn')->first;
 
-    ok $page_column->template_to_jquery,     'can produce jquery';
-    ok $page_column->template_to_objects,    'can produce objects';
+    ok $page_column->template->to_jstmpl, 'can produce jquery';
+    ok $page_column->template->get_nodes, 'can produce objects';
 
-    my $newline = Judoon::Tmpl::Factory::new_newline_node();
-    ok $page_column->set_template($newline), 'can set template...';
-    my @objects = $page_column->template_to_objects;
+    ok $page_column->template(Judoon::Tmpl->new_from_jstmpl('<br>')),
+        'can set template...';
+    my @objects = $page_column->template->get_nodes;
     ok @objects == 1 && ref($objects[0]) eq 'Judoon::Tmpl::Node::Newline',
         '  ...and get correct objects back';
 };

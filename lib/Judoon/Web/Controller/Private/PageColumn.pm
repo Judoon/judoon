@@ -9,7 +9,7 @@ with qw(Judoon::Web::Controller::Role::ExtractParams);
 
 use JSON qw(encode_json);
 use Judoon::SiteLinker;
-use Judoon::Tmpl::Translator;
+use Judoon::Tmpl;
 use List::AllUtils ();
 
 has sitelinker => (is => 'ro', isa => 'Judoon::SiteLinker', lazy => 1, builder => '_build_sitelinker',);
@@ -25,9 +25,6 @@ __PACKAGE__->config(
         api_path     => 'pagecolumn',
     },
 );
-
-has translator => (is => 'ro', isa => 'Judoon::Tmpl::Translator', lazy => 1, builder => '_build_translator',);
-sub _build_translator { return Judoon::Tmpl::Translator->new; }
 
 
 before private_base => sub {
@@ -89,10 +86,7 @@ before object_PUT => sub {
 
     my $params        = $c->req->get_object(0)->[1];
     my $template_html = $params->{template} // '[]';
-    my $template      = $self->translator->translate(
-        from => 'Native', to => 'Native', template => $template_html,
-    );
-    $params->{'template'} = $template;
+    $params->{template} = Judoon::Tmpl->new_from_native($template_html)->to_native;
 };
 
 

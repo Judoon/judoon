@@ -78,7 +78,7 @@
               <span class="label">[% column.title | html %]</span>
               <button class="btn btn-mini" [% loop.last ? 'disabled' : '' %]><i class="icon-arrow-right"></i></button>
               <div class="edit_widget">
-                [% column.template_to_jquery %]
+                [% column.template.to_jstmpl %]
               </div>
               <div>
                 [%- INCLUDE 'components/action_button.tt2' label='<i class="icon-plus"></i> Edit' url=c.uri_for_action('/private/pagecolumn/object', c.req.captures.merge([column.id])) -%]

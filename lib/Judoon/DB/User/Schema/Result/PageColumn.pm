@@ -100,74 +100,12 @@ __PACKAGE__->position_column('sort');
 __PACKAGE__->grouping_column('page_id');
 
 
-=head1 METHODS
+use Judoon::Tmpl;
 
-=head2 B<C< translator / _build_translator >>
+__PACKAGE__->inflate_column('template', {
+    inflate => sub { Judoon::Tmpl->new_from_native(shift) },
+    deflate => sub { shift->to_native },
+});
 
-Attribute / accessor to hold the C<L<Judoon::Tmpl::Translator>>
-utility object.
-
-=cut
-
-use Judoon::Tmpl::Translator;
-has translator => (is => 'lazy',); # isa => 'Judoon::Tmpl::Translator',);
-sub _build_translator { return Judoon::Tmpl::Translator->new; }
-
-
-=head2 B<C< template_to_jquery >>
-
-Translate the stored template into a JQuery template.
-
-=cut
-
-sub template_to_jquery {
-    my ($self) = @_;
-    return $self->translator->translate(
-        from => 'Native', to => 'JQueryTemplate', template => $self->template
-    );
-}
-
-
-=head2 B<C< template_to_objects >>
-
-Translate the stored template into a list of C<L<Judoon::Tmpl::Node>>
-objects.
-
-=cut
-
-sub template_to_objects {
-    my ($self) = @_;
-    return $self->translator->to_objects(
-        from => 'Native', template => $self->template
-    );
-}
-
-
-=head2 B<C< set_template >>
-
-Given a list of C<L<Judoon::Tmpl::Node>>s, save them to the
-L</template> field.
-
-=cut
-
-sub set_template {
-    my ($self, @objects) = @_;
-    $self->template($self->translator->from_objects(
-        to => 'Native', objects => \@objects,
-    ));
-}
-
-
-=head2 B<C< get_variables >>
-
-Get a list of variable names used in our template.
-
-=cut
-
-sub get_variables {
-    my ($self) = @_;
-    return map {$_->name} grep {$_->type eq 'variable'} map {$_->decompose}
-        $self->template_to_objects;
-}
 
 1;

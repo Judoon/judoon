@@ -8,7 +8,10 @@ use Test::More;
 BEGIN {
     my @modules = qw(
         Judoon::DB::User::Schema
+        Judoon::Tmpl
+        Judoon::Tmpl::Factory
         Judoon::Tmpl::Translator
+        Judoon::Tmpl::Util
         Judoon::SiteLinker
         Judoon::Spreadsheet
         Judoon::Standalone

@@ -210,7 +210,7 @@ sub templates_match_dataset {
         $self->dataset->ds_columns;
     my @bad_columns;
     for my $page_column (@page_columns) {
-        my @variables = $page_column->get_variables();
+        my @variables = $page_column->template->get_variables();
         if (my @invalid = grep {not $valid_ds_columns{$_}} @variables) {
             push @bad_columns, {
                 column   => $page_column,

@@ -75,7 +75,7 @@ after object_GET => sub {
     my $view = $c->req->param('view') // '';
     if (!$c->stash->{user}{is_owner} || $view eq 'preview') {
         $c->stash->{page_column}{templates}
-            = [map {$_->template_to_jquery} @page_columns];
+            = [map {$_->template->to_jstmpl} @page_columns];
         $c->stash->{template} = 'page/preview.tt2';
         $c->detach();
     }
@@ -98,10 +98,8 @@ after object_GET => sub {
 
     my %used;
     for my $page_col (@page_columns) {
-        for my $node (map {$_->decompose} $page_col->template_to_objects()) {
-            next unless ($node->type eq 'variable');
-            push @{$used{$node->name}}, $page_col->title;
-        }
+        push @{$used{$_}}, $page_col->title
+            for ($page_col->template->get_variables);
     }
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
