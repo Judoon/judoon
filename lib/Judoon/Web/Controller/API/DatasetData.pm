@@ -34,7 +34,7 @@ sub id : Chained('base') PathPart('') CaptureArgs(1) {
 
     $c->stash->{dataset}{id} = $ds_id;
     $c->stash->{dataset}{object} = $c->model('User::Dataset')->find({id => $ds_id});
-    $c->stash->{ds_column}{list} = [$c->stash->{dataset}{object}->ds_columns];
+    $c->stash->{ds_column}{list} = [$c->stash->{dataset}{object}->ds_columns_ordered->all];
 }
 
 sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
@@ -46,7 +46,7 @@ sub object_GET {
     my $tbl_name     = $dataset->schema_name . '.' . $dataset->tablename;
     my $dbic_storage = $dataset->result_source->storage;
     my $params       = $c->req->params();
-    my @fields       = map {$_->shortname} $dataset->ds_columns;
+    my @fields       = map {$_->shortname} $dataset->ds_columns_ordered->all;
     my $total        = $dataset->nbr_rows;
 
     # filter data

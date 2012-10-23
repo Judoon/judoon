@@ -38,7 +38,7 @@ after object_GET => sub {
 
     my $sitelinker = $c->model('SiteLinker');
     my $dataset = $c->req->get_chained_object(-2)->[0];
-    my @ds_columns = $dataset->ds_columns;
+    my @ds_columns = $dataset->ds_columns_ordered->all;
     $c->stash->{ds_column}{list} = \@ds_columns;
     $c->stash->{url_columns} = [grep {$_->is_url} @ds_columns];
     my @acc_columns = grep {$_->is_accession} @ds_columns;

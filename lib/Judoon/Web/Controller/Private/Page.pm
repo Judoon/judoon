@@ -103,7 +103,7 @@ after object_GET => sub {
     }
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $c->req->get_chained_object(0)->[0]->ds_columns;
+    }} $c->req->get_chained_object(0)->[0]->ds_columns_ordered->all;
     $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 

@@ -236,7 +236,7 @@ EOS
     });
 
     my $i = 1;
-    for my $ds_column ($self->ds_columns) {
+    for my $ds_column ($self->ds_columns_ordered->all) {
         my $page_column = $page->create_related('page_columns', {
             title    => $ds_column->name,
             template => Judoon::Tmpl->new({
@@ -262,7 +262,7 @@ sub data_table {
     my ($self, $args) = @_;
     return [
         [map {$args->{shortname} ? $_->shortname : $_->name}
-             sort {$a->sort <=> $b->sort} $self->ds_columns],
+             sort {$a->sort <=> $b->sort} $self->ds_columns_ordered->all],
         @{$self->data},
     ];
 }
@@ -324,7 +324,7 @@ sub _build_data {
     my ($self) = @_;
 
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
-        $self->ds_columns;
+        $self->ds_columns_ordered->all;
     my $select = join ', ', @columns;
 
     my $table = $self->schema_name . '.' . $self->tablename;
