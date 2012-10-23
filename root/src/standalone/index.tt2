@@ -105,7 +105,7 @@
 
         [% FOREACH column IN page.page_columns %]
         <script id="column_tmpl_[%- loop.count -%]" type="text/x-jquery-tmpl">
-          [%- column.template_to_jquery -%]
+          [%- column.template.to_jstmpl -%]
         </script>
         [%- END -%]
 
