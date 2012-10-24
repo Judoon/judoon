@@ -10,8 +10,7 @@ Judoon::Tmpl::Translator::Dialect::JQueryTemplate
 
 =head1 SYNOPSIS
 
- my $trans = Judoon::Tmpl::Translator->new;
- my $jq_tmpl = $trans->translate(
+ my $jq_tmpl = Judoon::Tmpl::Util::translate(
      from => 'Native', to => 'JQueryTemplate',
      template => $native_tmpl,
  );

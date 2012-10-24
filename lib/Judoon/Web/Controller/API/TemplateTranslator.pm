@@ -4,7 +4,7 @@ use namespace::autoclean;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
-use Judoon::Tmpl::Translator;
+use Judoon::Tmpl::Util ();
 
 =head1 NAME
 
@@ -17,16 +17,6 @@ Catalyst Controller.
 =head1 METHODS
 
 =cut
-
-has template_translator => (
-    is => 'ro',
-    isa => 'Judoon::Tmpl::Translator',
-    lazy => 1,
-    builder => '_build_template_translator',
-);
-sub _build_template_translator {
-    return Judoon::Tmpl::Translator->new;
-}
 
 
 sub base      :Chained('/api/base') PathPart('template')  CaptureArgs(0) {}
@@ -48,7 +38,7 @@ sub translate_POST : Private {
     my $template_html = $params->{template_html};
     my $template;
     try {
-        $template = $self->template_translator->translate({
+        $template = Judoon::Tmpl::Util::translate({
             from => 'Native', to => 'JQueryTemplate',
             template => $template_html
         });
