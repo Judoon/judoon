@@ -9,7 +9,6 @@ with qw(
     Judoon::Tmpl::Node::Role::Formatting
 );
 
-use Judoon::Tmpl::Factory;
 use List::AllUtils qw(each_arrayref);
 use Method::Signatures;
 use Moose::Util::TypeConstraints qw(enum);
