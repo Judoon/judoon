@@ -7,8 +7,42 @@ use Test::More;
 use Test::Fatal;
 
 use Data::Section::Simple qw(get_data_section);
-use Judoon::Tmpl::Factory;
 use Judoon::Tmpl::Util;
+
+subtest 'node factory' => sub {
+    my @node_types = qw(Text Variable Newline VarString Link);
+    my $varstring_args = {
+        varstring_type    => 'static',
+        text_segments     => ['foo','baz'],
+        variable_segments => ['bar'],
+    };
+    my %node_args  = (
+        Text      => {value => 'foo',},
+        Variable  => {name => 'bar'},
+        Newline   => {},
+        VarString => $varstring_args,
+        Link      => {url => $varstring_args, label => $varstring_args,},
+    );
+    for my $node_type (@node_types) {
+        my $node_class = "Judoon::Tmpl::Node::$node_type";
+
+        isa_ok build_node({
+            type => lc($node_type), %{$node_args{$node_type}},
+        }), $node_class;
+
+        my $function = 'new_'.lc($node_type).'_node';
+        my $node = do {
+            no strict 'refs';
+            $function->($node_args{$node_type});
+        };
+        isa_ok $node, $node_class;
+    }
+
+    like exception { build_node({type => 'moo'}); },
+        qr/unrecognized node type/i,
+            'build_node() dies w/ unknown node type';
+};
+
 
 subtest 'input validation' => sub {
     like exception {

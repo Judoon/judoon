@@ -6,7 +6,6 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Judoon::Tmpl::Factory;
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
 use Judoon::Tmpl::Node::Newline;
@@ -31,17 +30,6 @@ my %node_args  = (
 my $moose_type_error = qr{validation failed}i;
 my $yada_yada_error  = qr{unimplemented}i;
 
-
-subtest '::Factory' => sub {
-    for my $node_type (@node_types) {
-        isa_ok build_node({
-            type => lc($node_type), %{$node_args{$node_type}},
-        }), "Judoon::Tmpl::Node::$node_type";
-    }
-
-    like exception { build_node({type => 'moo'}); }, qr/unrecognized node type/i,
-        'build_node() dies w/ unknown node type';
-};
 
 subtest '::Node::Text' => sub {
     ok my $node = Judoon::Tmpl::Node::Text->new($node_args{Text}),
