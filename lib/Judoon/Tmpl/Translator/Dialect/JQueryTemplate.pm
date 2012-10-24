@@ -29,7 +29,6 @@ use feature ':5.10';
 with 'Judoon::Tmpl::Translator::Dialect';
 
 use Judoon::Tmpl::Util ();
-use Method::Signatures;
 
 =head1 ATTRIBUTES
 
@@ -109,7 +108,9 @@ explicitly, so it calls the C<_varstring_type> method to guess.
 
 =cut
 
-method parse($input) {
+sub parse {
+    my ($self, $input) = @_;
+
     die "Cannot parse undef input as JQueryTemplate"
         if (not defined $input);
     return () if ($input eq '');
@@ -166,9 +167,10 @@ outputs a jsrender-compatible HTML string.
 
 =cut
 
-method produce(\@native_objects) {
+sub produce {
+    my ($self, $native_objects) = @_;
 
-    my @objects = @native_objects;
+    my @objects = @$native_objects;
     my $template = q{};
     while (my $node = shift @objects) {
 
@@ -204,7 +206,8 @@ guess its type based upon the presence of non-empty C<variable_segments>.
 
 =cut
 
-method _varstring_type($varstring) {
+sub _varstring_type {
+    my ($self, $varstring) = @_;
     return (exists($varstring->{variable_segments})
         && grep {m/\S/} @{$varstring->{variable_segments}})
             ? 'variable' : 'static';

@@ -50,7 +50,6 @@ requires 'Getopt::Long';
 requires 'JSON';
 requires 'JSON::XS';
 requires 'List::AllUtils';
-requires 'Method::Signatures';
 requires 'Module::Pluggable';
 requires 'Moo';
 requires 'MooX::Types::MooseLike';

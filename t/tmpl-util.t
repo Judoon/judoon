@@ -60,10 +60,10 @@ subtest 'input validation' => sub {
 
 };
 
-# Here are some tests for error-checking provided by Params::Validate
-# and Method::Signatures. M::S tests' cover this, but Devel::Cover
-# can't detect that.  We test it here to get that lovely, lovely field
-# of green in our coverage report.
+# Here are some tests for error-checking provided by Params::Validate.
+# P::V tests' cover this, but Devel::Cover can't detect that.  We test
+# it here to get that lovely, lovely field of green in our coverage
+# report.
 subtest 'Making Devel::Cover happy' => sub {
 
     # set up our error regexes
@@ -105,21 +105,6 @@ subtest 'Making Devel::Cover happy' => sub {
             $method->(map {$_ => $fail_args{$_}} @$argset);
         }, $error, "calling $method w/ $descrs{$error}";
     }
-
-
-    # failing inputs to Dialect::*::{parse,produce}
-    for my $dialect (dialects()) {
-        my $dialect_obj = "Judoon::Tmpl::Translator::Dialect::$dialect"->new;
-        like exception {$dialect_obj->parse()}, $ms_missing_arg,
-            "::Dialect::${dialect}::parse w/ no args";
-        like exception {$dialect_obj->parse('moo','moo')}, $ms_too_many_args,
-            "::Dialect::${dialect}::parse w/ too many args";
-        like exception {$dialect_obj->produce()}, $ms_missing_arg,
-            "::Dialect::${dialect}::produce w/ no args";
-        like exception {$dialect_obj->produce([],[])}, $ms_too_many_args,
-            "::Dialect::${dialect}::produce w/ too many args";
-    }
-
 };
 
 

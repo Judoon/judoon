@@ -28,7 +28,6 @@ with 'Judoon::Tmpl::Translator::Dialect';
 
 use Judoon::Tmpl::Util ();
 use JSON qw(encode_json decode_json);
-use Method::Signatures;
 
 
 =head1 METHODS
@@ -40,7 +39,8 @@ parse it into a list of C<Judoon::Tmpl::Node::*> nodes.
 
 =cut
 
-method parse($input) {
+sub parse {
+    my ($self, $input) = @_;
     my $native_struct = decode_json($input);
     return map {Judoon::Tmpl::Util::build_node($_)} @$native_struct;
 }
@@ -53,8 +53,9 @@ outputs a JSON string representing them.
 
 =cut
 
-method produce(\@native_objects) {
-    my @output = map {$_->pack} @native_objects;
+sub produce {
+    my ($self, $native_objects) = @_;
+    my @output = map {$_->pack} @$native_objects;
     return encode_json(\@output);
 }
 
