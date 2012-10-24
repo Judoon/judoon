@@ -148,7 +148,7 @@ __PACKAGE__->belongs_to(
 use DateTime;
 use Judoon::Error;
 use Judoon::Tmpl;
-use Judoon::Tmpl::Factory qw(new_variable_node);
+use Judoon::Tmpl::Util qw(new_variable_node);
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 use SQL::Translator;

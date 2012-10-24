@@ -29,7 +29,7 @@ use feature ':5.10';
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
-use Judoon::Tmpl::Factory qw(build_node);
+use Judoon::Tmpl::Util ();
 use Method::Signatures;
 
 =head1 ATTRIBUTES
@@ -153,7 +153,7 @@ method parse($input) {
             }
         }
 
-        push @objects, build_node($jnode);
+        push @objects, Judoon::Tmpl::Util::build_node($jnode);
     }
 
     return @objects;

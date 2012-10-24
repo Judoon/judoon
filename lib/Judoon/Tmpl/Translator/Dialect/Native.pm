@@ -27,7 +27,7 @@ use Moo;
 
 with 'Judoon::Tmpl::Translator::Dialect';
 
-use Judoon::Tmpl::Factory;
+use Judoon::Tmpl::Util ();
 use JSON qw(encode_json decode_json);
 use Method::Signatures;
 
@@ -43,7 +43,7 @@ parse it into a list of C<Judoon::Tmpl::Node::*> nodes.
 
 method parse($input) {
     my $native_struct = decode_json($input);
-    return map {build_node($_)} @$native_struct;
+    return map {Judoon::Tmpl::Util::build_node($_)} @$native_struct;
 }
 
 
