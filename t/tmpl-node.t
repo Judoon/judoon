@@ -76,7 +76,6 @@ subtest '::Node::VarString' => sub {
     }); }, $moose_type_error, 'VarString dies on bad varstring_type';
 };
 
-
 subtest '::Node::Link' => sub {
     ok my $node = Judoon::Tmpl::Node::Link->new($node_args{Link}),
         'can create Link node';
@@ -97,29 +96,6 @@ subtest '::Node::Link' => sub {
     }); }, $moose_type_error, 'Link dies on bad varstring_type';
 };
 
-
-# Here are some tests for error-checking provided by
-# Method::Signatures. M::S tests' cover this, but Devel::Cover can't
-# detect that.  We test it here to get that lovely, lovely field of
-# green in our coverage report.
-subtest 'Making Devel::Cover happy' => sub {
-    for my $type (@node_types) {
-        like exception {
-            "Judoon::Tmpl::Node::$type"->new($node_args{$type})->decompose('moo');
-        }, qr{too many arguments}i,
-        "decompose for ::$type dies w/ too many args";
-    }
-
-    my $node = Judoon::Tmpl::Node::Link->new($node_args{Link});
-    for my $make_type (qw(text variable)) {
-        my $method = "make_${make_type}_node";
-        like exception { $node->$method() }, qr{missing required argument}i,
-            "::Role::Compostion::${method} dies w/ too few args";
-        like exception { $node->$method('foo','bar') },
-            qr{too many arguments}i,
-            "::Role::Compostion::${method} dies w/ too many args";
-    }
-};
 
 
 done_testing();

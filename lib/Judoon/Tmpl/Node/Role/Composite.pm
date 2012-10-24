@@ -5,7 +5,6 @@ use namespace::autoclean;
 
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
-use Method::Signatures;
 
 =pod
 
@@ -17,11 +16,13 @@ utility methods for building subnodes in decompose() methods
 
 =cut
 
-method make_text_node($text) {
+sub make_text_node {
+    my ($self, $text) = @_;
     return Judoon::Tmpl::Node::Text->new({value => $text, formatting => $self->formatting,});
 }
 
-method make_variable_node($var) {
+sub make_variable_node {
+    my ($self, $var) = @_;
     return Judoon::Tmpl::Node::Variable->new({name => $var, formatting => $self->formatting,});
 }
 

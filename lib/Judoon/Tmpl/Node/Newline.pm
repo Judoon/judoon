@@ -9,11 +9,13 @@ with qw(
     Judoon::Tmpl::Node::Role::Formatting
 );
 
-use Method::Signatures;
 
 has '+type' => (default => 'newline',);
 
-method decompose { return $self->make_text_node("<br>"); }
+sub decompose {
+    my ($self) = @_;
+    return $self->make_text_node("<br>");
+}
 
 __PACKAGE__->meta->make_immutable;
 

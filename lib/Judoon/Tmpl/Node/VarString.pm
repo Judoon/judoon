@@ -10,7 +10,6 @@ with qw(
 );
 
 use List::AllUtils qw(each_arrayref);
-use Method::Signatures;
 use Moose::Util::TypeConstraints qw(enum);
 
 enum 'VarStringType', [qw(static variable accession)];
@@ -33,7 +32,8 @@ C<text_segments>.
 
 =cut
 
-method decompose {
+sub decompose {
+    my ($self) = @_;
 
     my @nodes;
     my $it = each_arrayref $self->text_segments, $self->variable_segments;
