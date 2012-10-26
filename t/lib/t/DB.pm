@@ -38,6 +38,7 @@ sub import {
 }
 
 sub new_mech {
+    $ENV{PLACK_ENV} = 'testsuite';
     Judoon::Web->model('User')->schema($schema);
     return Test::WWW::Mechanize::Catalyst->new(catalyst_app => 'Judoon::Web');
 }

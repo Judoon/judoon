@@ -87,7 +87,7 @@ __PACKAGE__->config(
     },
     'Plugin::Static::Simple' => { dirs => ['static',], },
     'Plugin::ErrorCatcher' => {
-        enable             => defined($ENV{PLACK_ENV}) && ($ENV{PLACK_ENV} eq 'development') ? 0 : 1,
+        enable             => 0,
         context            => 5,
         always_log         => 1,
         include_session    => 1,
