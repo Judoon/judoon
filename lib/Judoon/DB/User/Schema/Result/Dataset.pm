@@ -148,7 +148,6 @@ __PACKAGE__->belongs_to(
 use DateTime;
 use Judoon::Error;
 use Judoon::Tmpl;
-use Judoon::Tmpl::Util qw(new_variable_node);
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 use SQL::Translator;
@@ -239,9 +238,9 @@ EOS
     for my $ds_column ($self->ds_columns_ordered->all) {
         my $page_column = $page->create_related('page_columns', {
             title    => $ds_column->name,
-            template => Judoon::Tmpl->new({
-                nodes => [new_variable_node({name => $ds_column->shortname})],
-            }),
+            template => Judoon::Tmpl->new_from_data([
+                {type => 'variable', name => $ds_column->shortname,}
+            ]),
             sort     => $i++,
         });
     }
