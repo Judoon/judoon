@@ -27,8 +27,9 @@ use Moo;
 with 'Judoon::Tmpl::Translator::Dialect';
 
 use Judoon::Tmpl::Util ();
-use JSON qw(encode_json decode_json);
+use JSON qw(to_json from_json);
 
+my $json_opts = {utf8 => 1};
 
 =head1 METHODS
 
@@ -41,14 +42,14 @@ parse it into a list of C<Judoon::Tmpl::Node::*> nodes.
 
 sub parse {
     my ($self, $input) = @_;
-    my $native_struct = decode_json($input);
+    my $native_struct = from_json($input, $json_opts);
     return map {Judoon::Tmpl::Util::build_node($_)} @$native_struct;
 }
 
 
 =head2 B<C<produce>>
 
-The C<produce> method takes a list of C<Judoon::Tmpl> nodes and
+The C<produce> method takes an arrayref of C<Judoon::Tmpl::Node>s and
 outputs a JSON string representing them.
 
 =cut
@@ -56,7 +57,7 @@ outputs a JSON string representing them.
 sub produce {
     my ($self, $native_objects) = @_;
     my @output = map {$_->pack} @$native_objects;
-    return encode_json(\@output);
+    return to_json(\@output, $json_opts);
 }
 
 
