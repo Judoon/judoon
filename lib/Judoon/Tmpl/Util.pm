@@ -30,6 +30,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(
     translate to_objects from_objects dialects
     jstmpl_to_nodes nodes_to_jstmpl native_to_nodes nodes_to_native
+    data_to_nodes nodes_to_data
 
     build_node new_text_node new_variable_node new_link_node new_newline_node
     new_varstring_node
@@ -37,6 +38,7 @@ our @EXPORT = qw(
 
 use Params::Validate qw(:all);
 
+use Judoon::Tmpl::Translator::Dialect::Data;
 use Judoon::Tmpl::Translator::Dialect::Native;
 use Judoon::Tmpl::Translator::Dialect::JQueryTemplate;
 
@@ -55,7 +57,7 @@ A list of supported dialects
 
 =cut
 
-sub dialects { return qw(Native JQueryTemplate); }
+sub dialects { return qw(Data Native JQueryTemplate); }
 
 my %dialects = map {
     my $dialect = $_;
@@ -132,6 +134,18 @@ sub nodes_to_native {
     my @nodes = @_;
     return from_objects(to => 'Native', objects => \@nodes);
 }
+
+sub data_to_nodes {
+    my ($template) = @_;
+    return to_objects(from => 'Data', template => $template);
+}
+
+sub nodes_to_data {
+    my @nodes = @_;
+    return from_objects(to => 'Data', objects => \@nodes);
+}
+
+
 
 
 =head1 FACTORY METHODS

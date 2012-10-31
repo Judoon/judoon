@@ -31,9 +31,16 @@ has nodes => (
 );
 sub _build_nodes { return []; }
 
-sub get_nodes { return @{ shift->nodes }; }
+sub get_nodes  { return @{ shift->nodes }; }
 sub node_count { return scalar shift->get_nodes; }
 sub node_types { return map {$_->type} shift->get_nodes; }
+
+
+=head1 Alternative Constructors
+
+=head2 new_from_jstmpl
+
+=cut
 
 sub new_from_jstmpl {
     my ($class, $template) = @_;
@@ -51,6 +58,13 @@ sub new_from_native {
     });
 }
 
+sub new_from_data {
+    my ($class, $nodelist) = @_;
+    die "Don't call new_from_native() on an object" if (ref($class));
+    return $class->new({
+        nodes => [Judoon::Tmpl::Util::data_to_nodes($nodelist)],
+    });
+}
 
 =head2 B<C< get_variables >>
 
@@ -76,6 +90,11 @@ sub to_native {
     return Judoon::Tmpl::Util::nodes_to_native($self->get_nodes);
 }
 
+
+sub to_data {
+    my ($self) = @_;
+    return Judoon::Tmpl::Util::nodes_to_data($self->get_nodes);
+}
 
 1;
 __END__
