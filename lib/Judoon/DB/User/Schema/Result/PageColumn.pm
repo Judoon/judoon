@@ -108,4 +108,21 @@ __PACKAGE__->inflate_column('template', {
 });
 
 
+=head2 B<C<get_cloneable_columns>>
+
+Get the columns of this PageColumn that are suitable for cloning,
+i.e. everything but foreign keys.
+
+=cut
+
+sub get_cloneable_columns {
+    my ($self) = @_;
+    my %me = $self->get_columns;
+    delete $me{id};
+    delete $me{page_id};
+    return %me;
+}
+
+
+
 1;

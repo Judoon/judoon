@@ -167,9 +167,7 @@ sub clone_from_existing {
         sub {
 
             # copy their page to ours
-            my %page_clone = $other_page->get_columns;
-            delete $page_clone{id};
-            delete $page_clone{dataset_id};
+            my %page_clone = $other_page->get_cloneable_columns();
             $self->set_columns( \%page_clone );
             $self->insert;
 
@@ -180,9 +178,7 @@ sub clone_from_existing {
 
             # copy their columns to our page
             for my $pagecol (@other_page_columns) {
-                my %column_clone = $pagecol->get_columns;
-                delete $column_clone{id};
-                delete $column_clone{page_id};
+                my %column_clone = $pagecol->get_cloneable_columns();
                 $self->create_related('page_columns', \%column_clone);
             }
         }
@@ -229,6 +225,22 @@ sub templates_match_dataset {
     }
 
     return 1;
+}
+
+
+=head2 B<C<get_cloneable_columns>>
+
+Get the columns of this Page that are suitable for cloning,
+i.e. everything but foreign keys.
+
+=cut
+
+sub get_cloneable_columns {
+    my ($self) = @_;
+    my %me = $self->get_columns;
+    delete $me{id};
+    delete $me{dataset_id};
+    return %me;
 }
 
 
