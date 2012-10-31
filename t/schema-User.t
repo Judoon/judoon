@@ -7,6 +7,7 @@ use lib q{t/lib};
 
 use Test::More;
 use Test::Fatal;
+use Test::JSON;
 use t::DB;
 
 use Data::Printer;
@@ -173,6 +174,19 @@ subtest 'Result::Dataset' => sub {
         $first_page->page_columns_ordered->first->template->to_jstmpl,
             'Page and cloned page have identical columns';
 
+    # dump_to_user()
+    my $first_dump = $first_page->dump_to_user();
+    is_valid_json $first_dump, 'dump_to_user json is well formed';
+
+    # clone_from_dump()
+    my $third_ds   = $user->import_data_by_filename('t/etc/data/clone2.xls');
+    my $third_page = $third_ds->new_related('pages',{})
+        ->clone_from_dump($first_dump);
+    is $third_page->page_columns_ordered->first->template->to_jstmpl,
+        $first_page->page_columns_ordered->first->template->to_jstmpl,
+            'Page and cloned page have identical columns';
+    is_json $first_dump, $third_page->dump_to_user,
+        'first & third pages have equivalent json';
 };
 
 subtest 'Result::DatasetColumn' => sub {

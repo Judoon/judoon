@@ -114,7 +114,11 @@ with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 
+use JSON qw(to_json from_json);
 use Judoon::Error::InvalidTemplate;
+
+my $json_opts = {utf8 => 1,};
+
 
 =head1 METHODS
 
@@ -206,11 +210,12 @@ sub templates_match_dataset {
         $self->dataset->ds_columns;
     my @bad_columns;
     for my $page_column (@page_columns) {
-        my @variables = $page_column->template->get_variables();
+        my $template  = $page_column->template;
+        my @variables = $template->get_variables();
         if (my @invalid = grep {not $valid_ds_columns{$_}} @variables) {
             push @bad_columns, {
                 column   => $page_column,
-                template => $page_column->template,
+                template => $template,
                 invalid  => \@invalid,
             };
         }
@@ -223,8 +228,71 @@ sub templates_match_dataset {
             valid_columns => [keys %valid_ds_columns],
         });
     }
-
     return 1;
+}
+
+
+=head2 B<C<dump_to_user>>
+
+Return a json representation of the Page.  The PageColumn templates
+are saved as data structures instead of json strings, to avoid
+double-quoting.  This should make it easier for the user to edit the
+page column templates.
+
+=cut
+
+sub dump_to_user {
+    my ($self) = @_;
+
+    my %page = $self->get_cloneable_columns();
+    for my $page_column ($self->page_columns_ordered->all) {
+        my %page_cols = $page_column->get_cloneable_columns();
+        $page_cols{template} = $page_column->template->to_data;
+        push @{ $page{page_columns} }, \%page_cols;
+    }
+
+    return to_json(\%page, $json_opts);
+}
+
+
+=head2 B<C<clone_from_dump>>
+
+Clone a new page from a json dump of a previous page.
+
+=cut
+
+sub clone_from_dump {
+    my ($self, $page_json) = @_;
+
+    my $other_page = from_json($page_json, $json_opts);
+    $self->result_source->schema->txn_do(
+        sub {
+
+            my $other_page_columns = delete $other_page->{page_columns};
+
+            # copy their page to ours
+            $self->set_columns( $other_page );
+            $self->insert;
+
+            # create new PageColumn objects, but don't insert them
+            # yet.
+            my @new_pagecols;
+            for my $pagecol (@$other_page_columns) {
+                my $template = delete $pagecol->{template};
+                $pagecol->{template}
+                    = Judoon::Tmpl->new_from_data($template)->to_native;
+                push @new_pagecols, $self->new_related('page_columns', $pagecol);
+            }
+
+            # make sure their referenced dataset columns are also in
+            # our dataset
+            $self->templates_match_dataset(@new_pagecols);
+
+            $_->insert for (@new_pagecols);
+        }
+    );
+
+    return $self;
 }
 
 

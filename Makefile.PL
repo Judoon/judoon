@@ -92,6 +92,7 @@ test_requires 'Pod::Coverage';
 test_requires 'Test::DBIx::Class';
 test_requires 'Test::More' => '0.88';
 test_requires 'Test::Fatal';
+test_requires 'Test::JSON';
 test_requires 'Test::Pod';
 test_requires 'Test::Pod::Coverage';
 test_requires 'Test::postgresql';
