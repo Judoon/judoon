@@ -9,7 +9,6 @@ BEGIN {
     my @modules = qw(
         Judoon::DB::User::Schema
         Judoon::Tmpl
-        Judoon::Tmpl::Util
         Judoon::SiteLinker
         Judoon::Spreadsheet
         Judoon::Standalone
