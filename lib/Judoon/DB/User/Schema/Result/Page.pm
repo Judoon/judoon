@@ -117,7 +117,7 @@ __PACKAGE__->register_permissions;
 use JSON qw(to_json from_json);
 use Judoon::Error::InvalidTemplate;
 
-my $json_opts = {utf8 => 1,};
+my $json_opts = {utf8 => 1, pretty => 1,};
 
 
 =head1 METHODS
