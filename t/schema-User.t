@@ -116,7 +116,7 @@ subtest 'Result::Dataset' => sub {
     ];
 
     # mutating methods, create new dataset
-    my $user = ResultSet('User')->first;
+    my $user = ResultSet('User')->find({username => 'testuser'});
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
     is $mutable_ds->name, 'Dog Roster', '  ..and name is correct';
 
@@ -144,49 +144,28 @@ subtest 'Result::Dataset' => sub {
         'ds_columns_ordered gets columns in their proper order';
 
     # test page cloning
-    my $first_ds = $user->import_data_by_filename('t/etc/data/clone1.xls');
-    my $first_page = $first_ds->add_to_pages({
-        title     => "IMDB's Top 5 Movies of all time",
-        preamble  => qq{Not gonna lie, these movies are pretty fucking amazing.},
-        postamble => qq{If you haven't seen these, kill yourself.},
-    });
+    t::DB::load_fixtures('clone_set');
+    my $cloneable_page = $user->my_pages->search({title => {like => '%All Time'},})->first;
+    my $new_ds         = $user->datasets_rs->find({name => 'IMDB Bottom 5'});
+    my $cloned_page    = $new_ds->new_related('pages',{})
+        ->clone_from_existing($cloneable_page);
 
-    my @columns = (
-        ['Name / Director', '<a href="{{=imdb}}">{{=title}}</a><br><strong>Directed By:</strong> {{=director}}'],
-        ['Year',   '{{=year}}',],
-        ['Rating', '{{=rating}}'],
-    );
-
-    my $i = 1;
-    for my $column (@columns) {
-        my $page_col = $first_page->add_to_page_columns({
-            title => $column->[0], sort => $i++,
-            template => Judoon::Tmpl->new_from_jstmpl($column->[1]),
-        });
-    }
-
-    my $second_ds   = $user->import_data_by_filename('t/etc/data/clone2.xls');
-    my $second_page = $second_ds->new_related('pages',{})
-        ->clone_from_existing($first_page);
-    $second_page->update({title => "IMDB's Bottom 5 Movies of all time"});
-
-    is $second_page->page_columns_ordered->first->template->to_jstmpl,
-        $first_page->page_columns_ordered->first->template->to_jstmpl,
+    is $cloned_page->page_columns_ordered->first->template->to_jstmpl,
+        $cloneable_page->page_columns_ordered->first->template->to_jstmpl,
             'Page and cloned page have identical columns';
 
     # dump_to_user()
-    my $first_dump = $first_page->dump_to_user();
-    is_valid_json $first_dump, 'dump_to_user json is well formed';
+    my $page_dump = $cloneable_page->dump_to_user();
+    is_valid_json $page_dump, 'dump_to_user json is well formed';
 
     # clone_from_dump()
-    my $third_ds   = $user->import_data_by_filename('t/etc/data/clone2.xls');
-    my $third_page = $third_ds->new_related('pages',{})
-        ->clone_from_dump($first_dump);
-    is $third_page->page_columns_ordered->first->template->to_jstmpl,
-        $first_page->page_columns_ordered->first->template->to_jstmpl,
+    my $dumpcloned_page = $new_ds->new_related('pages',{})
+        ->clone_from_dump($page_dump);
+    is $dumpcloned_page->page_columns_ordered->first->template->to_jstmpl,
+        $cloneable_page->page_columns_ordered->first->template->to_jstmpl,
             'Page and cloned page have identical columns';
-    is_json $first_dump, $third_page->dump_to_user,
-        'first & third pages have equivalent json';
+    is_json $page_dump, $dumpcloned_page->dump_to_user,
+        'page and its dumpcloned page have equivalent json';
 };
 
 subtest 'Result::DatasetColumn' => sub {
