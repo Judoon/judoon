@@ -12,6 +12,7 @@ use Config::General;
 use Data::Printer;
 use File::Temp qw(tempdir);
 use FindBin qw($Bin);
+use List::AllUtils ();
 
 
 # install basic fixtures
@@ -22,15 +23,16 @@ my %users = (
         name => 'New User', email_address => 'newuser@example.com',
     },
 );
+
+my $DATA_DIR = 't/etc/data';
 my %spreadsheets = (
-    basic       => 't/etc/data/basic.xls',
-    troublesome => 't/etc/data/troublesome.xls',
+    basic       => "$DATA_DIR/basic.xls",
+    troublesome => "$DATA_DIR/troublesome.xls",
+    clone1      => "$DATA_DIR/clone1.xls",
+    clone2      => "$DATA_DIR/clone2.xls",
 );
 
 # start test server
-# my $mech = Test::WWW::Mechanize::Catalyst->new(
-#     catalyst_app => 'Judoon::Web',
-# );
 my $mech = t::DB::new_mech();
 ok $mech, 'created test mech' or BAIL_OUT;
 
@@ -370,6 +372,7 @@ subtest 'Public Pages' => sub {
     like $mech->uri, qr{/page}, 'Sent back to list page';
 };
 
+
 subtest 'Permissions' => sub {
     login('testuser');
     $mech->get_ok('/user/testuser/dataset/1');
@@ -393,6 +396,31 @@ subtest 'Permissions' => sub {
     redirects_to_ok("/user/testuser/dataset/$ds_id/column", "/user/newuser");
     $mech->post("/user/testuser/dataset/$ds_id", {'x-tunneled-method' => 'PUT',},);
     like $mech->uri, qr{/user/newuser}, 'other user not allowed to PUT on dataset, redired to their page';
+};
+
+
+subtest 'Page Cloning' => sub {
+
+     # load clone1.xls, clone2.xls, and formatted page for clone1
+    t::DB::load_fixtures('clone_set');
+
+    my $ds_rs = t::DB::get_schema()->resultset('Dataset');
+    my $clone1_ds = $ds_rs->find({name => 'IMDB Top 5'});
+    my $clone2_ds = $ds_rs->find({name => 'IMDB Bottom 5'});
+    my @pages = map {$_->pages->all} ($clone1_ds, $clone2_ds);
+
+    login('testuser');
+    $mech->get(goto_page('dataset', ['testuser', $clone2_ds->id]));
+
+    my $cloneable_page = $clone1_ds->pages_rs->search({title => {like => '%All Time'}})->first;
+    $mech->submit_form(
+        form_name => 'clone_existing_page',
+        fields => {
+            'page.clone_from' => $cloneable_page->id,
+        },
+    );
+    like $mech->uri, qr{page/\d+}, 'got new page page';
+
 };
 
 
@@ -513,4 +541,36 @@ sub add_new_object_ok {
     like $new_uri, qr{$args->{page_uri_re}},
         qq{got new $args->{object}'s edit page};
     return $new_uri;
+}
+
+
+sub goto_page {
+    my ($page, $captures) = @_;
+
+    my %path = (
+        'users' => [['user'], 0,],
+        'user'  => [['user'], 1,],
+
+        'datasets' => [['user', 'dataset'], 1,],
+        'dataset'  => [['user', 'dataset'], 2,],
+
+        'dataset_columns' => [['user', 'dataset', 'column'], 2,],
+        'dataset_column'  => [['user', 'dataset', 'column'], 3,],
+
+        'pages' => [['user', 'dataset', 'page'], 2,],
+        'page'  => [['user', 'dataset', 'page'], 3,],
+
+        'page_columns' => [['user', 'dataset', 'page', 'column'], 3,],
+        'page_column'  => [['user', 'dataset', 'page', 'column'], 4,],
+    );
+
+    my $pathspec = $path{$page};
+    die "unknown page $page" unless ($pathspec);
+
+    my ($pathparts, $nbr_captures) = @$pathspec;
+    die "wrong number of captures to goto_page('$page')"
+        unless (scalar( @$captures ) == $nbr_captures);
+
+    my @pathsegs = List::AllUtils::zip @$pathparts, @$captures;
+    return join '/', ('', @pathsegs);
 }
