@@ -65,6 +65,7 @@
       <span class="help-inline">Create a new blank page:</span>
       [% INCLUDE 'components/forms/action_form.tt2'  label="Create" url=c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]), method="POST" form_name="add_page" -%]
     </li>
+    [% IF all_pages.list.size %]
     <li>
       <form name="clone_existing_page" id="clone_existing_page" action="[%- c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]) -%]" method="post" enctype="multipart/form-data" class="form-inline action-form">
         <span class="help-inline">Create new page using existing page's layout:</span>
@@ -76,6 +77,7 @@
         <button type="submit" class="btn btn-mini" form="clone_existing_page">Clone Page</button>
       </form>
     </li>
+    [% END %]
     <li>
       <form name="upload_page_template" id="upload_page_template" action="[%- c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]) -%]" method="post" enctype="multipart/form-data" class="form-inline action-form">
         <span class="help-inline">Create new page from a template:</span>
