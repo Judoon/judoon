@@ -1,4 +1,4 @@
-package Judoon::DB::User::Schema::ResultSet::User;
+package Judoon::Schema::ResultSet::User;
 
 =pod
 

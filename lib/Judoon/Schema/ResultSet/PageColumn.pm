@@ -1,4 +1,4 @@
-package Judoon::DB::User::Schema::ResultSet::PageColumn;
+package Judoon::Schema::ResultSet::PageColumn;
 
 =pod
 
@@ -6,7 +6,7 @@ package Judoon::DB::User::Schema::ResultSet::PageColumn;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::ResultSet::PageColumn
+Judoon::Schema::ResultSet::PageColumn
 
 =head1 DESCRIPTION
 

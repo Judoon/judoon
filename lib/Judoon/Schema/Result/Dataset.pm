@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::Dataset;
+package Judoon::Schema::Result::Dataset;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::Dataset;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::Dataset
+Judoon::Schema::Result::Dataset
 
 =cut
 
@@ -103,13 +103,13 @@ __PACKAGE__->set_primary_key("id");
 
 Type: has_many
 
-Related object: L<Judoon::DB::User::Schema::Result::DatasetColumn>
+Related object: L<Judoon::Schema::Result::DatasetColumn>
 
 =cut
 
 __PACKAGE__->has_many(
   "ds_columns",
-  "Judoon::DB::User::Schema::Result::DatasetColumn",
+  "Judoon::Schema::Result::DatasetColumn",
   { "foreign.dataset_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 1 },
 );
@@ -118,13 +118,13 @@ __PACKAGE__->has_many(
 
 Type: has_many
 
-Related object: L<Judoon::DB::User::Schema::Result::Page>
+Related object: L<Judoon::Schema::Result::Page>
 
 =cut
 
 __PACKAGE__->has_many(
   "pages",
-  "Judoon::DB::User::Schema::Result::Page",
+  "Judoon::Schema::Result::Page",
   { "foreign.dataset_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 1 },
 );
@@ -133,13 +133,13 @@ __PACKAGE__->has_many(
 
 Type: belongs_to
 
-Related object: L<Judoon::DB::User::Schema::Result::User>
+Related object: L<Judoon::Schema::Result::User>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "user",
-  "Judoon::DB::User::Schema::Result::User",
+  "Judoon::Schema::Result::User",
   { id => "user_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
@@ -153,7 +153,7 @@ use Spreadsheet::WriteExcel ();
 use SQL::Translator;
 
 # add permission column / methods to Dataset
-with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
+with qw(Judoon::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 

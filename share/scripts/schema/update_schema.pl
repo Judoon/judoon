@@ -2,7 +2,7 @@
 
 # Author:       Fitz Elliott <felliott@virginia.edu>
 # Date Created: Thu Jul 12 10:50:42 2012
-# Description:  this script updates the static Judoon::DB::User schema
+# Description:  this script updates the static Judoon::Schema schema
 #               from either the live database or a defined sql file.
 
 use strict;
@@ -60,7 +60,7 @@ main: {
     }
 
     make_schema_at(
-        'Judoon::DB::User::Schema',
+        'Judoon::Schema',
         { %common_args, %dbicsl_args, },
         $connect_info,
     );

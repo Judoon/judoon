@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema;
+package Judoon::Schema;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema;
 
 =head1 NAME
 
-Judoon::DB::User::Schema
+Judoon::Schema
 
 =cut
 

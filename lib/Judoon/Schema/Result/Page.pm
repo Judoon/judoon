@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::Page;
+package Judoon::Schema::Result::Page;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::Page;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::Page
+Judoon::Schema::Result::Page
 
 =cut
 
@@ -82,13 +82,13 @@ __PACKAGE__->set_primary_key("id");
 
 Type: belongs_to
 
-Related object: L<Judoon::DB::User::Schema::Result::Dataset>
+Related object: L<Judoon::Schema::Result::Dataset>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "dataset",
-  "Judoon::DB::User::Schema::Result::Dataset",
+  "Judoon::Schema::Result::Dataset",
   { id => "dataset_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
@@ -97,20 +97,20 @@ __PACKAGE__->belongs_to(
 
 Type: has_many
 
-Related object: L<Judoon::DB::User::Schema::Result::PageColumn>
+Related object: L<Judoon::Schema::Result::PageColumn>
 
 =cut
 
 __PACKAGE__->has_many(
   "page_columns",
-  "Judoon::DB::User::Schema::Result::PageColumn",
+  "Judoon::Schema::Result::PageColumn",
   { "foreign.page_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 1 },
 );
 
 
 # add permission column / methods to Page
-with qw(Judoon::DB::User::Schema::Role::Result::HasPermissions);
+with qw(Judoon::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 

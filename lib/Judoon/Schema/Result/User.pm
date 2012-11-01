@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::User;
+package Judoon::Schema::Result::User;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::User;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::User
+Judoon::Schema::Result::User
 
 =cut
 
@@ -124,13 +124,13 @@ __PACKAGE__->add_unique_constraint("username_unique", ["username"]);
 
 Type: has_many
 
-Related object: L<Judoon::DB::User::Schema::Result::Dataset>
+Related object: L<Judoon::Schema::Result::Dataset>
 
 =cut
 
 __PACKAGE__->has_many(
   "datasets",
-  "Judoon::DB::User::Schema::Result::Dataset",
+  "Judoon::Schema::Result::Dataset",
   { "foreign.user_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -139,13 +139,13 @@ __PACKAGE__->has_many(
 
 Type: has_many
 
-Related object: L<Judoon::DB::User::Schema::Result::UserRole>
+Related object: L<Judoon::Schema::Result::UserRole>
 
 =cut
 
 __PACKAGE__->has_many(
   "user_roles",
-  "Judoon::DB::User::Schema::Result::UserRole",
+  "Judoon::Schema::Result::UserRole",
   { "foreign.user_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );

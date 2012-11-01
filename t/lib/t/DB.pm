@@ -18,7 +18,7 @@ sub import {
     my ($self) = @_;
 
     Test::DBIx::Class->import({
-        schema_class => 'Judoon::DB::User::Schema',
+        schema_class => 'Judoon::Schema',
         traits       => 'Testpostgresql',
         connect_opts => {
             quote_char     => q{"},

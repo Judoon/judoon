@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::PageColumn;
+package Judoon::Schema::Result::PageColumn;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::PageColumn;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::PageColumn
+Judoon::Schema::Result::PageColumn
 
 =cut
 
@@ -83,13 +83,13 @@ __PACKAGE__->set_primary_key("id");
 
 Type: belongs_to
 
-Related object: L<Judoon::DB::User::Schema::Result::Page>
+Related object: L<Judoon::Schema::Result::Page>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "page",
-  "Judoon::DB::User::Schema::Result::Page",
+  "Judoon::Schema::Result::Page",
   { id => "page_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );

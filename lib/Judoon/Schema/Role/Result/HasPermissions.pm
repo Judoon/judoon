@@ -1,4 +1,4 @@
-package Judoon::DB::User::Schema::Role::Result::HasPermissions;
+package Judoon::Schema::Role::Result::HasPermissions;
 
 use Moo::Role;
 

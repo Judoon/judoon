@@ -1,4 +1,4 @@
-package Judoon::DB::User::Schema::ResultSet::Page;
+package Judoon::Schema::ResultSet::Page;
 
 =pod
 
@@ -6,7 +6,7 @@ package Judoon::DB::User::Schema::ResultSet::Page;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::ResultSet::Page
+Judoon::Schema::ResultSet::Page
 
 =head1 DESCRIPTION
 
@@ -17,7 +17,7 @@ Custom ResultSet class for Pages
 use Moo;
 use feature ':5.10';
 extends 'DBIx::Class::ResultSet';
-with 'Judoon::DB::User::Schema::Role::ResultSet::HasPermissions';
+with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
 =head1 METHODS
 

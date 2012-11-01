@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::UserRole;
+package Judoon::Schema::Result::UserRole;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::UserRole;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::UserRole
+Judoon::Schema::Result::UserRole
 
 =cut
 
@@ -63,13 +63,13 @@ __PACKAGE__->set_primary_key("user_id", "role_id");
 
 Type: belongs_to
 
-Related object: L<Judoon::DB::User::Schema::Result::Role>
+Related object: L<Judoon::Schema::Result::Role>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "role",
-  "Judoon::DB::User::Schema::Result::Role",
+  "Judoon::Schema::Result::Role",
   { id => "role_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
@@ -78,13 +78,13 @@ __PACKAGE__->belongs_to(
 
 Type: belongs_to
 
-Related object: L<Judoon::DB::User::Schema::Result::User>
+Related object: L<Judoon::Schema::Result::User>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "user",
-  "Judoon::DB::User::Schema::Result::User",
+  "Judoon::Schema::Result::User",
   { id => "user_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );

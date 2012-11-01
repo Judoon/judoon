@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::Role;
+package Judoon::Schema::Result::Role;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::Role;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::Role
+Judoon::Schema::Result::Role
 
 =cut
 
@@ -74,13 +74,13 @@ __PACKAGE__->add_unique_constraint("name_unique", ["name"]);
 
 Type: has_many
 
-Related object: L<Judoon::DB::User::Schema::Result::UserRole>
+Related object: L<Judoon::Schema::Result::UserRole>
 
 =cut
 
 __PACKAGE__->has_many(
   "user_roles",
-  "Judoon::DB::User::Schema::Result::UserRole",
+  "Judoon::Schema::Result::UserRole",
   { "foreign.role_id" => "self.id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );

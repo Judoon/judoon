@@ -1,5 +1,5 @@
 use utf8;
-package Judoon::DB::User::Schema::Result::DatasetColumn;
+package Judoon::Schema::Result::DatasetColumn;
 
 =pod
 
@@ -7,7 +7,7 @@ package Judoon::DB::User::Schema::Result::DatasetColumn;
 
 =head1 NAME
 
-Judoon::DB::User::Schema::Result::DatasetColumn
+Judoon::Schema::Result::DatasetColumn
 
 =cut
 
@@ -128,13 +128,13 @@ __PACKAGE__->add_unique_constraint(
 
 Type: belongs_to
 
-Related object: L<Judoon::DB::User::Schema::Result::Dataset>
+Related object: L<Judoon::Schema::Result::Dataset>
 
 =cut
 
 __PACKAGE__->belongs_to(
   "dataset",
-  "Judoon::DB::User::Schema::Result::Dataset",
+  "Judoon::Schema::Result::Dataset",
   { id => "dataset_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
