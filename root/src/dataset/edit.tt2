@@ -1,5 +1,13 @@
+[% extra_js = BLOCK %]
+  <script>
+    $('input[id=clone_template]').change(function() {
+       $('#template_fake').val($(this).val());
+    });
+  </script>
+[% END %]
 [% WRAPPER components/wrapper.tt2
   title = "View the &quot;$dataset.object.name&quot; Dataset"
+  extra_javascript = extra_js
 %]
 
 [%- WRAPPER 'components/breadcrumbs.tt2' -%]
@@ -40,23 +48,59 @@
   </fieldset>
 </form>
 
+
 <section id="actions">
   <h4>Actions</h4>
   [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset.object.id]) -%]
-  [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]), method="POST" form_name="add_page_" _ loop.count -%]
   [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/private/dataset/object', [user.object.username, dataset.object.id]),  method="DELETE" form_name="delete_dataset_" _ loop.count -%]
 </section>
+
+<br>
+
+<section id="new_page">
+  <h4>Create New Page</h4>
+
+  <ul>
+    <li>
+      <span class="help-inline">Create a new blank page:</span>
+      [% INCLUDE 'components/forms/action_form.tt2'  label="Create" url=c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]), method="POST" form_name="add_page" -%]
+    </li>
+    [% IF all_pages.list.size %]
+    <li>
+      <form name="clone_existing_page" id="clone_existing_page" action="[%- c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]) -%]" method="post" enctype="multipart/form-data" class="form-inline action-form">
+        <span class="help-inline">Create new page using existing page's layout:</span>
+        <select name="page.clone_from" id="page.clone_from">
+          [%- FOREACH all_page_obj IN all_pages.list -%]
+          <option value="[% all_page_obj.id %]">[% all_page_obj.title %]</option>
+          [%- END -%]
+        </select>
+        <button type="submit" class="btn btn-mini" form="clone_existing_page">Clone Page</button>
+      </form>
+    </li>
+    [% END %]
+    <li>
+      <form name="upload_page_template" id="upload_page_template" action="[%- c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]) -%]" method="post" enctype="multipart/form-data" class="form-inline action-form">
+        <span class="help-inline">Create new page from a template:</span>
+        <input style="display:none;" type="file" id="clone_template" form="upload_page_template" name="page.clone_template">
+        <input id="template_fake" class="input-large" type="text" form="upload_page_template">
+        <a class="btn" onclick="$('input[id=clone_template]').click();">Browse</a>
+        <button class="btn btn-primary" form="upload_page_template" type="submit"><i class="icon-upload"></i> Upload</button>
+      </form>
+    </li>
+  </ul>
+</section>
+
 
 <br>
 
 <section id="pages">
   <h4>Pages</h4>
   <ul>
-    [%- FOREACH page IN page.list -%]
+    [%- FOREACH page_obj IN page.list -%]
     <li>
-      <a href="[%- c.uri_for_action('/private/page/object', [c.user.username, dataset.object.id, page.id]) -%]">[%- page.title || '(untitled)' -%]</a>
-      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/private/page/object', [user.object.username, dataset.object.id, page.id], {view => 'preview'}) -%]
-      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', [user.object.username, dataset.object.id, page.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
+      <a href="[%- c.uri_for_action('/private/page/object', [c.user.username, dataset.object.id, page_obj.id]) -%]">[%- page_obj.title || '(untitled)' -%]</a>
+      [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/private/page/object', [user.object.username, dataset.object.id, page_obj.id], {view => 'preview'}) -%]
+      [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', [user.object.username, dataset.object.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ loop.count -%]
     </li>
     [%- END -%]
   </ul>

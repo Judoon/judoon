@@ -1,8 +1,16 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
+use feature ':5.10';
+
+# set debugging env flags
 BEGIN {
-    if ($ENV{PLACK_ENV} eq 'development') {
+
+    $ENV{PLACK_ENV} //= '';
+
+    if ($ENV{PLACK_ENV} =~ m/^development/) {
         $ENV{JUDOON_WEB_DEBUG}   = 1;
         $ENV{DBIC_TRACE}         = 1;
         $ENV{DBIC_TRACE_PROFILE} = 'console';
@@ -16,7 +24,32 @@ BEGIN {
 }
 
 use Judoon::Web;
+use Moose::Util ();
+use Plack::Builder;
 
-my $app = Judoon::Web->apply_default_middlewares(Judoon::Web->psgi_app);
-$app;
+builder {
+
+    # turn on debugging panels
+    if ($ENV{PLACK_ENV} =~ m/^development/) {
+        enable 'Plack::Middleware::Debug', panels => [qw(
+            Environment Response Timer Memory Session DBITrace
+            CatalystLog ModuleVersions Parameters
+        )];
+    }
+
+
+    # turn on heavyweight debugging panels
+    if ($ENV{PLACK_ENV} eq 'development-heavy') {
+        enable 'Debug::DBIC::QueryLog';
+
+        Moose::Util::apply_all_roles(
+            Judoon::Web->model('User'),
+            'Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack'
+        );
+    }
+
+
+    # mount app
+    mount '/' => Judoon::Web->apply_default_middlewares(Judoon::Web->psgi_app);
+};
 

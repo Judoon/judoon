@@ -69,13 +69,13 @@ after object_GET => sub {
     my ($self, $c) = @_;
 
     my $page = $c->req->get_object(0)->[0];
-    my @page_columns = $page->page_columns;
+    my @page_columns = $page->page_columns_ordered->all;
     $c->stash->{page_column}{list} = \@page_columns;
 
     my $view = $c->req->param('view') // '';
     if (!$c->stash->{user}{is_owner} || $view eq 'preview') {
         $c->stash->{page_column}{templates}
-            = [map {$_->template_to_jquery} @page_columns];
+            = [map {$_->template->to_jstmpl} @page_columns];
         $c->stash->{template} = 'page/preview.tt2';
         $c->detach();
     }
@@ -95,17 +95,22 @@ after object_GET => sub {
         $c->forward('Judoon::Web::View::Download::Plain');
         $c->detach();
     }
+    elsif ($view eq 'template') {
+        $c->res->headers->header( "Content-Type" => "application/json" );
+        my $name = $page->title;
+        $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.json" );
+        $c->res->body($page->dump_to_user);
+        $c->forward('Judoon::Web::View::Download::Plain');
+    }
 
     my %used;
     for my $page_col (@page_columns) {
-        for my $node (map {$_->decompose} $page_col->template_to_objects()) {
-            next unless ($node->type eq 'variable');
-            push @{$used{$node->name}}, $page_col->title;
-        }
+        push @{$used{$_}}, $page_col->title
+            for ($page_col->template->get_variables);
     }
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $c->req->get_chained_object(0)->[0]->ds_columns;
+    }} $c->req->get_chained_object(0)->[0]->ds_columns_ordered->all;
     $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 

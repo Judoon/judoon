@@ -147,7 +147,7 @@ __PACKAGE__->belongs_to(
 
 use DateTime;
 use Judoon::Error;
-use Judoon::Tmpl::Factory;
+use Judoon::Tmpl;
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 use SQL::Translator;
@@ -168,7 +168,7 @@ Get DatasetColumns in sorted order
 
 sub ds_columns_ordered {
     my ($self) = @_;
-    return $self->ds_columns_rs->search({},{order_by => {-asc => 'sort'}});
+    return $self->ds_columns_rs->search_rs({},{order_by => {-asc => 'sort'}});
 }
 
 
@@ -234,13 +234,15 @@ EOS
         postamble => $DEFAULT_POSTAMBLE,
     });
 
-    for my $ds_column ($self->ds_columns) {
+    my $i = 1;
+    for my $ds_column ($self->ds_columns_ordered->all) {
         my $page_column = $page->create_related('page_columns', {
             title    => $ds_column->name,
-            template => '',
+            template => Judoon::Tmpl->new_from_data([
+                {type => 'variable', name => $ds_column->shortname,}
+            ]),
+            sort     => $i++,
         });
-        $page_column->set_template(new_variable_node({name => $ds_column->shortname}));
-        $page_column->update;
     }
 
     return $page;
@@ -259,7 +261,7 @@ sub data_table {
     my ($self, $args) = @_;
     return [
         [map {$args->{shortname} ? $_->shortname : $_->name}
-             sort {$a->sort <=> $b->sort} $self->ds_columns],
+             sort {$a->sort <=> $b->sort} $self->ds_columns_ordered->all],
         @{$self->data},
     ];
 }
@@ -303,6 +305,13 @@ sub as_excel {
     return $output;
 }
 
+
+
+=head1 DATASTORE
+
+The following methods create and retreive the actual dataset data,
+which is stored in a different schema and table.
+
 =head2 B<C<data / _build_data>>
 
 Accessor for getting at the data stored in the Datastore.
@@ -314,7 +323,7 @@ sub _build_data {
     my ($self) = @_;
 
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
-        $self->ds_columns;
+        $self->ds_columns_ordered->all;
     my $select = join ', ', @columns;
 
     my $table = $self->schema_name . '.' . $self->tablename;

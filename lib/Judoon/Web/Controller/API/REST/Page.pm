@@ -57,6 +57,48 @@ before 'validate_object' => sub {
     $params->{dataset_id} //= $c->req->get_chained_object(-1)->[0]->id;
 };
 
+=head2 update_or_create_objects
+
+Intercept C<update_or_create_objects> to allow cloning a page from an
+existing page or from a provided template.
+
+=cut
+
+around 'update_or_create_objects' => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+
+    my $params = $c->req->params;
+    if (grep {exists $params->{$_}} qw(page.clone_template page.clone_from)) {
+
+        my $dataset = $c->req->get_chained_object(0)->[0];
+        my $new_page;
+        if (my $file = $params->{'page.clone_template'}) {
+            my $fh = $c->req->upload('page.clone_template')->fh;
+            my $page_template = do { local $/ = undef; <$fh>; };
+            $new_page = $dataset->new_related('pages',{})
+                ->clone_from_dump($page_template);
+        }
+        elsif (my ($page_id) = $params->{'page.clone_from'}) {
+            my $existing_page = $c->user->obj->my_pages->find({id => $page_id})
+                or die q{That page doesn't exist!};
+
+            $new_page = $dataset->new_related('pages',{})
+                ->clone_from_existing($existing_page);
+        }
+
+        $c->req->clear_objects();
+        $c->req->add_object([$new_page, {}]);
+    }
+    else {
+        $self->$orig($c);
+    }
+};
+
+
+
+
 =head1 NAME
 
  - REST Controller for 

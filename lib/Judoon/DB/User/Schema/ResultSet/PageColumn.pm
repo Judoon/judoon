@@ -28,7 +28,7 @@ Filter C<PageColumn>s to those belonging to a particular C<Page>.
 
 sub for_page {
     my ($self, $page) = @_;
-    return $self->search_rs({page_id => $page->id});
+    return $self->search_rs({page_id => $page->id},{order_by => {-asc => 'sort'}});
 }
 
 1;

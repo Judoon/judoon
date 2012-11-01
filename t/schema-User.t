@@ -7,13 +7,13 @@ use lib q{t/lib};
 
 use Test::More;
 use Test::Fatal;
+use Test::JSON;
 use t::DB;
 
 use Data::Printer;
 use Judoon::Spreadsheet;
-use Judoon::Tmpl::Factory ();
+use Judoon::Tmpl;
 use Spreadsheet::Read;
-
 
 sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
 sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
@@ -36,6 +36,9 @@ subtest 'Result::User' => sub {
         or die "Can't open test spreadsheet: $!";
     is_result $user->import_data($TEST_XLS);
     close $TEST_XLS;
+
+    # import_data_by_filename()
+    is_result $user->import_data_by_filename('t/etc/data/basic.xls');
 
 };
 
@@ -113,12 +116,9 @@ subtest 'Result::Dataset' => sub {
     ];
 
     # mutating methods, create new dataset
-    my $user = ResultSet('User')->first;
-    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
-         or die "Can't open test spreadsheet: $!";
-    my $mutable_ds = $user->import_data($TEST_XLS);
-    close $TEST_XLS;
-    is $mutable_ds->name, 'Sheet1', '  ..and name is correct';
+    my $user = ResultSet('User')->find({username => 'testuser'});
+    my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
+    is $mutable_ds->name, 'Dog Roster', '  ..and name is correct';
 
     is_deeply $mutable_ds->data, $xls_ds_data,
         'Data is as expected';
@@ -137,11 +137,35 @@ subtest 'Result::Dataset' => sub {
     is $xls_data->[1]{A6}, 'Goochie', 'Check data value';
     is $xls_data->[1]{D3}, undef, 'Check for undef value';
 
-    my @ds_cols = $mutable_ds->ds_columns_ordered;
+    my @ds_cols = $mutable_ds->ds_columns_ordered->all;
     $ds_cols[0]->move_next();
-    my @column_names = map {$_->name} $mutable_ds->ds_columns_ordered;
+    my @column_names = map {$_->name} $mutable_ds->ds_columns_ordered->all;
     is_deeply \@column_names, [qw(Age Name Gender)],
         'ds_columns_ordered gets columns in their proper order';
+
+    # test page cloning
+    t::DB::load_fixtures('clone_set');
+    my $cloneable_page = $user->my_pages->search({title => {like => '%All Time'},})->first;
+    my $new_ds         = $user->datasets_rs->find({name => 'IMDB Bottom 5'});
+    my $cloned_page    = $new_ds->new_related('pages',{})
+        ->clone_from_existing($cloneable_page);
+
+    is $cloned_page->page_columns_ordered->first->template->to_jstmpl,
+        $cloneable_page->page_columns_ordered->first->template->to_jstmpl,
+            'Page and cloned page have identical columns';
+
+    # dump_to_user()
+    my $page_dump = $cloneable_page->dump_to_user();
+    is_valid_json $page_dump, 'dump_to_user json is well formed';
+
+    # clone_from_dump()
+    my $dumpcloned_page = $new_ds->new_related('pages',{})
+        ->clone_from_dump($page_dump);
+    is $dumpcloned_page->page_columns_ordered->first->template->to_jstmpl,
+        $cloneable_page->page_columns_ordered->first->template->to_jstmpl,
+            'Page and cloned page have identical columns';
+    is_json $page_dump, $dumpcloned_page->dump_to_user,
+        'page and its dumpcloned page have equivalent json';
 };
 
 subtest 'Result::DatasetColumn' => sub {
@@ -154,8 +178,6 @@ subtest 'Result::DatasetColumn' => sub {
         is_accession => 1, accession_type => q{flybase_id},
         is_url => 0, url_root => q{},
     });
-    #is $new_ds_col->shortname, 'test_column', 'auto shortname works';
-    is $new_ds_col->linkset->[0]{value}, 'flybase', 'linkset works for accession';
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
@@ -164,28 +186,20 @@ subtest 'Result::DatasetColumn' => sub {
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
-    is $new_ds_col2->linkset->[0], 'something else?', 'BOGUS TEST: linkset works for url';
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
         name => q{}, sort => 98, is_accession => 0, accession_type => q{},
         is_url => 0, url_root => q{},
     }), 'can create column w/ empty name';
-    #is $ds_col3->shortname, 'nothing', 'shortname defaulted correctly';
-    is_deeply $ds_col3->linkset, [], 'unannotated column gives empty linkset';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
         name => q{#$*^(}, sort => 97, is_accession => 0, accession_type => q{},
         is_url => 1, url_root => q{http://google.com/?q=},
     }), 'can create column w/ non-ascii name';
-    #is $ds_col4->shortname, '_____', 'shortname defaulted correctly';
-    ok $ds_col4->linkset, 'can get linkset for url';
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
-    open my $TEST_XLS, '<', 't/etc/data/basic.xls'
-        or die "Can't open test spreadsheet: $!";
-    my $mutable_ds = $user->import_data($TEST_XLS);
-    close $TEST_XLS;
+    my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
 };
 
 
@@ -195,23 +209,47 @@ subtest 'Result::Page' => sub {
     is $page->nbr_columns, 3, '::nbr_columns is correct';
     is $page->nbr_rows, 5,    '::nbr_rows is correct';
 
-    my @page_cols = $page->page_columns_ordered;
+    my @page_cols = $page->page_columns_ordered->all;
     $page_cols[0]->move_next();
-    my @column_names = map {$_->title} $page->page_columns_ordered;
+    my @column_names = map {$_->title} $page->page_columns_ordered->all;
     is_deeply \@column_names, [qw(Age Name Gender)],
         'page_columns_ordered gets columns in their proper order';
+
+
+    my $movie_ds = ResultSet('Dataset')->find({name => 'IMDB Top 5',});
+    my $movie_page = $movie_ds->create_related(
+        'pages', {qw(title a preamble b postamble c)}
+    );
+    my $good_pcol = $movie_page->create_related(
+        'page_columns', {title => 'Good Column', template => '[]', sort => 1,}
+    );
+    $good_pcol->update;
+    ok !exception { $movie_page->templates_match_dataset },
+        'empty templates match dataset';
+
+    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{=title}}'));
+    $good_pcol->update;
+    ok !exception { $movie_page->templates_match_dataset },
+        'valid templates match dataset';
+
+    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{=nosuchname}}'));
+    $good_pcol->update;
+    isa_ok exception { $movie_page->templates_match_dataset },
+        'Judoon::Error::InvalidTemplate',
+            q{invalid templates don't match dataset};
+
 };
 
 
 subtest 'Result::PageColumn' => sub {
     my $page_column = ResultSet('PageColumn')->first;
 
-    ok $page_column->template_to_jquery,     'can produce jquery';
-    ok $page_column->template_to_objects,    'can produce objects';
+    ok $page_column->template->to_jstmpl, 'can produce jquery';
+    ok $page_column->template->get_nodes, 'can produce objects';
 
-    my $newline = Judoon::Tmpl::Factory::new_newline_node();
-    ok $page_column->set_template($newline), 'can set template...';
-    my @objects = $page_column->template_to_objects;
+    ok $page_column->template(Judoon::Tmpl->new_from_jstmpl('<br>')),
+        'can set template...';
+    my @objects = $page_column->template->get_nodes;
     ok @objects == 1 && ref($objects[0]) eq 'Judoon::Tmpl::Node::Newline',
         '  ...and get correct objects back';
 };

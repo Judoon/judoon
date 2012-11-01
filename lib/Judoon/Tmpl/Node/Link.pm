@@ -9,9 +9,7 @@ with qw(
     Judoon::Tmpl::Node::Role::Formatting
 );
 
-use Judoon::Tmpl::Factory;
 use Judoon::Tmpl::Node::VarString;
-use Method::Signatures;
 use Moose::Util::TypeConstraints qw(subtype as coerce from via);
 
 has '+type' => (default => 'link',);
@@ -33,7 +31,8 @@ code.
 
 =cut
 
-method decompose {
+sub decompose {
+    my ($self) = @_;
 
     # open anchor tag: <a href="
     my @nodes = $self->make_text_node(q{<a href="});

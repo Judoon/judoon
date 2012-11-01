@@ -22,7 +22,8 @@ Judoon::Tmpl::Node::Role::Base - Abstract interface for Tmpl::Nodes
 =head1 DESCRIPTION
 
 This role defines the base behavior of all Judoon::Tmpl::Nodes. It
-uses C<L<MooseX::Storage>> to provide serialization.
+uses C<L<MooseX::Storage>> to provide the pack() function, which lets
+us convert our Nodes into simple data structures.
 
 =cut
 
@@ -30,7 +31,8 @@ use Moose::Role;
 use MooseX::Storage;
 use namespace::autoclean;
 
-with Storage(format => [JSONpm => {json_opts => {utf8 => 1}}]);
+with Storage();
+
 
 =head1 ATTRIBUTES
 

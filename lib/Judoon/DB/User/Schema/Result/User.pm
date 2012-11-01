@@ -218,5 +218,21 @@ sub import_data {
 }
 
 
+sub import_data_by_filename {
+    my ($self, $filename) = @_;
+
+    open my $SPREADSHEET, '<', $filename
+         or die "Can't open test spreadsheet: $!";
+    (my $ext = $filename) =~ s/^.*\.//;
+    my $new_ds = $self->import_data($SPREADSHEET, $ext);
+    close $SPREADSHEET;
+    return $new_ds;
+}
+
+
+sub my_pages {
+    my ($self, $args) = @_;
+    return $self->datasets_rs->related_resultset('pages');
+}
 
 1;
