@@ -95,6 +95,13 @@ after object_GET => sub {
         $c->forward('Judoon::Web::View::Download::Plain');
         $c->detach();
     }
+    elsif ($view eq 'template') {
+        $c->res->headers->header( "Content-Type" => "application/json" );
+        my $name = $page->title;
+        $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.json" );
+        $c->res->body($page->dump_to_user);
+        $c->forward('Judoon::Web::View::Download::Plain');
+    }
 
     my %used;
     for my $page_col (@page_columns) {

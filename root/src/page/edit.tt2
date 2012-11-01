@@ -10,6 +10,7 @@
 
 <ul class="nav nav-pills">
   <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'template'},) %]">Save as template</a></li>
 </ul>
 
 

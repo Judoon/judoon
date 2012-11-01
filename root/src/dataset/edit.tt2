@@ -79,7 +79,7 @@
     <li>
       <form name="upload_page_template" id="upload_page_template" action="[%- c.uri_for_action('/private/page/list', [user.object.username, dataset.object.id]) -%]" method="post" enctype="multipart/form-data" class="form-inline action-form">
         <span class="help-inline">Create new page from a template:</span>
-        <input style="display:none;" type="file" id="clone_template" form="upload_page_template" name="page.template">
+        <input style="display:none;" type="file" id="clone_template" form="upload_page_template" name="page.clone_template">
         <input id="template_fake" class="input-large" type="text" form="upload_page_template">
         <a class="btn" onclick="$('input[id=clone_template]').click();">Browse</a>
         <button class="btn btn-primary" form="upload_page_template" type="submit"><i class="icon-upload"></i> Upload</button>
