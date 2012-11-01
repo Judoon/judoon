@@ -229,4 +229,10 @@ sub import_data_by_filename {
     return $new_ds;
 }
 
+
+sub my_pages {
+    my ($self, $args) = @_;
+    return $self->datasets_rs->related_resultset('pages');
+}
+
 1;
