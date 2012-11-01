@@ -116,6 +116,12 @@ after object_GET => sub {
             map {{ $_->get_columns }} @pages
         ];
     }
+
+    my @all_pages;
+    for my $ds ($c->user->obj->datasets_rs->all) {
+        push @all_pages, $ds->pages_rs->all;
+    }
+    $c->stash->{all_pages}{list} = \@all_pages;
 };
 
 
