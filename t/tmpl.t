@@ -2,13 +2,16 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::More;
+use Test::Differences;
 use Test::Fatal;
 
 use Data::Section::Simple qw(get_data_section);
+use Encode;
 use Judoon::Tmpl;
-use JSON qw(decode_json);
+use JSON qw(decode_json from_json);
 
 
 subtest 'basic tests' => sub {
@@ -62,6 +65,36 @@ subtest 'from / to formats' => sub {
     unlike(Judoon::Tmpl->new_from_data($formats{data})->to_native,
         qr{__CLASS__}, '__CLASS__ keys have been scrubbed from data');
 
+
+    my $utf8_text   = encode("utf8", '[{"type":"text","value":"resumé","formatting":[]}]');
+    my $latin1_text = encode("latin1", decode("utf8", $utf8_text));
+    my $utf8_to_utf8 = Judoon::Tmpl->new_from_native($utf8_text)
+        ->to_native();
+    my $latin1_to_utf8 = Judoon::Tmpl->new_from_native($latin1_text, {latin1 => 1})
+        ->to_native();
+    my $latin1_to_latin1 = Judoon::Tmpl->new_from_native($latin1_text, {latin1 => 1})
+        ->to_native({latin1 => 1});
+    my $utf8_to_latin1 = Judoon::Tmpl->new_from_native($utf8_text)
+        ->to_native({latin1 => 1});
+
+    my @things = (
+        ['utf8',   $utf8_text,   $utf8_to_utf8,     ],
+        ['utf8',   $utf8_text,   $latin1_to_utf8,   ],
+        ['latin1', $latin1_text, $latin1_to_latin1, ],
+        ['latin1', $latin1_text, $utf8_to_latin1,   ],
+    );
+
+    for my $thing (@things) {
+        my ($encoding, $expected, $output) = @$thing;
+
+        my $json_args = {$encoding => 1, canonical => 1};
+        my $output_canon;
+        ok !exception { $output_canon = from_json($output, $json_args); },
+            "output is properly encoded as $encoding";
+
+        my $expected_canon = from_json($expected, $json_args);
+        eq_or_diff $output_canon, $expected_canon, ' ..and has correct structure';
+    }
 };
 
 

@@ -36,7 +36,8 @@ use Judoon::Tmpl::Node::Link;
 use Judoon::Tmpl::Node::Newline;
 use Judoon::Tmpl::Node::VarString;
 
-my $json_opts = {utf8 => 1,};
+# default args to to_json and from_json
+my $default_json_args = {utf8 => 1,};
 
 
 =head1 ATTRIBUTES
@@ -122,6 +123,7 @@ sub _build_data_scrubber {
 }
 
 
+
 =head1 Alternative Constructors
 
 These constructors build a new C<Judoon::Tmpl> object from simpler
@@ -157,17 +159,19 @@ sub new_from_data {
 }
 
 
-=head2 new_from_native( $json )
+=head2 new_from_native( $json, \%json_args? )
 
 Builds a new C<Judoon::Tmpl> from its serialized representation. This
 is just a wrapper around C<L</new_from_data>> that decodes the given
-input, which is expected to be a vaid JSON string.
+input, which is expected to be a vaid JSON string. C<$json_args> is an
+optional hashref or arguments to C<L<JSON>>'s C<from_json> function.
 
 =cut
 
 sub new_from_native {
-    my ($class, $json) = @_;
-    my $nodelist = from_json($json, $json_opts);
+    my ($class, $json, $json_args) = @_;
+    $json_args //= $default_json_args;
+    my $nodelist = from_json($json, $json_args);
     return $class->new_from_data($nodelist);
 }
 
@@ -258,16 +262,18 @@ sub to_data {
 }
 
 
-=head2 to_native
+=head2 to_native( \%json_args? )
 
 Output our template as a serialized data structure. This method calls
-C<L</to_data>> and JSON-encodes the output.
+C<L</to_data>> and JSON-encodes the output. C<$json_args> is an
+optional hashref of arguments to C<L<JSON>>'s C<to_json> function;
 
 =cut
 
 sub to_native {
-    my ($self) = @_;
-    return to_json($self->to_data, $json_opts);
+    my ($self, $json_args) = @_;
+    $json_args //= $default_json_args;
+    return to_json($self->to_data, $json_args);
 }
 
 
