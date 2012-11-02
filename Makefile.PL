@@ -35,6 +35,7 @@ requires 'CatalystX::RoleApplicator';
 requires 'Config::General' => '2.51';
 requires 'Data::Printer';
 requires 'Data::Section::Simple';
+requires 'Data::Visitor::Callback';
 requires 'DateTime';
 requires 'DBD::Pg';
 requires 'DBD::SQLite' => '1.27'; # DBIx::Class::Fixtures needs this

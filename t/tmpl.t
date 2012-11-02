@@ -56,6 +56,12 @@ subtest 'from / to formats' => sub {
                 "  ..translates correctly to $out_format";
         }
     }
+
+
+    # tests for specific formats
+    unlike(Judoon::Tmpl->new_from_data($formats{data})->to_native,
+        qr{__CLASS__}, '__CLASS__ keys have been scrubbed from data');
+
 };
 
 

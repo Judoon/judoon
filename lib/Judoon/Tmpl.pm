@@ -24,10 +24,11 @@ C<Judoon::Tmpl> is an object that represents a template.
 =cut
 
 use Moo;
-use MooX::Types::MooseLike::Base qw(ArrayRef ConsumerOf RegexpRef);
+use MooX::Types::MooseLike::Base qw(ArrayRef ConsumerOf RegexpRef InstanceOf);
 use feature ':5.10';
 
 
+use Data::Visitor::Callback;
 use JSON qw(to_json from_json);
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
@@ -56,11 +57,11 @@ has nodes => (
 sub _build_nodes { return []; }
 
 
-=head1 Node methods
+=head2 Node methods
 
 These are convenience methods for getting / querying the node list.
 
-=head2 get_nodes
+=head3 get_nodes
 
 Returns the list of nodes
 
@@ -69,7 +70,7 @@ Returns the list of nodes
 sub get_nodes  { return @{ shift->nodes }; }
 
 
-=head2 node_count
+=head3 node_count
 
 Returns the number of nodes
 
@@ -78,7 +79,7 @@ Returns the number of nodes
 sub node_count { return scalar shift->get_nodes; }
 
 
-=head2 node_types
+=head3 node_types
 
 Returns a list of the C<type> property of every node in the list.
 
@@ -87,7 +88,7 @@ Returns a list of the C<type> property of every node in the list.
 sub node_types { return map {$_->type} shift->get_nodes; }
 
 
-=head2 get_variables
+=head3 get_variables
 
 Get a list of variable names used in our template.
 
@@ -97,6 +98,27 @@ sub get_variables {
     my ($self) = @_;
     return map {$_->name} grep {$_->type eq 'variable'} map {$_->decompose}
         $self->get_nodes;
+}
+
+
+=head2 data_scrubber / _build_data_scrubber
+
+A C<L</Data::Visitor::Callback>> object responsible for scrubbing
+unwanted keys from the C<L</to_data>> representation of the
+object. Currently, this just deletes the C<__CLASS__> keys added by
+C<L<MooseX::Storage>>'s C<pack()> method.
+
+=cut
+
+has data_scrubber => (is => 'lazy', isa => InstanceOf('Data::Visitor::Callback'),);
+sub _build_data_scrubber {
+    return Data::Visitor::Callback->new(
+        hash => sub {
+            my ($visitor, $data) = @_;
+            delete $data->{__CLASS__};
+            return $data;
+        },
+    );
 }
 
 
@@ -228,9 +250,10 @@ represents a node.
 
 sub to_data {
     my ($self) = @_;
-    my @node_data = map {my $h = $_->pack; delete $h->{__CLASS__}; $h}
-        $self->get_nodes;
-    #delete class recursively
+    # my @node_data = map {my $h = $_->pack; delete $h->{__CLASS__}; $h}
+    #     $self->get_nodes;
+    my @node_data = map {$_->pack;} $self->get_nodes;
+    $self->data_scrubber->visit(\@node_data);
     return \@node_data;
 }
 
