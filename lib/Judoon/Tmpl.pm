@@ -29,6 +29,7 @@ use feature ':5.10';
 
 
 use Data::Visitor::Callback;
+use HTML::TreeBuilder;
 use JSON qw(to_json from_json);
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
@@ -40,7 +41,8 @@ use Judoon::Tmpl::Node::VarString;
 my $default_json_args = {utf8 => 1,};
 
 
-=head1 ATTRIBUTES
+
+=head1 Attributes
 
 =head2 nodes / _build_nodes
 
@@ -179,65 +181,21 @@ sub new_from_native {
 =head2 new_from_jstmpl
 
 Builds a new C<Judoon::Tmpl> object from a string that is a
-jsrender.js -compatible template.  It uses C<L</_jstml_parser>> to
+jsrender.js -compatible template.  It calls C<L</_parse_js>> to
 parse the string into a list of C<Judoon::Tmpl::Node::*> nodes.  It
 dies on C<undef> input, and creates an empty template if given the
-empty string.  We can't know the C<varstring_type> of a link
-component (url or label) explicitly, so it calls the
-C<_varstring_type> method to guess.
+empty string.
 
 =cut
 
 sub new_from_jstmpl {
     my ($class, $jstmpl) = @_;
     die "Don't call new_from_jstmpl() on an object" if (ref($class));
-
-    die "Cannot parse undef input as JQueryTemplate"
+    die "Cannot parse undef input as javascript template"
         if (not defined $jstmpl);
-    return $class->new_from_data([]) if ($jstmpl eq '');
-    die "Cannot parse $jstmpl as JQueryTemplate, which shouldn't be possible"
-        if ($jstmpl !~ $class->_jstmpl_parser());
-
-    my @new_nodes;
-    for my $node (@{$/{Nodes}}) {
-        my ($type) = keys %$node;
-        my $rec    = $node->{$type};
-
-        my $jnode;
-        for ($type) {
-            when ('Text')     { $jnode = {type => 'text', value => $rec->{value}}; }
-            when ('Variable') { $jnode = {type => 'variable', name => $rec->{name}}; }
-            when ('Newline')  { $jnode = {type => 'newline'}; }
-            when ('Link')     {
-                my $segs;
-                for my $seg (qw(label url)) {
-                    for my $pair (@{$rec->{$seg}{Pairs}}) {
-                        push @{$segs->{$seg}{text_segments}},
-                            ($pair->{Text} && $pair->{Text}{value}) // '';
-                        push @{$segs->{$seg}{variable_segments}},
-                            ($pair->{Variable} && $pair->{Variable}{name}) // '';
-                    }
-                }
-                $jnode = {
-                    type => 'link',
-                    url  => {
-                        type           => 'varstring',
-                        varstring_type => $class->_varstring_type($segs->{url}),
-                        %{$segs->{url}},
-                    },
-                    label => {
-                        type           => 'varstring',
-                        varstring_type => $class->_varstring_type($segs->{label}),
-                        %{$segs->{label}},
-                    },
-                };
-            }
-        }
-
-        push @new_nodes, $jnode;
-    }
-
-    return $class->new_from_data(\@new_nodes);
+    return $class->new_from_data(
+        $jstmpl eq '' ? [] : $class->_parse_js($jstmpl)
+    );
 }
 
 
@@ -254,8 +212,6 @@ represents a node.
 
 sub to_data {
     my ($self) = @_;
-    # my @node_data = map {my $h = $_->pack; delete $h->{__CLASS__}; $h}
-    #     $self->get_nodes;
     my @node_data = map {$_->pack;} $self->get_nodes;
     $self->data_scrubber->visit(\@node_data);
     return \@node_data;
@@ -314,6 +270,7 @@ sub to_jstmpl {
 }
 
 
+
 =head1 Utility Methods
 
 =head2 _new_node( \%node )
@@ -341,85 +298,153 @@ sub _new_node {
 }
 
 
-=head2 _varstring_type( \%varstring )
+=head1 javascript template parsing methods
 
-The C<_varstring_type> method takes a varstring struct and attempts to
-guess its type based upon the presence of non-empty C<variable_segments>.
+These are private methods used to parse our html/javascript templates
+
+=head2 _parse_js( $js_template )
+
+Parse a javascript template using L<HTML::TreeBuilder>.  Returns a
+list of data structs suitable for passing to C<L</new_from_data>>.
 
 =cut
 
-sub _varstring_type {
-    my ($class, $varstring) = @_;
-    return (exists($varstring->{variable_segments})
-        && grep {m/\S/} @{$varstring->{variable_segments}})
+sub _parse_js {
+    my ($class, $jstmpl) = @_;
+    my $root = HTML::TreeBuilder->new_from_content($jstmpl);
+    my ($head, $body) = $root->content_list;
+    my @nodelist = $class->_get_nodes_from_tree($body);
+    return \@nodelist;
+}
+
+
+=head2 _get_nodes_from_tree( $html_element )
+
+Takes an C<L<HTML::Element>> and returns a list of nodes based on its
+children.  This is where the magic happens!
+
+=cut
+
+sub _get_nodes_from_tree {
+    my ($class, $current_element) = @_;
+
+    my @nodelist;
+    my @elements = $current_element->content_list;
+    for my $element (@elements) {
+        if (not ref $element) { # text and variables
+            my @nodes = $class->_parse_literal($element);
+            while (@nodes) {
+                my $text = shift @nodes;
+                push @nodelist, {type => 'text', value => $text}
+                    if ($text ne '');
+                my $variable = shift @nodes;
+                push @nodelist, {type => 'variable', name => $variable}
+                    if ($variable);
+            }
+        }
+        elsif ($element->tag eq 'a') { # add Link node
+            my $url_literal   = $element->attr('href');
+            my @label_content = $element->content_list;
+            die 'oh noe!' if (@label_content > 1);
+            my $label_literal = $label_content[0];
+
+            my $link_node = {
+                type  => 'link',
+                url   => { $class->_build_varstring($url_literal)   },
+                label => { $class->_build_varstring($label_literal) },
+            };
+            push @nodelist, $link_node;
+        }
+        elsif ($element->tag eq 'br') { # add Newline node
+            push @nodelist, {type => 'newline'};
+        }
+        elsif ($element->tag eq 'strong') { # mark content as bold
+            push @nodelist, $class->_apply_formatting_to_nodes(
+                'bold', $class->_get_nodes_from_tree($element)
+            );
+        }
+        elsif ($element->tag eq 'italic') { # mark content as italic
+            push @nodelist, $class->_apply_formatting_to_nodes(
+                'italic', $class->_get_nodes_from_tree($element)
+            );
+        }
+        else {
+            die 'Unsupported tag type in the javascript template: '
+                . $element->tag;
+        }
+    }
+
+    return @nodelist;
+}
+
+
+=head2 _apply_formatting_to_nodes( $format, @nodes )
+
+Take a formatting code (currently one of 'bold' or 'italic') and push
+it onto the given nodes formatting list, creating the list if not
+already present.
+
+=cut
+
+sub _apply_formatting_to_nodes {
+    my ($class, $format, @nodes) = @_;
+    for my $node (@nodes) {
+        $node->{formatting} //= [];
+        push @{$node->{formatting}}, $format;
+    }
+    return @nodes;
+}
+
+
+=head2 _parse_literal( $literal )
+
+Turn a regular text string into a list of text values and variable
+names.  The even-indexed elements of the list (i.e. 0,2,4,etc.) will
+always be text values, and the odd elements will always be variable
+names.  If the literal string begins with a variable (such as
+"{{=bar}}"), the first element of the list will be the empty string.
+
+ $class->_parse_literal('foo{{=bar}}baz');
+ # returns ('foo','bar','baz')
+
+ $class->_parse_literal('{{=bar}}baz');
+ # returns ('','bar','baz')
+
+=cut
+
+sub _parse_literal {
+    my ($class, $literal_string) = @_;
+    return split /{{=([\w_]+)}}/, $literal_string;
+}
+
+
+=head2 _build_varstring( $literal )
+
+Build a VarString struct. Guess at varstring_type.
+
+=cut
+
+sub _build_varstring {
+    my ($class, $literal_string) = @_;
+
+    my %varstring = (
+        type              => 'varstring',
+        text_segments     => [],
+        variable_segments => [],
+    );
+
+    my @segs = $class->_parse_literal($literal_string);
+    while (@segs) {
+        push @{$varstring{text_segments}}, shift(@segs);
+        push @{$varstring{variable_segments}}, (shift(@segs) // '');
+    }
+
+    $varstring{varstring_type}
+        = (grep {m/\S/} @{$varstring{variable_segments}})
             ? 'variable' : 'static';
+    return %varstring;
 }
 
-
-=head2 _jstmpl_parser
-
-Returns a L<Regexp::Grammars>-based parser regex for parsing
-javascript templates.
-
-=cut
-
-sub _jstmpl_parser {
-    my ($class) = @_;
-
-    my $parser = do {
-        # require Regexp::Grammars;
-        # Regexp::Grammars->import();
-        use Regexp::Grammars;
-        qr{
-            <nocontext:>
-            (?: <[Nodes=Node]> )+
-
-            <token: Node>
-              <Link> | <Variable> | <Newline> | <Text>
-
-            <token: Newline>
-               \<br\>
-            <token: Variable>
-              {{=<name=(\w+)>}}
-            <token: Link>
-               \<a[ ]href="
-               <url=UrlVarString>
-               "\>
-               <label=LabelVarString>
-               \<\/a\>
-
-            <token: UrlVarString>
-              <[Pairs=UrlVsPair]>+
-            <token: LabelVarString>
-              <[Pairs=LabelVsPair]>+
-            <token: VarString>
-              <[Pairs=VsPair]>+
-
-            <token: VsPair>
-              <Text><Variable> | <emptytext=1><Variable> | <Text><emptyvariable=1>
-            <token: UrlVsPair>
-               <Text=UrlText><Variable> | <emptytext=1><Variable> | <Text=UrlText><emptyvariable=1>
-            <token: LabelVsPair>
-               <Text=LabelText><Variable> | <emptytext=1><Variable> | <Text=LabelText><emptyvariable=1>
-
-            <token: Text>
-              <value=(.+?)> <?TextEnd>
-            <token: TextEnd>
-              <Link> | <Variable> | <Newline> | $
-
-            <token: UrlText>
-              <value=([^"]+?)> <?UrlTextEnd>
-            <token: UrlTextEnd>
-              <Variable> | \"
-
-            <token: LabelText>
-              <value=([^"]+?)> <?LabelTextEnd>
-            <token: LabelTextEnd>
-              <Variable> | <Newline> | \<\/a\>
-        }x;
-    };
-    return $parser;
-}
 
 
 1;
