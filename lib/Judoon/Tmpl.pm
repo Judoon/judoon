@@ -241,25 +241,41 @@ Output our template as a jsrender.js-compatible template.
 
 sub to_jstmpl {
     my ($self) = @_;
+    return $self->_nodes_to_jstmpl($self->get_nodes);
+}
 
-    my @objects = $self->get_nodes;
+# supported formatting tags
+my %format_tags = (
+    bold   => [qw(<strong> </strong>)],
+    italic => [qw(<em> </em>)],
+);
+
+
+=head3 _nodes_to_jstmpl( \@nodes)
+
+Private method for recursively rendering nodes to javascrpt template.
+
+=cut
+
+sub _nodes_to_jstmpl {
+    my ($self, @nodes) = @_;
+
     my $template = q{};
-    while (my $node = shift @objects) {
+    while (my $node = shift @nodes) {
+        my @text;
         if ($node->does('Judoon::Tmpl::Node::Role::Composite')) {
-            unshift @objects, $node->decompose();
-            next;
+            push @text, $self->_nodes_to_jstmpl($node->decompose());
+        }
+        else {
+            push @text, $node->type eq 'text'     ? $node->value
+                      : $node->type eq 'variable' ? '{{=' . $node->name . '}}'
+                      :     die "Unrecognized node type! " . $node->type;
         }
 
-        my @text = $node->type eq 'text'     ? $node->value
-                 : $node->type eq 'variable' ? '{{=' . $node->name . '}}'
-                 :     die "Unrecognized node type! " . $node->type;
-
         if (my @formats = @{$node->formatting}) {
-            if (grep {m/bold/} @formats) {
-                @text = ('<strong>',@text,'</strong>');
-            }
-            if (grep {m/italic/} @formats) {
-                @text = ('<em>',@text,'</em>');
+            for my $format (@formats) {
+                my $format_tags = $format_tags{$format};
+                @text = ($format_tags->[0], @text, $format_tags->[1]);
             }
         }
 
@@ -331,6 +347,7 @@ sub _get_nodes_from_tree {
     my @nodelist;
     my @elements = $current_element->content_list;
     for my $element (@elements) {
+
         if (not ref $element) { # text and variables
             my @nodes = $class->_parse_literal($element);
             while (@nodes) {
@@ -363,7 +380,7 @@ sub _get_nodes_from_tree {
                 'bold', $class->_get_nodes_from_tree($element)
             );
         }
-        elsif ($element->tag eq 'italic') { # mark content as italic
+        elsif ($element->tag eq 'em') { # mark content as italic
             push @nodelist, $class->_apply_formatting_to_nodes(
                 'italic', $class->_get_nodes_from_tree($element)
             );

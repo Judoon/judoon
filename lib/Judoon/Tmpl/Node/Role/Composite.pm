@@ -18,12 +18,12 @@ utility methods for building subnodes in decompose() methods
 
 sub make_text_node {
     my ($self, $text) = @_;
-    return Judoon::Tmpl::Node::Text->new({value => $text, formatting => $self->formatting,});
+    return Judoon::Tmpl::Node::Text->new({value => $text})
 }
 
 sub make_variable_node {
     my ($self, $var) = @_;
-    return Judoon::Tmpl::Node::Variable->new({name => $var, formatting => $self->formatting,});
+    return Judoon::Tmpl::Node::Variable->new({name => $var});
 }
 
 1;

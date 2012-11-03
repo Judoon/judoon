@@ -217,11 +217,11 @@ done_testing();
 
 __DATA__
 @@ js_template
-foo{{=bar}}<br><a href="pre{{=baz}}post">quux</a>
+<strong><em>foo</em></strong><strong>{{=bar}}</strong><br><em><a href="pre{{=baz}}post">quux</a></em>
 @@ serialized
 [
- {"type" : "text", "value" : "foo"},
- {"type" : "variable", "name" : "bar"},
+ {"type" : "text", "value" : "foo", "formatting" : ["italic", "bold"]},
+ {"type" : "variable", "name" : "bar", "formatting" : ["bold"]},
  {"type" : "newline"},
  {
    "type" : "link",
@@ -234,6 +234,7 @@ foo{{=bar}}<br><a href="pre{{=baz}}post">quux</a>
      "varstring_type"    : "static",
      "text_segments"     : ["quux"],
      "variable_segments" : [""]
-   }
+   },
+  "formatting" : ["italic"]
  }
 ]
