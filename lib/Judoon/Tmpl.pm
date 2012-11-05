@@ -106,7 +106,7 @@ sub get_variables {
 
 =head2 data_scrubber / _build_data_scrubber
 
-A C<L</Data::Visitor::Callback>> object responsible for scrubbing
+A C<L<Data::Visitor::Callback>> object responsible for scrubbing
 unwanted keys from the C<L</to_data>> representation of the
 object. Currently, this just deletes the C<__CLASS__> keys added by
 C<L<MooseX::Storage>>'s C<pack()> method.
@@ -166,7 +166,7 @@ sub new_from_data {
 Builds a new C<Judoon::Tmpl> from its serialized representation. This
 is just a wrapper around C<L</new_from_data>> that decodes the given
 input, which is expected to be a vaid JSON string. C<$json_args> is an
-optional hashref or arguments to C<L<JSON>>'s C<from_json> function.
+optional hashref or arguments to C<L<JSON/from_json>>.
 
 =cut
 
