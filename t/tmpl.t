@@ -95,6 +95,23 @@ subtest 'from / to formats' => sub {
         my $expected_canon = from_json($expected, $json_args);
         eq_or_diff $output_canon, $expected_canon, ' ..and has correct structure';
     }
+
+    like exception { Judoon::Tmpl->new_from_jstmpl(); },
+        qr/cannot parse undef input/i, 'new_from_jstmpl dies on no input';
+
+    is_deeply( Judoon::Tmpl->new_from_jstmpl('')->to_data(), [],
+        'empty string to new_from_jstmpl produces empty template');
+
+    like exception { Judoon::Tmpl->_new_node([]); },
+        qr{must be a hash}i, '_new_node dies on bad arg';
+
+    like exception { Judoon::Tmpl->new_from_jstmpl('<div>bad tag</div>'); },
+        qr{unsupported tag type}i, 'new_from_jstmpl dies on bad tag';
+
+    like exception { Judoon::Tmpl->new_from_jstmpl('<a href="foo">bad <br> tag </a>'); },
+        qr{html tags found inside <a></a>}i,
+            'new_from_jstmpl with html inside <a>';
+
 };
 
 

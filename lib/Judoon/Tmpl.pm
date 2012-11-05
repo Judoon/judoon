@@ -362,7 +362,7 @@ sub _get_nodes_from_tree {
         elsif ($element->tag eq 'a') { # add Link node
             my $url_literal   = $element->attr('href');
             my @label_content = $element->content_list;
-            die 'oh noe!' if (@label_content > 1);
+            die 'html tags found inside <a></a>' if (@label_content > 1);
             my $label_literal = $label_content[0];
 
             my $link_node = {
