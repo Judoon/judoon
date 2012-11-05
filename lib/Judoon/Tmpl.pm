@@ -36,6 +36,7 @@ use Judoon::Tmpl::Node::Variable;
 use Judoon::Tmpl::Node::Link;
 use Judoon::Tmpl::Node::Newline;
 use Judoon::Tmpl::Node::VarString;
+use Params::Validate qw(:all);
 
 # default args to to_json and from_json
 my $default_json_args = {utf8 => 1,};
@@ -171,8 +172,12 @@ optional hashref or arguments to C<L<JSON/from_json>>.
 =cut
 
 sub new_from_native {
-    my ($class, $json, $json_args) = @_;
-    $json_args //= $default_json_args;
+    my ($class, $json, $json_args) = validate_pos(
+        @_,
+        {type => SCALAR,},
+        {type => SCALAR,},
+        {type => HASHREF, optional => 1, default => $default_json_args},
+    );
     my $nodelist = from_json($json, $json_args);
     return $class->new_from_data($nodelist);
 }
@@ -228,7 +233,7 @@ optional hashref of arguments to C<L<JSON>>'s C<to_json> function;
 
 sub to_native {
     my ($self, $json_args) = @_;
-    $json_args //= $default_json_args;
+    $json_args ||= $default_json_args;
     return to_json($self->to_data, $json_args);
 }
 
@@ -406,7 +411,7 @@ already present.
 sub _apply_formatting_to_nodes {
     my ($class, $format, @nodes) = @_;
     for my $node (@nodes) {
-        $node->{formatting} //= [];
+        $node->{formatting} ||= [];
         push @{$node->{formatting}}, $format;
     }
     return @nodes;

@@ -200,6 +200,8 @@ subtest 'input validation' => sub {
 
     my $no_new_on_self   = qr{Don't call .* on an object}i;
     my $arg_must_be_array = qr{Argument to .* must be an arrayref}i;
+    my $pv_wrong_type = qr{Parameter.*which is not one of the allowed types}i;
+
 
     my $tmpl  = Judoon::Tmpl->new(nodes => []);
     my $class = 'Judoon::Tmpl';
@@ -208,8 +210,8 @@ subtest 'input validation' => sub {
         ['new_from_data',   [$tmpl, []], $no_new_on_self,],
         ['new_from_data',   [$class, {}], $arg_must_be_array,],
 
-        ['new_from_native', [$tmpl, '[]'], $no_new_on_self,],
-        ['new_from_native', [$class, '{"type":"text"}'], $arg_must_be_array,],
+        ['new_from_native', [$tmpl,  '[]',             ], $pv_wrong_type],
+        ['new_from_native', [$class, '{"type":"text"}',], $arg_must_be_array],
 
         ['new_from_jstmpl', [$tmpl, []], $no_new_on_self,],
     );
@@ -217,6 +219,7 @@ subtest 'input validation' => sub {
     my %descrs = (
         $no_new_on_self    => '$self instead of $class',
         $arg_must_be_array => 'non-array argument',
+        $pv_wrong_type => 'wrong argument type',
     );
 
 
