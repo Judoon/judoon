@@ -79,6 +79,8 @@ subtest 'Login / Logout' => sub {
     like $mech->uri, qr{/user/testuser$},
         'posting to login redirects to overview';
 
+    $mech->get_ok('/get_started', 'get get_started page while logged-in');
+
     # logout
     $mech->get_ok('/logout', 'can logout okay');
     redirects_to_ok('/settings/profile', '/login');

@@ -10,7 +10,7 @@
     To get started with Judoon, you'll need to first 
     <a href="[% c.uri_for_action('/user/signup') %]">create
     an account</a>.  It's quick, and once you're done you'll
-    be taken to your [% IF c.user_exists %]<a href="[% c.uri_for_action('/user/edit/', [c.user.username]) %]">overview page</a>[% ELSE %]overview page[% END %].
+    be taken to your [% IF c.user_exists %]<a href="[% c.uri_for_action('/user/edit', [c.user.username]) %]">overview page</a>[% ELSE %]overview page[% END %].
   </p>
 
   [% IF !c.user_exists %]
