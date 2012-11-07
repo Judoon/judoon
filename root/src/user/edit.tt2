@@ -29,6 +29,67 @@
 
 [%- BLOCK owner_view -%]
 
+<p class="help-inline">
+  <a href="#howto_modal" data-toggle="modal">What now?</a>
+</p>
+<div id="howto_modal" class="modal hide fade">
+  <div class="modal-header">
+    <h3>How this works.</h3>
+  </div>
+  <div class="modal-body">
+    <p>New to Judoon?  Here are the steps to get started:</p>
+    <ol>
+      <li>
+        <h5>Upload a spreadsheet</h5>
+        <p>
+          In the box labeled &quot;<strong>Add dataset</strong>&quot;
+          click the <span class="text-info">Browse</span> button, select
+          an Excel file for upload, then click <span class="text-info">Upload</span>.
+        </p>
+        <p>
+          If all goes well, a new dataset named after your worksheet
+          will appear in the list titled <strong>Datasets</strong>.
+          You will also see a new entry in the <strong>Pages</strong>
+          list.  When you upload a spreadsheet, we automatically build
+          a page that looks exactly like it.  If you're happy with the
+          formatting, then you're done!.
+        </p>
+      </li>
+
+      <li>
+        <h5>Annotate your dataset</h5>
+        <p>
+          When you annotate your dataset, that tells us what kind of
+          data is in each column of your spreadsheet.  It is not
+          necessary to do this, but can help us to provide more
+          intelligent sorting or even preconstructed links to external
+          databases.  Click on the <span class="text-info">Annotate
+          dataset</span> button to do this.
+        </p>
+      </li>
+
+      <li>
+        <h5>Build a new page</h5>
+        <p>
+          You can create a new page here by clicking
+          the <span class="text-info">Create a New Page</span> button
+          below the dataset's name.  This will take you your new
+          Page's overview, where you can set your new Page's title,
+          opening text, and afterword.
+        </p>
+        <p>
+          Below that will be a section called <strong>Page
+          Columns</strong>, where you will see a list (initially empty
+          of all the columns in your page.  To add a new column, type
+          a title into the <span class="text-info">Column Title</span>
+          and click "<span class="text-info">Add column</span>".
+      </li>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
+
 <section id="datasets">
 <h4>Datasets</h4>
 [%- IF dataset.list.size -%]
