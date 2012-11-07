@@ -130,7 +130,7 @@
 <p>You haven't uploaded any datasets yet.</p>
 [% END %]
 
-<div class="row-fluid"><div class="span6"></div><div class="span6">
+<div class="row-fluid"><div class="span5"></div><div class="span7">
 [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
 </div></div>
 </section>
