@@ -87,6 +87,7 @@ sub parse {
         for my $col ( $cols[0] .. $cols[1] ) {
             my $cell      = $ws->{cell}[$col][1];
             my $col_name  = normalize_name( $cell );
+            next unless ($col_name);
             my $data_type = @{$ws->{attr}} ? ET_to_ST( $ws->{attr}[$col][1]{type} )
                           :                  'VARCHAR';
             push @field_names, $col_name;
