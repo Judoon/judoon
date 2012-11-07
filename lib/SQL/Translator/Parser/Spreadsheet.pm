@@ -181,6 +181,8 @@ sub parse {
                 $field->data_type( $data_type );
             }
         }
+
+        last; # only import first workbook
     }
 
     return 1;
