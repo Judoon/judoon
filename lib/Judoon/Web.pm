@@ -32,6 +32,8 @@ use CatalystX::RoleApplicator;
 
 extends 'Catalyst';
 
+use Safe::Isa;
+
 __PACKAGE__->apply_request_class_roles(qw[
     Catalyst::TraitFor::Request::REST::ForBrowsers
 ]);
@@ -114,6 +116,40 @@ __PACKAGE__->config(
 
 # Start the application
 __PACKAGE__->setup();
+
+
+=head2 finalize_error
+
+Modify catalyst error output when debug is enabled.  Adds a summary of
+the error types.
+
+=cut
+
+after finalize_error => sub {
+    my ($c) = @_;
+
+    if ( $c->debug() ) {
+        my $err_summary = q{};
+        my $cnt = 1;
+        for my $error ( @{ $c->error } ) {
+            my ($error_type, $error_msg)
+                = !blessed($error)                ? ('Plain perl', $error)
+                : $error->$_DOES('Judoon::Error') ? (ref($error), $error->message)
+                :                                   (ref($error), (split /\n/, "$error")[0]);
+
+            $err_summary .= "$cnt: Error type: $error_type\n    $error_msg\n\n";
+            $cnt++;
+        }
+        $err_summary = qq{<div class="error"><h2>Summary</h2><pre wrap="">$err_summary</pre></div>};
+
+        my $error_html = $c->res->body();
+        $error_html =~ s/<div class="box">/<div class="box">$err_summary/;
+        $c->res->body($error_html);
+    }
+
+};
+
+
 
 =head1 NAME
 

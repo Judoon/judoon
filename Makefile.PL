@@ -67,6 +67,7 @@ requires 'Path::Class';
 requires 'Plack::Middleware::Debug';
 requires 'Plack::Middleware::Debug::DBIC::QueryLog';
 requires 'Pod::Usage';
+requires 'Safe::Isa';
 requires 'Spreadsheet::Read';
 requires 'Spreadsheet::ParseExcel';
 requires 'Spreadsheet::WriteExcel';
