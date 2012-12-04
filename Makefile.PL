@@ -21,6 +21,7 @@ requires 'Catalyst::Model::DBIC::Schema';
 requires 'Catalyst::Plugin::Authentication';
 requires 'Catalyst::Plugin::Authorization::Roles';
 requires 'Catalyst::Plugin::ConfigLoader';
+requires 'Catalyst::Plugin::CustomErrorMessage';
 requires 'Catalyst::Plugin::ErrorCatcher';
 requires 'Catalyst::Plugin::Session::State::Cookie';
 requires 'Catalyst::Plugin::Session::Store::File';

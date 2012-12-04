@@ -5,14 +5,10 @@
 
 <h2>Uh oh...</h2>
 
-<p>Something went terribly wrong.</p>
-
-<p>Does this help?:</p>
-
-<pre>
-  Ctx: [% c %]
-  Error: [% error %]
-</pre>
+<p>
+  Something went terribly wrong.  Our developers have been notified,
+  please try again shortly.
+</p>
 
 <p>Lacking alternatives, why not try our <a href="[% c.uri_for_action('/index') %]">front page</a>?</p>
 

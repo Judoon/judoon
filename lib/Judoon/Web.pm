@@ -21,6 +21,7 @@ use Catalyst qw/
     Static::Simple
     Authentication
     Authorization::Roles
+    CustomErrorMessage
     ErrorCatcher
     Session
     Session::Store::Memcached
@@ -99,6 +100,13 @@ __PACKAGE__->config(
         from     => 'felliott@virginia.edu',
         subject  => 'Judoon Error Report in %F, line %l',
         use_tags => 1,
+    },
+    'custom-error-message' => {  # for ::Plugin::CustomErrorMessage
+        'uri-for-not-found' => '/',
+        'error-template'    => 'error.tt2',
+        'content-type'      => 'text/html; charset=utf-8',
+        'view-name'         => 'HTML',
+        'response-status'   => 500,
     },
 );
 
