@@ -50,8 +50,7 @@ sub signup_POST {
     }
     catch {
         my $e = $_;
-        $self->handle_error($c, $e);
-        $c->detach;
+        $self->handle_error($c, $e, {redir_to => '/user/signup'});
     };
 
     $c->authenticate({
