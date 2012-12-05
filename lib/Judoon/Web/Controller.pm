@@ -55,8 +55,9 @@ sub handle_error :Private {
     my ($self, $c, $error, $args) = @_;
 
     if ( $error->$_DOES('Judoon::Error') ) {
-        $c->flash->{alert}{error} = $error->message;
-        $c->res->redirect( $c->uri_for_action( $args->{redir_to} ) );
+        $self->set_error_and_redirect(
+            $c, $error->message, $args->{redir_to}
+        );
     }
     else {
         $c->error($error);
@@ -65,6 +66,20 @@ sub handle_error :Private {
     $c->detach();
 }
 
+
+=head2 set_error_and_redirect( $c, $errmsg, \@action )
+
+Sets the flash to C<$errmsg> and redirects to the action given by
+C<\@action>, where C<\@action> is an arrayref of args suitable for
+passing to C<< $c->uri_for_action >>.
+
+=cut
+
+sub set_error_and_redirect {
+    my ($self, $c, $error, $action_ar) = @_;
+    $c->flash->{alert}{error} = $error;
+    $c->res->redirect( $c->uri_for_action( @$action_ar ) );
+}
 
 __PACKAGE__->meta->make_immutable;
 
