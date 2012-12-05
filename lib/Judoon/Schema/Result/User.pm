@@ -209,11 +209,15 @@ sub import_data {
     my $spreadsheet = Judoon::Spreadsheet->new(
         filehandle => $fh, filetype => $ext,
     );
-    my $dataset = $self->create_related('datasets',{
-        map({$_ => q{}} qw(name tablename original notes)),
-        map({$_ => 0}   qw(nbr_rows nbr_columns)),
+
+    my $dataset;
+    $self->result_source->schema->txn_do( sub {
+        $dataset = $self->create_related('datasets',{
+            map({$_ => q{}} qw(name tablename original notes)),
+            map({$_ => 0}   qw(nbr_rows nbr_columns)),
+        });
+        $dataset->import_from_spreadsheet($spreadsheet);
     });
-    $dataset->import_from_spreadsheet($spreadsheet);
     return $dataset;
 }
 
