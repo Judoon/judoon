@@ -62,6 +62,17 @@ Create a basic page for the user after creating the dataset
 
 =cut
 
+before list_POST => sub {
+    my ($self, $c) = @_;
+    if (not $c->req->params->{'dataset.file'}) {
+        $self->set_error_and_redirect(
+            $c, 'No file provided',
+            ['/user/edit', [$c->stash->{user}{id}]],
+        );
+        $c->detach();
+    }
+};
+
 after list_POST => sub {
     my ($self, $c) = @_;
     my $dataset = $c->req->get_object(0)->[0];
