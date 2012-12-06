@@ -77,10 +77,10 @@
       </li>
 
       <li>
-        <h5>Build a new page</h5>
+        <h5>Build a custom page</h5>
         <p>
           You can create a new page here by clicking
-          the <span class="text-info">Create a New Page</span> button
+          the <span class="text-info">Create a Custom Page</span> button
           below the dataset's name.  This will take you your new
           Page's overview, where you can set your new Page's title,
           opening text, and afterword.
@@ -112,9 +112,9 @@
           <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#dataset_info_[% loop.count %]">Show more</button></span>
         </p>
         <section>
-          [% INCLUDE 'components/action_button.tt2' label="Annotate Columns"  url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a New Page" url=c.uri_for_action('/private/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ dataset_obj.id -%]
-          [% INCLUDE 'components/forms/action_form.tt2'   label="Delete Dataset"    url=c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"  url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset_obj.id]) -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=c.uri_for_action('/private/page/list', [user.object.username, dataset_obj.id]), method="POST" form_name="add_page_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"    url=c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]),  method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
         </section>
         <section id="dataset_info_[% loop.count %]" class="collapse">
           [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
