@@ -3,6 +3,7 @@
 <script>
   $(document).ready(function() {
       $('.annotate_cols').tooltip({title: "Mark columns as having a specific data type or role"});
+      $('.custom_page').tooltip({title: "Create a custom view of your dataset"});
   });
 </script>
 [% END %]
@@ -120,7 +121,7 @@
         </p>
         <section>
           [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset_obj.id]) extra_classes="annotate_cols" -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=c.uri_for_action('/private/page/list',          [user.object.username, dataset_obj.id]) method="POST" form_name="add_page_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=c.uri_for_action('/private/page/list',          [user.object.username, dataset_obj.id]) method="POST" form_name="add_page_" _ dataset_obj.id extra_classes="custom_page"-%]
           [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=c.uri_for_action('/private/dataset/object',     [user.object.username, dataset_obj.id]) method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
         </section>
         <section id="dataset_info_[% loop.count %]" class="collapse">
