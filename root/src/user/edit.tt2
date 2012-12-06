@@ -29,9 +29,17 @@
 
 [%- BLOCK owner_view -%]
 
-<p class="help-inline">
-  <a href="#howto_modal" data-toggle="modal">What now?</a>
-</p>
+<div class="row-fluid">
+  <div class="span5">
+    <p class="help-inline">
+      <a href="#howto_modal" data-toggle="modal">What now?</a>
+    </p>
+  </div>
+  <div class="span7">
+    [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
+  </div>
+</div>
+
 <div id="howto_modal" class="modal hide fade">
   <div class="modal-header">
     <h3>How this works.</h3>
@@ -130,9 +138,6 @@
 <p>You haven't uploaded any datasets yet.</p>
 [% END %]
 
-<div class="row-fluid"><div class="span5"></div><div class="span7">
-[%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
-</div></div>
 </section>
 
 
