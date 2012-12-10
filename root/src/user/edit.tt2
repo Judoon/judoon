@@ -2,8 +2,10 @@
 [% INCLUDE 'components/forms/upload_dataset_js.tt2' %]
 <script>
   $(document).ready(function() {
-      $('.annotate_cols').tooltip({title: "Mark columns as having a specific data type or role"});
-      $('.custom_page').tooltip({title: "Create a custom view of your dataset"});
+      $('.action_edit_dataset').tooltip({title: "Update the name, permissions, or other properties of this dataset."});
+      $('.action_annotate_cols').tooltip({title: "Mark columns as having a specific data type or role"});
+      $('.action_custom_page').tooltip({title: "Create a custom view of your dataset"});
+      $('.action_delete_dataset').tooltip({title: "Delete this dataset.  *This will delete all of its pages as well!*"});
   });
 </script>
 [% END %]

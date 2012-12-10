@@ -13,22 +13,15 @@
   <div class="tab-content">
     [% FOREACH dataset_obj IN dataset.list %]
     <div class="tab-pane [% loop.first ? 'active' : '' %]" id="tab[% loop.count %]">
-      <h4>About</h4>
-      <ul>
-        <li><strong>Name:</strong> <a href="[%- dataset_obj.edit_url -%]">[%- dataset_obj.name | html %]</a></li>
-        <li>[%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</li>
-        <li><strong>Created:</strong> [%- dataset_obj.create -%]</li>
-        <li><strong>My Notes:</strong> [%- dataset_obj.notes || '-' -%]</li>
-        <li>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</li>
-        <li><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</li>
-      </ul>
+
+      <h3>[%- dataset_obj.name | html -%]</h3>
 
       <h4>Actions</h4>
-      <div style="margin-bottom: 2`0px;">
-        [% INCLUDE 'components/action_button.tt2'      label="Edit Dataset"     url=dataset_obj.edit_url extra_classes="" -%]
-        [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset_obj.id]) extra_classes="annotate_cols" -%]
-        [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=c.uri_for_action('/private/page/list',          [user.object.username, dataset_obj.id]) method="POST" form_name="add_page_" _ dataset_obj.id extra_classes="custom_page"-%]
-        [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=c.uri_for_action('/private/dataset/object',     [user.object.username, dataset_obj.id]) method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
+      <div style="margin-bottom: 20px;">
+        [% INCLUDE 'components/action_button.tt2'      label="Edit Dataset"         url=dataset_obj.edit_url        extra_classes="action_edit_dataset"  -%]
+        [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=dataset_obj.column_list_url extra_classes="action_annotate_cols" -%]
+        [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=dataset_obj.page_list_url   extra_classes="action_custom_page"    method="POST"   form_name="add_page_" _ dataset_obj.id -%]
+        [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=dataset_obj.edit_url        extra_classes="action_delete_dataset" method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
       </div>
 
       <h4>Pages</h4>
@@ -43,6 +36,15 @@
       [% ELSE %]
       <p>No pages created yet.</p>
       [% END %]
+
+      <h4>About this dataset</h4>
+      <ul>
+        <li>[%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</li>
+        <li><strong>Created:</strong> [%- dataset_obj.created -%]</li>
+        <li><strong>My Notes:</strong> [%- dataset_obj.notes || '-' -%]</li>
+        <li>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</li>
+        <li><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</li>
+      </ul>
       
     </div>
     [% END %]

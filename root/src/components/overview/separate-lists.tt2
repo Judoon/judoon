@@ -12,9 +12,9 @@
           <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#dataset_info_[% loop.count %]">Show more</button></span>
         </p>
         <section>
-          [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=dataset_obj.column_list_url extra_classes="annotate_cols" -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=dataset_obj.page_list_url   extra_classes="custom_page" method="POST" form_name="add_page_" _ dataset_obj.id -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=dataset_obj.edit_url        method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=dataset_obj.column_list_url extra_classes="action_annotate_cols" -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=dataset_obj.page_list_url   extra_classes="action_custom_page" method="POST" form_name="add_page_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=dataset_obj.edit_url        extra_classes="action_delete_dataset" method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
         </section>
         <section id="dataset_info_[% loop.count %]" class="collapse">
           [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
