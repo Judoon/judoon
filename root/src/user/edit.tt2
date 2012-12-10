@@ -45,16 +45,19 @@
     <p class="help-inline">
       <a href="#howto_modal" data-toggle="modal">What now?</a>
     </p>
+  </div>
+  <div class="span7">
+    [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
+  </div>
+</div>
+
+<div>
     <ul class="nav nav-pills">
       <li class="nav-header">Layout:</li>
       <li class="[% !c.req.param('separate_lists') && !c.req.param('nested_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {tabbed_view=>1}) %]">tabbed view</a></li>
       <li class="[% c.req.param('separate_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {separate_lists=>1}) %]">separate lists</a></li>
       <li class="[% c.req.param('nested_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {nested_lists=>1}) %]">nested lists</a></li>
     </ul>
-  </div>
-  <div class="span7">
-    [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
-  </div>
 </div>
 
 <div id="howto_modal" class="modal hide fade">
