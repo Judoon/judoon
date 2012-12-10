@@ -3,8 +3,9 @@
 [%- IF dataset.list.size -%]
 <div class="tabbable tabs-left">
 
-  <h4>Datasets</h4>
+  <h2>Datasets</h2>
   <ul class="nav nav-tabs">
+    <!-- <li class="nav-header">Datasets</li> -->
     [% FOREACH dataset_obj IN dataset.list %]
     <li class="[% loop.first ? 'active' : '' %]"><a href="#tab[% loop.count %]" data-toggle="tab">[%- dataset_obj.name | truncate(TAB_TITLE_MAXLEN) | html -%]</a></li>
     [% END %]
