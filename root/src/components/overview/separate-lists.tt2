@@ -1,0 +1,76 @@
+<section id="datasets">
+<h4>Datasets</h4>
+[%- IF dataset.list.size -%]
+<table class="table table-striped table-condensed dataset_list">
+  <tbody>
+    [% FOREACH dataset_obj IN dataset.list %]
+    <tr>
+      <td>[% loop.count %]<a name="dataset_[%- dataset_obj.id -%]"></td>
+      <td>
+        <p>
+          <a href="[% dataset_obj.edit_url %]">[%- dataset_obj.name | html -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows
+          <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#dataset_info_[% loop.count %]">Show more</button></span>
+        </p>
+        <section>
+          [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=dataset_obj.column_list_url extra_classes="annotate_cols" -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=dataset_obj.page_list_url   extra_classes="custom_page" method="POST" form_name="add_page_" _ dataset_obj.id -%]
+          [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=dataset_obj.edit_url        method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
+        </section>
+        <section id="dataset_info_[% loop.count %]" class="collapse">
+          [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
+          <p><strong>Columns:</strong>  [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</li></p>
+          <p>This dataset is <strong>[%- INCLUDE 'components/schema/permission.tt2' permission=dataset_obj.permission -%]</strong>.</p>
+          <p><strong>Download:</strong> [%- INCLUDE 'components/forms/download_tabular_data.tt2' base_url=dataset_obj.edit_url -%]</p>
+          [% IF dataset_obj.pages.size %]
+          <h5>Current Pages:</h5>
+          <ul>
+            [%- FOREACH page_obj IN dataset_obj.pages -%]
+            <li><a href="#page_[%- page_obj.id -%]">[%- page_obj.title | html -%]</a></li>
+            [%- END -%]
+          </ul>
+          [% END %]
+        </section>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[% ELSE %]
+<p>You haven't uploaded any datasets yet.</p>
+[% END %]
+
+</section>
+
+
+<section id="pages">
+<h4>Pages</h4>
+[% IF page.list.size %]
+<table class="table table-striped table-condensed page_list">
+  <tbody>
+    [% FOREACH page_obj IN page.list %]
+    <tr>
+      <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
+      <td>
+        <p>
+          <a href="[% page_obj.edit_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
+          <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_info_[% loop.count %]">Show more</button></span>
+        </p>
+        <section>
+          [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=page_obj.edit_url _ "?view=preview" -%]
+          [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=page_obj.edit_url method="DELETE", form_name="delete_page_" _ page_obj.id -%]
+        </section>
+        <section id="page_info_[% loop.count %]" class="collapse">
+          [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]
+          <p><strong>Parent Dataset:</strong> <a href="#dataset_[% page_obj.dataset.id %]">[% page_obj.dataset.name %]</a></p>
+          <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
+          <p>This page is <strong>[%- INCLUDE 'components/schema/permission.tt2' permission=page_obj.permission -%]</strong>.</p>
+          <p><strong>Download:</strong> [%- INCLUDE 'components/forms/download_tabular_data.tt2' base_url=page_obj.edit_url -%]</p>
+          <p><strong>Download Standalone App:</strong> <a href="[% page_obj.edit_url _ '?view=standalone&format=zip' %]">zip</a>, <a href="[% page_obj.edit_url _ '?view=standalone&format=tgz' %]">tar.gz</a></p>
+        </section>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[% ELSE %]
+<p>You haven't created any pages yet.</p>
+[% END %]
+</section>

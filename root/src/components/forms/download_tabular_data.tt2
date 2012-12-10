@@ -1,0 +1,1 @@
+<a href="[% base_url _ '?view=tab' %]">tab</a>, <a href="[% base_url _ '?view=csv' %]">csv</a>, <a href="[% base_url _ '?view=xls' %]">Excel</a>

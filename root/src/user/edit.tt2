@@ -15,33 +15,40 @@
 [%- WRAPPER 'components/breadcrumbs.tt2' -%]
 [%- INCLUDE 'components/breadcrumbs/overview.tt2' -%]
 [%- END -%]
-[%- INCLUDE 'components/identification.tt2' -%]
 
-<h2>[% user.object.username %]'s overview</h2>
-
-<br>
 [% INCLUDE 'components/notification.tt2' %]
 
 [% IF !user.is_owner && !dataset.list.size && !dataset.page.size %]
 <h4>[% user.object.username %] has not publicized any of their data yet</h4>
 [%- ELSIF user.is_owner -%]
-[%- PROCESS owner_view -%]
+  [% PROCESS guide_add_dataset %]
+  [% IF c.req.param('separate_lists') %]
+  [%- INCLUDE 'components/overview/separate-lists.tt2' -%]
+  [% ELSIF c.req.param('nested_lists') %]
+  [%- INCLUDE 'components/overview/nested-lists.tt2' -%]
+  [% ELSE %]
+  [%- INCLUDE 'components/overview/tabbed.tt2' -%]
+  [% END %]
 [%- ELSE -%]
-[%- PROCESS visitor_view -%]
+  [%- INCLUDE 'components/overview/visitor.tt2' -%]
 [%- END -%]
 
 [% END %]
 [%# end wrapper %]
 
 
-
-[%- BLOCK owner_view -%]
-
+[%- BLOCK guide_add_dataset -%]
 <div class="row-fluid">
   <div class="span5">
     <p class="help-inline">
       <a href="#howto_modal" data-toggle="modal">What now?</a>
     </p>
+    <ul class="nav nav-pills">
+      <li class="nav-header">Layout:</li>
+      <li class="[% !c.req.param('separate_lists') && !c.req.param('nested_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {tabbed_view=>1}) %]">tabbed view</a></li>
+      <li class="[% c.req.param('separate_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {separate_lists=>1}) %]">separate lists</a></li>
+      <li class="[% c.req.param('nested_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {nested_lists=>1}) %]">nested lists</a></li>
+    </ul>
   </div>
   <div class="span7">
     [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
@@ -105,133 +112,7 @@
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
   </div>
 </div>
-
-<section id="datasets">
-<h4>Datasets</h4>
-[%- IF dataset.list.size -%]
-<table class="table table-striped table-condensed dataset_list">
-  <tbody>
-    [% FOREACH dataset_obj IN dataset.list %]
-    <tr>
-      <td>[% loop.count %]<a name="dataset_[%- dataset_obj.id -%]"></td>
-      <td>[% dataset_url = c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]) %]
-        <p>
-          <a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows
-          <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#dataset_info_[% loop.count %]">Show more</button></span>
-        </p>
-        <section>
-          [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=c.uri_for_action('/private/datasetcolumn/list', [user.object.username, dataset_obj.id]) extra_classes="annotate_cols" -%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=c.uri_for_action('/private/page/list',          [user.object.username, dataset_obj.id]) method="POST" form_name="add_page_" _ dataset_obj.id extra_classes="custom_page"-%]
-          [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=c.uri_for_action('/private/dataset/object',     [user.object.username, dataset_obj.id]) method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
-        </section>
-        <section id="dataset_info_[% loop.count %]" class="collapse">
-          [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
-          <p><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns_ordered.all %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
-          <p>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
-          <p><strong>Download:</strong> <a href="[% dataset_url _ '?view=raw' %]">raw</a>, <a href="[% dataset_url _ '?view=csv' %]">csv</a>, <a href="[% dataset_url _ '?view=xls' %]">Excel</a></p>
-          [% IF dataset_obj.pages.size %]
-          <h5>Current Pages:</h5>
-          <ul>
-            [%- FOREACH page_obj IN dataset_obj.pages -%]
-            <li><a href="#page_[%- page_obj.id -%]">[%- page_obj.title -%]</a></li>
-            [%- END -%]
-          </ul>
-          [% END %]
-        </section>
-    </tr>
-    [% END %]
-  </tbody>
-</table>
-[% ELSE %]
-<p>You haven't uploaded any datasets yet.</p>
 [% END %]
 
-</section>
-
-
-<section id="pages">
-<h4>Pages</h4>
-[% IF page.list.size %]
-<table class="table table-striped table-condensed page_list">
-  <tbody>
-    [% FOREACH page_obj IN page.list %]
-    <tr>
-      <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
-      <td>[% page_url = c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
-        <p>
-          <a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
-          <span class="pull-right"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_info_[% loop.count %]">Show more</button></span>
-        </p>
-        <section>
-          [% INCLUDE 'components/action_button.tt2'     label="Preview"     url=c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id], {view => 'preview'}) -%]
-          [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]), method="DELETE", form_name="delete_page_" _ page_obj.id -%]
-        </section>
-        <section id="page_info_[% loop.count %]" class="collapse">
-          [%- IF page_obj.notes -%]<p><strong>About this page:</strong> [%- page_obj.notes -%]</p>[%- END -%]
-          <p><strong>Parent Dataset:</strong> <a href="#dataset_[% page_obj.dataset.id %]">[% page_obj.dataset.name %]</a></p>
-          <p><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns_ordered.all %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</p>
-          <p>This page is <strong>[%- page_obj.is_private ? 'private' : 'public' -%]</strong>.</p>
-          <p><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
-          <p><strong>Download Standalone App:</strong> <a href="[% page_url _ '?view=standalone&format=zip' %]">zip</a>, <a href="[% page_url _ '?view=standalone&format=tgz' %]">tar.gz</a></p>
-        </section>
-    </tr>
-    [% END %]
-  </tbody>
-</table>
-[% ELSE %]
-<p>You haven't created any pages yet.</p>
-[% END %]
-</section>
-
-[%- END -%]
-[%# end owner_view %]
-
-
-
-[%- BLOCK visitor_view -%]
-<section id="datasets">
-<h4>Public datasets:</h4>
-[%- IF dataset.list.size -%]
-<table class="table table-striped table-condensed dataset_list">
-  <tbody>
-    [% FOREACH dataset_obj IN dataset.list %]
-    <tr>
-      <td>[% loop.count %]</td>
-      <td>[% dataset_url = c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]) %]
-        <p><a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</p>
-        [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
-        <p><strong>Download:</strong> <a href="[% dataset_url _ '?view=raw' %]">raw</a>, <a href="[% dataset_url _ '?view=csv' %]">CSV</a>, <a href="[% dataset_url _ '?view=xls' %]">Excel</a></p>
-    </tr>
-    [% END %]
-  </tbody>
-</table>
-[%- ELSE -%]
-<p>[% user.object.username %] has not publicized any datasets yet.</p>
-[%- END -%]
-</section>
-
-<section id="pages">
-<h4>Public pages:</h4>
-[%- IF page.list.size -%]
-<table class="table table-striped table-condensed page_list">
-  <tbody>
-    [% FOREACH page_obj IN page.list %]
-    <tr>
-      <td>[% loop.count %]</td>
-      <td>[% page_url = c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
-        <p><a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows</p>
-        [%- IF 0 -%]<p><strong>About this page:</strong> [%- page_obj.preamble -%]</p>[%- END -%]
-        <p style="display: none;"><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
-    </tr>
-    [% END %]
-  </tbody>
-</table>
-[%- ELSE -%]
-<p>[% user.object.username %] has not publicized any pages yet.</p>
-[%- END -%]
-</section>
-
-[%- END -%]
-[%# end visitor_view %]
 
 

@@ -185,9 +185,50 @@ sub edit : Chained('id') PathPart('') Args(0) {
     $c->stash->{template} = 'user/edit.tt2';
 
     if ($c->stash->{user}{is_owner}) {
-        my @datasets = $c->stash->{user}{object}->datasets();
+        my @datasets = $c->stash->{user}{object}->datasets_rs->with_pages->hri->all;
+        my @url_keys = (
+            [qw(edit_url        /private/dataset/object    )],
+            [qw(column_list_url /private/datasetcolumn/list)],
+            [qw(page_list_url   /private/page/list         )],
+        );
+        for my $dataset (@datasets) {
+
+            $dataset->{ds_columns} = [
+                $c->model('User::Dataset')->find({id => $dataset->{id}})
+                    ->ds_columns_ordered->hri->all
+            ];
+
+            for my $url_keys (@url_keys) {
+                my ($url_stash_key, $url_action) = @$url_keys;
+                $dataset->{$url_stash_key} = $c->uri_for_action(
+                    $url_action,
+                    [$c->stash->{user}{object}->username, $dataset->{id}],
+                );
+            }
+
+            for my $page (@{$dataset->{pages}}) {
+
+                # give page access to its parent dataset's scalar fields
+                # this is only needed for the separate-lists overview template
+                $page->{dataset} = {
+                    map {$_ => $dataset->{$_}} grep {not ref $dataset->{$_}}
+                        keys %$dataset
+                };
+
+                $page->{page_columns} = [
+                    $c->model('User::Page')->find({id => $page->{id}})
+                        ->page_columns_ordered->hri->all
+                ];
+
+                $page->{edit_url} = $c->uri_for_action(
+                    '/private/page/object',
+                    [$c->stash->{user}{object}->username, $dataset->{id}, $page->{id}],
+                );
+            }
+        }
+
         $c->stash->{dataset}{list} = \@datasets;
-        $c->stash->{page}{list}    = [map {$_->pages} @datasets];
+        $c->stash->{page}{list} = [map {@{$_->{pages}}} @datasets];
     }
     else {
         my @datasets = $c->stash->{user}{object}->datasets_rs()->public();
