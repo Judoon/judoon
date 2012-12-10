@@ -220,6 +220,10 @@ sub edit : Chained('id') PathPart('') Args(0) {
                         ->page_columns_ordered->hri->all
                 ];
 
+                # not sure how to set this with dbic
+                $page->{nbr_rows}    = $dataset->{nbr_rows};
+                $page->{nbr_columns} = scalar @{$page->{page_columns}};
+
                 $page->{edit_url} = $c->uri_for_action(
                     '/private/page/object',
                     [$c->stash->{user}{object}->username, $dataset->{id}, $page->{id}],
