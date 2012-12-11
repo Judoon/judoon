@@ -6,6 +6,7 @@
       $('.action_annotate_cols').tooltip({title: "Mark columns as having a specific data type or role"});
       $('.action_custom_page').tooltip({title: "Create a custom view of your dataset"});
       $('.action_delete_dataset').tooltip({title: "Delete this dataset.  *This will delete all of its pages as well!*"});
+      $('.action_download_tabular').tooltip({title: "Download data as an Excel file, csv, or tab-delimited file."});
   });
 </script>
 [% END %]
