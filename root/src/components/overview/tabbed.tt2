@@ -154,7 +154,7 @@
       <h4>About this dataset</h4>
       <ul>
         <li>[%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</li>
-        <li><strong>Created:</strong> [%- dataset_obj.created -%]</li>
+        <li><strong>Created on:</strong> [%- dataset_obj.created -%]</li>
         <li><strong>My Notes:</strong> [%- dataset_obj.notes || '-' -%]</li>
         <li>This dataset is <strong>[%- dataset_obj.is_private ? 'private' : 'public' -%]</strong>.</li>
         <li><strong>Columns:</strong> [%- FOREACH ds_col IN dataset_obj.ds_columns %][%- ds_col.name -%][% UNLESS loop.last %], [% END %][%- END -%]</li>
