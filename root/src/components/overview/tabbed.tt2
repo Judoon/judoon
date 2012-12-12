@@ -33,15 +33,15 @@
         [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=dataset_obj.edit_url        extra_classes="action_delete_dataset" method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
         </div>
         <div class="btn-group">
-          <a class="btn btn-mini dropdown-toggle action_download_tabular" data-toggle="dropdown" href="#">
-            Download as:
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a href="[% dataset_obj.edit_url _ '?view=tab' %]">tab</a></li>
-            <li><a href="[% dataset_obj.edit_url _ '?view=csv' %]">csv</a></li>
-            <li><a href="[% dataset_obj.edit_url _ '?view=xls' %]">Excel</a></li>
-          </ul>
+          [% INCLUDE 'components/action_dropdown.tt2'
+             label         = "Download as:"
+             extra_classes = "action_download_tabular"
+             dropdown_links = [
+                 { label => 'tab',   url => dataset_obj.edit_url _ '?view=tab' },
+                 { label => 'csv',   url => dataset_obj.edit_url _ '?view=csv' },
+                 { label => 'Excel', url => dataset_obj.edit_url _ '?view=xls' },
+             ]
+          %]
         </div>
       </div>
 
