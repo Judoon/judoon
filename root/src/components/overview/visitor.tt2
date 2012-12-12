@@ -1,0 +1,41 @@
+<section id="datasets">
+<h4>Public datasets:</h4>
+[%- IF dataset.list.size -%]
+<table class="table table-striped table-condensed dataset_list">
+  <tbody>
+    [% FOREACH dataset_obj IN dataset.list %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% dataset_url = c.uri_for_action('/private/dataset/object', [user.object.username, dataset_obj.id]) %]
+        <p><a href="[%  dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</p>
+        [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
+        <p><strong>Download:</strong> <a href="[% dataset_url _ '?view=raw' %]">raw</a>, <a href="[% dataset_url _ '?view=csv' %]">CSV</a>, <a href="[% dataset_url _ '?view=xls' %]">Excel</a></p>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[%- ELSE -%]
+<p>[% user.object.username %] has not publicized any datasets yet.</p>
+[%- END -%]
+</section>
+
+<section id="pages">
+<h4>Public pages:</h4>
+[%- IF page.list.size -%]
+<table class="table table-striped table-condensed page_list">
+  <tbody>
+    [% FOREACH page_obj IN page.list %]
+    <tr>
+      <td>[% loop.count %]</td>
+      <td>[% page_url = c.uri_for_action('/private/page/object', [user.object.username, page_obj.dataset.id, page_obj.id]) %]
+        <p><a href="[%  page_url %]">[%- page_obj.title -%]</a> - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows</p>
+        [%- IF 0 -%]<p><strong>About this page:</strong> [%- page_obj.preamble -%]</p>[%- END -%]
+        <p style="display: none;"><strong>Download:</strong> <a href="[% page_url _ '?view=raw' %]">raw</a>, <a href="[% page_url _ '?view=csv' %]">CSV</a>, <a href="[% page_url _ '?view=xls' %]">Excel</a></p>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+[%- ELSE -%]
+<p>[% user.object.username %] has not publicized any pages yet.</p>
+[%- END -%]
+</section>

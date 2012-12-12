@@ -1,4 +1,4 @@
-<form name="add_dataset" id="add_dataset" action="[% c.uri_for_action('/private/dataset/list', [user.object.username]) %]" method="post" enctype="multipart/form-data" class="form-inline well">
+<form name="add_dataset" id="add_dataset" action="[% c.uri_for_action('/private/dataset/list', [user.object.username]) %]" method="post" enctype="multipart/form-data" class="form-inline">
   <h4 class="help-inline">Add dataset:</h4>
   <input style="display:none;" type="file" id="dataset" form="add_dataset" name="dataset.file" class="">
   <input id="dataset_fake" class="input-large" type="text" form="add_dataset">

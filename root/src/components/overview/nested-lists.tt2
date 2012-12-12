@@ -1,0 +1,29 @@
+<section id="datasets">
+<h4>Datasets</h4>
+[%- IF dataset.list.size -%]
+<ol>
+  [% FOREACH dataset_obj IN dataset.list %]
+  <li>
+    <a name="dataset_[%- dataset_obj.id -%]"></a>
+    <p><a href="[%- dataset_obj.edit_url -%]">[%- dataset_obj.name | html -%]</a></p>
+
+    <h5>Pages</h5>
+    [% IF dataset_obj.pages.size %]
+    <ol>
+      [% FOREACH page_obj IN dataset_obj.pages %]
+      <li>
+        <a href="[%- page_obj.edit_url -%]">[%- page_obj.title | html -%]</a>
+      </li>
+      [% END %]
+    </ol>
+    [% ELSE %]
+    <p>No pages created yet.</p>
+    [% END %]
+
+  </li>
+  [% END %]
+</ol>
+[% ELSE %]
+<p>You haven't uploaded any datasets yet.</p>
+[% END %]
+</section>

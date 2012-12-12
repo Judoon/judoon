@@ -104,7 +104,7 @@ after object_GET => sub {
     $name =~ s/__+/_/g;
     $name =~ s/(?:^_+|_+$)//g;
 
-    if ($view eq 'raw') {
+    if ($view eq 'tab') {
         $c->res->headers->header( "Content-Type" => "text/tab-separated-values" );
         $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.tab" );
         $c->stash->{plain}{data} = $dataset->as_raw;

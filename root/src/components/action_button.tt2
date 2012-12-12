@@ -1,1 +1,1 @@
-<a class="btn btn-mini" href="[% url %]">[% label %]</a>
+<a class="btn btn-mini [% extra_classes %]" href="[% url %]">[% label %]</a>

@@ -63,7 +63,6 @@ __PACKAGE__->config(
         INCLUDE_PATH => [
             Judoon::Web->path_to('root', 'src'),
         ],
-        ERROR        => 'error.tt2',
         TIMER        => 0,
         render_die   => 1,
     },
