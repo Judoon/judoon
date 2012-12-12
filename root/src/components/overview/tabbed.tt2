@@ -67,13 +67,86 @@
 
       <h4>Pages</h4>
       [% IF dataset_obj.pages.size %]
-      <ol>
-        [% FOREACH page_obj IN dataset_obj.pages %]
-        <li>
-          <a href="[%- page_obj.edit_url -%]">[%- page_obj.title | html -%]</a>
-        </li>
-        [% END %]
-      </ol>
+      <table class="table table-striped table-condensed page_list">
+        <tbody>
+          [% FOREACH page_obj IN dataset_obj.pages %]
+          <tr>
+            <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
+            <td>
+              <p style="display: inline-block;">
+                <a href="[% page_obj.edit_url %]">[%- page_obj.title | html -%]</a>
+                - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
+              </p>
+              <div class="btn-toolbar pull-right">
+                <div class="btn-group"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_actions_[% page_obj.id %]">More Actions</button></div>
+                <div class="btn-group"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_info_[% page_obj.id %]">More Info</button></div>
+              </div>
+
+              <div id="page_actions_[% page_obj.id %]" class="collapse">
+                <h5>Actions</h5>
+                <div class="btn-toolbar" style="margin-bottom: 20px;">
+                  <div class="btn-group">
+                    [%- INCLUDE "components/action_button.tt2"
+                        label         = "Edit"
+                        url           = page_obj.edit_url
+                        extra_classes = "action_edit_page"
+                    -%]
+                  </div>
+                  <div class="btn-group">
+                    [%- INCLUDE "components/action_button.tt2"
+                        label         = "Preview"
+                        url           = page_obj.edit_url _ "?view=preview"
+                        extra_classes = "action_preview_page"
+                    -%]
+                  </div>
+                  <div class="btn-group">
+                    [%- INCLUDE "components/forms/action_form.tt2"
+                        label         = "Delete Page"
+                        url           = page_obj.edit_url
+                        extra_classes = "action_delete_page"
+                        method        = "DELETE"
+                        form_name     = "delete_page_" _ page_obj.id
+                    -%]
+                  </div>
+                  <div class="btn-group">
+                    [% INCLUDE "components/action_dropdown.tt2"
+                       label         = "Download as:"
+                       extra_classes = "action_download_tabular_page"
+                       dropdown_links = [
+                           { label => "tab",   url => page_obj.edit_url _ "?view=tab", },
+                           { label => "csv",   url => page_obj.edit_url _ "?view=csv", },
+                           { label => "Excel", url => page_obj.edit_url _ "?view=xls", },
+                       ]
+                    %]
+                  </div>
+                  <div class="btn-group">
+                    [% INCLUDE "components/action_dropdown.tt2"
+                       label         = "Download standalone app:"
+                       extra_classes = "action_download_tabular"
+                       dropdown_links = [
+                           { label => "zip",    url => dataset_obj.edit_url _ "?view=standalone&format=zip", },
+                           { label => "tar.gz", url => dataset_obj.edit_url _ "?view=standalone&format=tgz", },
+                       ]
+                    %]
+                  </div>
+
+                </div>
+              </div>
+
+              <div id="page_info_[% page_obj.id %]" class="collapse">
+                <h5>About this page</h5>
+                <ul>
+                  <li><strong>Created on:</strong> [%- page_obj.created -%]</li>
+                  <li>This page is <strong>[%- INCLUDE 'components/schema/permission.tt2' permission=page_obj.permission -%]</strong>.</li>
+                  <li><strong>Columns:</strong> [%- FOREACH page_col IN page_obj.page_columns %][%- page_col.title -%][% UNLESS loop.last %], [% END %][%- END -%]</li>
+                </ul>
+              </div>
+
+            </td>
+          </tr>
+          [% END %]
+        </tbody>
+      </table>
       [% ELSE %]
       <p>No pages created yet.</p>
       [% END %]
