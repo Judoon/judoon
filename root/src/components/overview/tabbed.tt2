@@ -18,17 +18,25 @@
       <h3>[%- dataset_obj.name | html -%]</h3>
 
       <h4>Actions</h4>
-      <div style="margin-bottom: 20px;">
+      <div class="btn-toolbar" style="margin-bottom: 20px;">
+        
+        <div class="btn-group">
         [% INCLUDE 'components/action_button.tt2'      label="Edit Dataset"         url=dataset_obj.edit_url        extra_classes="action_edit_dataset"  -%]
+        </div>
+        <div class="btn-group">
         [% INCLUDE 'components/action_button.tt2'      label="Annotate Columns"     url=dataset_obj.column_list_url extra_classes="action_annotate_cols" -%]
+        </div>
+        <div class="btn-group">
         [% INCLUDE 'components/forms/action_form.tt2'  label="Create a Custom Page" url=dataset_obj.page_list_url   extra_classes="action_custom_page"    method="POST"   form_name="add_page_" _ dataset_obj.id -%]
+        </div>
+        <div class="btn-group">
         [% INCLUDE 'components/forms/action_form.tt2'  label="Delete Dataset"       url=dataset_obj.edit_url        extra_classes="action_delete_dataset" method="DELETE" form_name="delete_dataset_" _ dataset_obj.id -%]
-
-        <div class="btn-group" style="display: inline-block;">
-          <button class="btn btn-mini dropdown-toggle action_download_tabular" data-toggle="dropdown" href="#">
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-mini dropdown-toggle action_download_tabular" data-toggle="dropdown" href="#">
             Download as:
             <span class="caret"></span>
-          </button>
+          </a>
           <ul class="dropdown-menu">
             <li><a href="[% dataset_obj.edit_url _ '?view=tab' %]">tab</a></li>
             <li><a href="[% dataset_obj.edit_url _ '?view=csv' %]">csv</a></li>
