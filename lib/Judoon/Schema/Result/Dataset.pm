@@ -105,10 +105,12 @@ __PACKAGE__->add_columns(
     nbr_rows => {
         data_type   => "integer",
         is_nullable => 0,
+        is_numeric  => 1,
     },
     nbr_columns => {
         data_type   => "integer",
         is_nullable => 0,
+        is_numeric  => 1,
     },
 );
 
