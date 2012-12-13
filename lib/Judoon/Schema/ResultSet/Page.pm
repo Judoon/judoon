@@ -15,8 +15,7 @@ Custom ResultSet class for Pages
 =cut
 
 use Moo;
-use feature ':5.10';
-extends 'DBIx::Class::ResultSet';
+extends 'Judoon::Schema::ResultSet';
 with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
 =head1 METHODS

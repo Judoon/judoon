@@ -15,8 +15,7 @@ Custom ResultSet class for DatasetColumns
 =cut
 
 use Moo;
-use feature ':5.10';
-extends 'DBIx::Class::ResultSet';
+extends 'Judoon::Schema::ResultSet';
 
 =head1 METHODS
 

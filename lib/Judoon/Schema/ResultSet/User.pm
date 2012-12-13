@@ -7,8 +7,7 @@ package Judoon::Schema::ResultSet::User;
 =cut
 
 use Moo;
-use feature ':5.10';
-extends 'DBIx::Class::ResultSet';
+extends 'Judoon::Schema::ResultSet';
 
 use Judoon::Error;
 
