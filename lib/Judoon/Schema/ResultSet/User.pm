@@ -42,6 +42,9 @@ sub create_user {
     elsif (not defined $valid{password}) {
         $errmsg = q{No password was given!};
     }
+    elsif (not defined $valid{email_address}) {
+        $errmsg = q{No email address was given!};
+    }
     elsif (not $self->validate_username($valid{username})) {
         $errmsg = q{Invalid username! Use only a-z, 0-9, and '_'.};
     }

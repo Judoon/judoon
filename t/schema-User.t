@@ -64,8 +64,9 @@ subtest 'ResultSet::User' => sub {
     );
 
     my @exceptions = (
-        ['nousername', qr/no username was given/i,  'missing username',],
-        ['nopassword', qr/no password was given/i,  'missing password',],
+        ['nousername', qr/no username was given/i,       'missing username',],
+        ['nopassword', qr/no password was given/i,       'missing password',],
+        ['noemail',    qr/no email address was given/i,  'missing email',],
         ['badusername', qr/invalid username/i,      'invalid username',],
         ['badpassword', qr/password is not valid/i, 'invalid password',],
         ['dupeusername', qr/this username is already taken/i,  'duplicate username',],
@@ -76,6 +77,7 @@ subtest 'ResultSet::User' => sub {
 
     delete $create_user_exceptions{nousername}->{data}{username};
     delete $create_user_exceptions{nopassword}->{data}{password};
+    delete $create_user_exceptions{noemail}->{data}{email_address};
     $create_user_exceptions{badusername}->{data}{username} = 'sdf@#sfdg';
     $create_user_exceptions{badpassword}->{data}{password} = 'short';
     $create_user_exceptions{dupeusername}->{data}{username} = 'testuser';
