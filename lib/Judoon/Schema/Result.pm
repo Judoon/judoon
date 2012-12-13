@@ -23,9 +23,7 @@ extends 'DBIx::Class::Core';
 __PACKAGE__->load_components(qw{
    TimeStamp
    Helper::Row::NumifyGet
-   Helper::Row::ToJSON
    Helper::Row::RelationshipDWIM
-   Helper::Row::JoinTable
 });
 
 
