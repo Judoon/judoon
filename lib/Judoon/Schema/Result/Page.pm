@@ -221,7 +221,7 @@ sub templates_match_dataset {
     }
 
     my %valid_ds_columns = map {$_->shortname => 1}
-        $self->dataset->ds_columns;
+        $self->dataset->ds_columns_rs->all;
     my @bad_columns;
     for my $page_column (@page_columns) {
         my $template  = $page_column->template;

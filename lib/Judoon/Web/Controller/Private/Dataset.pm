@@ -122,7 +122,7 @@ after object_GET => sub {
         $c->forward('Judoon::Web::View::Download::Plain');
     }
 
-    if (my (@pages) = $dataset->pages) {
+    if (my (@pages) = $dataset->pages_rs->all) {
         $c->stash->{page}{list} = [
             map {{ $_->get_columns }} @pages
         ];
