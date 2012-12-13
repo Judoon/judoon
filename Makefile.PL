@@ -46,6 +46,7 @@ requires 'DBIx::Class::Migration';
 requires 'DBIx::Class::Migration::RunScript::Trait::AuthenPassphrase';
 requires 'DBIx::Class::PassphraseColumn';
 requires 'DBIx::Class::Schema::Loader';
+requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::RunSQL';
 requires 'File::Spec';
 requires 'File::Temp';
