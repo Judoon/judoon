@@ -31,7 +31,7 @@ sub create_user {
     my ($self, $params) = @_;
 
     my %valid;
-    for my $k (qw(username password name email_address phone_number mail_address active)) {
+    for my $k (qw(username password name email_address active)) {
         $valid{$k} = $params->{$k} if (exists $params->{$k});
     }
 

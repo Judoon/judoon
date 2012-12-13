@@ -63,16 +63,6 @@ __PACKAGE__->table("users");
   data_type: 'text'
   is_nullable: 0
 
-=head2 phone_number
-
-  data_type: 'text'
-  is_nullable: 1
-
-=head2 mail_address
-
-  data_type: 'text'
-  is_nullable: 1
-
 =cut
 
 __PACKAGE__->add_columns(
@@ -105,14 +95,6 @@ __PACKAGE__->add_columns(
     email_address => {
         data_type   => "text",
         is_nullable => 0,
-    },
-    phone_number => {
-        data_type   => "text",
-        is_nullable => 1,
-    },
-    mail_address => {
-        data_type   => "text",
-        is_nullable => 1,
     },
 );
 

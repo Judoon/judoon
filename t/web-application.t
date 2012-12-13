@@ -132,12 +132,11 @@ subtest 'User Tests' => sub {
             {
                 'user.email_address' => 'newuser@example.com',
                 'user.name'          => 'New Name',
-                'user.phone_number'  => '555-5505',
             },
             'can update profile',
         );
-        my ($phone_input) = $mech->grep_inputs({name => qr/^user\.phone_number$/});
-        is $phone_input->value, '555-5505', 'phone number has been updated';
+        my ($name_input) = $mech->grep_inputs({name => qr/^user\.name$/});
+        is $name_input->value, 'New Name', 'phone number has been updated';
 
         # broken: we're way too permissive right now
         # $mech->post_ok(

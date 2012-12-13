@@ -35,12 +35,6 @@
   </label>
   <input type="text" form="signup_form" class="span3" name="user.name">
 
-  <label>Phone Number</label>
-  <input type="text" form="signup_form" class="span3" name="user.phone_number">
-
-  <label>Mailing Address</label>
-  <input type="text" form="signup_form" class="span3" name="user.mail_address">
-
   <div class="form-actions">
     <button type="submit" form="signup_form" class="btn btn-primary">Submit</button>
   </div>
