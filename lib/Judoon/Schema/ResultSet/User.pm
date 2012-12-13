@@ -63,15 +63,12 @@ sub create_user {
     my $new_user = $self->create(\%valid);
 
     # create new schema for user on Pg
-    my $dbic_storage = $self->result_source->storage;
-    if ($dbic_storage->sqlt_type eq 'PostgreSQL') {
-        $dbic_storage->dbh_do(
-            sub {
-                my ($storage, $dbh) = @_;
-                $dbh->do("CREATE SCHEMA $valid{username}");
-            },
-        );
-    }
+    $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            $dbh->do("CREATE SCHEMA $valid{username}");
+        },
+    );
 
     return $new_user;
 }

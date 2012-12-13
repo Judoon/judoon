@@ -399,7 +399,7 @@ sub _store_data {
     # translate to sql
     my $sql = $sqlt->translate(
         from => 'Spreadsheet',
-        to   => $dbic_storage->sqlt_type,
+        to   => 'PostgreSQL',
     ) or die $sqlt->error;
 
     # create table
@@ -443,11 +443,6 @@ sub _check_table_name {
 
     my ($table)    = $sqlt_schema->get_tables();
     my $table_name = $self->_gen_table_name($table->name);
-
-    if ($self->result_source->storage->sqlt_type eq 'SQLite') {
-        $table_name = '[' . $table_name . ']';
-    }
-
     $table->name($self->schema_name . '.' . $table_name);
     return;
 }
@@ -466,9 +461,6 @@ sub _gen_table_name {
 
     $table_name = lc($table_name);
     $table_name =~ s/[^a-z_0-9]+/_/gi;
-    if ($self->result_source->storage->sqlt_type eq 'SQLite') {
-        $table_name = $self->user->username . '@' . $table_name;
-    }
     return $table_name unless ($self->_table_exists($table_name));
 
     my $new_name = List::AllUtils::first {not $self->_table_exists($_)}
@@ -513,8 +505,7 @@ the user.
 has schema_name => (is => 'lazy',);
 sub _build_schema_name {
     my ($self) = @_;
-    return $self->result_source->storage->sqlt_type eq 'SQLite'
-        ? 'data' : $self->user->username;
+    return $self->user->username;
 }
 
 
