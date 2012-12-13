@@ -139,7 +139,7 @@ Related object: L<Judoon::Schema::Result::DatasetColumn>
 =cut
 
 __PACKAGE__->has_many(
-    ds_columns => "Judoon::Schema::Result::DatasetColumn",
+    ds_columns => "::DatasetColumn",
     { "foreign.dataset_id" => "self.id" },
     { cascade_copy => 0, cascade_delete => 1 },
 );
@@ -153,7 +153,7 @@ Related object: L<Judoon::Schema::Result::Page>
 =cut
 
 __PACKAGE__->has_many(
-    pages => "Judoon::Schema::Result::Page",
+    pages => "::Page",
     { "foreign.dataset_id" => "self.id" },
     { cascade_copy => 0, cascade_delete => 1 },
 );
@@ -167,7 +167,7 @@ Related object: L<Judoon::Schema::Result::User>
 =cut
 
 __PACKAGE__->belongs_to(
-    user => "Judoon::Schema::Result::User",
+    user => "::User",
     { id => "user_id" },
     { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );

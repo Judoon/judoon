@@ -29,4 +29,17 @@ __PACKAGE__->load_components(qw{
 });
 
 
+=head1 METHODS
+
+=head2 default_result_namespace()
+
+The default namespace for our result classes.  Used by
+L<DBIx::Class::Helpers::RelationshipDWIM>.
+
+=cut
+
+sub default_result_namespace { 'Judoon::Schema::Result'; }
+
+
+
 1;

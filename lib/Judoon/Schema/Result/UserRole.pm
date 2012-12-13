@@ -77,7 +77,7 @@ Related object: L<Judoon::Schema::Result::Role>
 =cut
 
 __PACKAGE__->belongs_to(
-    role => "Judoon::Schema::Result::Role",
+    role => "::Role",
     { id => "role_id" },
     { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
@@ -91,7 +91,7 @@ Related object: L<Judoon::Schema::Result::User>
 =cut
 
 __PACKAGE__->belongs_to(
-    user => "Judoon::Schema::Result::User",
+    user => "::User",
     { id => "user_id" },
     { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );

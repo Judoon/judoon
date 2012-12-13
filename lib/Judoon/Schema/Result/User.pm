@@ -156,7 +156,7 @@ Related object: L<Judoon::Schema::Result::Dataset>
 =cut
 
 __PACKAGE__->has_many(
-    datasets => "Judoon::Schema::Result::Dataset",
+    datasets => "::Dataset",
     { "foreign.user_id" => "self.id" },
     { cascade_copy => 0, cascade_delete => 0 },
 );
@@ -170,7 +170,7 @@ Related object: L<Judoon::Schema::Result::UserRole>
 =cut
 
 __PACKAGE__->has_many(
-    user_roles => "Judoon::Schema::Result::UserRole",
+    user_roles => "::UserRole",
     { "foreign.user_id" => "self.id" },
     { cascade_copy => 0, cascade_delete => 0 },
 );

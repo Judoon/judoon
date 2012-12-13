@@ -88,7 +88,7 @@ Related object: L<Judoon::Schema::Result::UserRole>
 =cut
 
 __PACKAGE__->has_many(
-    user_roles => "Judoon::Schema::Result::UserRole",
+    user_roles => "::UserRole",
     { "foreign.role_id" => "self.id" },
     { cascade_copy => 0, cascade_delete => 0 },
 );

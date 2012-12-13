@@ -105,7 +105,7 @@ Related object: L<Judoon::Schema::Result::Page>
 =cut
 
 __PACKAGE__->belongs_to(
-    page => "Judoon::Schema::Result::Page",
+    page => "::Page",
     { id => "page_id" },
     { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );

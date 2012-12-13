@@ -159,7 +159,7 @@ Related object: L<Judoon::Schema::Result::Dataset>
 =cut
 
 __PACKAGE__->belongs_to(
-    dataset => "Judoon::Schema::Result::Dataset",
+    dataset => "::Dataset",
     { id => "dataset_id" },
     { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
