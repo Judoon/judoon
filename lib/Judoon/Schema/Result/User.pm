@@ -34,9 +34,9 @@ __PACKAGE__->table("users");
 
 =head2 active
 
-  data_type: 'char'
+  data_type: 'boolean'
+  default_value: true
   is_nullable: 0
-  size: 1
 
 =head2 username
 
@@ -72,9 +72,9 @@ __PACKAGE__->add_columns(
         is_nullable       => 0,
     },
     active => {
-        data_type   => "char",
-        is_nullable => 0,
-        size        => 1,
+        data_type     => "boolean",
+        default_value => \'true',
+        is_nullable   => 0,
     },
     username => {
         data_type   => "text",

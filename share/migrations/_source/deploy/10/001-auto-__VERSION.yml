@@ -1,0 +1,614 @@
+---
+schema:
+  procedures: {}
+  tables:
+    dbix_class_deploymenthandler_versions:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - version
+          match_type: ''
+          name: dbix_class_deploymenthandler_versions_version
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: UNIQUE
+      fields:
+        ddl:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: ddl
+          order: 3
+          size:
+            - 0
+        id:
+          data_type: int
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        upgrade_sql:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: upgrade_sql
+          order: 4
+          size:
+            - 0
+        version:
+          data_type: varchar
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 1
+          name: version
+          order: 2
+          size:
+            - 50
+      indices: []
+      name: dbix_class_deploymenthandler_versions
+      options: []
+      order: 1
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    DBIx::Class::Schema: ~
+    DBIx::Schema: ~
+    package: &1 !!perl/hash:Judoon::Schema
+      class_mappings:
+        DBIx::Class::DeploymentHandler::VersionStorage::Standard::VersionResult: __VERSION
+        Judoon::Schema::Result::Dataset: Dataset
+        Judoon::Schema::Result::DatasetColumn: DatasetColumn
+        Judoon::Schema::Result::Page: Page
+        Judoon::Schema::Result::PageColumn: PageColumn
+        Judoon::Schema::Result::Role: Role
+        Judoon::Schema::Result::User: User
+        Judoon::Schema::Result::UserRole: UserRole
+      source_registrations:
+        Dataset: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+            nbr_columns:
+              data_type: integer
+              is_nullable: 0
+              is_numeric: 1
+            nbr_rows:
+              data_type: integer
+              is_nullable: 0
+              is_numeric: 1
+            notes:
+              data_type: text
+              is_nullable: 0
+            original:
+              data_type: text
+              is_nullable: 0
+            permission:
+              data_type: text
+              default_value: private
+              is_nullable: 0
+            tablename:
+              data_type: text
+              is_nullable: 0
+            user_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - user_id
+            - name
+            - notes
+            - original
+            - tablename
+            - nbr_rows
+            - nbr_columns
+            - permission
+          _primaries: &2
+            - id
+          _relationships:
+            ds_columns:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 1
+                join_type: LEFT
+              class: Judoon::Schema::Result::DatasetColumn
+              cond:
+                foreign.dataset_id: self.id
+              source: Judoon::Schema::Result::DatasetColumn
+            pages:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 1
+                join_type: LEFT
+              class: Judoon::Schema::Result::Page
+              cond:
+                foreign.dataset_id: self.id
+              source: Judoon::Schema::Result::Page
+            user:
+              attrs:
+                accessor: single
+                fk_columns:
+                  user_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::Schema::Result::User
+              cond:
+                foreign.id: self.user_id
+              source: Judoon::Schema::Result::User
+          _unique_constraints:
+            primary: *2
+          name: datasets
+          result_class: Judoon::Schema::Result::Dataset
+          resultset_attributes: {}
+          resultset_class: Judoon::Schema::ResultSet::Dataset
+          schema: *1
+          source_name: Dataset
+        DatasetColumn: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            accession_type:
+              data_type: text
+              is_nullable: 0
+            dataset_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            is_accession:
+              data_type: integer
+              default_value: 0
+              is_nullable: 0
+            is_url:
+              data_type: integer
+              default_value: 0
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+            shortname:
+              data_type: text
+              is_nullable: 1
+            sort:
+              data_type: integer
+              is_nullable: 0
+            url_root:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - dataset_id
+            - name
+            - sort
+            - is_accession
+            - accession_type
+            - is_url
+            - url_root
+            - shortname
+          _primaries: &3
+            - id
+          _relationships:
+            dataset:
+              attrs:
+                accessor: single
+                fk_columns:
+                  dataset_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::Schema::Result::Dataset
+              cond:
+                foreign.id: self.dataset_id
+              source: Judoon::Schema::Result::Dataset
+          _unique_constraints:
+            dataset_id_shortname_unique:
+              - dataset_id
+              - shortname
+            primary: *3
+          name: dataset_columns
+          result_class: Judoon::Schema::Result::DatasetColumn
+          resultset_attributes: {}
+          resultset_class: Judoon::Schema::ResultSet::DatasetColumn
+          schema: *1
+          source_name: DatasetColumn
+        Page: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            dataset_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            permission:
+              data_type: text
+              default_value: private
+              is_nullable: 0
+            postamble:
+              data_type: text
+              is_nullable: 0
+            preamble:
+              data_type: text
+              is_nullable: 0
+            title:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - dataset_id
+            - title
+            - preamble
+            - postamble
+            - permission
+          _primaries: &4
+            - id
+          _relationships:
+            dataset:
+              attrs:
+                accessor: single
+                fk_columns:
+                  dataset_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::Schema::Result::Dataset
+              cond:
+                foreign.id: self.dataset_id
+              source: Judoon::Schema::Result::Dataset
+            page_columns:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 1
+                join_type: LEFT
+              class: Judoon::Schema::Result::PageColumn
+              cond:
+                foreign.page_id: self.id
+              source: Judoon::Schema::Result::PageColumn
+          _unique_constraints:
+            primary: *4
+          name: pages
+          result_class: Judoon::Schema::Result::Page
+          resultset_attributes: {}
+          resultset_class: Judoon::Schema::ResultSet::Page
+          schema: *1
+          source_name: Page
+        PageColumn: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            page_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            sort:
+              data_type: integer
+              is_nullable: 0
+            template:
+              _inflate_info:
+                deflate: !!perl/code '{ "DUMMY" }'
+                inflate: !!perl/code '{ "DUMMY" }'
+              data_type: text
+              is_nullable: 0
+            title:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - page_id
+            - title
+            - template
+            - sort
+          _primaries: &5
+            - id
+          _relationships:
+            page:
+              attrs:
+                accessor: single
+                fk_columns:
+                  page_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::Schema::Result::Page
+              cond:
+                foreign.id: self.page_id
+              source: Judoon::Schema::Result::Page
+          _unique_constraints:
+            primary: *5
+          name: page_columns
+          result_class: Judoon::Schema::Result::PageColumn
+          resultset_attributes: {}
+          resultset_class: Judoon::Schema::ResultSet::PageColumn
+          schema: *1
+          source_name: PageColumn
+        Role: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - name
+          _primaries: &6
+            - id
+          _relationships:
+            user_roles:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::Schema::Result::UserRole
+              cond:
+                foreign.role_id: self.id
+              source: Judoon::Schema::Result::UserRole
+          _unique_constraints:
+            name_unique:
+              - name
+            primary: *6
+          name: roles
+          result_class: Judoon::Schema::Result::Role
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: Role
+        User: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            active:
+              data_type: boolean
+              default_value: !!perl/ref
+                =: true
+              is_nullable: 0
+            email_address:
+              data_type: text
+              is_nullable: 0
+            id:
+              data_type: integer
+              is_auto_increment: 1
+              is_nullable: 0
+            name:
+              data_type: text
+              is_nullable: 0
+            password:
+              _inflate_info:
+                deflate: !!perl/code '{ "DUMMY" }'
+                inflate: !!perl/code '{ "DUMMY" }'
+              data_type: text
+              inflate_passphrase: rfc2307
+              is_nullable: 0
+              passphrase: rfc2307
+              passphrase_args:
+                cost: 8
+                salt_random: 20
+              passphrase_check_method: check_password
+              passphrase_class: BlowfishCrypt
+            password_expires:
+              _ic_dt_method: timestamp
+              _inflate_info:
+                deflate: !!perl/code '{ "DUMMY" }'
+                inflate: !!perl/code '{ "DUMMY" }'
+              data_type: timestamp
+              is_nullable: 1
+            username:
+              data_type: text
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - active
+            - username
+            - password
+            - password_expires
+            - name
+            - email_address
+          _primaries: &7
+            - id
+          _relationships:
+            datasets:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::Schema::Result::Dataset
+              cond:
+                foreign.user_id: self.id
+              source: Judoon::Schema::Result::Dataset
+            user_roles:
+              attrs:
+                accessor: multi
+                cascade_copy: 0
+                cascade_delete: 0
+                join_type: LEFT
+              class: Judoon::Schema::Result::UserRole
+              cond:
+                foreign.user_id: self.id
+              source: Judoon::Schema::Result::UserRole
+          _unique_constraints:
+            primary: *7
+            username_unique:
+              - username
+          name: users
+          result_class: Judoon::Schema::Result::User
+          resultset_attributes: {}
+          resultset_class: Judoon::Schema::ResultSet::User
+          schema: *1
+          source_name: User
+        UserRole: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            role_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+            user_id:
+              data_type: integer
+              is_foreign_key: 1
+              is_nullable: 0
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - user_id
+            - role_id
+          _primaries: &8
+            - user_id
+            - role_id
+          _relationships:
+            role:
+              attrs:
+                accessor: single
+                fk_columns:
+                  role_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::Schema::Result::Role
+              cond:
+                foreign.id: self.role_id
+              source: Judoon::Schema::Result::Role
+            user:
+              attrs:
+                accessor: single
+                fk_columns:
+                  user_id: 1
+                is_deferrable: 1
+                is_foreign_key_constraint: 1
+                on_delete: CASCADE
+                on_update: CASCADE
+                undef_on_null_fk: 1
+              class: Judoon::Schema::Result::User
+              cond:
+                foreign.id: self.user_id
+              source: Judoon::Schema::Result::User
+          _unique_constraints:
+            primary: *8
+          name: user_roles
+          result_class: Judoon::Schema::Result::UserRole
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::ResultSet
+          schema: *1
+          source_name: UserRole
+        __VERSION: !!perl/hash:DBIx::Class::ResultSource::Table
+          _columns:
+            ddl:
+              data_type: text
+              is_nullable: 1
+            id:
+              data_type: int
+              is_auto_increment: 1
+            upgrade_sql:
+              data_type: text
+              is_nullable: 1
+            version:
+              data_type: varchar
+              size: 50
+          _columns_info_loaded: 0
+          _ordered_columns:
+            - id
+            - version
+            - ddl
+            - upgrade_sql
+          _primaries: &9
+            - id
+          _relationships: {}
+          _unique_constraints:
+            dbix_class_deploymenthandler_versions_version:
+              - version
+            primary: *9
+          name: dbix_class_deploymenthandler_versions
+          result_class: DBIx::Class::DeploymentHandler::VersionStorage::Standard::VersionResult
+          resultset_attributes: {}
+          resultset_class: DBIx::Class::DeploymentHandler::VersionStorage::Standard::VersionResultSet
+          schema: *1
+          source_name: __VERSION
+      storage: !!perl/hash:DBIx::Class::Storage::DBI
+        _connect_info:
+          - dbi:Pg:dbname=judoon
+          - ''
+          - ''
+        _dbh_details: {}
+        _dbh_gen: 0
+        _dbi_connect_info:
+          - dbi:Pg:dbname=judoon
+          - ''
+          - ''
+          - &10
+            AutoCommit: 1
+            PrintError: 0
+            RaiseError: 1
+            ShowErrorStatement: 1
+        _dbic_connect_attributes: *10
+        _in_do_block: 0
+        _sql_maker: ~
+        _sql_maker_opts: {}
+        savepoints: []
+        schema: *1
+        transaction_depth: 0
+    sources:
+      - __VERSION
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11016

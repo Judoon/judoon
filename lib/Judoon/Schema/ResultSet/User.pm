@@ -54,7 +54,6 @@ sub create_user {
 
     Judoon::Error->throw($errmsg) if ($errmsg);
 
-    $valid{active} //= 1;
     my $new_user = $self->create(\%valid);
 
     # create new schema for user on Pg
