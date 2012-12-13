@@ -66,7 +66,8 @@ sub create_user {
     $self->result_source->storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
-            $dbh->do("CREATE SCHEMA $valid{username}");
+            my $schema_name = $new_user->schema_name;
+            $dbh->do("CREATE SCHEMA $schema_name");
         },
     );
 

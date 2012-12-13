@@ -497,15 +497,15 @@ sub _table_exists {
 =head2 schema_name() / _build_schema_name()
 
 Return schema name, which changes based on database engine.  For
-SQLite, the schema name is always 'data'.  For Pg, it's the name of
-the user.
+SQLite, the schema name is always 'data'.  For Pg, it's based on the
+name of the user.
 
 =cut
 
 has schema_name => (is => 'lazy',);
 sub _build_schema_name {
     my ($self) = @_;
-    return $self->user->username;
+    return $self->user->schema_name;
 }
 
 

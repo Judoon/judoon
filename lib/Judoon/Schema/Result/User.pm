@@ -16,6 +16,7 @@ extends 'Judoon::Schema::Result';
 
 use Judoon::Spreadsheet;
 
+use constant SCHEMA_PREFIX => 'user_';
 
 =head1 TABLE: C<users>
 
@@ -202,6 +203,17 @@ __PACKAGE__->add_columns(
 
 
 =head1 METHODS
+
+=head2 schema_name()
+
+Get the name of the PostgreSQL schema for this user.
+
+=cut
+
+sub schema_name {
+    return SCHEMA_PREFIX . $_[0]->username;
+}
+
 
 =head2 change_password( $password )
 
