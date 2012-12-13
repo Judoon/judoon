@@ -8,18 +8,15 @@ package Judoon::Schema::ResultSet::PageColumn;
 
 Judoon::Schema::ResultSet::PageColumn
 
-=head1 DESCRIPTION
-
-Custom ResultSet class for PageColumns
-
 =cut
 
 use Moo;
 extends 'Judoon::Schema::ResultSet';
 
+
 =head1 METHODS
 
-=head2 hri
+=head2 hri()
 
 Convenience method to set the HashRefInflator result_class
 
@@ -31,7 +28,7 @@ sub hri {
 }
 
 
-=head2 B<C<for_page( $page )>>
+=head2 for_page( $page )
 
 Filter C<PageColumn>s to those belonging to a particular C<Page>.
 
@@ -42,5 +39,5 @@ sub for_page {
     return $self->search_rs({page_id => $page->id},{order_by => {-asc => 'sort'}});
 }
 
+
 1;
-__END__

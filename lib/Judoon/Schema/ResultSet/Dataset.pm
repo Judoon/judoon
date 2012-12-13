@@ -6,11 +6,7 @@ package Judoon::Schema::ResultSet::Dataset;
 
 =head1 NAME
 
-Judoon::Schema::ResultSet::Datset
-
-=head1 DESCRIPTION
-
-Custom ResultSet class for Datasets
+Judoon::Schema::ResultSet::Dataset
 
 =cut
 
@@ -18,9 +14,10 @@ use Moo;
 extends 'Judoon::Schema::ResultSet';
 with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
+
 =head1 METHODS
 
-=head2 hri
+=head2 hri()
 
 Convenience method to set the HashRefInflator result_class
 
@@ -44,4 +41,3 @@ sub with_pages { return shift->search_rs({}, {prefetch => 'pages'}); }
 
 
 1;
-__END__

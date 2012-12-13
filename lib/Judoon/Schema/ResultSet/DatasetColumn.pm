@@ -8,18 +8,15 @@ package Judoon::Schema::ResultSet::DatasetColumn;
 
 Judoon::Schema::ResultSet::DatasetColumn
 
-=head1 DESCRIPTION
-
-Custom ResultSet class for DatasetColumns
-
 =cut
 
 use Moo;
 extends 'Judoon::Schema::ResultSet';
 
+
 =head1 METHODS
 
-=head2 hri
+=head2 hri()
 
 Convenience method to set the HashRefInflator result_class
 
@@ -31,7 +28,7 @@ sub hri {
 }
 
 
-=head2 B<C<for_dataset( $dataset_id )>>
+=head2 for_dataset( $dataset_id )
 
 Filter C<DatasetColumn> to those belonging to a particular C<Dataset>.
 
@@ -42,5 +39,5 @@ sub for_dataset {
     return $self->search_rs({dataset_id => $dataset->id},{order_by => {-asc => 'sort'}});
 }
 
+
 1;
-__END__

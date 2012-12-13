@@ -4,17 +4,24 @@ package Judoon::Schema::ResultSet::User;
 
 =encoding utf8
 
+=head1 NAME
+
+Judoon::Schema::ResultSet::User
+
 =cut
 
 use Moo;
 extends 'Judoon::Schema::ResultSet';
+
 
 use Judoon::Error;
 
 use constant MIN_PASSWORD_LENGTH => 8;
 
 
-=head2 B<C<create_user( \%params )>>
+=head1 METHODS
+
+=head2 create_user( \%params )
 
 Add a new user to the database, with sanity checks
 
@@ -65,7 +72,7 @@ sub create_user {
 }
 
 
-=head2 B<C<validate_username( $username )>>
+=head2 validate_username( $username )
 
 Makes sure C<$username> is valid.  Current regex is C<m/^\w+$/>.
 
@@ -77,7 +84,7 @@ sub validate_username {
 }
 
 
-=head2 B<C<validate_password( $password )>>
+=head2 validate_password( $password )
 
 Makes sure the password is valid.  Currently allows all defined passwords.
 
@@ -89,7 +96,7 @@ sub validate_password {
 }
 
 
-=head2 B<C<user_exists( $username )>>
+=head2 user_exists( $username )
 
 Check to see if the username C<username> is in the database.
 
@@ -102,4 +109,3 @@ sub user_exists {
 
 
 1;
-__END__
