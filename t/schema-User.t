@@ -70,6 +70,7 @@ subtest 'ResultSet::User' => sub {
         ['badusername', qr/invalid username/i,      'invalid username',],
         ['badpassword', qr/password is not valid/i, 'invalid password',],
         ['dupeusername', qr/this username is already taken/i,  'duplicate username',],
+        ['dupeemail',    qr/another account already has this email address/i,  'duplicate email_address',],
     );
     my %create_user_exceptions = map {$_->[0] => {
         data => {%newuser}, exception => $_->[1], descr => $_->[2],
@@ -81,6 +82,7 @@ subtest 'ResultSet::User' => sub {
     $create_user_exceptions{badusername}->{data}{username} = 'sdf@#sfdg';
     $create_user_exceptions{badpassword}->{data}{password} = 'short';
     $create_user_exceptions{dupeusername}->{data}{username} = 'testuser';
+    $create_user_exceptions{dupeemail}->{data}{email_address} = 'testuser@example.com';
 
     for my $i (values %create_user_exceptions) {
         like exception { $user_rs->create_user($i->{data}); },
@@ -89,9 +91,10 @@ subtest 'ResultSet::User' => sub {
 
     ok $user_rs->create_user(\%newuser), 'able to create new user';
 
-    $newuser{username} = 'neweruser';
-    $newuser{active}   = 0;
-    ok my $inactive = $user_rs->create_user(\%newuser), 'create new user (explicitly not active)';
+    @newuser{qw(username email_address active)}
+        = qw(neweruser neweruser@example.com 0);
+    ok my $inactive = $user_rs->create_user(\%newuser),
+        'create new user (explicitly not active)';
     ok !$inactive->active, 'inactive user is inactive';
 };
 

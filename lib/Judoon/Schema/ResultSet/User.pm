@@ -51,6 +51,9 @@ sub create_user {
     elsif ($self->user_exists($valid{username})) {
         $errmsg = q{This username is already taken!};
     }
+    elsif ($self->email_exists($valid{email_address})) {
+        $errmsg = q{Another account already has this email address.};
+    }
     elsif (not $self->validate_password($valid{password})) {
         $errmsg = q{Password is not valid!  Must be more than eight characters long.};
     }
@@ -107,6 +110,19 @@ Check to see if the username C<username> is in the database.
 sub user_exists {
     my ($self, $username) = @_;
     return $self->find({username => $username});
+}
+
+
+=head2 email_exists( $email_address )
+
+Check to see if the email address C<$email_address> is already in the
+database.
+
+=cut
+
+sub email_exists {
+    my ($self, $email_address) = @_;
+    return $self->find({email_address => $email_address});
 }
 
 

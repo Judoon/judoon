@@ -23,7 +23,7 @@ to work
 
 =cut
 
-our $VERSION = 10;
+our $VERSION = 11;
 
 
 __PACKAGE__->load_namespaces;

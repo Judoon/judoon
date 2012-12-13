@@ -122,9 +122,20 @@ __PACKAGE__->set_primary_key("id");
 
 =back
 
+=head2 C<email_address_unique>
+
+=over 4
+
+=item * L</email_address>
+
+=back
+
+
 =cut
 
 __PACKAGE__->add_unique_constraint("username_unique", ["username"]);
+__PACKAGE__->add_unique_constraint("email_address_unique", ["email_address"]);
+
 
 
 =head1 RELATIONS
