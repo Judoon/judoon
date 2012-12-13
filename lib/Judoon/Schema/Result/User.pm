@@ -76,24 +76,44 @@ __PACKAGE__->table("users");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "active",
-  { data_type => "char", is_nullable => 0, size => 1 },
-  "username",
-  { data_type => "text", is_nullable => 0 },
-  "password",
-  { data_type => "text", is_nullable => 0 },
-  "password_expires",
-  { data_type => "timestamp", is_nullable => 1 },
-  "name",
-  { data_type => "text", is_nullable => 0 },
-  "email_address",
-  { data_type => "text", is_nullable => 0 },
-  "phone_number",
-  { data_type => "text", is_nullable => 1 },
-  "mail_address",
-  { data_type => "text", is_nullable => 1 },
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    active => {
+        data_type   => "char",
+        is_nullable => 0,
+        size        => 1,
+    },
+    username => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    password => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    password_expires => {
+        data_type   => "timestamp",
+        is_nullable => 1,
+    },
+    name => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    email_address => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    phone_number => {
+        data_type   => "text",
+        is_nullable => 1,
+    },
+    mail_address => {
+        data_type   => "text",
+        is_nullable => 1,
+    },
 );
 
 
@@ -136,10 +156,9 @@ Related object: L<Judoon::Schema::Result::Dataset>
 =cut
 
 __PACKAGE__->has_many(
-  "datasets",
-  "Judoon::Schema::Result::Dataset",
-  { "foreign.user_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    datasets => "Judoon::Schema::Result::Dataset",
+    { "foreign.user_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 0 },
 );
 
 =head2 user_roles
@@ -151,10 +170,9 @@ Related object: L<Judoon::Schema::Result::UserRole>
 =cut
 
 __PACKAGE__->has_many(
-  "user_roles",
-  "Judoon::Schema::Result::UserRole",
-  { "foreign.user_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    user_roles => "Judoon::Schema::Result::UserRole",
+    { "foreign.user_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 0 },
 );
 
 =head2 roles

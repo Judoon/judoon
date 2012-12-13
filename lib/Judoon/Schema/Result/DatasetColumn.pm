@@ -75,24 +75,46 @@ __PACKAGE__->table("dataset_columns");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "dataset_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "name",
-  { data_type => "text", is_nullable => 0 },
-  "sort",
-  { data_type => "integer", is_nullable => 0 },
-  "is_accession",
-  { data_type => "integer", default_value => 0, is_nullable => 0 },
-  "accession_type",
-  { data_type => "text", is_nullable => 0 },
-  "is_url",
-  { data_type => "integer", default_value => 0, is_nullable => 0 },
-  "url_root",
-  { data_type => "text", is_nullable => 0 },
-  "shortname",
-  { data_type => "text", is_nullable => 1 },
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    dataset_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+    name => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    sort => {
+        data_type   => "integer",
+        is_nullable => 0,
+    },
+    is_accession => {
+        data_type     => "integer",
+        default_value => 0,
+        is_nullable   => 0,
+    },
+    accession_type => {
+        data_type => "text",
+        is_nullable => 0,
+    },
+    is_url => {
+        data_type     => "integer",
+        default_value => 0,
+        is_nullable   => 0,
+    },
+    url_root => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    shortname => {
+        data_type   => "text",
+        is_nullable => 1,
+    },
 );
 
 
@@ -122,7 +144,7 @@ __PACKAGE__->set_primary_key("id");
 =cut
 
 __PACKAGE__->add_unique_constraint(
-    "dataset_id_shortname_unique", => [qw(dataset_id shortname)],
+    dataset_id_shortname_unique => [qw(dataset_id shortname)],
 );
 
 
@@ -137,10 +159,9 @@ Related object: L<Judoon::Schema::Result::Dataset>
 =cut
 
 __PACKAGE__->belongs_to(
-  "dataset",
-  "Judoon::Schema::Result::Dataset",
-  { id => "dataset_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+    dataset => "Judoon::Schema::Result::Dataset",
+    { id => "dataset_id" },
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
 

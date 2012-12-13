@@ -61,16 +61,28 @@ __PACKAGE__->table("pages");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "dataset_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "title",
-  { data_type => "text", is_nullable => 0 },
-  "preamble",
-  { data_type => "text", is_nullable => 0 },
-  "postamble",
-  { data_type => "text", is_nullable => 0 },
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    dataset_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+    title => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    preamble => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    postamble => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
 );
 
 
@@ -98,10 +110,9 @@ Related object: L<Judoon::Schema::Result::Dataset>
 =cut
 
 __PACKAGE__->belongs_to(
-  "dataset",
-  "Judoon::Schema::Result::Dataset",
-  { id => "dataset_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+    dataset => "Judoon::Schema::Result::Dataset",
+    { id => "dataset_id" },
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
 =head2 page_columns
@@ -113,10 +124,9 @@ Related object: L<Judoon::Schema::Result::PageColumn>
 =cut
 
 __PACKAGE__->has_many(
-  "page_columns",
-  "Judoon::Schema::Result::PageColumn",
-  { "foreign.page_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 1 },
+    page_columns => "Judoon::Schema::Result::PageColumn",
+    { "foreign.page_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 1 },
 );
 
 

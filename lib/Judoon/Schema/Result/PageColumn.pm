@@ -56,17 +56,28 @@ __PACKAGE__->table("page_columns");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "page_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "title",
-  { data_type => "text", is_nullable => 0 },
-  "template",
-  { data_type => "text", is_nullable => 0 },
-  "sort",
-  { data_type => "integer", is_nullable => 0 },
-
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    page_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+    title => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    template => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    sort => {
+        data_type   => "integer",
+        is_nullable => 0,
+    },
 );
 
 
@@ -94,10 +105,9 @@ Related object: L<Judoon::Schema::Result::Page>
 =cut
 
 __PACKAGE__->belongs_to(
-  "page",
-  "Judoon::Schema::Result::Page",
-  { id => "page_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+    page => "Judoon::Schema::Result::Page",
+    { id => "page_id" },
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
 
@@ -126,7 +136,6 @@ __PACKAGE__->inflate_column('template', {
     inflate => sub { Judoon::Tmpl->new_from_native(shift) },
     deflate => sub { shift->to_native },
 });
-
 
 
 =head1 METHODS

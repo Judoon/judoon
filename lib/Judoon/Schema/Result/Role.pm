@@ -37,10 +37,15 @@ __PACKAGE__->table("roles");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "name",
-  { data_type => "text", is_nullable => 0 },
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    name => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
 );
 
 
@@ -83,10 +88,9 @@ Related object: L<Judoon::Schema::Result::UserRole>
 =cut
 
 __PACKAGE__->has_many(
-  "user_roles",
-  "Judoon::Schema::Result::UserRole",
-  { "foreign.role_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    user_roles => "Judoon::Schema::Result::UserRole",
+    { "foreign.role_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 0 },
 );
 
 =head2 users
