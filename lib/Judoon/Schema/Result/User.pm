@@ -12,7 +12,7 @@ Judoon::Schema::Result::User
 =cut
 
 use Moo;
-extends 'DBIx::Class::Core';
+extends 'Judoon::Schema::Result';
 
 =head1 TABLE: C<users>
 
