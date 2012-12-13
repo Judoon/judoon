@@ -21,6 +21,7 @@ use Moo;
 extends 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw{
+   InflateColumn::DateTime
    TimeStamp
    Helper::Row::NumifyGet
    Helper::Row::RelationshipDWIM
