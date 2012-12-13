@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::User;
 
 =pod
@@ -14,11 +13,16 @@ Judoon::Schema::Result::User
 use Moo;
 extends 'Judoon::Schema::Result';
 
+
+use Judoon::Spreadsheet;
+
+
 =head1 TABLE: C<users>
 
 =cut
 
 __PACKAGE__->table("users");
+
 
 =head1 ACCESSORS
 
@@ -92,6 +96,7 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 1 },
 );
 
+
 =head1 PRIMARY KEY
 
 =over 4
@@ -103,6 +108,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("id");
+
 
 =head1 UNIQUE CONSTRAINTS
 
@@ -117,6 +123,7 @@ __PACKAGE__->set_primary_key("id");
 =cut
 
 __PACKAGE__->add_unique_constraint("username_unique", ["username"]);
+
 
 =head1 RELATIONS
 
@@ -161,8 +168,13 @@ Composing rels: L</user_roles> -> role
 __PACKAGE__->many_to_many("roles", "user_roles", "role");
 
 
-use Judoon::Spreadsheet;
+=head1 EXTRA COMPONENTS
 
+=head2 PassphraseColumn
+
+Encrypt C<password> field using Blowfish cypher.
+
+=cut
 
 __PACKAGE__->load_components('PassphraseColumn');
 __PACKAGE__->add_columns(
@@ -180,7 +192,7 @@ __PACKAGE__->add_columns(
 
 =head1 METHODS
 
-=head2 B<C<change_password( $password )>>
+=head2 change_password( $password )
 
 Validates and sets password
 
@@ -222,6 +234,12 @@ sub import_data {
 }
 
 
+=head2 import_data_by_filename( $filename )
+
+Convenience method.  Opens C<$filename> then calls L</import_data>.
+
+=cut
+
 sub import_data_by_filename {
     my ($self, $filename) = @_;
 
@@ -234,9 +252,16 @@ sub import_data_by_filename {
 }
 
 
+=head2 my_pages()
+
+Convenience method to get C<User>'s pages as a resultset.
+
+=cut
+
 sub my_pages {
-    my ($self, $args) = @_;
+    my ($self) = @_;
     return $self->datasets_rs->related_resultset('pages');
 }
+
 
 1;

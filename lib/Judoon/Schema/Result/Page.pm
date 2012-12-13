@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::Page;
 
 =pod
@@ -14,11 +13,21 @@ Judoon::Schema::Result::Page
 use Moo;
 extends 'Judoon::Schema::Result';
 
+
+use JSON qw(to_json from_json);
+use Judoon::Error::InvalidTemplate;
+
+# default options for serializing C<Page> objects as JSON.
+# this gets passed to to_json().
+my $json_opts = {utf8 => 1, pretty => 1,};
+
+
 =head1 TABLE: C<pages>
 
 =cut
 
 __PACKAGE__->table("pages");
+
 
 =head1 ACCESSORS
 
@@ -64,6 +73,7 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 0 },
 );
 
+
 =head1 PRIMARY KEY
 
 =over 4
@@ -75,6 +85,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("id");
+
 
 =head1 RELATIONS
 
@@ -109,22 +120,24 @@ __PACKAGE__->has_many(
 );
 
 
-# add permission column / methods to Page
+=head1 EXTRA COMPONENTS
+
+=head2 ::Role::Result::HasPermissions
+
+Add C<permission> column / methods to C<Page>.
+
+=cut
+
 with qw(Judoon::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 
-use JSON qw(to_json from_json);
-use Judoon::Error::InvalidTemplate;
-
-my $json_opts = {utf8 => 1, pretty => 1,};
-
 
 =head1 METHODS
 
-=head2 B<C<page_columns_ordered>>
+=head2 page_columns_ordered()
 
-Get this Page's PageColumns in sorted order
+Get this C<Page>'s C<PageColumn>s in sorted order
 
 =cut
 
@@ -134,7 +147,7 @@ sub page_columns_ordered {
 }
 
 
-=head2 B<C<nbr_columns>>
+=head2 nbr_columns()
 
 Number of columns in this page.
 
@@ -146,7 +159,7 @@ sub nbr_columns {
 }
 
 
-=head2 B<C<nbr_rows>>
+=head2 nbr_rows()
 
 Number of rows in this page.
 
@@ -158,9 +171,10 @@ sub nbr_rows {
 }
 
 
-=head2 B<C<clone_from_existing>>
+=head2 clone_from_existing( $page_obj )
 
-Clone a new page from an existing page
+Clone a new page using the structure of C<$page_obj>, another
+C<Page> row object.
 
 =cut
 
@@ -192,7 +206,7 @@ sub clone_from_existing {
 }
 
 
-=head2 B<C<templates_match_dataset>>
+=head2 templates_match_dataset( @page_columns )
 
 Validate that the C<Tmpl::Node::Variable>s in the PageColumn template
 are valid references to DatasetColumns in the parent Dataset.
@@ -232,7 +246,7 @@ sub templates_match_dataset {
 }
 
 
-=head2 B<C<dump_to_user>>
+=head2 dump_to_user()
 
 Return a json representation of the Page.  The PageColumn templates
 are saved as data structures instead of json strings, to avoid
@@ -255,7 +269,7 @@ sub dump_to_user {
 }
 
 
-=head2 B<C<clone_from_dump>>
+=head2 clone_from_dump( $page_json )
 
 Clone a new page from a json dump of a previous page.
 
@@ -296,7 +310,7 @@ sub clone_from_dump {
 }
 
 
-=head2 B<C<get_cloneable_columns>>
+=head2 get_cloneable_columns()
 
 Get the columns of this Page that are suitable for cloning,
 i.e. everything but foreign keys.

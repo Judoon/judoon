@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::DatasetColumn;
 
 =pod
@@ -14,11 +13,13 @@ Judoon::Schema::Result::DatasetColumn
 use Moo;
 extends 'Judoon::Schema::Result';
 
+
 =head1 TABLE: C<dataset_columns>
 
 =cut
 
 __PACKAGE__->table("dataset_columns");
+
 
 =head1 ACCESSORS
 
@@ -94,6 +95,7 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 1 },
 );
 
+
 =head1 PRIMARY KEY
 
 =over 4
@@ -105,6 +107,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("id");
+
 
 =head1 UNIQUE CONSTRAINTS
 
@@ -122,6 +125,7 @@ __PACKAGE__->add_unique_constraint(
     "dataset_id_shortname_unique", => [qw(dataset_id shortname)],
 );
 
+
 =head1 RELATIONS
 
 =head2 dataset
@@ -138,6 +142,16 @@ __PACKAGE__->belongs_to(
   { id => "dataset_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
+
+
+=head1 EXTRA COMPONENTS
+
+=head2 Ordered
+
+C<DatasetColumns> are ordered by the C<sort> column, grouped by
+C<dataset_id>.
+
+=cut
 
 __PACKAGE__->load_components(qw(Ordered));
 __PACKAGE__->position_column('sort');

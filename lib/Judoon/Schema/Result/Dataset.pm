@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::Dataset;
 
 =pod
@@ -15,11 +14,20 @@ use Moo;
 extends 'Judoon::Schema::Result';
 
 
+use DateTime;
+use Judoon::Error;
+use Judoon::Tmpl;
+use List::AllUtils qw(each_arrayref);
+use Spreadsheet::WriteExcel ();
+use SQL::Translator;
+
+
 =head1 TABLE: C<datasets>
 
 =cut
 
 __PACKAGE__->table("datasets");
+
 
 =head1 ACCESSORS
 
@@ -86,6 +94,7 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 0 },
 );
 
+
 =head1 PRIMARY KEY
 
 =over 4
@@ -97,6 +106,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("id");
+
 
 =head1 RELATIONS
 
@@ -146,22 +156,21 @@ __PACKAGE__->belongs_to(
 );
 
 
-use DateTime;
-use Judoon::Error;
-use Judoon::Tmpl;
-use List::AllUtils qw(each_arrayref);
-use Spreadsheet::WriteExcel ();
-use SQL::Translator;
+=head1 EXTRA COMPONENTS
 
-# add permission column / methods to Dataset
+=head2 ::Role::Result::HasPermissions
+
+Add C<permission> column / methods to C<Dataset>.
+
+=cut
+
 with qw(Judoon::Schema::Role::Result::HasPermissions);
 __PACKAGE__->register_permissions;
 
 
 =head1 METHODS
 
-
-=head2 B<C<ds_columns_ordered>>
+=head2 ds_columns_ordered()
 
 Get DatasetColumns in sorted order
 
@@ -173,7 +182,7 @@ sub ds_columns_ordered {
 }
 
 
-=head2 B<C<import_from_spreadsheet>>
+=head2 import_from_spreadsheet( $spreadsheet )
 
 Update a new C<Dataset> from a C<Judoon::Spreadsheet> object.  Calling this
 will create a new table in the Datastore and store the meta-information in the
@@ -210,7 +219,7 @@ sub import_from_spreadsheet {
 }
 
 
-=head2 B<C<create_basic_page()>>
+=head2 create_basic_page()
 
 Turn a dataset into a simple page with a one-to-one mapping between
 data columns and page columns.
@@ -250,7 +259,7 @@ EOS
 }
 
 
-=head2 B<C<data_table( $args )>>
+=head2 data_table( $args )
 
 Returns an arrayref of arrayref of the dataset's data with the header
 columns. If C<$args->{shortname}> is true, use the column shortnames
@@ -268,7 +277,7 @@ sub data_table {
 }
 
 
-=head2 B<C<as_raw( $args )>>
+=head2 as_raw( $args )
 
 Return data as a tab-delimited string. Passes C<$args> to C<L</data_table>>.
 
@@ -287,7 +296,7 @@ sub as_raw {
 }
 
 
-=head2 B<C<as_excel>>
+=head2 as_excel
 
 Return data as an Excel spreadsheet.
 
@@ -313,7 +322,7 @@ sub as_excel {
 The following methods create and retreive the actual dataset data,
 which is stored in a different schema and table.
 
-=head2 B<C<data / _build_data>>
+=head2 data() / _build_data()
 
 Accessor for getting at the data stored in the Datastore.
 
@@ -339,7 +348,7 @@ sub _build_data {
 }
 
 
-=head2 B<C< _store_data( $spreadsheet ) >>
+=head2 _store_data( $spreadsheet )
 
 This private method actually creates the new table for the data in the
 Datastore.  It passes the spreadsheet to L<SQL::Translator> to get the
@@ -405,7 +414,7 @@ sub _store_data {
 }
 
 
-=head2 B<C< _check_table_name >>
+=head2 _check_table_name( $sqlt_schema )
 
 Private method passed to the L<SQL::Translator> filter to create a
 unique table name.
@@ -427,7 +436,7 @@ sub _check_table_name {
 }
 
 
-=head2 B<C< _gen_table_name >>
+=head2 _gen_table_name( $table_name )
 
 Private method to generate a new table name.  This method trys a
 couple different techniques, but will die if it's unable to find a
@@ -456,7 +465,7 @@ sub _gen_table_name {
 }
 
 
-=head2 B<C< _table_exists >>
+=head2 _table_exists( $table_name )
 
 Private method to test whether a particular table name is already in
 use.
@@ -476,11 +485,20 @@ sub _table_exists {
 }
 
 
+=head2 schema_name() / _build_schema_name()
+
+Return schema name, which changes based on database engine.  For
+SQLite, the schema name is always 'data'.  For Pg, it's the name of
+the user.
+
+=cut
+
 has schema_name => (is => 'lazy',);
 sub _build_schema_name {
     my ($self) = @_;
     return $self->result_source->storage->sqlt_type eq 'SQLite'
         ? 'data' : $self->user->username;
 }
+
 
 1;

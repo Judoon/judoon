@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::UserRole;
 
 =pod
@@ -14,11 +13,13 @@ Judoon::Schema::Result::UserRole
 use Moo;
 extends 'Judoon::Schema::Result';
 
+
 =head1 TABLE: C<user_roles>
 
 =cut
 
 __PACKAGE__->table("user_roles");
+
 
 =head1 ACCESSORS
 
@@ -43,6 +44,7 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
 );
 
+
 =head1 PRIMARY KEY
 
 =over 4
@@ -56,6 +58,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("user_id", "role_id");
+
 
 =head1 RELATIONS
 
