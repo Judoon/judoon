@@ -138,6 +138,17 @@ __PACKAGE__->inflate_column('template', {
 });
 
 
+=head2 ::Role::Result::HasTimestamps
+
+Add <created> and <modified> columns to C<PageColumn>.
+
+=cut
+
+with qw(Judoon::Schema::Role::Result::HasTimestamps);
+__PACKAGE__->register_timestamps;
+
+
+
 =head1 METHODS
 
 =head2 get_cloneable_columns()

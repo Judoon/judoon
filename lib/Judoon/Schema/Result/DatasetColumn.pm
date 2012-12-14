@@ -179,4 +179,15 @@ __PACKAGE__->position_column('sort');
 __PACKAGE__->grouping_column('dataset_id');
 
 
+=head2 ::Role::Result::HasTimestamps
+
+Add <created> and <modified> columns to C<DatasetColumn>.
+
+=cut
+
+with qw(Judoon::Schema::Role::Result::HasTimestamps);
+__PACKAGE__->register_timestamps;
+
+
+
 1;

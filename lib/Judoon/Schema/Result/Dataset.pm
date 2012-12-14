@@ -179,10 +179,18 @@ __PACKAGE__->belongs_to(
 
 Add C<permission> column / methods to C<Dataset>.
 
+=head2 ::Role::Result::HasTimestamps
+
+Add <created> and <modified> columns to C<Dataset>.
+
 =cut
 
-with qw(Judoon::Schema::Role::Result::HasPermissions);
+with qw(
+    Judoon::Schema::Role::Result::HasPermissions
+    Judoon::Schema::Role::Result::HasTimestamps
+);
 __PACKAGE__->register_permissions;
+__PACKAGE__->register_timestamps;
 
 
 =head1 METHODS

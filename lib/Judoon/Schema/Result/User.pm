@@ -202,6 +202,16 @@ __PACKAGE__->add_columns(
 );
 
 
+=head2 ::Role::Result::HasTimestamps
+
+Add <created> and <modified> columns to C<User>.
+
+=cut
+
+with qw(Judoon::Schema::Role::Result::HasTimestamps);
+__PACKAGE__->register_timestamps;
+
+
 =head1 METHODS
 
 =head2 schema_name()

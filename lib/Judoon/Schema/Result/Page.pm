@@ -136,10 +136,18 @@ __PACKAGE__->has_many(
 
 Add C<permission> column / methods to C<Page>.
 
+=head2 ::Role::Result::HasTimestamps
+
+Add <created> and <modified> columns to C<Page>.
+
 =cut
 
-with qw(Judoon::Schema::Role::Result::HasPermissions);
+with qw(
+    Judoon::Schema::Role::Result::HasPermissions
+    Judoon::Schema::Role::Result::HasTimestamps
+);
 __PACKAGE__->register_permissions;
+__PACKAGE__->register_timestamps;
 
 
 
