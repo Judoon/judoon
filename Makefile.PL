@@ -79,10 +79,10 @@ requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 
 
-# deploy deps
-# Server::Starter => '1.12'
-# Starman => '3.003'
-# nost sure if this is deploy dep: DBIx::Class::Migration
+# deployment deps
+requires 'Net::Server::SS::PreFork';
+requires 'Server::Starter' => '1.12';
+requires 'Starman' => '3.003';
 
 
 test_requires 'indirect';
