@@ -55,6 +55,7 @@ requires 'JSON';
 requires 'JSON::XS';
 requires 'List::AllUtils';
 requires 'Module::Pluggable';
+requires 'Module::Versions';
 requires 'Moo';
 requires 'MooX::Types::MooseLike';
 requires 'Moose';
