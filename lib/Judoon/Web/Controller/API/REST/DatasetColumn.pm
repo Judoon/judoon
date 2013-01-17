@@ -14,13 +14,13 @@ __PACKAGE__->config(
     # stash namespace
     stash_namespace         => 'ds_column',
     # Columns required to create
-    create_requires         =>  [qw/accession_type dataset_id data_type_id is_accession name sort/],
+    create_requires         =>  [qw/dataset_id data_type_id name sort/],
     # Additional non-required columns that create allows
-    create_allows           =>  [qw/shortname/],
+    create_allows           =>  [qw/shortname accession_type_id/],
     # Columns that update allows
-    update_allows           =>  [qw/accession_type dataset_id data_type_id is_accession name sort shortname/],
+    update_allows           =>  [qw/dataset_id data_type_id accession_type_id name sort shortname/],
     # Columns that list returns
-    list_returns            =>  [qw/id dataset_id name sort data_type is_accession accession_type shortname/],
+    list_returns            =>  [qw/id dataset_id name sort data_type accession_type shortname/],
 
 
     # Every possible prefetch param allowed
@@ -33,7 +33,7 @@ __PACKAGE__->config(
     list_ordered_by         => [qw/id/],
     # columns that can be searched on via list
     list_search_exposes     => [
-        qw/id dataset_id name sort data_type is_accession accession_type shortname/,
+        qw/id dataset_id name sort data_type accession_type shortname/,
     ],
 
 );

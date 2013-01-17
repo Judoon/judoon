@@ -115,9 +115,9 @@ subtest 'Result::Dataset' => sub {
         ['Goochie',  1, 'female'],
     ];
     my $xls_cols = [
-        {name => 'Name',   sort => 1, accession_domain => q{biology}, accession_type => q{},},
-        {name => 'Age',    sort => 2, accession_domain => q{biology}, accession_type => q{},},
-        {name => 'Gender', sort => 3, accession_domain => q{biology}, accession_type => q{},},
+        {name => 'Name',   sort => 1, },
+        {name => 'Age',    sort => 2, },
+        {name => 'Gender', sort => 3, },
     ];
 
     # mutating methods, create new dataset
@@ -181,26 +181,21 @@ subtest 'Result::DatasetColumn' => sub {
     my $new_ds_col = $dataset->create_related('ds_columns', {
         name => 'Test Column', sort => 99,
         data_type_id => 1,
-        is_accession => 1, accession_domain => q{biology},
-        accession_type => q{flybase_id},
     });
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
         data_type_id => 1,
-        is_accession => 0, accession_domain => q{biology}, accession_type => q{},
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
         name => q{}, sort => 98, data_type_id => 1,
-        is_accession => 0, accession_domain => q{biology}, accession_type => q{},
     }), 'can create column w/ empty name';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
         name => q{#$*^(}, sort => 97, data_type_id => 1,
-        is_accession => 0, accession_domain => q{biology}, accession_type => q{},
     }), 'can create column w/ non-ascii name';
 
     # mutating methods, create new dataset

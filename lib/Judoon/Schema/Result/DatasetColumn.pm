@@ -56,22 +56,11 @@ __PACKAGE__->table("dataset_columns");
   is_foreign_key: 1
   is_nullable: 0
 
-=head2 is_accession
+=head2 accession_type_id
 
-  data_type: 'boolean'
-  default_value: \'false'
-  is_nullable: 0
-
-=head2 accession_domain
-
-  data_type: 'text'
-  default: \'biology'
-  is_nullable: 0
-
-=head2 accession_type
-
-  data_type: 'text'
-  is_nullable: 0
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 1
 
 =cut
 
@@ -103,19 +92,10 @@ __PACKAGE__->add_columns(
         is_foreign_key => 1,
         is_nullable    => 0,
     },
-    is_accession => {
-        data_type     => "boolean",
-        default_value => \'false',
-        is_nullable   => 0,
-    },
-    accession_domain => {
-        data_type   => "text",
-        default     => \"biology",
-        is_nullable => 0,
-    },
-    accession_type => {
-        data_type   => "text",
-        is_nullable => 0,
+    accession_type_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 1,
     },
 );
 
@@ -180,6 +160,24 @@ __PACKAGE__->belongs_to(
     { "foreign.id" => "self.data_type_id" },
     {
         lookup_proxy => 'data_type',
+        is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE",
+    },
+);
+
+
+=head3 accession_type_id
+
+Type: belongs_to
+
+Related object: L<Judoon::Schema::Result::TtAccessionType>
+
+=cut
+
+__PACKAGE__->belongs_to(
+    accession_type_rel => "::TtAccessionType",
+    { "foreign.id" => "self.accession_type_id" },
+    {
+        lookup_proxy => 'accession_type',
         is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE",
     },
 );

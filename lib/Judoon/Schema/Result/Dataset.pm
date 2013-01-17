@@ -239,7 +239,6 @@ sub import_from_spreadsheet {
         $self->create_related('ds_columns', {
             name => ($header // ''), shortname => $sqlt_field->name,
             sort => $sort++, data_type_rel => $dscol_datatype,
-            accession_domain => 'biology', accession_type => q{},
         });
     }
 

@@ -73,7 +73,7 @@ after list_GET => sub {
     # this should be in the view
     for my $column (@$columns) {
         my @meta;
-        if ($column->{is_accession}) {
+        if (exists $column->{accession_type}) {
             push @meta, 'accession: ' . $column->{accession_type};
         }
         $column->{metadata} = @meta ? join(', ', @meta) : 'plain text';

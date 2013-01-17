@@ -41,7 +41,7 @@ after object_GET => sub {
     my @ds_columns = $dataset->ds_columns_ordered->all;
     $c->stash->{ds_column}{list} = \@ds_columns;
     $c->stash->{url_columns} = [];
-    my @acc_columns = grep {$_->is_accession} @ds_columns;
+    my @acc_columns = grep {$_->accession_type} @ds_columns;
     $c->stash->{acc_columns}    = \@acc_columns;
     for my $acc_column (@acc_columns) {
         my $sites = $sitelinker->mapping->{accession}{$acc_column->accession_type};
