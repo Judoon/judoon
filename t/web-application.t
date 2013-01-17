@@ -190,7 +190,7 @@ subtest 'User Tests' => sub {
 subtest 'User Overview' => sub {
     $mech->get('/logout');
     $mech->get_ok('/user/newuser', 'can get others overview w/o login');
-    $mech->content_like(qr/newuser's overview/i,
+    $mech->content_like(qr/newuser/i,
         'got welcome message for visitor w/o login');
 
     login('testuser');
@@ -199,7 +199,7 @@ subtest 'User Overview' => sub {
         'can find upload dataset widget');
 
     $mech->get_ok('/user/newuser', 'can get others overview w/ login');
-    $mech->content_like(qr/newuser's overview/i,
+    $mech->content_like(qr/newuser/i,
         'got welcome message for visitor w/ login');
 
     $mech->get('/user/baduser');
