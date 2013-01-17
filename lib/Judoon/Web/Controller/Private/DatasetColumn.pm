@@ -76,9 +76,6 @@ after list_GET => sub {
         if ($column->{is_accession}) {
             push @meta, 'accession: ' . $column->{accession_type};
         }
-        if ($column->{is_url}) {
-            push @meta, 'url: ' . $column->{url_root};
-        }
         $column->{metadata} = @meta ? join(', ', @meta) : 'plain text';
     }
 

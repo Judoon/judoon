@@ -56,29 +56,6 @@
         </div>
       </div>
 
-      <h4>URLs</h4>
-
-      <div class="control-group">
-        <label class="control-label" for="ds_column.is_url">Does this column contain URLs?</label>
-        <div class="controls">
-          <label class="checkbox inline" for="ds_column.is_url_yes">
-            <input type="radio" form="dscolumn_edit" name="ds_column.is_url" id="ds_column.is_url_yes" value="1" [% IF ds_column.object.is_url %]checked="checked"[% END %] />
-            Yes
-          </label>
-          <label class="checkbox inline" for="ds_column.is_url_no">
-            <input type="radio" name="ds_column.is_url" id="ds_column.is_url_no" value="0" [% IF ! ds_column.object.is_url %]checked="checked"[% END %] />
-            No
-          </label>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">What is the URL base?</label>
-        <div class="controls">
-          <input type="text" form="dscolumn_edit" name="ds_column.url_root" value="[% ds_column.object.url_root | html %]" />
-        </div>
-      </div>
-
       <input type="hidden" form="dscolumn_edit" name="x-tunneled-method" value="PUT">
 
       [% INCLUDE 'components/forms/form_submit.tt2'

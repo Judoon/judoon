@@ -115,9 +115,9 @@ subtest 'Result::Dataset' => sub {
         ['Goochie',  1, 'female'],
     ];
     my $xls_cols = [
-        {name => 'Name',   sort => 1, accession_type => q{}, url_root => q{},},
-        {name => 'Age',    sort => 2, accession_type => q{}, url_root => q{},},
-        {name => 'Gender', sort => 3, accession_type => q{}, url_root => q{},},
+        {name => 'Name',   sort => 1, accession_domain => q{biology}, accession_type => q{},},
+        {name => 'Age',    sort => 2, accession_domain => q{biology}, accession_type => q{},},
+        {name => 'Gender', sort => 3, accession_domain => q{biology}, accession_type => q{},},
     ];
 
     # mutating methods, create new dataset
@@ -180,31 +180,44 @@ subtest 'Result::DatasetColumn' => sub {
     my $dataset = $ds_column->dataset;
     my $new_ds_col = $dataset->create_related('ds_columns', {
         name => 'Test Column', sort => 99,
-        is_accession => 1, accession_type => q{flybase_id},
-        is_url => 0, url_root => q{},
+        data_type_id => 1,
+        is_accession => 1, accession_domain => q{biology},
+        accession_type => q{flybase_id},
     });
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
-        is_accession => 0, accession_type => q{},
-        is_url => 1, url_root => q{http://google.com/},
+        data_type_id => 1,
+        is_accession => 0, accession_domain => q{biology}, accession_type => q{},
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
-        name => q{}, sort => 98, is_accession => 0, accession_type => q{},
-        is_url => 0, url_root => q{},
+        name => q{}, sort => 98, data_type_id => 1,
+        is_accession => 0, accession_domain => q{biology}, accession_type => q{},
     }), 'can create column w/ empty name';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
-        name => q{#$*^(}, sort => 97, is_accession => 0, accession_type => q{},
-        is_url => 1, url_root => q{http://google.com/?q=},
+        name => q{#$*^(}, sort => 97, data_type_id => 1,
+        is_accession => 0, accession_domain => q{biology}, accession_type => q{},
     }), 'can create column w/ non-ascii name';
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
+
+
+    # test data_type lookup column
+    is $ds_col3->data_type(), 'text', 'can proxy to lookup';
+    ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
+        ' lookup_proxy lives w/ good lookup';
+    is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
+    is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
+    ok exception { $ds_col3->data_type("moo"); },
+        ' lookup_proxy dies on bad lookup';
+
+
 };
 
 

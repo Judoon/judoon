@@ -40,37 +40,38 @@ __PACKAGE__->table("dataset_columns");
   data_type: 'text'
   is_nullable: 0
 
+=head2 shortname
+
+  data_type: 'text'
+  is_nullable: 1
+
 =head2 sort
 
   data_type: 'integer'
   is_nullable: 0
 
-=head2 is_accession
+=head2 data_type_id
 
   data_type: 'integer'
-  default_value: 0
+  is_foreign_key: 1
+  is_nullable: 0
+
+=head2 is_accession
+
+  data_type: 'boolean'
+  default_value: \'false'
+  is_nullable: 0
+
+=head2 accession_domain
+
+  data_type: 'text'
+  default: \'biology'
   is_nullable: 0
 
 =head2 accession_type
 
   data_type: 'text'
   is_nullable: 0
-
-=head2 is_url
-
-  data_type: 'integer'
-  default_value: 0
-  is_nullable: 0
-
-=head2 url_root
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 shortname
-
-  data_type: 'text'
-  is_nullable: 1
 
 =cut
 
@@ -89,31 +90,32 @@ __PACKAGE__->add_columns(
         data_type   => "text",
         is_nullable => 0,
     },
+    shortname => {
+        data_type   => "text",
+        is_nullable => 1,
+    },
     sort => {
         data_type   => "integer",
         is_nullable => 0,
     },
+    data_type_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
     is_accession => {
-        data_type     => "integer",
-        default_value => 0,
+        data_type     => "boolean",
+        default_value => \'false',
         is_nullable   => 0,
+    },
+    accession_domain => {
+        data_type   => "text",
+        default     => \"biology",
+        is_nullable => 0,
     },
     accession_type => {
-        data_type => "text",
-        is_nullable => 0,
-    },
-    is_url => {
-        data_type     => "integer",
-        default_value => 0,
-        is_nullable   => 0,
-    },
-    url_root => {
         data_type   => "text",
         is_nullable => 0,
-    },
-    shortname => {
-        data_type   => "text",
-        is_nullable => 1,
     },
 );
 
@@ -163,6 +165,25 @@ __PACKAGE__->belongs_to(
     { id => "dataset_id" },
     { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
+
+
+=head2 data_type_rel
+
+Type: belongs_to
+
+Related object: L<Judoon::Schema::Result::TtDscolumnDatatype>
+
+=cut
+
+__PACKAGE__->belongs_to(
+    data_type_rel => "::TtDscolumnDatatype",
+    { "foreign.id" => "self.data_type_id" },
+    {
+        lookup_proxy => 'data_type',
+        is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE",
+    },
+);
+
 
 
 =head1 EXTRA COMPONENTS

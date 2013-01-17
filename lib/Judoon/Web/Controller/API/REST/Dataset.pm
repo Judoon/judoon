@@ -34,7 +34,7 @@ __PACKAGE__->config(
     # columns that can be searched on via list
     list_search_exposes     => [
         qw/id user_id name notes original nbr_rows nbr_columns tablename permission/,
-        { 'ds_columns' => [qw/id dataset_id name sort is_accession accession_type is_url url_root shortname/] },
+        { 'ds_columns' => [qw/id dataset_id name sort data_type is_accession accession_type shortname/] },
         { 'pages'      => [qw/id dataset_id title preamble postamble permission/] },
     ],
 

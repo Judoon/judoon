@@ -231,12 +231,15 @@ sub import_from_spreadsheet {
     $self->original(q{});
     $self->update;
 
+    my $dscol_datatype = $self->result_source->schema
+        ->resultset('TtDscolumnDatatype')->find({data_type => 'text'});
     my $sort = 1;
     my $it = each_arrayref $spreadsheet->headers, [$sqlt_table->get_fields];
     while (my ($header, $sqlt_field) = $it->()) {
         $self->create_related('ds_columns', {
             name => ($header // ''), shortname => $sqlt_field->name,
-            sort => $sort++, accession_type => q{},   url_root => q{},
+            sort => $sort++, data_type_rel => $dscol_datatype,
+            accession_domain => 'biology', accession_type => q{},
         });
     }
 

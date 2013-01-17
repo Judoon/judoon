@@ -267,14 +267,12 @@ subtest 'DatasetColumns' => sub {
     my $dscol_uri = get_link_like_ok("dataset column",
          qr{/user/testuser/dataset/\d+/column/\d+$});
 
+    # DISABLED UNTIL dscolumn edit page rework
     # PUT datatsetcolumn/object
-    puts_ok('dataset_column', $dscol_uri, {
-        'ds_column.is_url'   => '1',
-        'ds_column.url_root' => 'http://www.google.com/',
-    });
-    $mech->get($dscol_list_uri);
-    $mech->content_like(qr{url: http://www.google.com/},
-                        'can update dataset column');
+    # puts_ok('dataset_column', $dscol_uri, {});
+    # $mech->get($dscol_list_uri);
+    # $mech->content_like(qr{url: http://www.google.com/},
+    #                     'can update dataset column');
 };
 
 

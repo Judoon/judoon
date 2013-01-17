@@ -55,6 +55,12 @@ sub get_testuser { return \%testuser; }
 
 my %fixture_subs = (
     basic => sub {
+        get_schema()->resultset('TtDscolumnDatatype')->populate([
+            ['id','data_type',],
+            [1,'text',],[2,'numeric',],[3,'datetime',],[4,'currency',],
+        ]);
+
+
         my $user_rs = get_schema()->resultset('User');
         my $user = $user_rs->find({username => get_testuser()->{username}})
             // $user_rs->create_user(get_testuser());
