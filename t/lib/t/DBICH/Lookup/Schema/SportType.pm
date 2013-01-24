@@ -1,6 +1,6 @@
-package t::DBIC::Components::Schema::SportType;
+package t::DBICH::Lookup::Schema::SportType;
 
-use t::DBIC::Components::Schema::Candy;
+use t::DBICH::Lookup::Schema::Candy;
 
 table 'sport_types';
 

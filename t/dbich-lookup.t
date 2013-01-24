@@ -9,7 +9,7 @@ use Test::More;
 use Test::Fatal;
 
 use Test::DBIx::Class {
-    schema_class => 't::DBIC::Components::Schema',
+    schema_class => 't::DBICH::Lookup::Schema',
 };
 
 

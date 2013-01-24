@@ -1,6 +1,6 @@
-package t::DBIC::Components::Schema::CD;
+package t::DBICH::Lookup::Schema::CD;
 
-use t::DBIC::Components::Schema::Candy;
+use t::DBICH::Lookup::Schema::Candy;
 
 table 'cds';
 
@@ -10,7 +10,7 @@ text_column 'title';
 foreign_key_column 'genre_id';
 
 belongs_to(
-    genre_rel => 't::DBIC::Components::Schema::Genre',
+    genre_rel => 't::DBICH::Lookup::Schema::Genre',
     {id => 'genre_id',},
     { join_type => 'left',  lookup_proxy => 'genre', }
 );

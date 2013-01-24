@@ -1,4 +1,4 @@
-package t::DBIC::Components::Schema::BaseResultSet;
+package t::DBICH::Lookup::Schema::BaseResultSet;
 
 use strict;
 use warnings;

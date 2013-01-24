@@ -1,6 +1,6 @@
-package t::DBIC::Components::Schema::UsState;
+package t::DBICH::Lookup::Schema::UsState;
 
-use t::DBIC::Components::Schema::Candy;
+use t::DBICH::Lookup::Schema::Candy;
 
 table 'us_states';
 

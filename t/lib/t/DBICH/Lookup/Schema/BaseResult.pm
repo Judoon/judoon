@@ -1,4 +1,4 @@
-package t::DBIC::Components::Schema::BaseResult;
+package t::DBICH::Lookup::Schema::BaseResult;
 
 use strict;
 use warnings;
@@ -6,12 +6,12 @@ use warnings;
 use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw/
-    +t::DBIC::Components::Schema::Util
+    +t::DBICH::Lookup::Schema::Util
     Helper::Row::Lookup
     Helper::Row::RelationshipDWIM
 /);
 
-sub default_result_namespace { 't::DBIC::Components::Schema' }
+sub default_result_namespace { 't::DBICH::Lookup::Schema' }
 
 
 1;

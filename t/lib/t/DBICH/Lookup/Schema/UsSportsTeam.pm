@@ -1,6 +1,6 @@
-package t::DBIC::Components::Schema::UsSportsTeam;
+package t::DBICH::Lookup::Schema::UsSportsTeam;
 
-use t::DBIC::Components::Schema::Candy;
+use t::DBICH::Lookup::Schema::Candy;
 
 table 'us_sports_teams';
 
@@ -32,7 +32,7 @@ belongs_to(
     },
 );
 
-resultset_class( 't::DBIC::Components::Schema::BaseResultSet' );
+resultset_class( 't::DBICH::Lookup::Schema::BaseResultSet' );
 
 
 1;

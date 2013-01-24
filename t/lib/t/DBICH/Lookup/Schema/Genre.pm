@@ -1,6 +1,6 @@
-package t::DBIC::Components::Schema::Genre;
+package t::DBICH::Lookup::Schema::Genre;
 
-use t::DBIC::Components::Schema::Candy;
+use t::DBICH::Lookup::Schema::Candy;
 
 table 'genres';
 
