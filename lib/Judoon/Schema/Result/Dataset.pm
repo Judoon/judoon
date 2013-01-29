@@ -207,6 +207,20 @@ sub ds_columns_ordered {
 }
 
 
+=head2 pages_ordered()
+
+Get related Pages in sorted order
+
+}
+
+=cut
+
+sub pages_ordered {
+    my ($self) = @_;
+    return $self->pages_rs->search_rs({}, {order_by => {-asc => 'created'}});
+}
+
+
 =head2 import_from_spreadsheet( $spreadsheet )
 
 Update a new C<Dataset> from a C<Judoon::Spreadsheet> object.  Calling this

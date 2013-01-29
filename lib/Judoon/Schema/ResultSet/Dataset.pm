@@ -23,7 +23,12 @@ Add prefetch of pages to current rs
 
 =cut
 
-sub with_pages { return shift->search_rs({}, {prefetch => 'pages'}); }
+sub with_pages {
+    return shift->search_rs(
+        {},
+        {prefetch => 'pages', order_by => 'pages.created'}
+    );
+}
 
 
 1;
