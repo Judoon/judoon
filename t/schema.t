@@ -222,6 +222,16 @@ subtest 'Result::DatasetColumn' => sub {
     $ds_col3->discard_changes;
     is $ds_col3->accession_type(), 'entrez_gene_id', 'accession_type correctly set';
 
+
+    # make sure we can import datasets w/ duplicate column names
+    $user = ResultSet('User')->first;
+    is_result my $dupe_cols_ds
+        = $user->import_data_by_filename('t/etc/data/dupe_colnames.xls'),
+            'Can successfully import dataset with duplicate column names';
+    my @dupe_cols = $dupe_cols_ds->ds_columns_ordered->all;
+    my %seen_colnames;
+    my $dupes = grep {$seen_colnames{$_->shortname}++} @dupe_cols;
+    ok !$dupes, q{  ...and columns names aren't repeated.};
 };
 
 

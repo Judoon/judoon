@@ -34,6 +34,7 @@ requires 'Catalyst::View::Download';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::RoleApplicator';
 requires 'Config::General' => '2.51';
+requires 'Data::UUID';
 requires 'Data::Printer';
 requires 'Data::Section::Simple';
 requires 'Data::Visitor::Callback';
