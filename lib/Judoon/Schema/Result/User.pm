@@ -46,7 +46,8 @@ __PACKAGE__->table("users");
 
 =head2 password
 
-  data_type: 'text'
+  data_type: 'character varying'
+  size: 40
   is_nullable: 0
 
 =head2 password_expires
@@ -78,7 +79,8 @@ __PACKAGE__->add_columns(
         is_nullable   => 0,
     },
     username => {
-        data_type   => "text",
+        data_type   => "varchar",
+        size => 40,
         is_nullable => 0,
     },
     password => {

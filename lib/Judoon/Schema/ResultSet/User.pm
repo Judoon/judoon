@@ -17,6 +17,7 @@ extends 'Judoon::Schema::ResultSet';
 use Judoon::Error;
 
 use constant MIN_PASSWORD_LENGTH => 8;
+use constant USERNAME_MAXLEN => 40;
 
 
 =head1 METHODS
@@ -46,7 +47,8 @@ sub create_user {
         $errmsg = q{No email address was given!};
     }
     elsif (not $self->validate_username($valid{username})) {
-        $errmsg = q{Invalid username! Use only a-z, 0-9, and '_'.};
+        $errmsg = q{Invalid username! Use only a-z, 0-9, and '_'. Must be }
+            . q{less than } . USERNAME_MAXLEN . q{ characters.};
     }
     elsif ($self->user_exists($valid{username})) {
         $errmsg = q{This username is already taken!};
@@ -83,7 +85,8 @@ Makes sure C<$username> is valid.  Current regex is C<m/^\w+$/>.
 
 sub validate_username {
     my ($self, $username) = @_;
-    return $username && $username =~ m/^\w+$/;
+    return $username && $username =~ m/^\w+$/
+        && length($username) <= USERNAME_MAXLEN;
 }
 
 

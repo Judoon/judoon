@@ -45,10 +45,11 @@ subtest 'Result::User' => sub {
 subtest 'ResultSet::User' => sub {
     my $user_rs = ResultSet('User');
 
-    ok $user_rs->validate_username('boo'),   'validate simple username';
-    ok !$user_rs->validate_username('b!!o'), 'reject invalid username';
-    ok !$user_rs->validate_username(''),     'reject empty username';
-    ok !$user_rs->validate_username(),       'reject undef username';
+    ok $user_rs->validate_username('boo'),     'validate simple username';
+    ok !$user_rs->validate_username('b!!o'),   'reject invalid username';
+    ok !$user_rs->validate_username(''),       'reject empty username';
+    ok !$user_rs->validate_username(),         'reject undef username';
+    ok !$user_rs->validate_username('b' x 50), 'reject too-long username';
 
     ok $user_rs->validate_password('boobooboo'),   'validate simple password';
     ok $user_rs->validate_password('n(&*M09{}}#'), 'validate complex password';
