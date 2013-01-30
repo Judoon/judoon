@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::PageColumn;
 
 =pod
@@ -12,13 +11,18 @@ Judoon::Schema::Result::PageColumn
 =cut
 
 use Moo;
-extends 'DBIx::Class::Core';
+extends 'Judoon::Schema::Result';
+
+
+use Judoon::Tmpl;
+
 
 =head1 TABLE: C<page_columns>
 
 =cut
 
 __PACKAGE__->table("page_columns");
+
 
 =head1 ACCESSORS
 
@@ -52,18 +56,30 @@ __PACKAGE__->table("page_columns");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "page_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "title",
-  { data_type => "text", is_nullable => 0 },
-  "template",
-  { data_type => "text", is_nullable => 0 },
-  "sort",
-  { data_type => "integer", is_nullable => 0 },
-
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    page_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+    title => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    template => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    sort => {
+        data_type   => "integer",
+        is_nullable => 0,
+    },
 );
+
 
 =head1 PRIMARY KEY
 
@@ -77,6 +93,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
+
 =head1 RELATIONS
 
 =head2 page
@@ -88,19 +105,32 @@ Related object: L<Judoon::Schema::Result::Page>
 =cut
 
 __PACKAGE__->belongs_to(
-  "page",
-  "Judoon::Schema::Result::Page",
-  { id => "page_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+    page => "::Page",
+    { id => "page_id" },
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
+
+=head1 EXTRA COMPONENTS
+
+=head2 Ordered
+
+Order C<PageColumn> by C<sort> column, grouping by C<page_id>.
+
+=cut
 
 __PACKAGE__->load_components(qw(Ordered));
 __PACKAGE__->position_column('sort');
 __PACKAGE__->grouping_column('page_id');
 
 
-use Judoon::Tmpl;
+=head2 InflateColumn
+
+The C<template> field of C<PageColumn> will be inflated to a
+L<Judoon::Tmpl> object when C<< $page_column->template() >> is
+called. Use C<< ->get_column('template') >> to get the raw data.
+
+=cut
 
 __PACKAGE__->inflate_column('template', {
     inflate => sub { Judoon::Tmpl->new_from_native(shift) },
@@ -108,9 +138,22 @@ __PACKAGE__->inflate_column('template', {
 });
 
 
-=head2 B<C<get_cloneable_columns>>
+=head2 ::Role::Result::HasTimestamps
 
-Get the columns of this PageColumn that are suitable for cloning,
+Add <created> and <modified> columns to C<PageColumn>.
+
+=cut
+
+with qw(Judoon::Schema::Role::Result::HasTimestamps);
+__PACKAGE__->register_timestamps;
+
+
+
+=head1 METHODS
+
+=head2 get_cloneable_columns()
+
+Get the columns of this C<PageColumn> that are suitable for cloning,
 i.e. everything but foreign keys.
 
 =cut

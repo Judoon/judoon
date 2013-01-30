@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema;
 
 =pod
@@ -11,10 +10,10 @@ Judoon::Schema
 
 =cut
 
+use 5.10.1;
+
 use Moo;
 extends 'DBIx::Class::Schema';
-
-__PACKAGE__->load_namespaces;
 
 
 =head2 C<$VERSION>
@@ -24,6 +23,10 @@ to work
 
 =cut
 
-our $VERSION = 8;
+our $VERSION = 16;
+
+
+__PACKAGE__->load_namespaces;
+
 
 1;

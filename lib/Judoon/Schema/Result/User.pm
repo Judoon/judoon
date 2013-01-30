@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::User;
 
 =pod
@@ -12,13 +11,19 @@ Judoon::Schema::Result::User
 =cut
 
 use Moo;
-extends 'DBIx::Class::Core';
+extends 'Judoon::Schema::Result';
+
+
+use Judoon::Spreadsheet;
+
+use constant SCHEMA_PREFIX => 'user_';
 
 =head1 TABLE: C<users>
 
 =cut
 
 __PACKAGE__->table("users");
+
 
 =head1 ACCESSORS
 
@@ -30,9 +35,9 @@ __PACKAGE__->table("users");
 
 =head2 active
 
-  data_type: 'char'
+  data_type: 'boolean'
+  default_value: true
   is_nullable: 0
-  size: 1
 
 =head2 username
 
@@ -41,7 +46,8 @@ __PACKAGE__->table("users");
 
 =head2 password
 
-  data_type: 'text'
+  data_type: 'character varying'
+  size: 40
   is_nullable: 0
 
 =head2 password_expires
@@ -59,38 +65,42 @@ __PACKAGE__->table("users");
   data_type: 'text'
   is_nullable: 0
 
-=head2 phone_number
-
-  data_type: 'text'
-  is_nullable: 1
-
-=head2 mail_address
-
-  data_type: 'text'
-  is_nullable: 1
-
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "active",
-  { data_type => "char", is_nullable => 0, size => 1 },
-  "username",
-  { data_type => "text", is_nullable => 0 },
-  "password",
-  { data_type => "text", is_nullable => 0 },
-  "password_expires",
-  { data_type => "timestamp", is_nullable => 1 },
-  "name",
-  { data_type => "text", is_nullable => 0 },
-  "email_address",
-  { data_type => "text", is_nullable => 0 },
-  "phone_number",
-  { data_type => "text", is_nullable => 1 },
-  "mail_address",
-  { data_type => "text", is_nullable => 1 },
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    active => {
+        data_type     => "boolean",
+        default_value => \'true',
+        is_nullable   => 0,
+    },
+    username => {
+        data_type   => "varchar",
+        size => 40,
+        is_nullable => 0,
+    },
+    password => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    password_expires => {
+        data_type   => "timestamp",
+        is_nullable => 1,
+    },
+    name => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
+    email_address => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
 );
+
 
 =head1 PRIMARY KEY
 
@@ -104,6 +114,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("id");
 
+
 =head1 UNIQUE CONSTRAINTS
 
 =head2 C<username_unique>
@@ -114,9 +125,21 @@ __PACKAGE__->set_primary_key("id");
 
 =back
 
+=head2 C<email_address_unique>
+
+=over 4
+
+=item * L</email_address>
+
+=back
+
+
 =cut
 
 __PACKAGE__->add_unique_constraint("username_unique", ["username"]);
+__PACKAGE__->add_unique_constraint("email_address_unique", ["email_address"]);
+
+
 
 =head1 RELATIONS
 
@@ -129,10 +152,9 @@ Related object: L<Judoon::Schema::Result::Dataset>
 =cut
 
 __PACKAGE__->has_many(
-  "datasets",
-  "Judoon::Schema::Result::Dataset",
-  { "foreign.user_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    datasets => "::Dataset",
+    { "foreign.user_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 0 },
 );
 
 =head2 user_roles
@@ -144,10 +166,9 @@ Related object: L<Judoon::Schema::Result::UserRole>
 =cut
 
 __PACKAGE__->has_many(
-  "user_roles",
-  "Judoon::Schema::Result::UserRole",
-  { "foreign.user_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    user_roles => "::UserRole",
+    { "foreign.user_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 0 },
 );
 
 =head2 roles
@@ -161,8 +182,13 @@ Composing rels: L</user_roles> -> role
 __PACKAGE__->many_to_many("roles", "user_roles", "role");
 
 
-use Judoon::Spreadsheet;
+=head1 EXTRA COMPONENTS
 
+=head2 PassphraseColumn
+
+Encrypt C<password> field using Blowfish cypher.
+
+=cut
 
 __PACKAGE__->load_components('PassphraseColumn');
 __PACKAGE__->add_columns(
@@ -178,9 +204,30 @@ __PACKAGE__->add_columns(
 );
 
 
+=head2 ::Role::Result::HasTimestamps
+
+Add <created> and <modified> columns to C<User>.
+
+=cut
+
+with qw(Judoon::Schema::Role::Result::HasTimestamps);
+__PACKAGE__->register_timestamps;
+
+
 =head1 METHODS
 
-=head2 B<C<change_password( $password )>>
+=head2 schema_name()
+
+Get the name of the PostgreSQL schema for this user.
+
+=cut
+
+sub schema_name {
+    return SCHEMA_PREFIX . $_[0]->username;
+}
+
+
+=head2 change_password( $password )
 
 Validates and sets password
 
@@ -222,6 +269,12 @@ sub import_data {
 }
 
 
+=head2 import_data_by_filename( $filename )
+
+Convenience method.  Opens C<$filename> then calls L</import_data>.
+
+=cut
+
 sub import_data_by_filename {
     my ($self, $filename) = @_;
 
@@ -234,9 +287,16 @@ sub import_data_by_filename {
 }
 
 
+=head2 my_pages()
+
+Convenience method to get C<User>'s pages as a resultset.
+
+=cut
+
 sub my_pages {
-    my ($self, $args) = @_;
+    my ($self) = @_;
     return $self->datasets_rs->related_resultset('pages');
 }
+
 
 1;

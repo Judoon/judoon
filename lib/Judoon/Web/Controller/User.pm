@@ -235,7 +235,7 @@ sub edit : Chained('id') PathPart('') Args(0) {
         $c->stash->{page}{list} = [map {@{$_->{pages}}} @datasets];
     }
     else {
-        my @datasets = $c->stash->{user}{object}->datasets_rs()->public();
+        my @datasets = $c->stash->{user}{object}->datasets_rs->public->all;
         $c->stash->{dataset}{list} = \@datasets;
         $c->stash->{page}{list}    = [map {$_->pages_rs->public} @datasets];
     }

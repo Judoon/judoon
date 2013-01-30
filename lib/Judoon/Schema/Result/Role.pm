@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::Role;
 
 =pod
@@ -12,13 +11,15 @@ Judoon::Schema::Result::Role
 =cut
 
 use Moo;
-extends 'DBIx::Class::Core';
+extends 'Judoon::Schema::Result';
+
 
 =head1 TABLE: C<roles>
 
 =cut
 
 __PACKAGE__->table("roles");
+
 
 =head1 ACCESSORS
 
@@ -36,11 +37,17 @@ __PACKAGE__->table("roles");
 =cut
 
 __PACKAGE__->add_columns(
-  "id",
-  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
-  "name",
-  { data_type => "text", is_nullable => 0 },
+    id => {
+        data_type         => "integer",
+        is_auto_increment => 1,
+        is_nullable       => 0,
+    },
+    name => {
+        data_type   => "text",
+        is_nullable => 0,
+    },
 );
+
 
 =head1 PRIMARY KEY
 
@@ -53,6 +60,7 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("id");
+
 
 =head1 UNIQUE CONSTRAINTS
 
@@ -68,6 +76,7 @@ __PACKAGE__->set_primary_key("id");
 
 __PACKAGE__->add_unique_constraint("name_unique", ["name"]);
 
+
 =head1 RELATIONS
 
 =head2 user_roles
@@ -79,10 +88,9 @@ Related object: L<Judoon::Schema::Result::UserRole>
 =cut
 
 __PACKAGE__->has_many(
-  "user_roles",
-  "Judoon::Schema::Result::UserRole",
-  { "foreign.role_id" => "self.id" },
-  { cascade_copy => 0, cascade_delete => 0 },
+    user_roles => "::UserRole",
+    { "foreign.role_id" => "self.id" },
+    { cascade_copy => 0, cascade_delete => 0 },
 );
 
 =head2 users

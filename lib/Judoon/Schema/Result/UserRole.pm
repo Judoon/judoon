@@ -1,4 +1,3 @@
-use utf8;
 package Judoon::Schema::Result::UserRole;
 
 =pod
@@ -12,13 +11,15 @@ Judoon::Schema::Result::UserRole
 =cut
 
 use Moo;
-extends 'DBIx::Class::Core';
+extends 'Judoon::Schema::Result';
+
 
 =head1 TABLE: C<user_roles>
 
 =cut
 
 __PACKAGE__->table("user_roles");
+
 
 =head1 ACCESSORS
 
@@ -37,11 +38,18 @@ __PACKAGE__->table("user_roles");
 =cut
 
 __PACKAGE__->add_columns(
-  "user_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "role_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+    user_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
+    role_id => {
+        data_type      => "integer",
+        is_foreign_key => 1,
+        is_nullable    => 0,
+    },
 );
+
 
 =head1 PRIMARY KEY
 
@@ -57,6 +65,7 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("user_id", "role_id");
 
+
 =head1 RELATIONS
 
 =head2 role
@@ -68,10 +77,9 @@ Related object: L<Judoon::Schema::Result::Role>
 =cut
 
 __PACKAGE__->belongs_to(
-  "role",
-  "Judoon::Schema::Result::Role",
-  { id => "role_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+    role => "::Role",
+    { id => "role_id" },
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
 =head2 user
@@ -83,10 +91,9 @@ Related object: L<Judoon::Schema::Result::User>
 =cut
 
 __PACKAGE__->belongs_to(
-  "user",
-  "Judoon::Schema::Result::User",
-  { id => "user_id" },
-  { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+    user => "::User",
+    { id => "user_id" },
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
 

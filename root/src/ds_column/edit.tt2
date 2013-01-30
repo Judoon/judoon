@@ -14,20 +14,6 @@
 
     <h4>Accessions</h4>
       <div class="control-group">
-        <label class="control-label" for="ds_column.is_accession">Does this field contain accessions?</label>
-        <div class="controls">
-          <label class="checkbox inline" for="ds_column.is_acc_yes">
-            <input type="radio" form="dscolumn_edit" name="ds_column.is_accession" id="ds_column.is_acc_yes" value="1" [% IF ds_column.object.is_accession %]checked="checked"[% END %] />
-            Yes
-          </label>
-          <label class="checkbox inline" for="ds_column.is_acc_no">
-            <input type="radio" form="dscolumn_edit" name="ds_column.is_accession" id="ds_column.is_acc_no" value="0" [% IF !ds_column.object.is_accession %]checked="checked"[% END %] />
-            No
-          </label>
-        </div>
-      </div>
-
-      <div class="control-group">
         <label class="control-label" for="ds_column.accession_type">Accession type:</label>
         <div class="controls">
           <select form="dscolumn_edit" name="ds_column.accession_type" id="ds_column.accession_type">
@@ -39,43 +25,6 @@
             </optgroup>
             [% END %]
           </select>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label" for="ds_column.multiple_ids">Can there be more than one accession per row in this column?</label>
-        <div class="controls">
-          <label class="checkbox inline" for="ds_column.multiple_ids_yes">
-            <input type="radio" form="dscolumn_edit" name="ds_column.multiple_ids" id="ds_column.multiple_ids_yes" value="1" [% IF ds_column.object.multiple_ids %]checked="checked"[% END %] />
-            Yes
-          </label>
-          <label class="checkbox inline" for="ds_column.multipl_ids_no">
-            <input type="radio" form="dscolumn_edit" name="ds_column.multiple_ids" id="ds_column.multiple_ids_no" value="0" [% IF ! ds_column.object.multiple_ids %]checked="checked"[% END %] />
-            No
-          </label>
-        </div>
-      </div>
-
-      <h4>URLs</h4>
-
-      <div class="control-group">
-        <label class="control-label" for="ds_column.is_url">Does this column contain URLs?</label>
-        <div class="controls">
-          <label class="checkbox inline" for="ds_column.is_url_yes">
-            <input type="radio" form="dscolumn_edit" name="ds_column.is_url" id="ds_column.is_url_yes" value="1" [% IF ds_column.object.is_url %]checked="checked"[% END %] />
-            Yes
-          </label>
-          <label class="checkbox inline" for="ds_column.is_url_no">
-            <input type="radio" name="ds_column.is_url" id="ds_column.is_url_no" value="0" [% IF ! ds_column.object.is_url %]checked="checked"[% END %] />
-            No
-          </label>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">What is the URL base?</label>
-        <div class="controls">
-          <input type="text" form="dscolumn_edit" name="ds_column.url_root" value="[% ds_column.object.url_root | html %]" />
         </div>
       </div>
 

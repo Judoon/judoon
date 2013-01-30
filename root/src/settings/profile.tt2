@@ -15,12 +15,6 @@
     <label>Name</label>
     <input type="text" form="profile_form" class="span3" name="user.name" value="[% user.object.name %]">
 
-    <label>Phone Number</label>
-    <input type="text" form="profile_form" class="span3" name="user.phone_number" value="[% user.object.phone_number %]">
-
-    <label>Mailing Address</label>
-    <input type="text" form="profile_form" class="span3" name="user.mail_address" value="[% user.object.mail_address %]">
-
     [% INCLUDE 'components/forms/form_submit.tt2'
        submit_type = 'update'
        form_name   = 'profile_form'

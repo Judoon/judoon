@@ -4,18 +4,25 @@ package Judoon::Schema::ResultSet::User;
 
 =encoding utf8
 
+=head1 NAME
+
+Judoon::Schema::ResultSet::User
+
 =cut
 
 use Moo;
-use feature ':5.10';
-extends 'DBIx::Class::ResultSet';
+extends 'Judoon::Schema::ResultSet';
+
 
 use Judoon::Error;
 
 use constant MIN_PASSWORD_LENGTH => 8;
+use constant USERNAME_MAXLEN => 40;
 
 
-=head2 B<C<create_user( \%params )>>
+=head1 METHODS
+
+=head2 create_user( \%params )
 
 Add a new user to the database, with sanity checks
 
@@ -25,7 +32,7 @@ sub create_user {
     my ($self, $params) = @_;
 
     my %valid;
-    for my $k (qw(username password name email_address phone_number mail_address active)) {
+    for my $k (qw(username password name email_address active)) {
         $valid{$k} = $params->{$k} if (exists $params->{$k});
     }
 
@@ -36,11 +43,18 @@ sub create_user {
     elsif (not defined $valid{password}) {
         $errmsg = q{No password was given!};
     }
+    elsif (not defined $valid{email_address}) {
+        $errmsg = q{No email address was given!};
+    }
     elsif (not $self->validate_username($valid{username})) {
-        $errmsg = q{Invalid username! Use only a-z, 0-9, and '_'.};
+        $errmsg = q{Invalid username! Use only a-z, 0-9, and '_'. Must be }
+            . q{less than } . USERNAME_MAXLEN . q{ characters.};
     }
     elsif ($self->user_exists($valid{username})) {
         $errmsg = q{This username is already taken!};
+    }
+    elsif ($self->email_exists($valid{email_address})) {
+        $errmsg = q{Another account already has this email address.};
     }
     elsif (not $self->validate_password($valid{password})) {
         $errmsg = q{Password is not valid!  Must be more than eight characters long.};
@@ -48,25 +62,22 @@ sub create_user {
 
     Judoon::Error->throw($errmsg) if ($errmsg);
 
-    $valid{active} //= 1;
     my $new_user = $self->create(\%valid);
 
     # create new schema for user on Pg
-    my $dbic_storage = $self->result_source->storage;
-    if ($dbic_storage->sqlt_type eq 'PostgreSQL') {
-        $dbic_storage->dbh_do(
-            sub {
-                my ($storage, $dbh) = @_;
-                $dbh->do("CREATE SCHEMA $valid{username}");
-            },
-        );
-    }
+    $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $schema_name = $new_user->schema_name;
+            $dbh->do("CREATE SCHEMA $schema_name");
+        },
+    );
 
     return $new_user;
 }
 
 
-=head2 B<C<validate_username( $username )>>
+=head2 validate_username( $username )
 
 Makes sure C<$username> is valid.  Current regex is C<m/^\w+$/>.
 
@@ -74,11 +85,12 @@ Makes sure C<$username> is valid.  Current regex is C<m/^\w+$/>.
 
 sub validate_username {
     my ($self, $username) = @_;
-    return $username && $username =~ m/^\w+$/;
+    return $username && $username =~ m/^\w+$/
+        && length($username) <= USERNAME_MAXLEN;
 }
 
 
-=head2 B<C<validate_password( $password )>>
+=head2 validate_password( $password )
 
 Makes sure the password is valid.  Currently allows all defined passwords.
 
@@ -90,7 +102,7 @@ sub validate_password {
 }
 
 
-=head2 B<C<user_exists( $username )>>
+=head2 user_exists( $username )
 
 Check to see if the username C<username> is in the database.
 
@@ -102,5 +114,17 @@ sub user_exists {
 }
 
 
+=head2 email_exists( $email_address )
+
+Check to see if the email address C<$email_address> is already in the
+database.
+
+=cut
+
+sub email_exists {
+    my ($self, $email_address) = @_;
+    return $self->find({email_address => $email_address});
+}
+
+
 1;
-__END__

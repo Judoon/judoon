@@ -40,8 +40,8 @@ after object_GET => sub {
     my $dataset = $c->req->get_chained_object(-2)->[0];
     my @ds_columns = $dataset->ds_columns_ordered->all;
     $c->stash->{ds_column}{list} = \@ds_columns;
-    $c->stash->{url_columns} = [grep {$_->is_url} @ds_columns];
-    my @acc_columns = grep {$_->is_accession} @ds_columns;
+    $c->stash->{url_columns} = [];
+    my @acc_columns = grep {$_->accession_type} @ds_columns;
     $c->stash->{acc_columns}    = \@acc_columns;
     for my $acc_column (@acc_columns) {
         my $sites = $sitelinker->mapping->{accession}{$acc_column->accession_type};
@@ -69,9 +69,7 @@ after object_GET => sub {
     $c->stash->{sitelinker_sites} = encode_json( $sitelinker->sites );
     $c->stash->{sitelinker_accs}  = encode_json( $sitelinker->accessions );
 
-    $c->stash->{url_prefixes} = encode_json({
-        map {$_->shortname => $_->url_root} @{$c->stash->{url_columns}}
-    });
+    $c->stash->{url_prefixes} = encode_json({});
 
     # copied & pasted from DataSetColumn
     # need to factor this out.

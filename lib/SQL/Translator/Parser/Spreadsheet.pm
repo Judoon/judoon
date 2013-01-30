@@ -34,6 +34,7 @@ our ($DEBUG, @EXPORT_OK);
 $DEBUG = 0 unless defined $DEBUG;
 our $VERSION = '1.59';
 
+use Data::UUID;
 use Spreadsheet::Read qw(ReadData);
 use Exporter;
 use SQL::Translator::Utils qw(debug normalize_name);
@@ -84,9 +85,10 @@ sub parse {
         my $table = $schema->add_table( name => $table_name );
 
         my @field_names = ();
+        my %colnames_seen;
         for my $col ( $cols[0] .. $cols[1] ) {
             my $cell      = $ws->{cell}[$col][1];
-            my $col_name  = normalize_name( $cell );
+            my $col_name  = _unique_sqlname(\%colnames_seen, normalize_name( $cell ));
             next unless ($col_name);
             my $data_type = @{$ws->{attr}} ? ET_to_ST( $ws->{attr}[$col][1]{type} )
                           :                  'VARCHAR';
@@ -192,6 +194,27 @@ sub ET_to_ST {
     my $et = shift;
     $ET_to_ST{lc($et)} || $ET_to_ST{lc('Text')};
 }
+
+
+# make sure that fields in a table don't have duplicate names
+sub _unique_sqlname {
+    my ($seen, $colname) = @_;
+    return $colname if (!$seen->{$colname}++);
+
+    for my $suffix (map {sprintf '%02d', $_} 1..99) {
+        my $new_colname = $colname . '_' . $suffix;
+        return $new_colname if (!$seen->{$new_colname}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $colname . '_' . $uuid;
+        return $uuid_name if(!$seen->{$uuid_name}++);
+    }
+
+    die "absolutely insane.  how can we not generate a unique name for this?";
+}
+
 
 1;
 

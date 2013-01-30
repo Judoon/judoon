@@ -45,10 +45,11 @@ subtest 'Result::User' => sub {
 subtest 'ResultSet::User' => sub {
     my $user_rs = ResultSet('User');
 
-    ok $user_rs->validate_username('boo'),   'validate simple username';
-    ok !$user_rs->validate_username('b!!o'), 'reject invalid username';
-    ok !$user_rs->validate_username(''),     'reject empty username';
-    ok !$user_rs->validate_username(),       'reject undef username';
+    ok $user_rs->validate_username('boo'),     'validate simple username';
+    ok !$user_rs->validate_username('b!!o'),   'reject invalid username';
+    ok !$user_rs->validate_username(''),       'reject empty username';
+    ok !$user_rs->validate_username(),         'reject undef username';
+    ok !$user_rs->validate_username('b' x 50), 'reject too-long username';
 
     ok $user_rs->validate_password('boobooboo'),   'validate simple password';
     ok $user_rs->validate_password('n(&*M09{}}#'), 'validate complex password';
@@ -64,11 +65,13 @@ subtest 'ResultSet::User' => sub {
     );
 
     my @exceptions = (
-        ['nousername', qr/no username was given/i,  'missing username',],
-        ['nopassword', qr/no password was given/i,  'missing password',],
+        ['nousername', qr/no username was given/i,       'missing username',],
+        ['nopassword', qr/no password was given/i,       'missing password',],
+        ['noemail',    qr/no email address was given/i,  'missing email',],
         ['badusername', qr/invalid username/i,      'invalid username',],
         ['badpassword', qr/password is not valid/i, 'invalid password',],
         ['dupeusername', qr/this username is already taken/i,  'duplicate username',],
+        ['dupeemail',    qr/another account already has this email address/i,  'duplicate email_address',],
     );
     my %create_user_exceptions = map {$_->[0] => {
         data => {%newuser}, exception => $_->[1], descr => $_->[2],
@@ -76,9 +79,11 @@ subtest 'ResultSet::User' => sub {
 
     delete $create_user_exceptions{nousername}->{data}{username};
     delete $create_user_exceptions{nopassword}->{data}{password};
+    delete $create_user_exceptions{noemail}->{data}{email_address};
     $create_user_exceptions{badusername}->{data}{username} = 'sdf@#sfdg';
     $create_user_exceptions{badpassword}->{data}{password} = 'short';
     $create_user_exceptions{dupeusername}->{data}{username} = 'testuser';
+    $create_user_exceptions{dupeemail}->{data}{email_address} = 'testuser@example.com';
 
     for my $i (values %create_user_exceptions) {
         like exception { $user_rs->create_user($i->{data}); },
@@ -87,9 +92,10 @@ subtest 'ResultSet::User' => sub {
 
     ok $user_rs->create_user(\%newuser), 'able to create new user';
 
-    $newuser{username} = 'neweruser';
-    $newuser{active}   = 0;
-    ok my $inactive = $user_rs->create_user(\%newuser), 'create new user (explicitly not active)';
+    @newuser{qw(username email_address active)}
+        = qw(neweruser neweruser@example.com 0);
+    ok my $inactive = $user_rs->create_user(\%newuser),
+        'create new user (explicitly not active)';
     ok !$inactive->active, 'inactive user is inactive';
 };
 
@@ -110,9 +116,9 @@ subtest 'Result::Dataset' => sub {
         ['Goochie',  1, 'female'],
     ];
     my $xls_cols = [
-        {name => 'Name',   sort => 1, accession_type => q{}, url_root => q{},},
-        {name => 'Age',    sort => 2, accession_type => q{}, url_root => q{},},
-        {name => 'Gender', sort => 3, accession_type => q{}, url_root => q{},},
+        {name => 'Name',   sort => 1, },
+        {name => 'Age',    sort => 2, },
+        {name => 'Gender', sort => 3, },
     ];
 
     # mutating methods, create new dataset
@@ -175,31 +181,58 @@ subtest 'Result::DatasetColumn' => sub {
     my $dataset = $ds_column->dataset;
     my $new_ds_col = $dataset->create_related('ds_columns', {
         name => 'Test Column', sort => 99,
-        is_accession => 1, accession_type => q{flybase_id},
-        is_url => 0, url_root => q{},
+        data_type_id => 1,
     });
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
-        is_accession => 0, accession_type => q{},
-        is_url => 1, url_root => q{http://google.com/},
+        data_type_id => 1,
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
-        name => q{}, sort => 98, is_accession => 0, accession_type => q{},
-        is_url => 0, url_root => q{},
+        name => q{}, sort => 98, data_type_id => 1,
     }), 'can create column w/ empty name';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
-        name => q{#$*^(}, sort => 97, is_accession => 0, accession_type => q{},
-        is_url => 1, url_root => q{http://google.com/?q=},
+        name => q{#$*^(}, sort => 97, data_type_id => 1,
     }), 'can create column w/ non-ascii name';
 
     # mutating methods, create new dataset
     my $user = ResultSet('User')->first;
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
+
+
+    # test data_type lookup column
+    is $ds_col3->data_type(), 'text', 'can proxy to lookup';
+    ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
+        ' lookup_proxy lives w/ good lookup';
+    is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
+    is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
+    ok exception { $ds_col3->data_type("moo"); },
+        ' lookup_proxy dies on bad lookup';
+
+    # test accession_type lookup column
+    $ds_col3->discard_changes; # needed b/c fk is nullable
+    is $ds_col3->accession_type(), undef, 'accession_type not yet set';
+    ok !exception {
+        $ds_col3->accession_type('entrez_gene_id');
+    }, 'Can successfully set accession type';
+    $ds_col3->update;
+    $ds_col3->discard_changes;
+    is $ds_col3->accession_type(), 'entrez_gene_id', 'accession_type correctly set';
+
+
+    # make sure we can import datasets w/ duplicate column names
+    $user = ResultSet('User')->first;
+    is_result my $dupe_cols_ds
+        = $user->import_data_by_filename('t/etc/data/dupe_colnames.xls'),
+            'Can successfully import dataset with duplicate column names';
+    my @dupe_cols = $dupe_cols_ds->ds_columns_ordered->all;
+    my %seen_colnames;
+    my $dupes = grep {$seen_colnames{$_->shortname}++} @dupe_cols;
+    ok !$dupes, q{  ...and columns names aren't repeated.};
 };
 
 
