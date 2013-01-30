@@ -27,6 +27,7 @@ use Catalyst qw/
     Session::Store::Memcached
     Session::State::Cookie
     StackTrace
+    Unicode::Encoding
 /;
 use CatalystX::RoleApplicator;
 
@@ -55,6 +56,7 @@ __PACKAGE__->config(
     disable_component_resolution_regex_fallback => 1,
     enable_catalyst_header => 1, # Send X-Catalyst header
     default_view => 'HTML',
+    encoding => 'UTF-8',
 );
 
 __PACKAGE__->config(
