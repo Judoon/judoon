@@ -405,11 +405,13 @@ sub _store_data {
         unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
     my $sqlt = SQL::Translator->new(
+        parser      => 'Spreadsheet',
         parser_args => {
             scan_fields     => 0,
             spreadsheet_ref => $spreadsheet->spreadsheet,
         },
 
+        producer      => 'PostgreSQL',
         producer_args => { no_transaction => 1, },
 
         filters => [
@@ -417,16 +419,10 @@ sub _store_data {
             ['Names', {fields => 'lc',} ],
         ],
     );
-
-    my $dbic_storage = $self->result_source->storage;
-
-    # translate to sql
-    my $sql = $sqlt->translate(
-        from => 'Spreadsheet',
-        to   => 'PostgreSQL',
-    ) or die $sqlt->error;
+    my $sql = $sqlt->translate() or die $sqlt->error;
 
     # create table
+    my $dbic_storage = $self->result_source->storage;
     $dbic_storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
