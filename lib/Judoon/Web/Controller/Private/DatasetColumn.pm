@@ -91,7 +91,34 @@ Add accession types to stash.
 
 after object_GET => sub {
     my ($self, $c) = @_;
+    $c->stash->{ds_column}{object}{data_type} = $c->req->get_object(0)->[0]->data_type;
+    $c->stash->{ds_column}{object}{accession_type} = $c->req->get_object(0)->[0]->accession_type;
     $c->stash->{accession_types} = $c->model('SiteLinker')->accession_groups;
+};
+
+
+=head2 object_PUT (before)
+
+=cut
+
+before object_PUT => sub {
+    my ($self, $c) = @_;
+
+    my $params = $c->req->get_object(0)->[1];
+
+    if (my $data_type = delete $params->{data_type}) {
+        my $dt_obj = $c->model('User::TtDscolumnDatatype')->find({data_type => $data_type})
+            or die "Can't find type object for $data_type";
+        $params->{data_type_id} = $dt_obj->id;
+    }
+
+    if (my $acc_type = delete $params->{accession_type}) {
+        my $acc_obj = $c->model('User::TtAccessionType')->find({accession_type => $acc_type})
+            or die "Can't find type object for $acc_type";
+        $params->{accession_type_id} = $acc_obj->id;
+    }
+
+    return;
 };
 
 
