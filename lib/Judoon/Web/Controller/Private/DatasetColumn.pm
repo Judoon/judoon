@@ -72,11 +72,11 @@ after list_GET => sub {
 
     # this should be in the view
     for my $column (@$columns) {
-        my @meta;
+        my @meta = ($column->{data_type});
         if (exists $column->{accession_type}) {
             push @meta, 'accession: ' . $column->{accession_type};
         }
-        $column->{metadata} = @meta ? join(', ', @meta) : 'plain text';
+        $column->{metadata} = join(', ', @meta);
     }
 
     $c->stash->{ds_column}{list} = $columns;
@@ -117,6 +117,10 @@ before object_PUT => sub {
             or die "Can't find type object for $acc_type";
         $params->{accession_type_id} = $acc_obj->id;
     }
+    else {
+        $params->{accession_type_id} = undef;
+    }
+
 
     return;
 };
