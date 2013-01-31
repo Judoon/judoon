@@ -54,7 +54,7 @@ around BUILDARGS => sub {
 has spreadsheet_read_args => (is => 'lazy', isa => HashRef,);
 sub _build_spreadsheet_read_args {
     my ($self) = @_;
-    return {attr => 1, clip =>1,};
+    return {cells => 1, rc => 1, attr => 1, clip =>1,};
 }
 
 has spreadsheet => (is => 'lazy', isa => ArrayRef,);

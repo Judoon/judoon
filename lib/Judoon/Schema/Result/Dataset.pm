@@ -407,7 +407,7 @@ sub _store_data {
     my $sqlt = SQL::Translator->new(
         parser      => 'Spreadsheet',
         parser_args => {
-            scan_fields     => 0,
+            scan_fields     => 1,
             spreadsheet_ref => $spreadsheet->spreadsheet,
         },
 

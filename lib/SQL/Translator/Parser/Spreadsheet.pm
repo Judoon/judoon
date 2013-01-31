@@ -44,7 +44,7 @@ use base qw(Exporter);
 @EXPORT_OK = qw(parse);
 
 my %ET_to_ST  = (
-    lc('Text')    => 'VARCHAR',
+    lc('Text')    => 'TEXT',
     lc('Date')    => 'DATETIME',
     lc('Numeric') => 'DOUBLE',
 );
@@ -89,29 +89,22 @@ sub parse {
         for my $col ( $cols[0] .. $cols[1] ) {
             my $cell      = $ws->{cell}[$col][1];
             my $col_name  = _unique_sqlname(\%colnames_seen, normalize_name( $cell ));
-            next unless ($col_name);
-            my $data_type = @{$ws->{attr}} ? ET_to_ST( $ws->{attr}[$col][1]{type} )
-                          :                  'VARCHAR';
             push @field_names, $col_name;
+            next unless ($col_name);
 
+            my $data_type = @{$ws->{attr}}
+                ? ET_to_ST( $ws->{attr}[$col][2]{type} )
+                : 'TEXT';
             my $field = $table->add_field(
                 name              => $col_name,
                 data_type         => $data_type,
-                default_value     => '',
-                size              => 255,
                 is_nullable       => 1,
                 is_auto_increment => undef,
             ) or die $table->error;
-
-            # if ( $col == 0 ) {
-            #     $table->primary_key( $field->name );
-            #     $field->is_primary_key(1);
-            # }
         }
 
-        #
+
         # If directed, look at every field's values to guess size and type.
-        #
         unless (
             defined $args->{'scan_fields'} &&
             $args->{'scan_fields'} == 0
@@ -119,7 +112,7 @@ sub parse {
             my %field_info = map { $_, {} } @field_names;
 
             for(
-                my $iR = 1;
+                my $iR = 2;
                 defined $ws->{'maxrow'} && $iR <= $ws->{'maxrow'};
                 $iR++
             ) {
@@ -128,10 +121,9 @@ sub parse {
                     defined $ws->{'maxcol'} && $iC <= $ws->{'maxcol'};
                     $iC++
                 ) {
-                    my $field = $field_names[ $iC ];
+                    my $field = $field_names[ $iC-1 ];
                     my $data  = $ws->{cell}[ $iC ][ $iR ];
                     next if !defined $data || $data eq '';
-                    my $size  = [ length $data ];
                     my $type;
 
                     if ( $data =~ /^-?\d+$/ ) {
@@ -145,22 +137,9 @@ sub parse {
                         $data =~ /^-?\.\d+$/
                     ) {
                         $type = 'float';
-                        my ( $w, $d ) =
-                            map { s/,//g; length $_ || 1 }
-                            split( /\./, $data )
-                        ;
-                        $size = [ $w + $d, $d ];
                     }
                     else {
-                        $type = 'char';
-                    }
-
-                    for my $i ( 0, 1 ) {
-                        next unless defined $size->[ $i ];
-                        my $fsize = $field_info{ $field }{'size'}[ $i ] || 0;
-                        if ( $size->[ $i ] > $fsize ) {
-                            $field_info{ $field }{'size'}[ $i ] = $size->[ $i ];
-                        }
+                        $type = 'text';
                     }
 
                     $field_info{ $field }{ $type }++;
@@ -168,18 +147,11 @@ sub parse {
             }
 
             for my $field ( keys %field_info ) {
-                my $size      = $field_info{ $field }{'size'} || [ 1 ];
                 my $data_type =
-                    $field_info{ $field }{'char'}    ? 'char'    :
-                    $field_info{ $field }{'float'}   ? 'float'   :
-                    $field_info{ $field }{'integer'} ? 'integer' : 'char';
-
-                if ( $data_type eq 'char' && scalar @$size == 2 ) {
-                    $size = [ $size->[0] + $size->[1] ];
-                }
-
+                    $field_info{ $field }{'text'}    ? 'text'    :
+                    $field_info{ $field }{'float'}   ? 'double'  :
+                    $field_info{ $field }{'integer'} ? 'integer' : 'text';
                 my $field = $table->get_field( $field );
-                $field->size( $size ) if $size;
                 $field->data_type( $data_type );
             }
         }
