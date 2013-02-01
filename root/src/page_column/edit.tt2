@@ -17,7 +17,7 @@
     <div class="control-group">
       <label class="control-label" for="page_column.title">Column Title:</label>
       <div class="controls">
-        <input type="text" form="pagecol_form" class="" name="page_column.title" id="page_column.title" value="[% page_column.object.title %]" />
+        <input type="text" form="pagecol_form" class="" name="page_column.title" id="page_column_title" value="[% page_column.object.title %]" />
         <p class="help-block">This will be the header for the column</p>
       </div>
     </div>
@@ -31,7 +31,36 @@
         </div>
         <input type="hidden" form="pagecol_form" name="page_column.template" />
 
-        <p class="help-block">Add formatting with the buttons or <a href="#">preview</a>.</p>
+      </div>
+    </div>
+
+
+    <div class="control-group">
+      <label class="control-label" for="page_column.preview">Preview:</label>
+      <div class="controls">
+        <div id="preview_space" class="span3" style="border: 1px solid #ddd; border-radius: 3px;">
+          <table id="preview_table" class="display data_table table table-striped table-condensed dataTable">
+            <thead>
+              <tr>
+                <th id="preview_column_title"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="odd">
+                <td id="preview_content"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="control-group">
+      <label class="control-label" for=""></label>
+      <div class="controls">
+
+        <p class="help-block">Add formatting with the buttons or <a id="btn_preview" href="#">preview</a>.</p>
 
 
         <div id="actions" class="row-fluid">
