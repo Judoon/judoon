@@ -82,7 +82,12 @@
               </div>
             </div>
           </div>
+          <div class="span4">
+            <h6>Widget Guide</h6>
+            <img src="/static/images/pagecolumn_components_labeled.png">
+          </div>
         </div>
+
       </div>
     </div>
 
