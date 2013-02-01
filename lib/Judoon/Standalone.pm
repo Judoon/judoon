@@ -17,6 +17,8 @@ has standalone_index => (is => 'lazy',);
 sub _build_standalone_index { return 'index.html'; }
 has standalone_db => (is => 'lazy',);
 sub _build_standalone_db { return 'cgi-bin/database.tab'; }
+has standalone_types => (is => 'lazy',);
+sub _build_standalone_types { return 'cgi-bin/datatypes.tab'; }
 
 
 has template_dir => (is => 'lazy',);
@@ -59,9 +61,18 @@ sub _build_archive {
     ) or die "Cannot template? " . $archive->errstr;
 
     # add database
+    my $dataset = $self->page->dataset;
     $archive_section->new_file(
-        $self->standalone_db, 'string', $self->page->dataset->as_raw({shortname => 1})
+        $self->standalone_db, 'string', $dataset->as_raw({shortname => 1})
     );
+
+    # add datatypes
+    $archive_section->new_file(
+        $self->standalone_types, 'string',
+        join("\t", map {$_->{data_type_rel}{data_type}}
+                 $dataset->ds_columns_ordered->with_lookups->hri->all)
+    );
+
 
     die $archive->errstr if ($archive->errstr);
     return $archive;

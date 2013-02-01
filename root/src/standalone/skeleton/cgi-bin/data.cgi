@@ -37,6 +37,11 @@ main: {
     @real_data = map {[split /\t/, $_]} @real_data;
 
 
+    open my $types_fh, '<', 'datatypes.tab'
+        or die "Cannot open datatypes.tab: $!";
+    my @data_type = split /\t/, do { local $/ = undef; <$types_fh>; };
+    close $types_fh;
+
     # order data
     # iSortingCols: # of columns to sort by
     # sSortDir_#: asc/ desc
@@ -54,8 +59,10 @@ main: {
             my $retval;
             for my $sort (@sorts) {
                 my $idx = $sort->[0];
-                $retval = $sort->[1] eq 'asc' ? ($left->[$idx]  cmp $right->[$idx])
-                        :                       ($right->[$idx] cmp $left->[$idx] );
+                $retval = $data_type[$idx] eq 'text'    ? ($left->[$idx]  cmp $right->[$idx])
+                        : $data_type[$idx] eq 'numeric' ? ($left->[$idx]  <=> $right->[$idx])
+                        :                                 die 'Unknown data type: ' . $data_type[$idx];
+                $retval *= -1 if ($sort->[1] eq 'desc');
                 last if ($retval);
             }
             return $retval;

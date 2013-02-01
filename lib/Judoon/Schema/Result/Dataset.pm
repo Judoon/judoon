@@ -19,7 +19,6 @@ use Judoon::Error;
 use Judoon::Tmpl;
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
-use SQL::Translator;
 
 
 =head1 TABLE: C<datasets>
@@ -234,25 +233,21 @@ sub import_from_spreadsheet {
     die q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'}
         unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
-    my $sqlt_table = $self->_store_data($spreadsheet);
-    $self->name($spreadsheet->worksheet_name);
-    my $schema_name = $self->schema_name;
-    (my $tablename = $sqlt_table->name) =~ s/^$schema_name\.//; # get rid of schema
-    $self->tablename($tablename);
+    my $table_name = $self->_store_data($spreadsheet);
+
+    $self->name($spreadsheet->name);
+    $self->tablename($table_name);
     $self->nbr_rows($spreadsheet->nbr_rows);
     $self->nbr_columns($spreadsheet->nbr_columns);
     $self->notes(q{});
     $self->original(q{});
     $self->update;
 
-    my $dscol_datatype = $self->result_source->schema
-        ->resultset('TtDscolumnDatatype')->find({data_type => 'text'});
     my $sort = 1;
-    my $it = each_arrayref $spreadsheet->headers, [$sqlt_table->get_fields];
-    while (my ($header, $sqlt_field) = $it->()) {
+    for my $field (@{ $spreadsheet->fields }) {
         $self->create_related('ds_columns', {
-            name => ($header // ''), shortname => $sqlt_field->name,
-            sort => $sort++, data_type_rel => $dscol_datatype,
+            name => $field->{name}, shortname => $field->{shortname},
+            sort => $sort++, data_type => $field->{type},
         });
     }
 
@@ -391,11 +386,10 @@ sub _build_data {
 
 =head2 _store_data( $spreadsheet )
 
-This private method actually creates the new table for the data in the
-Datastore.  It passes the spreadsheet to L<SQL::Translator> to get the
-SQL for creating the table.  It also checks for table name collisions
-and changes the name accordingly.  After creating the table, it
-inserts the data. Returns the new table name.
+This private method creates the new table for the data in the
+Datastore.  It also checks for table name collisions and changes the
+name accordingly.  After creating the table, it inserts the
+data. Returns the new table name.
 
 =cut
 
@@ -404,22 +398,12 @@ sub _store_data {
     die 'arg must be a Judoon::Spreadsheet'
         unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
-    my $sqlt = SQL::Translator->new(
-        parser      => 'Spreadsheet',
-        parser_args => {
-            scan_fields     => 1,
-            spreadsheet_ref => $spreadsheet->spreadsheet,
-        },
-
-        producer      => 'PostgreSQL',
-        producer_args => { no_transaction => 1, },
-
-        filters => [
-            sub { $self->_check_table_name(shift); },
-            ['Names', {fields => 'lc',} ],
-        ],
-    );
-    my $sql = $sqlt->translate() or die $sqlt->error;
+    my $schema     = $self->schema_name;
+    my $table_name = $self->_gen_table_name( $spreadsheet->name );
+    my @fields     = @{ $spreadsheet->fields };
+    my $sql        = qq{CREATE TABLE "$schema"."$table_name" (\n}
+        . join(",\n", map { qq|"$_->{shortname}" text| } @fields)
+        . ')';
 
     # create table
     my $dbic_storage = $self->result_source->storage;
@@ -431,40 +415,19 @@ sub _store_data {
     );
 
     # populate table
-    my ($table)    = $sqlt->schema->get_tables;
-    my $table_name = $table->name;
-    my @fields     = map {$_->name} $table->get_fields;
-    my $field_list = join ', ', @fields;
+    my $field_list = join ', ', map {$_->{shortname}} @fields;
     my $join_list  = join ', ', (('?') x @fields);
-
     $dbic_storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
             my $sth_insert = $dbh->prepare_cached(
-                "INSERT INTO $table_name ($field_list) VALUES ($join_list)"
+                "INSERT INTO $schema.$table_name ($field_list) VALUES ($join_list)"
             );
             $sth_insert->execute(@$_) for (@{$spreadsheet->data});
         },
     );
 
-    return $table;
-}
-
-
-=head2 _check_table_name( $sqlt_schema )
-
-Private method passed to the L<SQL::Translator> filter to create a
-unique table name.
-
-=cut
-
-sub _check_table_name {
-    my ($self, $sqlt_schema) = @_;
-
-    my ($table)    = $sqlt_schema->get_tables();
-    my $table_name = $self->_gen_table_name($table->name);
-    $table->name($self->schema_name . '.' . $table_name);
-    return;
+    return $table_name;
 }
 
 
@@ -484,7 +447,7 @@ sub _gen_table_name {
     return $table_name unless ($self->_table_exists($table_name));
 
     my $new_name = List::AllUtils::first {not $self->_table_exists($_)}
-        map { "${table_name}_${_}" } (1..10);
+        map { "${table_name}_" . sprintf('%02d', $_) } (1..99);
     return $new_name if ($new_name);
 
     $new_name = $table_name . '_' . time();
