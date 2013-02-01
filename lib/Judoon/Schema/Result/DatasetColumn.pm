@@ -177,7 +177,8 @@ __PACKAGE__->belongs_to(
     accession_type_rel => "::TtAccessionType",
     { "foreign.id" => "self.accession_type_id" },
     {
-        lookup_proxy => 'accession_type',
+        join_type     => 'left',
+        lookup_proxy  => 'accession_type',
         is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE",
     },
 );

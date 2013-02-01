@@ -48,7 +48,7 @@ test_psgi $urlmap->to_app, sub {
     my @basic_search = query_result($cb, {search => 'Bene'});
     is @basic_search, 1, 'found 1 expected entry';
 
-    my @ages = qw(1 14 2 5 8);
+    my @ages = qw(1 2 5 8 14);
     my @sorted = query_result($cb, {sortby => [[1,'asc'],],});
     is_deeply [map {$_->{age}} @sorted], \@ages, 'data is properly sorted';
 

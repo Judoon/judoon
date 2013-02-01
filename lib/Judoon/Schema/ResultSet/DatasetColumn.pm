@@ -30,4 +30,9 @@ sub for_dataset {
 }
 
 
+sub with_lookups {
+    my ($self) = @_;
+    return $self->search_rs({}, {prefetch => ['data_type_rel', 'accession_type_rel']},);
+}
+
 1;

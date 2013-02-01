@@ -44,9 +44,19 @@ around generate_rs => sub {
     my $self = shift;
     my $c    = shift;
     my $rs = $self->$orig($c);
-    return $rs->for_dataset($c->req->get_chained_object(0)->[0]);
+    return $rs->for_dataset($c->req->get_chained_object(0)->[0])
+        ->with_lookups();
 };
 
+
+sub row_format_output {
+    my ($self, undef, $row) = @_;
+    $row->{data_type} = $row->{data_type_rel}{data_type};
+    if ($row->{accession_type_rel}) {
+        $row->{accession_type} = $row->{accession_type_rel}{accession_type};
+    }
+    return $row;
+}
 
 =head1 NAME
 

@@ -12,30 +12,43 @@
   <fieldset>
     <legend>Annotate column "[% ds_column.object.name %]"</legend>
 
-    <h4>Accessions</h4>
-      <div class="control-group">
-        <label class="control-label" for="ds_column.accession_type">Accession type:</label>
-        <div class="controls">
-          <select form="dscolumn_edit" name="ds_column.accession_type" id="ds_column.accession_type">
-            [% FOREACH accgroup IN accession_types %]
-            <optgroup label="[% accgroup.group_label %]">
-              [% FOREACH acctype IN accgroup.types %]
-              <option value="[% acctype.name %]" [% IF acctype.name == ds_column.object.accession_type %]selected[% END %]>[% acctype.label | html %]</option>
-              [% END %]
-            </optgroup>
-            [% END %]
-          </select>
-        </div>
+    <h4>Data Type</h4>
+    <div class="control-group">
+      <label class="control-label" for="ds_column.data_type">Data type:</label>
+      <div class="controls">
+        <select form="dscolumn_edit" name="ds_column.data_type" id="ds_column.data_type">
+          [% FOREACH data_type IN ['text', 'numeric'] %]
+          <option value="[% data_type %]" [% IF data_type == ds_column.object.data_type %]selected[% END %]>[% data_type.ucfirst %]</option>
+          [% END %]
+        </select>
       </div>
+    </div>
 
-      <input type="hidden" form="dscolumn_edit" name="x-tunneled-method" value="PUT">
+    <h4>Accessions</h4>
+    <div class="control-group">
+      <label class="control-label" for="ds_column.accession_type">Accession type:</label>
+      <div class="controls">
+        <select form="dscolumn_edit" name="ds_column.accession_type" id="ds_column.accession_type">
+          <option value="" [% IF !ds_column.object.accesstion_type %]selected[% END %]>Not an accession</option>
+          [% FOREACH accgroup IN accession_types %]
+          <optgroup label="[% accgroup.group_label %]">
+            [% FOREACH acctype IN accgroup.types %]
+            <option value="[% acctype.name %]" [% IF acctype.name == ds_column.object.accession_type %]selected[% END %]>[% acctype.label | html %]</option>
+            [% END %]
+          </optgroup>
+          [% END %]
+        </select>
+      </div>
+    </div>
 
-      [% INCLUDE 'components/forms/form_submit.tt2'
-         submit_type = 'update'
-         return_url  = c.uri_for_action('/private/datasetcolumn/list', c.req.captures.slice(0,-2))
-         return_page = 'column list'
-         form_name   = 'dscolumn_edit'
-      %]
+    <input type="hidden" form="dscolumn_edit" name="x-tunneled-method" value="PUT">
+
+    [% INCLUDE 'components/forms/form_submit.tt2'
+        submit_type = 'update'
+        return_url  = c.uri_for_action('/private/datasetcolumn/list', c.req.captures.slice(0,-2))
+        return_page = 'column list'
+        form_name   = 'dscolumn_edit'
+    %]
 
   </fieldset>
 </form>

@@ -23,9 +23,12 @@ that spreadsheet.
 =cut
 
 use Moo;
-use MooX::Types::MooseLike::Base qw(Str ArrayRef HashRef);
+use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef);
 
+use Data::UUID;
 use Clone qw(clone);
+use List::Util ();
+use Regexp::Common;
 use Spreadsheet::Read ();
 
 
@@ -51,14 +54,8 @@ around BUILDARGS => sub {
     return $args;
 };
 
-has spreadsheet_read_args => (is => 'lazy', isa => HashRef,);
-sub _build_spreadsheet_read_args {
-    my ($self) = @_;
-    return {attr => 1, clip =>1,};
-}
 
-has spreadsheet => (is => 'lazy', isa => ArrayRef,);
-sub _build_spreadsheet {
+sub BUILD {
     my ($self) = @_;
 
     my @source_args;
@@ -73,55 +70,95 @@ sub _build_spreadsheet {
             ($self->filetype // 'xls');
     }
 
-    return Spreadsheet::Read::ReadData(
-        @source_args, %{$self->spreadsheet_read_args},
+    my $spreadsheet = Spreadsheet::Read::ReadData(
+        @source_args, cell => 1, rc => 1, attr => 1, clip => 1, # debug => 8,
     ) or die "Unable to read spreadsheet: $!";
+
+    my $worksheet = $spreadsheet->[1];
+    $self->{name} = $worksheet->{label};
+
+    my $data             = [Spreadsheet::Read::rows($worksheet)];
+    my $headers          = shift @$data;
+    $self->{data}        = $data;
+    $self->{nbr_rows}    = scalar @$data;
+    $self->{nbr_columns} = scalar @{ $data->[0] };
+
+    my (@fields, %colnames_seen);
+    my $colidx = 1;
+    for my $header (@$headers) {
+        my $shortname = $self->_unique_sqlname( \%colnames_seen, $header );
+
+        my $excel_type = $worksheet->{attr}[$colidx][2]{type};
+        my %heuristic_types;
+        for my $rowidx (2..$worksheet->{maxrow}) {
+            my $data = $worksheet->{cell}[ $colidx ][ $rowidx ];
+            next if !defined $data || $data eq '';
+            my $type = $data =~ m/^$RE{num}{int}$/  ? 'integer'
+                     : $data =~ m/^$RE{num}{real}$/ ? 'numeric'
+                     :                                'text';
+            $heuristic_types{ $type }++;
+        }
+        my $heuristic_type = List::Util::first {$heuristic_types{$_}}
+            qw(text numeric integer);
+        $heuristic_type //= 'text';
+        $heuristic_type = 'numeric' if ($heuristic_type eq 'integer');
+
+        my $data_type = $heuristic_type;
+        push @fields, {
+            name => $header,    shortname => $shortname,
+            type => $data_type, excel_type => $excel_type,
+            heuristic_type => $heuristic_type,
+        };
+        $colidx++;
+    }
+    $self->{fields} = \@fields;
 }
 
 
-has orig_data => (is => 'lazy', isa => ArrayRef[ArrayRef],);
-sub _build_orig_data {
-    my ($self) = @_;
-    return [Spreadsheet::Read::rows($self->spreadsheet->[1])];
+
+has name        => (is => 'ro', init_arg => undef, isa => Str, );
+has fields      => (is => 'ro', init_arg => undef, isa => ArrayRef[HashRef],);
+has data        => (is => 'ro', init_arg => undef, isa => ArrayRef[ArrayRef],);
+has nbr_rows    => (is => 'ro', init_arg => undef, isa => Int, );
+has nbr_columns => (is => 'ro', init_arg => undef, isa => Int, );
+
+
+sub _unique_sqlname {
+    my ($self, $seen, $name) = @_;
+
+    # stolen from SQL::Translator::Utils::normalize_name
+    # The name can only begin with a-zA-Z_; if there's anything
+    # else, prefix with _
+    $name =~ s/^([^a-zA-Z_])/_$1/;
+
+    # anything other than a-zA-Z0-9_ in the non-first position
+    # needs to be turned into _
+    $name =~ tr/[a-zA-Z0-9_]/_/c;
+
+    # All duplicated _ need to be squashed into one.
+    $name =~ tr/_/_/s;
+
+    # Trim a trailing _
+    $name =~ s/_$//;
+
+    $name = lc $name;
+
+    return $name if (!$seen->{$name}++);
+
+    for my $suffix (map {sprintf '%02d', $_} 1..99) {
+        my $new_colname = $name . '_' . $suffix;
+        return $new_colname if (!$seen->{$new_colname}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $name . '_' . $uuid;
+        return $uuid_name if(!$seen->{$uuid_name}++);
+    }
+
+    die "absolutely insane.  how can we not generate a unique name for this?";
 }
 
-has workbook_meta => (is => 'lazy', isa => HashRef,);
-sub _build_workbook_meta {
-    my ($self) = @_;
-    return $self->spreadsheet->[0];
-}
-
-
-has data    => (is => 'ro', isa => ArrayRef[ArrayRef], predicate => 1, init_arg => undef, lazy => 1, builder => '_build_data_and_headers',);
-has headers => (is => 'ro', isa => ArrayRef,           predicate => 1, init_arg => undef, lazy => 1, builder => '_build_data_and_headers',);
-sub _build_data_and_headers {
-    my ($self) = @_;
-    my $data = clone($self->orig_data);
-    my $headers = shift @$data;
-    $self->{headers} = $headers;
-    $self->{data}    = $data;
-}
-
-
-=head1 METHODS
-
-=cut
-
-sub worksheet_name {
-    my ($self) = @_;
-    return $self->spreadsheet->[1]{label};
-}
-
-
-sub nbr_rows {
-    my ($self) = @_;
-    return scalar @{$self->data};
-}
-
-sub nbr_columns {
-    my ($self) = @_;
-    return scalar @{$self->data->[0]};
-}
 
 1;
 __END__

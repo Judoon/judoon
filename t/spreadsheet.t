@@ -13,36 +13,30 @@ use Judoon::Spreadsheet;
 
 subtest 'basic' => sub {
 
-    ok my $js_filename   = Judoon::Spreadsheet->new({filename => 't/etc/data/basic.xls'});
+    my $test_file_root = 't/etc/data';
+    for my $file (qw(basic.xls basic.xlsx)) { # basic.csv)) {
 
-    my $TEST_XLS = IO::File->new("t/etc/data/basic.xls", 'r');
-    ok my $js_filehandle = Judoon::Spreadsheet->new({filehandle => $TEST_XLS});
+        my $basic_fn = "${test_file_root}/${file}";
+        my ($ext) = ($basic_fn =~ m/\.(\w+)$/);
+        my $TEST_XLS = IO::File->new($basic_fn, 'r');
+        my $TEST_XLS_SLURP = IO::File->new($basic_fn, 'r');
+        binmode $TEST_XLS_SLURP;
+        my $file_contents = do {local $/ = undef; <$TEST_XLS_SLURP>; };
 
-    ok my $js_filehandle2 = Judoon::Spreadsheet->new({filehandle => $TEST_XLS, filetype => 'xls'});
+        my @constructor_tests = (
+            [{filename => $basic_fn}, 'filename-only'],
+            [{filehandle => $TEST_XLS, filetype => $ext}, 'filehandle+parser-only',],
+            # [{filehandle => $TEST_XLS}, 'filehandle-only'],
+            # [{content => $file_contents}, 'contents-only'],
+        );
 
-    binmode $TEST_XLS;
-    my $file_contents = do {local $/ = undef; <$TEST_XLS>; };
-    ok my $js_contents = Judoon::Spreadsheet->new({content => $file_contents});
-
-    my @tests = (
-        # file              type    data
-        ['basic.xls',       undef,  ], # $basic, ],
-        ['basic.xls',       'xls',  ], # $basic, ],
-        ['basic.xlsx',      'xlsx', ], # $basic, ],
-        ['basic.csv',       'csv',  ], # {%$basic,name=>'IO'}, ],
-        ['troublesome.xls', '',     ], # undef,   ],
-    );
-
-    for my $test (@tests) {
-        my ($file, $type, $expected) = @$test;
-
-        my $TEST_XLS = IO::File->new("t/etc/data/$file", 'r');
-        ok my $spreadsheet = Judoon::Spreadsheet->new({
-            filehandle => $TEST_XLS, filetype => $type,
-        }),
-            "can read spreadsheet $file";
+        for my $cons_test (@constructor_tests) {
+            ok my $js = Judoon::Spreadsheet->new($cons_test->[0]),
+                "new() via $cons_test->[1] for $ext";
+            is $js->name, ($ext =~ m/xls/ ? 'Dog Roster' : 'Sheet1'),
+                '  ...basic sanity test';
+        }
     }
-
 };
 
 done_testing();
