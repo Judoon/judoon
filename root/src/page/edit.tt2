@@ -13,10 +13,12 @@
   <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'template'},) %]">Save as template</a></li>
 </ul>
 
-
+<div class="row-fluid">
+  <div class="span6">
 <form name="page_edit" id="page_edit" action="[% c.uri_for_action('/private/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
   <fieldset>
     <legend>Page Layout</legend>
+
 
     <div class="control-group">
       <label class="control-label" for="page.title">Title: </label>
@@ -52,6 +54,12 @@
     %]
   </fieldset>
 </form>
+</div>
+  <div class="span6">
+    <img src="/static/images/page_components_labeled.png">
+  </div>
+</div>
+
 
 <form name="add_page_column_form" id="add_page_column_form" action="[% c.uri_for_action('/private/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
