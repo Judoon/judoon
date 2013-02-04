@@ -124,8 +124,8 @@
                        label         = "Download standalone app:"
                        extra_classes = "action_download_tabular"
                        dropdown_links = [
-                           { label => "zip",    url => dataset_obj.edit_url _ "?view=standalone&format=zip", },
-                           { label => "tar.gz", url => dataset_obj.edit_url _ "?view=standalone&format=tgz", },
+                           { label => "zip",    url => page_obj.edit_url _ "?view=standalone&format=zip", },
+                           { label => "tar.gz", url => page_obj.edit_url _ "?view=standalone&format=tgz", },
                        ]
                     %]
                   </div>
