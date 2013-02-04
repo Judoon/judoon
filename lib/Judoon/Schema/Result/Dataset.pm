@@ -194,6 +194,20 @@ __PACKAGE__->register_timestamps;
 
 =head1 METHODS
 
+=head2 delete()
+
+Delete datastore table after deleteing object
+
+=cut
+
+sub delete {
+    my ($self) = @_;
+    $self->next::method(@_);
+    $self->_delete_datastore();
+    return;
+}
+
+
 =head2 ds_columns_ordered()
 
 Get DatasetColumns in sorted order
@@ -428,6 +442,26 @@ sub _store_data {
     );
 
     return $table_name;
+}
+
+
+=head2 _delete_datastore()
+
+
+=cut
+
+sub _delete_datastore {
+    my ($self) = @_;
+
+    my $dbic_storage = $self->result_source->storage;
+    $dbic_storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my ($schema_name, $table_name) = ($self->schema_name, $self->tablename);
+            $dbh->do(qq{DROP TABLE $schema_name.$table_name});
+        },
+    );
+    return;
 }
 
 

@@ -149,6 +149,14 @@ subtest 'Result::Dataset' => sub {
     is_deeply \@column_names, [qw(Age Name Gender)],
         'ds_columns_ordered gets columns in their proper order';
 
+    # test dataset deletion
+    my $schema_name = $mutable_ds->schema_name;
+    my $table_name  = $mutable_ds->tablename;
+    ok !exception { $mutable_ds->delete; }, 'can delete dataset okay';
+    ok !$mutable_ds->_table_exists($table_name), '  ..datastore table is dropped';
+    my $sth_table_exists = t::DB::get_schema->storage->dbh->table_info(undef, $schema_name, $table_name, 'TABLE');
+    is_deeply $sth_table_exists->fetchall_arrayref, [], '  ...double checking, yep';
+
     # test page cloning
     t::DB::load_fixtures('clone_set');
     my $cloneable_page = $user->my_pages->search({title => {like => '%All Time'},})->first;
