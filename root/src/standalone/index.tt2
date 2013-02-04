@@ -16,6 +16,13 @@
                 padding-top: 60px;
                 padding-bottom: 40px;
             }
+
+            table.table thead .sorting { background: url('img/sort_both.png') no-repeat center right; }
+            table.table thead .sorting_asc { background: url('img/sort_asc.png') no-repeat center right; }
+            table.table thead .sorting_desc { background: url('img/sort_desc.png') no-repeat center right; }
+
+            table.table thead .sorting_asc_disabled { background: url('img/sort_asc_disabled.png') no-repeat center right; }
+            table.table thead .sorting_desc_disabled { background: url('img/sort_desc_disabled.png') no-repeat center right; }
         </style>
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
 
@@ -89,7 +96,7 @@
           <hr>
 
           <footer>
-            <p>&copy; Cell Migration Consortium 2012</p>
+            <p>&copy; Cell Migration Consortium 2013</p>
           </footer>
 
         </div> <!-- /container -->
