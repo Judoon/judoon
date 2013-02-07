@@ -29,12 +29,13 @@ subtest 'Result::User' => sub {
         'Cant set invalid password';
 
     # import_data()
-    like exception { $user->import_data(); },
-        qr{import_data\(\) needs a filehandle}i, 'import_data() dies w/o fh';
-
     open my $TEST_XLS, '<', 't/etc/data/basic.xls'
         or die "Can't open test spreadsheet: $!";
-    is_result $user->import_data($TEST_XLS);
+    like exception { $user->import_data(); },
+        qr{import_data\(\) needs a filehandle}i, 'import_data() dies w/o fh';
+    like exception { $user->import_data($TEST_XLS); },
+        qr{import_data\(\) needs a filetype}i, 'import_data() dies w/o filetype';
+    is_result $user->import_data($TEST_XLS, 'xls');
     close $TEST_XLS;
 
     # import_data_by_filename()
