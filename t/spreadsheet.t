@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+use utf8;
 use strict;
 use warnings;
 use autodie;
@@ -10,15 +11,15 @@ use Test::Fatal;
 use IO::File;
 use Judoon::Spreadsheet;
 
+my $TEST_DATA_DIR = 't/etc/data';
 
 subtest 'basic' => sub {
 
     note("");
-    my $test_file_root = 't/etc/data';
     my @test_files = qw(basic.xls basic.xlsx basic.csv); # basic.tab);
     for my $file (@test_files) {
 
-        my $basic_fn = "${test_file_root}/${file}";
+        my $basic_fn = "${TEST_DATA_DIR}/${file}";
         my ($ext) = ($basic_fn =~ m/\.(\w+)$/);
         $ext = 'csv' if ($ext eq 'tab');
         my $TEST_XLS = IO::File->new($basic_fn, 'r');
@@ -50,5 +51,32 @@ subtest 'basic' => sub {
         }
     }
 };
+
+
+TODO: {
+local $TODO = 'need better encoding support';
+subtest 'encoding' => sub {
+
+    for my $ext (qw(xls xlsx csv)) {
+        subtest "for $ext" => sub {
+            my $js_utf8;
+            ok !exception {
+                $js_utf8 = Judoon::Spreadsheet->new({
+                    filename => "${TEST_DATA_DIR}/encoding-utf8.${ext}"
+                });
+            }, 'can open spreadsheet w/ utf8 chars';
+
+            if ($js_utf8) {
+            is $js_utf8->name, 'sheet-üñîçø∂é', 'got correctly-encoded name';
+            is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['Üñîçøð€'],
+                'correctly-encoded column title';
+            is_deeply $js_utf8->data, [['Elipsis…'], ['ภาษาพูด'],],
+                'utf8-encoded data good';
+        } else { fail 'dang'; }
+        };
+    }
+
+};
+}
 
 done_testing();
