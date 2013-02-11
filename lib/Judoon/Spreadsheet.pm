@@ -30,11 +30,11 @@ use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef FileHandle);
 
 use Data::Printer;
 use Data::UUID;
+use Excel::Reader::XLSX;
 use IO::File ();
 use List::Util ();
 use Regexp::Common;
 use Spreadsheet::ParseExcel;
-use Spreadsheet::XLSX;
 use Text::CSV;
 
 
@@ -199,6 +199,32 @@ sub _build_from_csv {
 }
 
 sub _get_csv_data_type { return 'text'; }
+
+
+sub _build_from_xlsx {
+    my ($self) = @_;
+
+    my $parser    = Excel::Reader::XLSX->new;
+    my $workbook  = $parser->read_filehandle( $self->filehandle )
+        or die $parser->error();
+    my @allsheets = $workbook->worksheets;
+    my $worksheet = $allsheets[0];
+    die "Couldn't find a worksheet" unless ($worksheet);
+
+    $self->{_parser_obj} = $worksheet;
+
+    my @data;
+    while ( my $row = $worksheet->next_row() ) {
+        my @row;
+        while ( my $cell = $row->next_cell() ) {
+            push @row, $cell->value();
+        }
+        push @data, \@row;
+    }
+
+    return ($worksheet->name, \@data);
+}
+sub _get_xlsx_data_type { return 'text'; }
 
 
 =head2 name
