@@ -187,6 +187,19 @@ sub _get_xls_data_type {
 }
 
 
+sub _build_from_csv {
+    my ($self) = @_;
+
+    my $parser = Text::CSV->new;
+    $self->{_parser_obj} = $parser;
+
+    my $data = $parser->getline_all( $self->filehandle );
+    my $name = 'IO';
+    return ($name, $data);
+}
+
+sub _get_csv_data_type { return 'text'; }
+
 
 =head2 name
 
