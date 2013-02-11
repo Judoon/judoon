@@ -105,13 +105,6 @@ sub read_file {
         return;
     }
 
-    # Create a, locally scoped, temp dir to unzip the XLSX file into.
-    my $tempdir = File::Temp->newdir( DIR => $self->{_tempdir} );
-
-    # Archive::Zip requires a Unix directory separator to the end.
-    $tempdir .= '/' if $tempdir !~ m{/$};
-
-
     # Create an Archive::Zip object to unzip the XLSX file.
     my $zipfile = Archive::Zip->new();
 
@@ -126,6 +119,54 @@ sub read_file {
         $self->{_error_extra_text} = $error_text;
         return;
     }
+
+    return $self->extract_archive( $zipfile );
+}
+
+
+#########################################################################
+#
+# read_filehandle()
+#
+# Unzip the XLSX file and read the [Content_Types].xml file to get the
+# structure of the contained XML files.
+#
+# Return a valid Workbook object if successful. If not return undef and set
+# the error status.
+#
+sub read_filehandle {
+
+    my $self       = shift;
+    my $filehandle = shift;
+
+    # Create an Archive::Zip object to unzip the XLSX file.
+    my $zipfile = Archive::Zip->new();
+
+    # Read the XLSX zip file and catch any errors.
+    eval { $zipfile->readFromFileHandle( $filehandle ) };
+
+    # Store the zip error and return.
+    if ( $@ ) {
+        my $error_text = $@;
+        chomp $error_text;
+        $self->{_error_status}     = $ERROR_file_zip_error;
+        $self->{_error_extra_text} = $error_text;
+        return;
+    }
+
+    return $self->extract_archive( $zipfile );
+}
+
+
+
+sub extract_archive {
+    my ($self, $zipfile) = @_;
+
+    # Create a, locally scoped, temp dir to unzip the XLSX file into.
+    my $tempdir = File::Temp->newdir( DIR => $self->{_tempdir} );
+
+    # Archive::Zip requires a Unix directory separator to the end.
+    $tempdir .= '/' if $tempdir !~ m{/$};
 
     # Extract the XML files from the XLSX zip.
     $zipfile->extractTree( '', $tempdir );
