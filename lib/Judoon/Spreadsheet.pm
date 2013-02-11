@@ -33,7 +33,9 @@ use Data::UUID;
 use IO::File ();
 use List::Util ();
 use Regexp::Common;
-use Spreadsheet::Read ();
+use Spreadsheet::ParseExcel;
+use Spreadsheet::XLSX;
+use Text::CSV;
 
 
 =head1 METHODS
@@ -103,15 +105,16 @@ around BUILDARGS => sub {
 sub BUILD {
     my ($self) = @_;
 
-    my $spreadsheet = Spreadsheet::Read::ReadData(
-        $self->filehandle, parser => $self->filetype,
-        cells => 1, rc => 1, attr => 1, clip => 1, # debug => 8,
-    ) or die "Unable to read spreadsheet: $!";
+    my %parsertype_map = (
+        xls  => { build => '_build_from_xls',  data_type => '_get_xls_data_type',  },
+        xlsx => { build => '_build_from_xlsx', data_type => '_get_xlsx_data_type', },
+        csv  => { build => '_build_from_csv',  data_type => '_get_csv_data_type',  },
+    );
+    my $build_meth  = $parsertype_map{ $self->filetype }->{build};
+    my $type_meth   = $parsertype_map{ $self->filetype }->{data_type};
+    my ($name, $data) = $self->$build_meth();
 
-    my $worksheet = $spreadsheet->[1];
-    $self->{name} = $worksheet->{label};
-
-    my $data             = [Spreadsheet::Read::rows($worksheet)];
+    $self->{name} = $name;
     my $headers          = shift @$data;
     $self->{data}        = $data;
     $self->{nbr_rows}    = scalar @$data;
@@ -121,13 +124,13 @@ sub BUILD {
     for my $header (@$headers) {
         my $shortname = $self->_unique_sqlname(\%seen, $header);
 
-        my $excel_type = $worksheet->{attr}[$colidx][2]{type};
+        my $parser_type = $self->$type_meth( $colidx );
         my %heuristic_types;
-        for my $rowidx (2..$worksheet->{maxrow}) {
-            my $data = $worksheet->{cell}[ $colidx ][ $rowidx ];
-            next if !defined $data || $data eq '';
-            my $type = $data =~ m/^$RE{num}{int}$/  ? 'integer'
-                     : $data =~ m/^$RE{num}{real}$/ ? 'numeric'
+        for my $row (@$data) {
+            my $datum = $row->[ $colidx-1 ];
+            next if !defined $datum || $datum eq '';
+            my $type = $datum =~ m/^$RE{num}{int}$/  ? 'integer'
+                     : $datum =~ m/^$RE{num}{real}$/ ? 'numeric'
                      :                                'text';
             $heuristic_types{ $type }++;
         }
@@ -138,14 +141,51 @@ sub BUILD {
         my $data_type = $heuristic_type eq 'integer' ? 'numeric'
                       :                                $heuristic_type;
         push @fields, {
-            name => $header,    shortname => $shortname,
-            type => $data_type, excel_type => $excel_type,
+            name => $header,    shortname   => $shortname,
+            type => $data_type, parser_type => $parser_type,
             heuristic_type => $heuristic_type,
         };
         $colidx++;
     }
     $self->{fields} = \@fields;
 }
+
+
+has _parser_obj => (is => 'ro', init_arg => undef,);
+
+sub _build_from_xls {
+    my ($self) = @_;
+
+    my $parser    = Spreadsheet::ParseExcel->new;
+    my $workbook  = $parser->parse($self->filehandle);
+    my @allsheets = $workbook->worksheets;
+    my $worksheet = $allsheets[0];
+    die "Couldn't find a worksheet" unless ($worksheet);
+
+    $self->{_parser_obj} = $worksheet;
+
+    my ($row_min, $row_max) = $worksheet->row_range();
+    my ($col_min, $col_max) = $worksheet->col_range();
+
+    my @data;
+    for my $row ( $row_min .. $row_max ) {
+        my @row_data;
+        for my $col ( $col_min .. $col_max ) {
+            my $cell = $worksheet->get_cell( $row, $col );
+            push @row_data, $cell ? $cell->value() : undef;
+        }
+        push @data, \@row_data;
+    }
+
+    return ($worksheet->get_name, \@data);
+}
+
+sub _get_xls_data_type {
+    my ($self, $column_idx) = @_;
+    my $cell = $self->_parser_obj->get_cell(2,$column_idx);
+    return defined $cell ? $cell->type : undef;
+}
+
 
 
 =head2 name

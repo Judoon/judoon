@@ -16,7 +16,7 @@ my $TEST_DATA_DIR = 't/etc/data';
 subtest 'basic' => sub {
 
     note("");
-    my @test_files = qw(basic.xls basic.xlsx basic.csv); # basic.tab);
+    my @test_files = qw(basic.xls); # basic.xlsx basic.csv); # basic.tab);
     for my $file (@test_files) {
 
         my $basic_fn = "${TEST_DATA_DIR}/${file}";
