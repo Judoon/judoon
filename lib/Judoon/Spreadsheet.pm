@@ -35,6 +35,7 @@ use Excel::Reader::XLSX;
 use IO::File ();
 use List::Util ();
 use Regexp::Common;
+use Safe::Isa;
 use Spreadsheet::ParseExcel;
 use Text::CSV;
 
@@ -172,8 +173,8 @@ sub _build_from_xls {
     for my $row ( $row_min .. $row_max ) {
         my @row_data;
         for my $col ( $col_min .. $col_max ) {
-            my $cell = $worksheet->get_cell( $row, $col );
-            push @row_data, $cell ? $cell->value() : undef;
+            push @row_data, $worksheet->get_cell( $row, $col )
+                ->$_call_if_object('value');
         }
         push @data, \@row_data;
     }
@@ -183,18 +184,18 @@ sub _build_from_xls {
 
 sub _get_xls_data_type {
     my ($self, $column_idx) = @_;
-    my $cell = $self->_parser_obj->get_cell(2,$column_idx);
-    return defined $cell ? $cell->type : undef;
+    return $self->_parser_obj->get_cell(2,$column_idx)
+        ->$_call_if_object('type');
 }
 
 
 sub _build_from_csv {
     my ($self) = @_;
 
-    my $parser = Text::CSV->new;
+    my $parser = Text::CSV->new({binary => 1}) or die Text::CSV->error_diag;
     $self->{_parser_obj} = $parser;
 
-    my $data = $parser->getline_all( $self->filehandle );
+    my $data = $parser->getline_all( $self->filehandle ) or die Text::CSV->error_diag;
     my $name = 'IO';
     return ($name, $data);
 }
