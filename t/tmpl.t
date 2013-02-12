@@ -66,8 +66,9 @@ subtest 'from / to formats' => sub {
         qr{__CLASS__}, '__CLASS__ keys have been scrubbed from data');
 
 
-    my $utf8_text   = encode("utf-8", '[{"type":"text","value":"resumé","formatting":[]}]');
-    my $latin1_text = encode("latin1", decode("utf-8", $utf8_text));
+    my $perl_text   = '[{"type":"text","value":"resumé","formatting":[]}]';
+    my $utf8_text   = encode("utf-8", $perl_text);
+    my $latin1_text = encode("latin1", $perl_text);
     my $utf8_to_utf8 = Judoon::Tmpl->new_from_native($utf8_text)
         ->to_native();
     my $latin1_to_utf8 = Judoon::Tmpl->new_from_native($latin1_text, {latin1 => 1})
