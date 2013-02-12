@@ -13,7 +13,7 @@ use t::DB;
 use Data::Printer;
 use Judoon::Spreadsheet;
 use Judoon::Tmpl;
-use Spreadsheet::Read;
+use Spreadsheet::ParseExcel;
 
 sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
 sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
@@ -135,14 +135,18 @@ subtest 'Result::Dataset' => sub {
 
     ok my $excel = $mutable_ds->as_excel, 'can get excel object';
     open my $XLS, '<', \$excel;
-    ok my $xls_data  = Spreadsheet::Read::ReadData($XLS, parser => 'xls'),
-        'is a readable xls';
+    my $generated_xls;
+    ok !exception {
+        $generated_xls = Spreadsheet::ParseExcel->new->parse($XLS);
+    }, '  ...is a readable xls';
     close $XLS;
-    is $xls_data->[1]{A1}, 'Name', 'Check header value';
-    is $xls_data->[1]{C1}, 'Gender', 'Check header value';
-    is $xls_data->[1]{A2}, 'Va Bene', 'Check data value';
-    is $xls_data->[1]{A6}, 'Goochie', 'Check data value';
-    is $xls_data->[1]{D3}, undef, 'Check for undef value';
+
+    my $gen_xls_data = $generated_xls->worksheet(0);
+    is $gen_xls_data->get_cell(0,0)->value(), 'Name', 'Check header value';
+    is $gen_xls_data->get_cell(0,2)->value(), 'Gender', 'Check header value';
+    is $gen_xls_data->get_cell(1,0)->value(), 'Va Bene', 'Check data value';
+    is $gen_xls_data->get_cell(5,0)->value(), 'Goochie', 'Check data value';
+    is $gen_xls_data->get_cell(2,3), undef, 'Check for undef value';
 
     my @ds_cols = $mutable_ds->ds_columns_ordered->all;
     $ds_cols[0]->move_next();

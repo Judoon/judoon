@@ -17,8 +17,9 @@ Judoon::Spreadsheet - spreadsheet parsing module
 
 =head1 DESCRIPTION
 
-This module is currently a thin wrapper around L<Spreadsheet::Read>
-that takes either a filename or a filehandle and file type
+This module is an abstraction around different kinds of
+spreadsheets. It can parse Excel '97, Excel XML, and CSV files.
+It takes either a filename or a filehandle and file type
 (e.g. 'xls', 'csv', 'xlsx') and returns a object with methods for
 getting at the name, columns, and data of that spreadsheet.
 
