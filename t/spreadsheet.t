@@ -61,11 +61,13 @@ subtest 'encoding' => sub {
                 });
             }, 'can open spreadsheet w/ utf8 chars';
 
-            is $js_utf8->name, 'sheet-üñîçø∂é', 'got correctly-encoded name';
-            is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['Üñîçøð€'],
+            is $js_utf8->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
+                'got correctly-encoded name';
+            is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
                 'correctly-encoded column title';
-            is_deeply $js_utf8->data, [['Elipsis…'], ['ภาษาพูด'],],
-                'utf8-encoded data good';
+            is_deeply $js_utf8->data,
+                [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
+                    'utf8-encoded data good';
         };
     }
 
