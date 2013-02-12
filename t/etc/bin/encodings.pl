@@ -14,7 +14,7 @@ use IO::All;
 
 main: {
     my $name = 'sheet-üñîçø∂é';
-    my $data = "ÜñîçøðÆ\nElipsis…\n‘Single Quotes’\n“Double quotes”";
+    my $data = "ÜñîçøðÆ\nEllipsis…\n‘Single Quotes’\n“Double quotes”";
 
     my @encodings = qw(utf-8 cp1252);
     for my $enc (@encodings) {
