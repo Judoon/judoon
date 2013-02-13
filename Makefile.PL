@@ -89,8 +89,8 @@ requires 'Try::Tiny';
 
 # deployment deps
 requires 'Net::Server::SS::PreFork';
-requires 'Server::Starter' => '1.12';
-requires 'Starman' => '3.003';
+requires 'Server::Starter' => '0.12';
+requires 'Starman' => '0.3003';
 
 
 test_requires 'indirect';
