@@ -82,7 +82,7 @@ requires 'Spreadsheet::ParseExcel';
 requires 'Spreadsheet::WriteExcel';
 requires 'Sub::Name';
 requires 'Template';
-requires 'Text::CSV';
+requires 'Text::CSV::Encoded';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 

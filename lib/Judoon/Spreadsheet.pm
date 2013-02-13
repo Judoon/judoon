@@ -37,7 +37,7 @@ use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
-use Text::CSV;
+use Text::CSV::Encoded;
 
 
 =head1 METHODS
@@ -192,10 +192,14 @@ sub _get_xls_data_type {
 sub _build_from_csv {
     my ($self) = @_;
 
-    my $parser = Text::CSV->new({binary => 1}) or die Text::CSV->error_diag;
+    my $parser = Text::CSV::Encoded->new({
+        encoding_in  => 'utf-8',
+        encoding_out => 'utf-8',
+    }) or die Text::CSV::Encoded->error_diag;
     $self->{_parser_obj} = $parser;
 
-    my $data = $parser->getline_all( $self->filehandle ) or die Text::CSV->error_diag;
+    my $data = $parser->getline_all( $self->filehandle )
+        or die Text::CSV::Encoded->error_diag;
     my $name = 'IO';
     return ($name, $data);
 }

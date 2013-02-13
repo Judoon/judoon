@@ -52,7 +52,7 @@ subtest 'basic' => sub {
 
 subtest 'encoding' => sub {
 
-    for my $ext (qw(xls xlsx)) { # csv)) {
+    for my $ext (qw(xls xlsx csv)) {
         subtest "for $ext" => sub {
             my $js_utf8;
             ok !exception {
