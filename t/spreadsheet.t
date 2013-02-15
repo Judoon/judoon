@@ -60,14 +60,31 @@ subtest 'encoding' => sub {
                     filename => "${TEST_DATA_DIR}/encoding-utf8.${ext}"
                 });
             }, 'can open spreadsheet w/ utf8 chars';
-
             is $js_utf8->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
-                'got correctly-encoded name';
+                '  ...name is correct utf-8';
             is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
-                'correctly-encoded column title';
+                '  ...title is correct utf-8';
             is_deeply $js_utf8->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
-                    'utf8-encoded data good';
+                    '  ...data is correct utf-8';
+
+            if (-e "${TEST_DATA_DIR}/encoding-cp1252.${ext}") {
+
+            my $js_cp1252;
+            ok !exception {
+                $js_cp1252 = Judoon::Spreadsheet->new({
+                    filename => "${TEST_DATA_DIR}/encoding-cp1252.${ext}"
+                });
+            }, 'can open spreadsheet w/ cp1252 chars';
+            is $js_cp1252->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
+                '  ...name successfully converted to utf8';
+            is_deeply [map {$_->{name}} @{ $js_cp1252->fields }], ['ÜñîçøðÆ'],
+                '  ...title successfully converted to utf8';
+            is_deeply $js_cp1252->data,
+                [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
+                    '  ...data successfully converted to utf8';
+
+            }
         };
     }
 

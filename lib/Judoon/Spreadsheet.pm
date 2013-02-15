@@ -37,7 +37,7 @@ use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
-use Text::CSV::Encoded;
+use Text::CSV::Encoded coder_class => 'Text::CSV::Encoded::Coder::EncodeGuess';
 
 
 =head1 METHODS
@@ -84,7 +84,7 @@ around BUILDARGS => sub {
         die "Don't pass filename and filehandle to Judoon::Spreadsheet->new"
             if (exists $args->{filehandle});
 
-        die "No such file $args->{filename} in constructor of Judoon::Spreadsheet"
+        die "No such file $filename in constructor of Judoon::Spreadsheet"
             unless (-e $filename);
 
         my ($filetype) = ($filename =~ m/\.([^\.]+)$/);
@@ -193,7 +193,7 @@ sub _build_from_csv {
     my ($self) = @_;
 
     my $parser = Text::CSV::Encoded->new({
-        encoding_in  => 'utf-8',
+        encoding_in  => ['utf-8','cp1252'],
         encoding_out => 'utf-8',
     }) or die Text::CSV::Encoded->error_diag;
     $self->{_parser_obj} = $parser;
