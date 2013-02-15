@@ -241,17 +241,18 @@ sub change_password {
 }
 
 
-=head2 import_data( $filehandle )
+=head2 import_data( $filehandle, $filetype )
 
-C<import_data()> takes in a filehandle arg and attempts to turn it into
-a L<Judoon::Spreadsheet>.  It will then munge the data and insert it
-into the database.
+C<import_data()> takes in a filehandle and filetype and attempts to
+turn it into a L<Judoon::Spreadsheet>.  It will then munge the data
+and insert it into the database.
 
 =cut
 
 sub import_data {
     my ($self, $fh, $ext) = @_;
     die 'import_data() needs a filehandle' unless ($fh);
+    die 'import_data() needs a filetype' unless ($ext);
 
     my $spreadsheet = Judoon::Spreadsheet->new(
         filehandle => $fh, filetype => $ext,

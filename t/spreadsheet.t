@@ -1,5 +1,6 @@
-#/usr/bin/env perl
+#!/usr/bin/env perl
 
+use utf8;
 use strict;
 use warnings;
 use autodie;
@@ -10,33 +11,84 @@ use Test::Fatal;
 use IO::File;
 use Judoon::Spreadsheet;
 
+my $TEST_DATA_DIR = 't/etc/data';
 
 subtest 'basic' => sub {
 
-    my $test_file_root = 't/etc/data';
-    for my $file (qw(basic.xls basic.xlsx)) { # basic.csv)) {
+    for my $ext (qw(xls xlsx csv)) {
+        subtest "for $ext" => sub {
 
-        my $basic_fn = "${test_file_root}/${file}";
-        my ($ext) = ($basic_fn =~ m/\.(\w+)$/);
-        my $TEST_XLS = IO::File->new($basic_fn, 'r');
-        my $TEST_XLS_SLURP = IO::File->new($basic_fn, 'r');
-        binmode $TEST_XLS_SLURP;
-        my $file_contents = do {local $/ = undef; <$TEST_XLS_SLURP>; };
+            my $filename = "${TEST_DATA_DIR}/basic.${ext}";
+            my $TEST_XLS = IO::File->new($filename, 'r');
 
-        my @constructor_tests = (
-            [{filename => $basic_fn}, 'filename-only'],
-            [{filehandle => $TEST_XLS, filetype => $ext}, 'filehandle+parser-only',],
-            # [{filehandle => $TEST_XLS}, 'filehandle-only'],
-            # [{content => $file_contents}, 'contents-only'],
-        );
+            my @constructor_tests = (
+                [{filename => $filename},                     'filename',         ],
+                [{filehandle => $TEST_XLS, filetype => $ext}, 'filehandle+parser',],
+            );
 
-        for my $cons_test (@constructor_tests) {
-            ok my $js = Judoon::Spreadsheet->new($cons_test->[0]),
-                "new() via $cons_test->[1] for $ext";
-            is $js->name, ($ext =~ m/xls/ ? 'Dog Roster' : 'Sheet1'),
-                '  ...basic sanity test';
-        }
+            for my $cons_test (@constructor_tests) {
+                ok my $js = Judoon::Spreadsheet->new($cons_test->[0]),
+                    "  new() via $cons_test->[1] for $ext";
+                is $js->name, ($ext =~ m/xls/ ? 'Dog Roster' : 'IO'),
+                    '    ...correct name';
+                is $js->nbr_rows, 5, '    ...correct number of rows';
+                is $js->nbr_columns, 3, '    ...correct number of columns';
+                is_deeply [map {$_->{name}} @{$js->fields}],
+                    [qw(Name Age Gender)], '    ...correct field names';
+                is_deeply [map {$_->{type}} @{$js->fields}],
+                    [qw(text numeric text)], '    ...correct field types';
+                is_deeply $js->data, [
+                    ['Va Bene', 14, 'female'],
+                    ['Chloe',    2, 'female'],
+                    ['Grover',   8, 'male'  ],
+                    ['Chewie',   5, 'male'  ],
+                    ['Goochie',  1, 'female'],
+                ], '    ...correct data';
+            }
+        };
     }
 };
+
+
+subtest 'encoding' => sub {
+
+    for my $ext (qw(xls xlsx csv)) {
+        subtest "for $ext" => sub {
+            my $js_utf8;
+            ok !exception {
+                $js_utf8 = Judoon::Spreadsheet->new({
+                    filename => "${TEST_DATA_DIR}/encoding-utf8.${ext}"
+                });
+            }, 'can open spreadsheet w/ utf8 chars';
+            is $js_utf8->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
+                '  ...name is correct utf-8';
+            is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
+                '  ...title is correct utf-8';
+            is_deeply $js_utf8->data,
+                [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
+                    '  ...data is correct utf-8';
+
+            if (-e "${TEST_DATA_DIR}/encoding-cp1252.${ext}") {
+
+            my $js_cp1252;
+            ok !exception {
+                $js_cp1252 = Judoon::Spreadsheet->new({
+                    filename => "${TEST_DATA_DIR}/encoding-cp1252.${ext}"
+                });
+            }, 'can open spreadsheet w/ cp1252 chars';
+            is $js_cp1252->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
+                '  ...name successfully converted to utf8';
+            is_deeply [map {$_->{name}} @{ $js_cp1252->fields }], ['ÜñîçøðÆ'],
+                '  ...title successfully converted to utf8';
+            is_deeply $js_cp1252->data,
+                [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
+                    '  ...data successfully converted to utf8';
+
+            }
+        };
+    }
+
+};
+
 
 done_testing();
