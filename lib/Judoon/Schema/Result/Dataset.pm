@@ -398,6 +398,29 @@ sub _build_data {
 }
 
 
+has sample_data => (is => 'lazy',);
+sub _build_sample_data {
+    my ($self) = @_;
+
+    my @sample_data;
+    for my $idx (0..$self->nbr_columns-1) {
+      ROW_SEARCH:
+        for my $row (@{$self->data}) {
+            if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
+                push @sample_data, $row->[$idx];
+                last ROW_SEARCH;
+            }
+        }
+    }
+
+    my %sample_data;
+    @sample_data{map {$_->shortname} $self->ds_columns_ordered->all}
+        = @sample_data;
+    return \%sample_data;
+}
+
+
+
 =head2 _store_data( $spreadsheet )
 
 This private method creates the new table for the data in the
