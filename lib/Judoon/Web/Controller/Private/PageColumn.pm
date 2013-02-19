@@ -52,10 +52,12 @@ after list_GET => sub {
         $column->{js_template} = $tmpl->to_jstmpl;
     }
 
+    my $dataset = $c->req->get_chained_object(0)->[0];
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $c->req->get_chained_object(0)->[0]->ds_columns_ordered->all;
+    }} $dataset->ds_columns_ordered->all;
     $c->stash->{dataset}{headers_used} = \@headers_used;
+    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
 };
 
 
