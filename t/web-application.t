@@ -329,6 +329,7 @@ subtest 'PageColumn' => sub {
         form_name => 'add_page_column_form',
         form_args => {
             'page_column.title' => 'Chaang Column',
+            'page_column.template' => undef,
             'x-tunneled-method' => 'POST',
         }, page_uri_re => qr{/user/testuser/dataset/\d+/page/\d+/column/\d+},
     });

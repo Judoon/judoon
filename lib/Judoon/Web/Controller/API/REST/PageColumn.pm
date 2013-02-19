@@ -18,7 +18,7 @@ __PACKAGE__->config(
     # Additional non-required columns that create allows
     create_allows           =>  [qw//],
     # Columns that update allows
-    update_allows           =>  [qw/page_id template title/],
+    update_allows           =>  [qw/page_id template title sort/],
     # Columns that list returns
     list_returns            =>  [qw/id page_id title template/],
 
@@ -40,8 +40,9 @@ around generate_rs => sub {
     my $orig = shift;
     my $self = shift;
     my $c    = shift;
-    my $rs = $self->$orig($c);
-    return $rs->for_page($c->req->get_chained_object(-1)->[0]);
+    my $rs   = $self->$orig($c);
+    return $rs->for_page($c->req->get_chained_object(-1)->[0])
+        ->search_rs({}, {order_by => {-asc=>'sort'}});
 };
 
 
@@ -49,8 +50,10 @@ before 'validate_object' => sub {
     my ($self, $c, $obj) = @_;
     my ($object, $params) = @$obj;
 
-    $params->{template} //= q{[]};
-    $params->{page_id}  //= $c->req->get_chained_object(-1)->[0]->id;
+    if (exists $params->{template}) {
+        $params->{template} //= q{[]};
+    }
+    $params->{page_id} //= $c->req->get_chained_object(-1)->[0]->id;
 };
 
 =head1 NAME
