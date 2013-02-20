@@ -1,7 +1,6 @@
 
 
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/static/js/vendor/jsrender.js"></script>
 <script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {

@@ -12,7 +12,7 @@ Judoon::Tmpl - Object representing a template
 
  use Judoon::Tmpl;
 
- my $template   = Judoon::Tmpl->new_from_jstmpl('foo{{=bar}}baz');
+ my $template   = Judoon::Tmpl->new_from_jstmpl('foo{{bar}}baz');
  my @variables  = $template->get_variables(); # 'bar'
  my $serialized = $template->to_native;
  my $javascript = $template->to_jstmpl;
@@ -186,7 +186,7 @@ sub new_from_native {
 =head2 new_from_jstmpl
 
 Builds a new C<Judoon::Tmpl> object from a string that is a
-jsrender.js -compatible template.  It calls C<L</_parse_js>> to
+Handlebars.js -compatible template.  It calls C<L</_parse_js>> to
 parse the string into a list of C<Judoon::Tmpl::Node::*> nodes.  It
 dies on C<undef> input, and creates an empty template if given the
 empty string.
@@ -240,7 +240,7 @@ sub to_native {
 
 =head2 to_jstmpl
 
-Output our template as a jsrender.js-compatible template.
+Output our template as a Handlebars.js-compatible template.
 
 =cut
 
@@ -256,9 +256,10 @@ my %format_tags = (
 );
 
 
-=head3 _nodes_to_jstmpl( \@nodes)
+=head3 _nodes_to_jstmpl( \@nodes )
 
-Private method for recursively rendering nodes to javascrpt template.
+Private method for recursively rendering nodes to the Handlebars
+javascript template dialect.
 
 =cut
 
@@ -273,7 +274,7 @@ sub _nodes_to_jstmpl {
         }
         else {
             push @text, $node->type eq 'text'     ? $node->value
-                      : $node->type eq 'variable' ? '{{=' . $node->name . '}}'
+                      : $node->type eq 'variable' ? '{{' . $node->name . '}}'
                       :     die "Unrecognized node type! " . $node->type;
         }
 
@@ -424,19 +425,19 @@ Turn a regular text string into a list of text values and variable
 names.  The even-indexed elements of the list (i.e. 0,2,4,etc.) will
 always be text values, and the odd elements will always be variable
 names.  If the literal string begins with a variable (such as
-"{{=bar}}"), the first element of the list will be the empty string.
+"{{bar}}"), the first element of the list will be the empty string.
 
- $class->_parse_literal('foo{{=bar}}baz');
+ $class->_parse_literal('foo{{bar}}baz');
  # returns ('foo','bar','baz')
 
- $class->_parse_literal('{{=bar}}baz');
+ $class->_parse_literal('{{bar}}baz');
  # returns ('','bar','baz')
 
 =cut
 
 sub _parse_literal {
     my ($class, $literal_string) = @_;
-    return split /{{=([\w_]+)}}/, $literal_string;
+    return split /{{([\w_]+)}}/, $literal_string;
 }
 
 

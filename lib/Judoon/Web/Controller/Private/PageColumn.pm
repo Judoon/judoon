@@ -11,6 +11,7 @@ use JSON qw(encode_json);
 use Judoon::Tmpl;
 use List::AllUtils ();
 
+
 __PACKAGE__->config(
     action => {
         base => { Chained => '/private/page/chainpoint', PathPart => 'column', },
@@ -43,21 +44,22 @@ Do some postprocessing on the page columns data to get js templates and add
 after list_GET => sub {
     my ($self, $c) = @_;
 
+    my $dataset              = $c->req->get_chained_object(0)->[0];
+    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
+
     my %used;
     for my $column (@{$c->stash->{page_column}{list}}) {
         my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
+        $column->{js_template} = $tmpl->to_jstmpl;
         for my $var ($tmpl->get_variables) {
             push @{$used{$var}}, $column->{title};
         }
-        $column->{js_template} = $tmpl->to_jstmpl;
     }
 
-    my $dataset = $c->req->get_chained_object(0)->[0];
     my @headers_used = map {{
         title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
     }} $dataset->ds_columns_ordered->all;
     $c->stash->{dataset}{headers_used} = \@headers_used;
-    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
 };
 
 

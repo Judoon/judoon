@@ -1,23 +1,28 @@
 [% extra_js = BLOCK %]
 
-<script src="/static/js/vendor/jsrender.js"></script>
+<script src="/static/js/vendor/handlebars.min.js"></script>
 
 [% FOREACH column IN page_column.list %]
-<script id="column_tmpl_[% column.id %]" type="text/x-jquery-tmpl">
-[% column.js_template %]
+<script class="hb_template_[% column.id %]" type="x/text-handlebars-template">
+[%- column.js_template -%]
 </script>
 [% END %]
 
 <script>
+  var sample_data = [% sample_data %];
+
   $(document).ready(function () {
+
+    $('script[type="x/text-handlebars-template"]').each(
+      function (idx) {
+        var template = Handlebars.compile($(this).html());
+        $('#pagecol_list tr td.' + $(this).attr('class')).html( template(sample_data) );
+      }
+    );
 
     $('#pagecol_list').on( 'click', 'button.move-up',   function(event) { move_up(event.currentTarget); } );
     $('#pagecol_list').on( 'click', 'button.move-down', function(event) { move_down(event.currentTarget); } );
 
-    $('#pagecol_list tbody tr').each(function(idx) {
-         var id = $(this).find(".pagecol_id").val();
-         $(this).children('td.example').first().html( $("#column_tmpl_" + id).render( sample_data ));
-    });
   });
 
   function move_up(widget) {
@@ -43,8 +48,6 @@
   }
 
   function get_sort_field(widget) { return widget.find('input[name$=".sort"]'); }
-
-  var sample_data = [% sample_data %];
 
 </script>
 
@@ -97,7 +100,7 @@
             <input type="hidden" class="pagecol_id" name="page_column.[% loop.count - 1 %].id"   value="[% column.id  %]">
           </td>
           <td>[% column.title | html %]</td>
-          <td class="example"></td>
+          <td class="hb_template_[% column.id %]"></td>
           <td>[% column.js_template | html %]</td>
           <td>
             [%- INCLUDE 'components/action_button.tt2' label='<i class="icon-pencil"></i> Edit' url=c.uri_for_action('/private/pagecolumn/object', c.req.captures.merge([column.id])) -%]
