@@ -86,6 +86,11 @@ requires 'Text::CSV::Encoded';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 
+# Excel::Reader::XLSX deps
+requires 'Archive::Zip';
+requires 'OLE::Storage_Lite';
+requires 'XML::LibXML';
+
 
 # deployment deps
 requires 'Net::Server::SS::PreFork';
