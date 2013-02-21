@@ -155,12 +155,24 @@ subtest 'Result::Dataset' => sub {
         'ds_columns_ordered gets columns in their proper order';
 
     # test dataset deletion
+    my @pages      = $mutable_ds->pages_rs->all;
+    my @linked_ids = (
+        ['DatasetColumn', [map {$_->id} $mutable_ds->ds_columns_rs->all]],
+        ['Page',          [map {$_->id} @pages]],
+        ['PageColumn',    [map {$_->id} map {$_->page_columns_rs->all} @pages]],
+    );
     my $schema_name = $mutable_ds->schema_name;
     my $table_name  = $mutable_ds->tablename;
     ok !exception { $mutable_ds->delete; }, 'can delete dataset okay';
-    ok !$mutable_ds->_table_exists($table_name), '  ..datastore table is dropped';
+    ok !$mutable_ds->_table_exists($table_name), '  ...datastore table is dropped';
     my $sth_table_exists = t::DB::get_schema->storage->dbh->table_info(undef, $schema_name, $table_name, 'TABLE');
     is_deeply $sth_table_exists->fetchall_arrayref, [], '  ...double checking, yep';
+    for my $linked (@linked_ids) {
+        my ($rs_name, $ids) = @$linked;
+        is ResultSet($rs_name)->search({id => {in => $ids}})->count,
+            0, "  ...all linked ${rs_name}s gone.";
+    }
+
 
     # test page cloning
     t::DB::load_fixtures('clone_set');
