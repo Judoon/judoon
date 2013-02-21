@@ -33,6 +33,9 @@ __PACKAGE__->config(
 );
 
 
+my $SPREADSHEET_MAX_SIZE = 10_000_000;
+
+
 before private_base => sub {
     my ($self, $c) = @_;
     if (!$c->stash->{user}{is_owner} and $c->req->method ne 'GET') {
@@ -67,6 +70,13 @@ before list_POST => sub {
     if (not $c->req->params->{'dataset.file'}) {
         $self->set_error_and_redirect(
             $c, 'No file provided',
+            ['/user/edit', [$c->stash->{user}{id}]],
+        );
+        $c->detach();
+    }
+    elsif ($c->req->upload('dataset.file')->size > $SPREADSHEET_MAX_SIZE)  {
+        $self->set_error_and_redirect(
+            $c, 'Your spreadsheet is too big. It must be less than 10 megabytes.',
             ['/user/edit', [$c->stash->{user}{id}]],
         );
         $c->detach();
