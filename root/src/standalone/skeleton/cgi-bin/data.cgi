@@ -28,7 +28,7 @@ main: {
     my @real_data;
     # filter data by search param
     if (my $search = $params->{sSearch}) {
-        @real_data = grep {m/$search/i} @data[1..$#data];
+        @real_data = grep {m/\Q$search\E/i} @data[1..$#data];
         $filtered = @real_data;
     }
     else {
