@@ -182,7 +182,7 @@ subtest '$resultset->new_result' => sub {
 subtest '$row->update' => sub {
 
     ok my $annapolis_obj = $team_rs->search_rs({name => {like => '%Poultry%'}})->first,
-        'Managing the Annapolis Poultry-Slanders';
+        'Managing the Annapolis Poultry-Slanderers';
     is $annapolis_obj->state_name, undef, '  ..state name not yet set';
     my %team_attrs = (
         sport_type => 'pigeon-taunting',
