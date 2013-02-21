@@ -238,7 +238,7 @@ done_testing();
 
 __DATA__
 @@ js_template
-<strong><em>foo</em></strong><strong>{{=bar}}</strong><br><em><a href="pre{{=baz}}post">quux</a></em>
+<strong><em>foo</em></strong><strong>{{bar}}</strong><br><em><a href="pre{{baz}}post">quux</a></em>
 @@ serialized
 [
  {"type" : "text", "value" : "foo", "formatting" : ["italic", "bold"]},

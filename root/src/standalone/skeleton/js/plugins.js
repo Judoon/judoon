@@ -116,7 +116,7 @@ $(document).ready(function() {
     var columnCount = columns.length;
     var templates = [];
     for (var k = 1; k <= columnCount; k++) {
-        templates.push($('#column_tmpl_'+k));
+        templates.push(Handlebars.compile($('#column_tmpl_'+k).html()));
     }
 
     $('#datatable').dataTable({
@@ -148,7 +148,7 @@ $(document).ready(function() {
                         for (i = 0; i < data.tmplData.length; i++) {
                             row = [];
                             for (j = 0; j < columnCount;  j++) {
-                                row.push(templates[j].render(data.tmplData[i]));
+                                row.push(templates[j](data.tmplData[i]));
                             }
                             new_data.push(row);
                         }

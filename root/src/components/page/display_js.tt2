@@ -1,16 +1,21 @@
 [% FOREACH template IN page_column.templates %]
-<script id="column_tmpl_[% loop.count %]" type="text/x-jquery-tmpl">
+<script id="column_tmpl_[% loop.count %]" type="text/x-handlebars-template">
 [% template %]
 </script>
 [% END %]
 
 
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/static/js/vendor/jsrender.js"></script>
+<script src="/static/js/vendor/handlebars.min.js"></script>
 <script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
       judoon.datatables.bootstrap_init();
+
+      var compiled_templates = [];
+      $('script[type="text/x-handlebars-template"]').each( function( idx ) {
+          compiled_templates[idx] = Handlebars.compile($(this).html());
+      });
 
       $('#demo_page').dataTable({
           "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",
@@ -24,11 +29,10 @@
                      function(data) {
                         var new_data = [];
                         for (var i = 0; i < data.tmplData.length; i++) {
-                            new_data[i] = [
-                                [% FOREACH p_column IN page_column.list %]
-                                $('#column_tmpl_[% loop.count %]').render(data.tmplData[i])[% UNLESS loop.last %],[% END%]
-                                [% END %]
-                            ];
+                            new_data[i] = [];
+                            for (var j = 0; j < compiled_templates.length; j++) {
+                                new_data[i][j] = compiled_templates[j](data.tmplData[i]);
+                            }
                         }
                         data.aaData = new_data;
                      },

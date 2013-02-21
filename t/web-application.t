@@ -313,17 +313,23 @@ subtest 'PageColumn' => sub {
     login('testuser');
     $mech->get('/user/testuser');
 
+    # GET pagecolumn/list
     my ($page_uri) = $mech->find_all_links(
         url_regex => qr{/user/testuser/dataset/\d+/page/\d+$}
     );
     $mech->get($page_uri);
+    my ($pagecol_list_uri) = $mech->find_all_links(
+        url_regex => qr{/user/testuser/dataset/\d+/page/\d+/column$}
+    );
+    $mech->get_ok($pagecol_list_uri, 'can get PageColumn list');
 
     # POST pagecolumn/list
     my $pagecol_uri = add_new_object_ok({
-        object => 'page column', list_uri => $page_uri,
+        object => 'page column', list_uri => $pagecol_list_uri,
         form_name => 'add_page_column_form',
         form_args => {
             'page_column.title' => 'Chaang Column',
+            'page_column.template' => undef,
             'x-tunneled-method' => 'POST',
         }, page_uri_re => qr{/user/testuser/dataset/\d+/page/\d+/column/\d+},
     });
@@ -334,7 +340,7 @@ subtest 'PageColumn' => sub {
     });
 
     # GET pagecolumn/object
-    $mech->get($page_uri);
+    $mech->get($pagecol_list_uri);
     $mech->follow_link_ok({
         url_regex => qr{/page/\d+/column/\d+},
     }, 'can get all pagecolumn links');
@@ -343,7 +349,7 @@ subtest 'PageColumn' => sub {
     my ($pagecol_id) = ($pagecol_uri =~ m{(\d+)$});
     delete_ok({
         object => 'page column', object_id => $pagecol_id,
-        object_uri => $pagecol_uri, list_uri => $page_uri,
+        object_uri => $pagecol_uri, list_uri => $pagecol_list_uri,
         form_prefix => 'delete_page_column_',
     });
 };

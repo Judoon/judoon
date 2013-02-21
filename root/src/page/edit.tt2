@@ -61,75 +61,12 @@
 </div>
 
 
-<form name="add_page_column_form" id="add_page_column_form" action="[% c.uri_for_action('/private/pagecolumn/list', c.req.captures) %]" method="post" class="form-horizontal">
-  <fieldset>
-    <legend>Table Layout</legend>
+<section id="actions">
+  <h4>Actions</h4>
+  [% INCLUDE 'components/action_button.tt2' label="Preview Page" url=c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'}, ) -%]
+  [% INCLUDE 'components/action_button.tt2' label="Edit Columns" url=c.uri_for_action('/private/pagecolumn/list', c.req.captures) -%]
+  [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', c.req.captures), method="DELETE" form_name="delete_page" -%]
+</section>
 
-    <div class="control-group">
-      <input type="text" name="page_column.title" class="" placeholder="Column title..." />
-      <button type="submit" class="btn" form="add_page_column_form"><i class="icon-plus"></i>Add page column</button>
-    </div>
-
-
-  </fieldset>
-</form>
-
-    <div class="row-fluid">
-
-      <div class="span8">
-        <div class="row-fluid">
-          <h4>Current columns</h4>
-          <div class="well">
-            [% IF page_column.list.size %]
-            [% FOREACH column IN page_column.list %]
-            <div class="column_container">
-              <button class="btn btn-mini" [% loop.first ? 'disabled' : '' %]><i class="icon-arrow-left"></i></button>
-              <span class="label">[% column.title | html %]</span>
-              <button class="btn btn-mini" [% loop.last ? 'disabled' : '' %]><i class="icon-arrow-right"></i></button>
-              <div class="edit_widget">
-                [% column.template.to_jstmpl %]
-              </div>
-              <div>
-                [%- INCLUDE 'components/action_button.tt2' label='<i class="icon-plus"></i> Edit' url=c.uri_for_action('/private/pagecolumn/object', c.req.captures.merge([column.id])) -%]
-                [%- INCLUDE 'components/forms/action_form.tt2'
-                      label='<i class="icon-trash"></i> Delete',
-                      url=c.uri_for_action('/private/pagecolumn/object', c.req.captures.merge([column.id])),
-                      method="DELETE", form_name="delete_page_column_" _ column.id
-                -%]
-              </div>
-              <div class="clearsep"></div>
-            </div>
-            [% END %]
-            [% END %]
-          </div>
-        </div>
-      </div>
-
-      <div class="span4">
-        <div class="well">
-          <table id="columns_used_list" class="table table-striped table-condensed">
-            <thead>
-              <tr>
-                <th>Spreadsheet column</th>
-                <th>...used in</th>
-              </tr>
-            </thead>
-            <tbody>
-              [% FOREACH header IN dataset.headers_used %]
-              <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
-                <td>[% header.title | html %]</td>
-                <td>[% header.used_in | html %]</td>
-              </tr>
-              [% END %]
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-
-<ul class="nav nav-pills">
-  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
-</ul>
 
 [% END %]

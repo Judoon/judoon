@@ -38,7 +38,7 @@ on each path:
    Verb   Action       Result
    ------------------------------------------------
    GET    list_GET     list all $resource
-   PUT    list_PUT     <not implemented>
+   PUT    list_PUT     update multiple $resources
    POST   list_POST    add new $resource
    DELETE list_DELETE  <not implemented>
 
@@ -155,7 +155,11 @@ sub private_base :Private {
     my $key      = $self->rpc->{stash_key};
     my $req_data = $c->req->request_data;
     if ($req_data && exists $req_data->{$key}) {
-        $c->req->_set_request_data($req_data->{$key});
+        $c->req->_set_request_data(
+            ref($req_data->{$key}) eq 'ARRAY'
+                ? {list => $req_data->{$key}}
+                : $req_data->{$key}
+         );
     }
 }
 
@@ -195,6 +199,23 @@ sub list_POST :Private {
     $c->forward("/api/rest/$api_path/update_or_create_objects");
     my $object = $c->req->get_object(0)->[0];
     $self->go_relative($c, 'object', [@{$c->req->captures}, $object->id]);
+}
+
+
+=head2 list_PUT
+
+This method is called when a POST request is made to
+C</$resource_path>.  This is used to update list members.
+Forwards to C<API::REST>'s C<update_or_create_objects>.  When done,
+redirects back to the list (C<L</list_GET>>.
+
+=cut
+
+sub list_PUT :Private {
+    my ($self, $c) = @_;
+    my $api_path = $self->rpc->{api_path};
+    $c->forward("/api/rest/$api_path/update_or_create_objects");
+    $self->go_relative($c, 'list', $c->req->captures);
 }
 
 

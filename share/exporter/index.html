@@ -125,23 +125,23 @@
         </script>
 
         <script id="column_tmpl_1" type="text/x-jquery-tmpl">
-          Gene: <a href="http://google.com/?q={{=gene_name}}">{{=protein_name}}<br>Flybase: <a href="http://flybase.org/reports/{{=flybase_link}}.html">{{=flybase_link}}</a>
+          Gene: <a href="http://google.com/?q={{gene_name}}">{{protein_name}}<br>Flybase: <a href="http://flybase.org/reports/{{flybase_link}}.html">{{flybase_link}}</a>
         </script>
         <script id="column_tmpl_2" type="text/x-jquery-tmpl">
-          {{=proposed_function}}
+          {{proposed_function}}
         </script>
         <script id="column_tmpl_3" type="text/x-jquery-tmpl">
-          Nearest mammalian homolog: {{=nearest_mammalian_homolog}}<br><a href="http://www.ncbi.nlm.nih.gov/UniGene/clust.cgi?UGID={{=unigene_human_homolog}}">Unigene</a>
+          Nearest mammalian homolog: {{nearest_mammalian_homolog}}<br><a href="http://www.ncbi.nlm.nih.gov/UniGene/clust.cgi?UGID={{unigene_human_homolog}}">Unigene</a>
         </script>
         <script id="column_tmpl_4" type="text/x-jquery-tmpl">
-          <strong>{{=fold_change}}</strong>
+          <strong>{{fold_change}}</strong>
         </script>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.1.min.js"><\/script>')</script>
         <script src="js/vendor/bootstrap.min.js"></script>
         <script src="js/vendor/jquery.dataTables.min.js"></script>
-        <script src="js/vendor/jsrender.min.js"></script>
+        <script src="js/vendor/handlebars.min.js"></script>
         <script src="js/plugins.js"></script>
     </body>
 </html>

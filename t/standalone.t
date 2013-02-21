@@ -54,7 +54,7 @@ sub test_contents {
         index.html cgi-bin/data.cgi cgi-bin/database.tab js/plugins.min.js
         .htaccess css/bootstrap.min.css css/bootstrap-responsive.min.css
         js/vendor/bootstrap.min.js js/vendor/jquery-1.8.1.min.js
-        js/vendor/jquery.dataTables.min.js js/vendor/jsrender.min.js
+        js/vendor/jquery.dataTables.min.js js/vendor/handlebars.min.js
         js/vendor/modernizr-2.6.1-respond-1.1.0.min.js
     );
     for my $has (@has) {

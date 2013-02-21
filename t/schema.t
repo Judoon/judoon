@@ -273,12 +273,12 @@ subtest 'Result::Page' => sub {
     ok !exception { $movie_page->templates_match_dataset },
         'empty templates match dataset';
 
-    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{=title}}'));
+    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{title}}'));
     $good_pcol->update;
     ok !exception { $movie_page->templates_match_dataset },
         'valid templates match dataset';
 
-    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{=nosuchname}}'));
+    $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{nosuchname}}'));
     $good_pcol->update;
     isa_ok exception { $movie_page->templates_match_dataset },
         'Judoon::Error::InvalidTemplate',

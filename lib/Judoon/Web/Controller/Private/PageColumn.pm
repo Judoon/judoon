@@ -11,6 +11,7 @@ use JSON qw(encode_json);
 use Judoon::Tmpl;
 use List::AllUtils ();
 
+
 __PACKAGE__->config(
     action => {
         base => { Chained => '/private/page/chainpoint', PathPart => 'column', },
@@ -30,6 +31,35 @@ before private_base => sub {
         $self->go_here($c, '/login/login', []);
         $c->detach;
     }
+};
+
+
+=head2 list_GET (after)
+
+Do some postprocessing on the page columns data to get js templates and add
+"dataset columns used" list.
+
+=cut
+
+after list_GET => sub {
+    my ($self, $c) = @_;
+
+    my $dataset              = $c->req->get_chained_object(0)->[0];
+    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
+
+    my %used;
+    for my $column (@{$c->stash->{page_column}{list}}) {
+        my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
+        $column->{js_template} = $tmpl->to_jstmpl;
+        for my $var ($tmpl->get_variables) {
+            push @{$used{$var}}, $column->{title};
+        }
+    }
+
+    my @headers_used = map {{
+        title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
+    }} $dataset->ds_columns_ordered->all;
+    $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 
 
@@ -71,22 +101,7 @@ after object_GET => sub {
 
     $c->stash->{url_prefixes} = encode_json({});
 
-    # copied & pasted from DataSetColumn
-    # need to factor this out.
-    my $rows = $dataset->data;
-    my @sample_data;
-    for my $idx (0..$#ds_columns) {
-      ROW_SEARCH:
-        for my $row (@$rows) {
-            if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
-                push @sample_data, $row->[$idx];
-                last ROW_SEARCH;
-            }
-        }
-    }
-    my %sample_data;
-    @sample_data{map {$_->shortname} @ds_columns} = @sample_data;
-    $c->stash->{sample_data} = encode_json( \%sample_data );
+    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
 };
 
 before object_PUT => sub {
@@ -102,8 +117,9 @@ after object_DELETE => sub {
     my ($self, $c) = @_;
     my $captures = $c->req->captures;
     pop @$captures;
-    $self->go_here($c, '/private/page/object', $captures);
+    $self->go_here($c, '/private/pagecolumn/list', $captures);
 };
+
 
 __PACKAGE__->meta->make_immutable;
 

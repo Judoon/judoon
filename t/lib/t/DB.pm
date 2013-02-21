@@ -95,9 +95,9 @@ my %fixture_subs = (
         });
 
         my @columns = (
-            ['Name / Director', '<a href="{{=imdb}}">{{=title}}</a><br><strong>Directed By:</strong> {{=director}}'],
-            ['Year',   '{{=year}}',],
-            ['Rating', '{{=rating}}'],
+            ['Name / Director', '<a href="{{imdb}}">{{title}}</a><br><strong>Directed By:</strong> {{director}}'],
+            ['Year',   '{{year}}',],
+            ['Rating', '{{rating}}'],
         );
 
         my $i = 1;

@@ -1,0 +1,2 @@
+[% INCLUDE 'components/breadcrumbs/page.tt2' divider=1 active=1 %]
+<li>[% UNLESS active %]Column List[% ELSE %]<a href="[% c.uri_for_action('/private/pagecolumn/list', [user.id, dataset.id, page.id]) %]">Column List</a>[% IF divider %] <span class="divider">/</span>[% END %][% END %]</li>

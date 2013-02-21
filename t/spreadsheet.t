@@ -61,14 +61,14 @@ subtest 'encoding' => sub {
                 });
             }, 'can open spreadsheet w/ utf8 chars';
             is $js_utf8->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
-                '  ...name is correct utf-8';
+                '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
-                '  ...title is correct utf-8';
+                '  ...title is correct';
             is_deeply $js_utf8->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
-                    '  ...data is correct utf-8';
+                    '  ...data is correct';
 
-            if (-e "${TEST_DATA_DIR}/encoding-cp1252.${ext}") {
+            return if ($ext eq 'xlsx');
 
             my $js_cp1252;
             ok !exception {
@@ -77,14 +77,12 @@ subtest 'encoding' => sub {
                 });
             }, 'can open spreadsheet w/ cp1252 chars';
             is $js_cp1252->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
-                '  ...name successfully converted to utf8';
+                '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_cp1252->fields }], ['ÜñîçøðÆ'],
-                '  ...title successfully converted to utf8';
+                '  ...title is correct';
             is_deeply $js_cp1252->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
-                    '  ...data successfully converted to utf8';
-
-            }
+                    '  ...data is correct';
         };
     }
 
