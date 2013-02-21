@@ -19,6 +19,9 @@ sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
 sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
 
 
+my $DATA_DIR = 't/etc/data';
+
+
 subtest 'Result::User' => sub {
     my $user_rs = ResultSet('User');
     is_result my $user = $user_rs->find({username => 'testuser'});
@@ -197,6 +200,17 @@ subtest 'Result::Dataset' => sub {
             'Page and cloned page have identical columns';
     is_json $page_dump, $dumpcloned_page->dump_to_user,
         'page and its dumpcloned page have equivalent json';
+
+
+    # test non-unique column names
+    my $repeat_ds = $user->import_data_by_filename("$DATA_DIR/repeat_cols.csv");
+    my @repeat_dscols = $repeat_ds->ds_columns_ordered->all;
+    is_deeply [map {$_->name} @repeat_dscols],
+        ['repeat', map {"repeat ($_)"} 1..9],
+            'duplicate names correctly assigned';
+    is_deeply [map {$_->shortname} @repeat_dscols],
+        ['repeat', map {"repeat_0$_"} 1..9],
+            'duplicate shortnames correctly assigned';
 };
 
 subtest 'Result::DatasetColumn' => sub {

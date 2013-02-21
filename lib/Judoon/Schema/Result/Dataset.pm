@@ -224,8 +224,6 @@ sub ds_columns_ordered {
 
 Get related Pages in sorted order
 
-}
-
 =cut
 
 sub pages_ordered {

@@ -122,9 +122,10 @@ sub BUILD {
     $self->{nbr_rows}    = scalar @$data;
     $self->{nbr_columns} = scalar @{ $data->[0] };
 
-    my ($colidx, @fields, %seen) = (1);
+    my ($colidx, @fields, %sql_seen, %header_seen) = (1);
     for my $header (@$headers) {
-        my $shortname = $self->_unique_sqlname(\%seen, $header);
+        my $shortname = $self->_unique_sqlname(\%sql_seen, $header);
+        $header = $self->_unique_header(\%header_seen, $header);
 
         my $parser_type = $self->$type_meth( $colidx );
         my %heuristic_types;
@@ -336,6 +337,28 @@ sub _unique_sqlname {
 
     die "absolutely insane. How can we not generate a unique name for this?"
         . p(%{ {name => $name, seen => $seen} });
+}
+
+
+# generate a unique column title
+sub _unique_header {
+    my ($self, $seen, $header) = @_;
+
+    return $header if (not $seen->{$header}++);
+
+    for my $i (1..999) {
+        my $new_header = $header . " ($i)";
+        return $new_header if (not $seen->{$new_header}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $header . " ($uuid)";
+        return $uuid_name if(not $seen->{$uuid_name}++);
+    }
+
+    die "absolutely insane. How can we not generate a unique name for this?"
+        . p(%{ {header => $header, seen => $seen} });
 }
 
 
