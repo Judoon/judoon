@@ -49,10 +49,7 @@ around generate_rs => sub {
 before 'validate_object' => sub {
     my ($self, $c, $obj) = @_;
     my ($object, $params) = @$obj;
-
-    if (exists $params->{template}) {
-        $params->{template} //= q{[]};
-    }
+    $params->{template} //= q{[]};
     $params->{page_id} //= $c->req->get_chained_object(-1)->[0]->id;
 };
 
