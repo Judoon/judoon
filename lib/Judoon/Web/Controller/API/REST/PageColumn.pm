@@ -49,9 +49,18 @@ around generate_rs => sub {
 before 'validate_object' => sub {
     my ($self, $c, $obj) = @_;
     my ($object, $params) = @$obj;
-    $params->{template} //= q{[]};
     $params->{page_id} //= $c->req->get_chained_object(-1)->[0]->id;
 };
+
+
+before update_or_create_objects => sub {
+    my ($self, $c) = @_;
+    if ($c->req->method eq 'POST') {
+        my $params = $c->req->get_object(-1)->[-1];
+        $params->{template} ||= q{[]};
+    }
+};
+
 
 =head1 NAME
 
