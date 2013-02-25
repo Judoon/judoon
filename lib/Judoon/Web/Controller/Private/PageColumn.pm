@@ -47,19 +47,10 @@ after list_GET => sub {
     my $dataset              = $c->req->get_chained_object(0)->[0];
     $c->stash->{sample_data} = encode_json( $dataset->sample_data );
 
-    my %used;
     for my $column (@{$c->stash->{page_column}{list}}) {
         my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
         $column->{js_template} = $tmpl->to_jstmpl;
-        for my $var ($tmpl->get_variables) {
-            push @{$used{$var}}, $column->{title};
-        }
     }
-
-    my @headers_used = map {{
-        title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
-    }} $dataset->ds_columns_ordered->all;
-    $c->stash->{dataset}{headers_used} = \@headers_used;
 };
 
 

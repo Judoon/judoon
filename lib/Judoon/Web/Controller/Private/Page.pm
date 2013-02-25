@@ -58,6 +58,28 @@ override list_GET => sub {
 };
 
 
+after id => sub {
+    my ($self, $c) = @_;
+
+    my $dataset   = $c->req->get_chained_object(-1)->[0];
+    my $page      = $c->req->get_object(0)->[0];
+    my @page_cols = $page->page_columns_ordered->all;
+
+    my %used;
+    for my $column (@page_cols) {
+        my $tmpl = $column->template;
+        for my $var ($tmpl->get_variables) {
+            push @{$used{$var}}, $column->title;
+        }
+    }
+
+    my @headers_used = map {{
+        title => $_->name, used_in => join(', ', @{$used{$_->shortname} || []}),
+    }} $dataset->ds_columns_ordered->all;
+    $c->stash->{dataset}{headers_used} = \@headers_used;
+};
+
+
 =head2 object_GET (after)
 
 After L<Private/object_GET>, set up the stash parameters the page's edit
