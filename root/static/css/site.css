@@ -1,3 +1,5 @@
+/* ========== Basic structure styles ========== */
+
 body {
     background-color: #eee;
     padding: 5px;
@@ -16,9 +18,7 @@ footer {
     color: rgb(4, 53, 108);
     border-color: rgb(13, 86, 166);
 }
-footer p {
-    padding: 2px;
-}
+footer p { padding: 2px; }
 
 #middle {
     margin: 0 0 3px 0;
@@ -27,10 +27,23 @@ footer p {
     background-color: #fff;
 }
 
-/* for frontpage */
-#getstarted a.btn:visited { color: #fff; }
 
 
+/* ========== Boostrap fixes ========== */
+
+/*
+  fix for bootstrap bug: dropdowns inside collapses get cut off
+  may be fixed in v3.0
+  see https://github.com/twitter/bootstrap/issues/3601
+*/
+.page_actions.collapse.in,
+.page_info.collapse.in {
+    overflow: visible;
+}
+
+
+
+/* ========== Utility classes ========== */
 /*
   Action forms are used to enable button-like controls for
   POST/PUT/DELETEs.
@@ -41,11 +54,23 @@ footer p {
 }
 
 
-/* make "Add Dataset" label on user overview page align w/ form controls */
+
+/* ========== Frontpage ========== */
+#getstarted a.btn:visited { color: #fff; }
+
+
+
+/* ========== Overview ========== */
+
+/*
+  make "Add Dataset" label on user overview page align w/ form
+  controls
+*/
 .form-inline h4.help-inline { margin-top: 0; margin-right: 5px; }
 
 
-/* for Page Column edit page */
+
+/* ========== PageColumn edit ========= */
 
 #canvas_cursor {
     border: thin #aaa solid;
@@ -71,21 +96,12 @@ footer p {
 #widget_library { display: none; }
 #modal_title { display: none; }
 
-
-
-/*
-  fix for bootstrap bug: dropdowns inside collapses get cut off
-  may be fixed in v3.0
-  see https://github.com/twitter/bootstrap/issues/3601
-*/
-.page_actions.collapse.in,
-.page_info.collapse.in {
-    overflow: visible;
-}
+#link_widget_url_source select.link_site { display: none;  }
+#link_widget_url_source select.link_site.link_site_active  { display: block; }
 
 
 
-/* for Page / Dataset previews */
+/* ========== Page / Dataset previews ========== */
 
 #notes, #preamble {
     padding-left: 1em;
@@ -104,32 +120,27 @@ footer p {
     border-top: thin lightgray solid;
 }
 
-/* for DataTables */
+
+
+/* ========== DataTables ========== */
+
 div.dataTables_length label {
-	float: left;
-	text-align: left;
+    float: left;
+    text-align: left;
 }
 
-div.dataTables_length select {
-	width: 75px;
-}
-
-div.dataTables_filter label {
-	float: right;
-}
-
-div.dataTables_info {
-	padding-top: 8px;
-}
+div.dataTables_length select { width: 75px; }
+div.dataTables_filter label { float: right; }
+div.dataTables_info { padding-top: 8px; }
 
 div.dataTables_paginate {
-	float: right;
-	margin: 0;
+    float: right;
+    margin: 0;
 }
 
 table.table {
-	clear: both;
-	margin-bottom: 6px !important;
+    clear: both;
+    margin-bottom: 6px !important;
 }
 
 table.table thead .sorting,
@@ -137,20 +148,26 @@ table.table thead .sorting_asc,
 table.table thead .sorting_desc,
 table.table thead .sorting_asc_disabled,
 table.table thead .sorting_desc_disabled {
-	cursor: pointer;
-	*cursor: hand;
+    cursor: pointer;
+    *cursor: hand;
 }
 
-table.table thead .sorting { background: url('../images/sort_both.png') no-repeat center right; }
-table.table thead .sorting_asc { background: url('../images/sort_asc.png') no-repeat center right; }
-table.table thead .sorting_desc { background: url('../images/sort_desc.png') no-repeat center right; }
-
-table.table thead .sorting_asc_disabled { background: url('../images/sort_asc_disabled.png') no-repeat center right; }
-table.table thead .sorting_desc_disabled { background: url('../images/sort_desc_disabled.png') no-repeat center right; }
-
-table.dataTable th:active {
-	outline: none;
+table.table thead .sorting {
+    background: url('../images/sort_both.png') no-repeat center right;
+}
+table.table thead .sorting_asc {
+    background: url('../images/sort_asc.png') no-repeat center right;
+}
+table.table thead .sorting_desc {
+    background: url('../images/sort_desc.png') no-repeat center right;
 }
 
-#link_widget_url_source select.link_site { display: none;  }
-#link_widget_url_source select.link_site.link_site_active  { display: block; }
+table.table thead .sorting_asc_disabled {
+    background: url('../images/sort_asc_disabled.png') no-repeat center right;
+}
+table.table thead .sorting_desc_disabled {
+    background: url('../images/sort_desc_disabled.png') no-repeat center right;
+}
+
+table.dataTable th:active { outline: none; }
+
