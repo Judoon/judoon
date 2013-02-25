@@ -78,6 +78,18 @@ footer p {
 .input-append .dropdown-menu { font-size: 14px; }
 
 
+/*
+  fix for bootstrap bug: dropdowns inside collapses get cut off
+  may be fixed in v3.0
+  see https://github.com/twitter/bootstrap/issues/3601
+*/
+.page_actions.collapse.in,
+.page_info.collapse.in {
+    overflow: visible;
+}
+
+
+
 /* for Page / Dataset previews */
 
 #notes, #preamble {

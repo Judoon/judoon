@@ -82,7 +82,7 @@
                 <div class="btn-group"><button class="btn btn-mini" data-toggle="collapse" data-target="#page_info_[% page_obj.id %]">More Info</button></div>
               </div>
 
-              <div id="page_actions_[% page_obj.id %]" class="collapse">
+              <div id="page_actions_[% page_obj.id %]" class="page_actions collapse">
                 <h5>Actions</h5>
                 <div class="btn-toolbar" style="margin-bottom: 20px;">
                   <div class="btn-group">
@@ -133,7 +133,7 @@
                 </div>
               </div>
 
-              <div id="page_info_[% page_obj.id %]" class="collapse">
+              <div id="page_info_[% page_obj.id %]" class="page_info collapse">
                 <h5>About this page</h5>
                 <ul>
                   <li><strong>Created on:</strong> [%- page_obj.created -%]</li>
