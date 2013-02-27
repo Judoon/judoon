@@ -185,17 +185,20 @@ sub edit : Chained('id') PathPart('') Args(0) {
     $c->stash->{template} = 'user/edit.tt2';
 
     if ($c->stash->{user}{is_owner}) {
-        my @datasets = $c->stash->{user}{object}->datasets_rs->with_pages->hri->all;
+        my @datasets = $c->stash->{user}{object}->datasets_rs
+            ->ordered_with_pages_and_pagecols->hri->all;
+
         my @url_keys = (
             [qw(edit_url        /private/dataset/object    )],
             [qw(column_list_url /private/datasetcolumn/list)],
             [qw(page_list_url   /private/page/list         )],
         );
+
         for my $dataset (@datasets) {
 
             $dataset->{ds_columns} = [
-                $c->model('User::Dataset')->find({id => $dataset->{id}})
-                    ->ds_columns_ordered->hri->all
+                $c->model('User::DatasetColumn')
+                    ->for_dataset_id($dataset->{id})->hri->all
             ];
 
             for my $url_keys (@url_keys) {
@@ -215,11 +218,6 @@ sub edit : Chained('id') PathPart('') Args(0) {
                         keys %$dataset
                 };
 
-                $page->{page_columns} = [
-                    $c->model('User::Page')->find({id => $page->{id}})
-                        ->page_columns_ordered->hri->all
-                ];
-
                 # not sure how to set this with dbic
                 $page->{nbr_rows}    = $dataset->{nbr_rows};
                 $page->{nbr_columns} = scalar @{$page->{page_columns}};
@@ -232,13 +230,14 @@ sub edit : Chained('id') PathPart('') Args(0) {
         }
 
         $c->stash->{dataset}{list} = \@datasets;
-        $c->stash->{page}{list} = [map {@{$_->{pages}}} @datasets];
+        $c->stash->{page}{list}    = [map {@{$_->{pages}}} @datasets];
     }
     else {
-        my @datasets = $c->stash->{user}{object}->datasets_rs->public->all;
+        my @datasets = $c->stash->{user}{object}->datasets_rs->ordered->public->all;
         $c->stash->{dataset}{list} = \@datasets;
-        $c->stash->{page}{list}    = [map {$_->pages_rs->public} @datasets];
+        $c->stash->{page}{list}    = [map {$_->pages_rs->ordered->public} @datasets];
     }
+
 }
 
 
