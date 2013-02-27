@@ -122,7 +122,7 @@
                   <div class="btn-group">
                     [% INCLUDE "components/action_dropdown.tt2"
                        label         = "Download standalone app:"
-                       extra_classes = "action_download_tabular"
+                       extra_classes = "action_download_app"
                        dropdown_links = [
                            { label => "zip",    url => page_obj.edit_url _ "?view=standalone&format=zip", },
                            { label => "tar.gz", url => page_obj.edit_url _ "?view=standalone&format=tgz", },

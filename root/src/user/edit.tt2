@@ -7,6 +7,12 @@
       $('.action_custom_page').tooltip({title: "Create a custom view of your dataset", container: "body"});
       $('.action_delete_dataset').tooltip({title: "Delete this dataset.  *This will delete all of its pages as well!*", container: "body"});
       $('.action_download_tabular').tooltip({title: "Download data as an Excel file, csv, or tab-delimited file.", container: "body"});
+
+      $('.action_edit_page').tooltip({title: "Update the title, surrounding text, and other properties of this page", container: "body"});
+      $('.action_preview_page').tooltip({title: "See how this page will appear to others", container: "body"});
+      $('.action_delete_page').tooltip({title: "Delete this page", container: "body"});
+      $('.action_download_tabular_page').tooltip({title: "Download the page's data table as an Excel file, csv, or tab-delimited file.", container: "body"});
+      $('.action_download_app').tooltip({title: "Download an archive of the page that you can host on your own.", container: "body"});
   });
 </script>
 [% END %]
