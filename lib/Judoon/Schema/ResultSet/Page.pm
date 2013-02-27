@@ -17,6 +17,21 @@ with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
 =head1 METHODS
 
+=head2 ordered
+
+Order a set of pages by their creation timestamp
+
+=cut
+
+sub ordered {
+    my ($self) = @_;
+    return $self->search_rs(
+        undef,
+        {order_by => {-asc => $self->me . 'created'},},
+    );
+}
+
+
 =head2 for_dataset( $dataset )
 
 Filter C<Page>s to those belonging to a particular C<Dataset>.
