@@ -41,7 +41,7 @@ Add prefetch of pages to current rs
 sub with_pages {
     return shift->search_rs(
         {},
-        {prefetch => 'pages', order_by => 'pages.created'}
+        {prefetch => 'pages', order_by => {-asc => 'pages.created'}}
     );
 }
 
