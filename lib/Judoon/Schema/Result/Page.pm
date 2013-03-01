@@ -16,6 +16,7 @@ extends 'Judoon::Schema::Result';
 
 use JSON qw(to_json from_json);
 use Judoon::Error::InvalidTemplate;
+use Template;
 
 # default options for serializing C<Page> objects as JSON.
 # this gets passed to to_json().
@@ -342,6 +343,59 @@ sub get_cloneable_columns {
     delete $me{dataset_id};
     return %me;
 }
+
+
+=head2 headers
+
+Get an ArrayRef of page headers
+
+=cut
+
+sub headers {
+    my ($self) = @_;
+    return [map {$_->title} $self->page_columns_ordered->all];
+}
+
+
+=head2 data_table
+
+Get and ArrayRef of ArrayRefs of the page data
+
+=cut
+
+sub data_table {
+    my ($self) = @_;
+
+    my @col_templates = map {$_->template->to_jstmpl}
+        $self->page_columns_ordered->all;
+
+    my $data = $self->dataset->data_table({shortname => 1});
+    my $data_labels = shift @$data; # get rid of headers
+
+
+    my $tt = Template->new({
+        START_TAG => quotemeta('{{'),
+        END_TAG   => quotemeta('}}'),
+    }) or die "Cant make tt: " . Template->error;
+
+    my @page_data;
+    for my $data_row (@$data) {
+        my %vars;
+        @vars{@$data_labels} = @$data_row;
+
+        my @page_row;
+        for my $col_tmpl (@col_templates) {
+            my $cell;
+            $tt->process(\$col_tmpl, \%vars, \$cell)
+                or die "Cant fill tmpl: " . $tt->error;
+            push @page_row, $cell;
+        }
+        push @page_data, \@page_row;
+    }
+
+    return \@page_data;
+}
+
 
 
 1;
