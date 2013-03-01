@@ -64,6 +64,8 @@ subtest 'encoding' => sub {
                 '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
                 '  ...title is correct';
+            is_deeply [map {$_->{shortname}} @{ $js_utf8->fields }],
+                ['unicodae'], '  ...shortname is correct';
             is_deeply $js_utf8->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
                     '  ...data is correct';
@@ -80,6 +82,8 @@ subtest 'encoding' => sub {
                 '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_cp1252->fields }], ['ÜñîçøðÆ'],
                 '  ...title is correct';
+            is_deeply [map {$_->{shortname}} @{ $js_cp1252->fields }],
+                ['unicodae'], '  ...shortname is correct';
             is_deeply $js_cp1252->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
                     '  ...data is correct';

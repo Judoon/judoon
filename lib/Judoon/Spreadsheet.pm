@@ -38,6 +38,7 @@ use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
 use Text::CSV::Encoded coder_class => 'Text::CSV::Encoded::Coder::EncodeGuess';
+use Text::Unidecode;
 
 
 =head1 METHODS
@@ -304,6 +305,8 @@ has nbr_columns => (is => 'ro', init_arg => undef, isa => Int, );
 # name.
 sub _unique_sqlname {
     my ($self, $seen, $name) = @_;
+
+    $name = unidecode($name);
 
     # stolen from SQL::Translator::Utils::normalize_name
     # The name can only begin with a-zA-Z_; if there's anything

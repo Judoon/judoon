@@ -83,6 +83,7 @@ requires 'Spreadsheet::WriteExcel';
 requires 'Sub::Name';
 requires 'Template';
 requires 'Text::CSV::Encoded';
+requires 'Text::Unidecode';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 
