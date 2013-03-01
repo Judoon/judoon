@@ -6,7 +6,7 @@ package Judoon::Web::Controller::Role::ExtractParams;
 
 =head1 NAME
 
-Judoon::Web::Controller::Role::ExtracrParams - get keyed parameters
+Judoon::Web::Controller::Role::ExtractParams - get keyed parameters
 
 =head1 SYNOPSIS
 

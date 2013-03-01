@@ -310,7 +310,7 @@ EOS
 =head2 data_table( $args )
 
 Returns an arrayref of arrayref of the dataset's data with the header
-columns. If C<$args->{shortname}> is true, use the column shortnames
+columns. If C<< $args->{shortname} >> is true, use the column shortnames
 in the header instead of the original names
 
 =cut
