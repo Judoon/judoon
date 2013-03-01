@@ -19,7 +19,9 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
-with qw(Judoon::Web::Controller::Role::ExtractParams);
+with qw(
+    Judoon::Web::Controller::Role::TabularData
+);
 
 use File::Slurp qw(slurp);
 use Judoon::Standalone;
@@ -101,6 +103,12 @@ after object_GET => sub {
         $c->stash->{template} = 'page/preview.tt2';
         $c->detach();
     }
+
+
+    $self->table_view(
+        $c, $view, $page->title,
+        $page->headers, $page->data_table,
+    );
 
     if ($view eq 'standalone') {
         my $type = $c->req->param('format') // 'zip';

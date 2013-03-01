@@ -59,7 +59,8 @@
              dropdown_links = [
                  { label => "tab",   url => dataset_obj.edit_url _ "?view=tab", },
                  { label => "csv",   url => dataset_obj.edit_url _ "?view=csv", },
-                 { label => "Excel", url => dataset_obj.edit_url _ "?view=xls", },
+                 { label => "Excel 97", url => dataset_obj.edit_url _ "?view=xls", },
+                 { label => "Excel 2007", url => dataset_obj.edit_url _ "?view=xlsx", },
              ]
           %]
         </div>
@@ -115,7 +116,8 @@
                        dropdown_links = [
                            { label => "tab",   url => page_obj.edit_url _ "?view=tab", },
                            { label => "csv",   url => page_obj.edit_url _ "?view=csv", },
-                           { label => "Excel", url => page_obj.edit_url _ "?view=xls", },
+                           { label => "Excel 97", url => page_obj.edit_url _ "?view=xls", },
+                           { label => "Excel 2007", url => page_obj.edit_url _ "?view=xlsx", },
                        ]
                     %]
                   </div>

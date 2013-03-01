@@ -18,6 +18,9 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
+with qw(
+    Judoon::Web::Controller::Role::TabularData
+);
 
 use JSON qw(encode_json);
 
@@ -110,27 +113,13 @@ after object_GET => sub {
         $c->detach();
     }
 
-    (my $name = $dataset->name) =~ s/\W/_/g;
-    $name =~ s/__+/_/g;
-    $name =~ s/(?:^_+|_+$)//g;
 
-    if ($view eq 'tab') {
-        $c->res->headers->header( "Content-Type" => "text/tab-separated-values" );
-        $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.tab" );
-        $c->stash->{plain}{data} = $dataset->as_raw;
-        $c->forward('Judoon::Web::View::Download::Plain');
-    }
-    elsif ($view eq 'csv') {
-        $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.csv" );
-        $c->stash->{csv}{data} = $dataset->data_table;
-        $c->forward('Judoon::Web::View::Download::CSV');
-    }
-    elsif ($view eq 'xls') {
-        $c->res->headers->header( "Content-Type" => "application/vnd.ms-excel" );
-        $c->res->headers->header( "Content-Disposition" => "attachment; filename=$name.xls" );
-        $c->res->body($dataset->as_excel);
-        $c->forward('Judoon::Web::View::Download::Plain');
-    }
+    my $data_table = $dataset->data_table;
+    my $headers = shift @$data_table;
+    $self->table_view(
+        $c, $view, $dataset->name,
+        $headers, $data_table,
+    );
 
     if (my (@pages) = $dataset->pages_rs->all) {
         $c->stash->{page}{list} = [

@@ -52,6 +52,7 @@ requires 'DBIx::Class::PassphraseColumn';
 requires 'DBIx::Class::Schema::Loader';
 requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::RunSQL';
+requires 'Excel::Writer::XLSX';
 requires 'File::Spec';
 requires 'File::Temp';
 requires 'FindBin';
