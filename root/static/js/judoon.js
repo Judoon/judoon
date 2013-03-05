@@ -709,6 +709,58 @@ var judoon = {
 
     }, /* end linkbuilder */
 
+    preview_column: function() {
+        var preview = '';
+        judoon.canvas.get_canvas().find('div.widget-object').each(function(idx) {
+            var widget_classes = $(this).attr('class');
+            var widget_match   = /widget-type-([\w\-]+)/.exec(widget_classes);
+            var widget_type    = widget_match[1];
+            var formatting;
+            var html = '';
+            switch (widget_type) {
+                case 'newline':
+                    html = '<br>';
+                    break;
+                case 'newline-icon':
+                    break;
+                case 'text':
+                    formatting = judoon.canvas.widget.extract_format($(this));
+                    html = $(this).find('input').val();
+                    break;
+                case 'data':
+                    formatting = judoon.canvas.widget.extract_format($(this));
+                    html = sample_data[$(this).find('select').val()];
+                    break;
+                case 'link':
+                    var url   = judoon.canvas.widget.get_link_attr($(this), 'url');
+                    var label = judoon.canvas.widget.get_link_attr($(this), 'label');
+                    formatting = judoon.canvas.widget.extract_format($(this));
+                    html = '<a href="'
+                        + judoon.linkbuilder.util.zip_segments(url.text_segments, [sample_data[ url.variable_segments[0] ]])
+                        + '">'
+                        + judoon.linkbuilder.util.zip_segments(label.text_segments, [sample_data[ label.variable_segments[0] ]])
+                        + '</a>';
+                    break;
+            }
+
+            if (formatting) {
+               for (var i = 0; i < formatting.length; i++) {
+                   if (formatting[i] === 'bold') {
+                      html = '<strong>' + html + '</strong>';
+                   }
+                   if (formatting[i] === 'italic') {
+                      html = '<em>' + html + '</em>';
+                   }
+               }
+            }
+            preview += html;
+        });
+        $('#preview_column_title').html( $('#page_column_title').val() );
+        $('#preview_content').html( preview );
+        return false;
+    },
+
+
 
     /***
      *
