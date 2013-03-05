@@ -54,12 +54,10 @@ subtest 'encoding' => sub {
 
     for my $ext (qw(xls xlsx csv)) {
         subtest "for $ext" => sub {
-            my $js_utf8;
-            ok !exception {
-                $js_utf8 = Judoon::Spreadsheet->new({
-                    filename => "${TEST_DATA_DIR}/encoding-utf8.${ext}"
-                });
-            }, 'can open spreadsheet w/ utf8 chars';
+
+            ok my $js_utf8 = Judoon::Spreadsheet->new({
+                filename => "${TEST_DATA_DIR}/encoding-utf8.${ext}"
+            }), 'can open spreadsheet w/ utf8 chars';
             is $js_utf8->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
                 '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
@@ -72,12 +70,9 @@ subtest 'encoding' => sub {
 
             return if ($ext eq 'xlsx');
 
-            my $js_cp1252;
-            ok !exception {
-                $js_cp1252 = Judoon::Spreadsheet->new({
-                    filename => "${TEST_DATA_DIR}/encoding-cp1252.${ext}"
-                });
-            }, 'can open spreadsheet w/ cp1252 chars';
+            ok my $js_cp1252 = Judoon::Spreadsheet->new({
+                filename => "${TEST_DATA_DIR}/encoding-cp1252.${ext}"
+            }), 'can open spreadsheet w/ cp1252 chars';
             is $js_cp1252->name, ($ext eq 'csv' ? 'IO' : 'sheet-üñîçø∂é'),
                 '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_cp1252->fields }], ['ÜñîçøðÆ'],
