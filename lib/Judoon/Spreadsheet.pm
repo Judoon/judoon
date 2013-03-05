@@ -34,6 +34,7 @@ use Data::UUID;
 use Encode qw(decode);
 use Excel::Reader::XLSX;
 use IO::File ();
+use Judoon::Error::Spreadsheet::InvalidEncoding;
 use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
@@ -176,30 +177,39 @@ sub _build_from_xls {
     for my $row ( $row_min .. $row_max ) {
         my @row_data;
         for my $col ( $col_min .. $col_max ) {
-            my $val;
             my $cell = $worksheet->get_cell($row, $col);
+            my $val  = $cell->$_call_if_object('value');
+
+            # Weirdness ensues...
             if ($cell) {
-
-                # Weirdness ensues...
-
                 # Spreadsheet::ParseExcel is not consistent about how
                 # it returns values.  If a cell contains a string with
                 # with unicode codepoints that requires more than one
                 # byte (e.g. 'Ellipsis…', where the character
-                # HORIZONTAL ELLIPSIS is codepoint U+2026), it decodes
+                # HORIZONTAL ELLIPSIS is codepoint 0x2026), it decodes
                 # the cell into a proper perl string. However, if the
                 # string contains only characters representable in
-                # single-byte unicode codepoints, it does not get
-                # decoded. (e.g. 'ÜñîçøðÆ'). Since single-byte unicode
-                # is identical to latin1, we'll decode as that.
+                # single-byte unicode codepoints (e.g. 'ÜñîçøðÆ'), it
+                # does not get decoded. utf8::upgrade() will decode it
+                # if it is not yet decoded, and leave it alone
+                # otherwise.
+
+                # Spreadsheet::ParseExcel claims to support other
+                # encoding types, but I don't have examples of these,
+                # so I can't test them yet.  Until then, die when we
+                # encounter them.
                 my $enc = $cell->encoding();
-                $val = $enc eq '1' ? decode('latin1', $cell->value)
-                     : $enc eq '2' ? $cell->value
-                     :               die 'Unhandled cell encoding';
+                ($enc == 1 || $enc == 2)
+                    ? utf8::upgrade($val)
+                    : Judoon::Error::Spreadsheet::InvalidEncoding->throw({
+                        message  => 'Unhandled cell encoding type in XLS parser',
+                        encoding => ($enc == 3 ? 'UTF16-BE'
+                                  :  $enc == 4 ? 'pre-Excel 97 encoding'
+                                  :              "unknown type: $enc"),
+                        filetype => $self->filetype,
+                    });
             }
-            else {
-                $val = undef;
-            }
+
             push @row_data, $val;
 
         }
