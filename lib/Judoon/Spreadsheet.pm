@@ -216,7 +216,12 @@ sub _build_from_xls {
         push @data, \@row_data;
     }
 
-    return ($worksheet->get_name, \@data);
+
+    # How come? see the above note for cell data. worksheet name
+    # suffers the same problem.
+    my $name = $worksheet->get_name;
+    utf8::upgrade($name);
+    return ($name, \@data);
 }
 
 sub _get_xls_data_type {
