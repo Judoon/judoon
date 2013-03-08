@@ -15,7 +15,8 @@ extends 'Judoon::Schema::Result';
 
 
 use DateTime;
-use Judoon::Error;
+use Judoon::Error::Devel::Arguments;
+use Judoon::Error::Devel::Impossible;
 use Judoon::Tmpl;
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
@@ -242,8 +243,12 @@ C<Dataset> and C<DatasetColumns>.
 
 sub import_from_spreadsheet {
     my ($self, $spreadsheet) = @_;
-    die q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'}
-        unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
+
+    Judoon::Error::Devel::Arguments->throw({
+        message  => q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'},
+        expected => q{->isa('Judoon::Spreadsheet')},
+        got      => q{->isa('} . ref($spreadsheet) . q{')},
+    }) unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
     my $table_name = $self->_store_data($spreadsheet);
 
@@ -430,8 +435,12 @@ data. Returns the new table name.
 
 sub _store_data {
     my ($self, $spreadsheet) = @_;
-    die 'arg must be a Judoon::Spreadsheet'
-        unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
+
+    Judoon::Error::Devel::Arguments->throw({
+        message  => q{'spreadsheet' argument to Result::Dataset must be a Judoon::Spreadsheet'},
+        expected => q{->isa('Judoon::Spreadsheet')},
+        got      => q{->isa('} . ref($spreadsheet) . q{')},
+    }) unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
     my $schema     = $self->schema_name;
     my $table_name = $self->_gen_table_name( $spreadsheet->name );
@@ -506,8 +515,9 @@ sub _gen_table_name {
     return $new_name if ($new_name);
 
     $new_name = $table_name . '_' . time();
-    die "Unable to find suitable name for table: $table_name"
-        if ($self->_table_exists($new_name));
+    Judoon::Error::Devel::Impossible->throw({
+        message => "Unable to find suitable name for table: $table_name",
+    })  if ($self->_table_exists($new_name));
     return $new_name;
 }
 
