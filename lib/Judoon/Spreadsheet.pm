@@ -34,7 +34,14 @@ use Data::UUID;
 use Encode qw(decode);
 use Excel::Reader::XLSX;
 use IO::File ();
+use Judoon::Error::Devel::Arguments;
+use Judoon::Error::Devel::Foreign;
+use Judoon::Error::Devel::Impossible;
+use Judoon::Error::Input::File;
+use Judoon::Error::Input::Filename;
+use Judoon::Error::Spreadsheet;
 use Judoon::Error::Spreadsheet::Encoding;
+use Judoon::Error::Spreadsheet::Type;
 use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
@@ -84,22 +91,32 @@ around BUILDARGS => sub {
     my $args = $class->$orig(@args);
 
     if (my $filename = delete $args->{filename}) {
-        die "Don't pass filename and filehandle to Judoon::Spreadsheet->new"
-            if (exists $args->{filehandle});
+        Judoon::Error::Devel::Arguments->throw({
+            message  => "Don't pass filename and filehandle to Judoon::Spreadsheet->new",
+            got      => $args->{flehandle},
+            expected => 'undef',
+        }) if (exists $args->{filehandle});
 
-        die "No such file $filename in constructor of Judoon::Spreadsheet"
-            unless (-e $filename);
+        Judoon::Error::Input::Filename->throw({
+            message  => "No such file $filename",
+            filename => $filename,
+        }) unless (-e $filename);
 
         my ($filetype) = ($filename =~ m/\.([^\.]+)$/);
-        die "Couldn't determine file type of $filename"
-            unless ($filetype);
+        Judoon::Error::Input::Filename->throw({
+            message => "Couldn't determine file type of $filename from extension (extension seems to be missing?)",
+            filename => $filename,
+        }) unless ($filetype);
 
-        die "Invalid file format: $filetype"
-            if ($filetype !~ m/^xlsx?|csv|tab/);
+        Judoon::Error::Spreadsheet::Type->throw({
+            message => "Invalid file format: $filetype",
+        }) if ($filetype !~ m/^xlsx?|csv|tab/);
         $args->{filetype} = $filetype eq 'tab' ? 'csv' : $filetype;
 
         my $spreadsheet_fh = IO::File->new($filename, 'r')
-            or die "Unable to open file $filename: $!";
+            or Judoon::Error::Input::File->throw({
+                message => "Unable to open file $filename: $!",
+            });
         $args->{filehandle} = $spreadsheet_fh;
     }
 
@@ -166,7 +183,10 @@ sub _build_from_xls {
     my $workbook  = $parser->parse($self->filehandle);
     my @allsheets = $workbook->worksheets;
     my $worksheet = $allsheets[0];
-    die "Couldn't find a worksheet" unless ($worksheet);
+    Judoon::Error::Spreadsheet->throw({
+        message  => "Couldn't find a worksheet",
+        filetype => $self->filetype,
+    }) unless ($worksheet);
 
     $self->{_parser_obj} = $worksheet;
 
@@ -237,11 +257,19 @@ sub _build_from_csv {
     my $parser = Text::CSV::Encoded->new({
         encoding_in  => ['utf-8','cp1252'],
         encoding_out => 'utf-8',
-    }) or die Text::CSV::Encoded->error_diag;
+    }) or Judoon::Error::Devel::Foreign->throw({
+        message => q{Couldn't create CSV decoder object'},
+        module  => 'Text::CSV::Encoded',
+        foreign_message => Text::CSV::Encoded->error_diag,
+    });
     $self->{_parser_obj} = $parser;
 
     my $data = $parser->getline_all( $self->filehandle )
-        or die Text::CSV::Encoded->error_diag;
+        or Judoon::Error::Devel::Foreign->throw({
+            message => q{Couldn't create write CSV line'},
+            module  => 'Text::CSV::Encoded',
+            foreign_message => Text::CSV::Encoded->error_diag,
+        });
     my $name = 'IO';
     return ($name, $data);
 }
@@ -254,10 +282,17 @@ sub _build_from_xlsx {
 
     my $parser    = Excel::Reader::XLSX->new;
     my $workbook  = $parser->read_filehandle( $self->filehandle )
-        or die $parser->error();
+        or Judoon::Error::Devel::Foreign->throw({
+            message => q{Couldn't parse xlsx file'},
+            module  => 'Excel::Reader::XLSX',
+            foreign_message => $parser->error(),
+        });
     my @allsheets = $workbook->worksheets;
     my $worksheet = $allsheets[0];
-    die "Couldn't find a worksheet" unless ($worksheet);
+    Judoon::Error::Spreadsheet->throw({
+        message  => "Couldn't find a worksheet",
+        filetype => $self->filetype,
+    }) unless ($worksheet);
 
     $self->{_parser_obj} = $worksheet;
 
@@ -378,8 +413,10 @@ sub _unique_sqlname {
         return $uuid_name if(!$seen->{$uuid_name}++);
     }
 
-    die "absolutely insane. How can we not generate a unique name for this?"
-        . p(%{ {name => $name, seen => $seen} });
+    Judoon::Error::Devel::Impossible->throw({
+        message => "couldn't generate a unique sql column name: "
+            . p(%{ {name => $name, seen => $seen} }),
+    });
 }
 
 
@@ -400,8 +437,10 @@ sub _unique_header {
         return $uuid_name if(not $seen->{$uuid_name}++);
     }
 
-    die "absolutely insane. How can we not generate a unique name for this?"
-        . p(%{ {header => $header, seen => $seen} });
+    Judoon::Error::Devel::Impossible->throw({
+        message => "couldn't generate a unique column name: "
+            . p(%{ {header => $header, seen => $seen} }),
+    });
 }
 
 
