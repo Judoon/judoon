@@ -14,6 +14,7 @@ use Moo;
 extends 'Judoon::Schema::Result';
 
 
+use Data::UUID;
 use DateTime;
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Impossible;
@@ -515,6 +516,11 @@ sub _gen_table_name {
     return $new_name if ($new_name);
 
     $new_name = $table_name . '_' . time();
+    return $new_name unless ($self->_table_exists($new_name));
+
+    # if this doesn't work, something is seriously wrong
+    $new_name = $table_name . '_' . Data::UUID->new->create_str();
+    $new_name =~ s/-/_/g;
     Judoon::Error::Devel::Impossible->throw({
         message => "Unable to find suitable name for table: $table_name",
     })  if ($self->_table_exists($new_name));
