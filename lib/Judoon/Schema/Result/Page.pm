@@ -15,6 +15,7 @@ extends 'Judoon::Schema::Result';
 
 
 use JSON qw(to_json from_json);
+use Judoon::Error::Devel::Foreign;
 use Judoon::Error::Template;
 use Template;
 
@@ -376,7 +377,11 @@ sub data_table {
     my $tt = Template->new({
         START_TAG => quotemeta('{{'),
         END_TAG   => quotemeta('}}'),
-    }) or die "Cant make tt: " . Template->error;
+    }) or Judoon::Error::Devel::Foreign->throw({
+        message         => "Can't build a Template object w/ handlebars syntax",
+        module          => 'Template',
+        foreign_message => Template->error,
+    });
 
     my @page_data;
     for my $data_row (@$data) {
@@ -387,7 +392,11 @@ sub data_table {
         for my $col_tmpl (@col_templates) {
             my $cell;
             $tt->process(\$col_tmpl, \%vars, \$cell)
-                or die "Cant fill tmpl: " . $tt->error;
+                or Judoon::Error::Devel::Foreign->throw({
+                    message         => "Can't fill template",
+                    module          => 'Template',
+                    foreign_message => $tt->error,
+                });
             push @page_row, $cell;
         }
         push @page_data, \@page_row;
