@@ -34,7 +34,7 @@ use Data::UUID;
 use Encode qw(decode);
 use Excel::Reader::XLSX;
 use IO::File ();
-use Judoon::Error::Spreadsheet::InvalidEncoding;
+use Judoon::Error::Spreadsheet::Encoding;
 use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
@@ -201,7 +201,7 @@ sub _build_from_xls {
                 my $enc = $cell->encoding();
                 ($enc == 1 || $enc == 2)
                     ? utf8::upgrade($val)
-                    : Judoon::Error::Spreadsheet::InvalidEncoding->throw({
+                    : Judoon::Error::Spreadsheet::Encoding->throw({
                         message  => 'Unhandled cell encoding type in XLS parser',
                         encoding => ($enc == 3 ? 'UTF16-BE'
                                   :  $enc == 4 ? 'pre-Excel 97 encoding'
