@@ -15,7 +15,7 @@ extends 'Judoon::Schema::Result';
 
 
 use JSON qw(to_json from_json);
-use Judoon::Error::InvalidTemplate;
+use Judoon::Error::Template;
 use Template;
 
 # default options for serializing C<Page> objects as JSON.
@@ -255,7 +255,7 @@ sub templates_match_dataset {
     }
 
     if (@bad_columns) {
-        Judoon::Error::InvalidTemplate->throw({
+        Judoon::Error::Template->throw({
             message       => 'Some templates reference non-existing columns in the dataset',
             templates     => \@bad_columns,
             valid_columns => [keys %valid_ds_columns],

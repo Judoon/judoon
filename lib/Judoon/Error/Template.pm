@@ -1,4 +1,4 @@
-package Judoon::Error::InvalidTemplate;
+package Judoon::Error::Template;
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef Str);
