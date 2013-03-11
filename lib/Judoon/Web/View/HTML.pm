@@ -1,5 +1,19 @@
 package Judoon::Web::View::HTML;
 
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::View::HTML - TT View for Judoon::Web
+
+=head1 DESCRIPTION
+
+TT View for Judoon::Web.
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -10,14 +24,6 @@ __PACKAGE__->config(
     render_die => 1,
 );
 
-
-=head1 NAME
-
-Judoon::Web::View::HTML - TT View for Judoon::Web
-
-=head1 DESCRIPTION
-
-TT View for Judoon::Web.
 
 =head1 SEE ALSO
 
