@@ -14,7 +14,7 @@ Judoon::Web::Controller - base controller for Judoon
 
 =head1 DESCRIPTION
 
-This provides common utility methods for Judoon
+This provides common utility methods for Judoon::Web controllers.
 
 =cut
 
@@ -25,7 +25,8 @@ BEGIN { extends 'Catalyst::Controller::ActionRole'; }
 
 use Safe::Isa;
 
-
+# use ActionRole::DetachOnDie, so we don't keep running though the
+# action chain after a die.
 __PACKAGE__->config(
    action => {
       '*' => { Does => 'DetachOnDie' },
@@ -40,7 +41,7 @@ __PACKAGE__->config(
 This method encapsulates common error-handling logic for
 L<Judoon::Web> controllers.  If the given error does the
 L<Judoon::Error> role, then it's assumed to be recoverable and the
-error message is stuffed into the flash and and the user is redirect
+error message is stuffed into the flash and and the user is redirected
 to the action in C<$args->{redir_to}>.
 
 If the given error is not a C<Judoon::Error>, it is added the the

@@ -1,4 +1,21 @@
 package Judoon::Web::Controller::Root;
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::Root - Root Controller for Judoon::Web
+
+=head1 DESCRIPTION
+
+This is the Root controller for L<Judoon::Web>.  Default actions, and
+basic actions that don't fit anywhere else go here.
+
+=cut
+
+
 use Moose;
 use namespace::autoclean;
 
@@ -13,17 +30,6 @@ __PACKAGE__->config(namespace => '');
 
 with 'Judoon::Web::Controller::Role::GoHere';
 
-=pod
-
-=encoding utf8
-
-=head1 NAME
-
-Judoon::Web::Controller::Root - Root Controller for Judoon::Web
-
-=head1 DESCRIPTION
-
-[enter your description here]
 
 =head1 METHODS
 
@@ -35,9 +41,9 @@ The root page (/)
 
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
-
     $c->stash->{template} = 'index.tt2';
 }
+
 
 =head2 default
 
