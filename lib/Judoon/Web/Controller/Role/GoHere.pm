@@ -3,6 +3,7 @@ package Judoon::Web::Controller::Role::GoHere;
 use Moose::Role;
 use namespace::autoclean;
 
+use Judoon::Error::Devel::Arguments;
 
 =head2 B<C<go_here($c, $action, \@captures?, \%query?)>>
 
@@ -21,7 +22,11 @@ sub go_here {
     for my $arg (@args) {
         ref $arg eq 'ARRAY' ? $captures = $arg
       : ref $arg eq 'HASH'  ? $query    = $arg
-      : die q{go_here() doesn't handle complicated arguments};
+      : Judoon::Error::Devel::Arguments->throw({
+          message  => q{go_here() doesn't handle complicated arguments},
+          got      => (!defined($arg) ? 'undef' : ref($arg)),
+          expected => 'arrayref or hashref',
+      });
     }
     $captures //= $c->req->captures;
     $query    //= $c->req->query_params;
