@@ -37,7 +37,9 @@ key/val pairs, and scrubs C<"string\."> from the keys. e.g.
 use Moose::Role;
 use namespace::autoclean;
 
-=head2 B<C<extract_params($key, \%params)>>
+=head1 METHODS
+
+=head2 extract_params($key, \%params)
 
 see L</DESCRIPTION>.
 
