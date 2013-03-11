@@ -17,11 +17,12 @@ BEGIN { extends 'Judoon::Web::Controller'; }
 
 with 'Judoon::Web::Controller::Role::GoHere';
 
-=head1 DESCRIPTION
+
+=head1 METHODS
 
 =head2 Actions
 
-=head3 C<B<not_required>>
+=head3 not_required
 
 C<not_required> is a no-op chaining point for actions that do not
 require a login.
@@ -31,7 +32,7 @@ require a login.
 sub not_required : Chained('/') PathPart('') CaptureArgs(0) {}
 
 
-=head3 C<B<required>>
+=head3 required
 
 C<required> is a chaining point for actions that require a user to be
 logged in.  If they are not, they will be sent to the login page, and
@@ -49,7 +50,7 @@ sub required : Chained('/') PathPart('') CaptureArgs(0) {
 }
 
 
-=head3 C<B<login>>
+=head3 login
 
 Action for logging in. GET requests show the login page, POST requests
 attempt a login. Dispatches to C<L</login_GET>> for GETs,
@@ -57,7 +58,6 @@ C<L</login_POST>> for POSTs.
 
 If an already logged-in user hits this action again, they are sent to
 their overview.
-
 
 =cut
 
@@ -71,7 +71,7 @@ sub login :Chained('not_required') :PathPart('login') :Args(0) ActionClass('REST
 }
 
 
-=head3 C<B<logout>>
+=head3 logout
 
 Action for logging out users.  Returns to index.
 
@@ -87,7 +87,7 @@ sub logout : Chained('/') PathPart('logout') Args(0) {
 
 =head2 Other methods
 
-=head3 C<B<login_GET>>
+=head3 login_GET
 
 Placeholder method. C<L</login>> does all the necessary work.
 
@@ -96,7 +96,7 @@ Placeholder method. C<L</login>> does all the necessary work.
 sub login_GET {}
 
 
-=head3 C<B<login_POST>>
+=head3 login_POST
 
 Attepts to login the user with the supplied credentials.  If
 successful, redirects to the user's overview or the previously
@@ -119,7 +119,7 @@ sub login_POST {
 }
 
 
-=head3 B<C<login_redirect>>
+=head3 login_redirect
 
 C<login_redirect> saves the requested url and redirects to the login
 page.
@@ -135,7 +135,7 @@ sub login_redirect {
 }
 
 
-=head3 C<B<redirect_after_login_uri>>
+=head3 redirect_after_login_uri
 
 Returns the saved url if user was attempting to get to a protected
 page. Otherwise, sends user to their overview.
