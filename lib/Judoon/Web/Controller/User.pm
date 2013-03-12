@@ -51,12 +51,9 @@ sub signup_POST {
     }
     catch {
         my $e = $_;
-        if ($e->$_DOES('Judoon::Error::Input')) {
-            $self->set_error_and_redirect($c, $e->message, ['/user/signup']);
-        }
-        else {
-            $self->handle_error($c, $e);
-        }
+        $e->$_DOES('Judoon::Error::Input')
+            ? $self->set_error_and_redirect($c, $e->message, ['/user/signup'])
+            : $c->error($e);
         $c->detach();
     };
 
