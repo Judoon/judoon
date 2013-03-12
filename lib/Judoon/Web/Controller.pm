@@ -68,7 +68,7 @@ passing to C<< $c->uri_for_action >>.
 sub set_error_and_redirect {
     my ($self, $c, $error, $action_ar) = @_;
     $c->flash->{alert}{error} = $error;
-    $c->res->redirect( $c->uri_for_action( @$action_ar ) );
+    $self->go_here($c, @$action_ar);
 }
 
 
