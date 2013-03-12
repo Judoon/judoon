@@ -96,7 +96,7 @@ __PACKAGE__->config(
         always_log         => 1,
         include_session    => 1,
         user_identified_by => 'username',
-        emit_module        => 'Catalyst::Plugin::ErrorCatcher::Email',
+        emit_module        => 'Judoon::Web::Plugin::ErrorCatcher::Email',
     },
     'Plugin::ErrorCatcher::Email' => {
         to       => 'felliott@virginia.edu',
