@@ -28,8 +28,6 @@ BEGIN { extends 'Judoon::Web::Controller' }
 #
 __PACKAGE__->config(namespace => '');
 
-with 'Judoon::Web::Controller::Role::GoHere';
-
 
 =head1 METHODS
 

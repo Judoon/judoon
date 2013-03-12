@@ -16,8 +16,6 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
-with 'Judoon::Web::Controller::Role::GoHere';
-
 
 =head1 CONFIG
 

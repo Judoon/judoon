@@ -16,7 +16,6 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::Controller'; }
 with qw(
     Judoon::Web::Controller::Role::ExtractParams
-    Judoon::Web::Controller::Role::GoHere
 );
 
 use Safe::Isa;
