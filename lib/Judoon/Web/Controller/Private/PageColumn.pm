@@ -27,8 +27,9 @@ __PACKAGE__->config(
 before private_base => sub {
     my ($self, $c) = @_;
     if (not $c->stash->{user}{is_owner}) {
-        $c->flash->{alert}{error} = 'You must be the owner to see this page';
-        $self->go_here($c, '/login/login', []);
+        $self->set_error_and_redirect(
+            $c, 'You must be the owner to do this', ['/login/login'],
+        );
         $c->detach;
     }
 };

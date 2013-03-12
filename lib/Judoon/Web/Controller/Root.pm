@@ -76,8 +76,10 @@ denied action. should probably return 501
 sub denied :Chained('') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
     if ($c->user_exists) {
-        $c->flash->{alert}{error} = q{You don't have permission to see that page};
-        $self->go_here($c, '/user/edit', [$c->user->username]);
+        $self->set_error_and_redirect(
+            $c, q{You don't have permission to see that page},
+            ['/user/edit', [$c->user->username]],
+        );
     }
     else {
         $c->stash->{template} = 'denied.tt2';
