@@ -4,6 +4,7 @@ use Moo;
 
 use Archive::Builder;
 use File::Temp qw(tempfile);
+use Judoon::Error::Devel::Foreign;
 use Path::Class qw(dir);
 use Template;
 
@@ -44,7 +45,11 @@ sub _build_archive {
             my $child_path = $child->relative($self->skeleton_dir);
             $archive_section->new_file(
                 $child_path->stringify, 'file', $child->stringify
-            ) or die "($child_path|$child): " . $archive->errstr;
+            ) or Judoon::Error::Devel::Foreign->throw({
+                message => "error adding file to archive: ($child_path|$child)",
+                module  => 'Archive::Builder',
+                foreign_message => $archive->errstr,
+            });
         }
     } );
 
@@ -58,7 +63,11 @@ sub _build_archive {
     $archive_section->new_file(
         'index.html', 'template', $self->tt, $self->index_tmpl->stringify,
         {page => $self->page},
-    ) or die "Cannot template? " . $archive->errstr;
+    ) or Judoon::Error::Devel::Foreign->throw({
+        message         => "Can't fill in index Template via Archive",
+        module          => 'Template or Archive::Builder',
+        foreign_message => $archive->errstr,
+    });
 
     # add database
     my $dataset = $self->page->dataset;
@@ -73,8 +82,12 @@ sub _build_archive {
                  $dataset->ds_columns_ordered->with_lookups->hri->all)
     );
 
+    Judoon::Error::Devel::Foreign->throw({
+        message         => "Can't build Standalone archive",
+        module          => 'Archive::Builder',
+        foreign_message => $archive->errstr,
+    }) if ($archive->errstr);
 
-    die $archive->errstr if ($archive->errstr);
     return $archive;
 }
 
@@ -90,9 +103,18 @@ sub _build_tt { return Template->new; }
 sub compress {
     my ($self, $type) = @_;
     my $archive_compressed = $self->archive->archive($type || 'zip')
-        or die $self->archive->errstr;
+        or Judoon::Error::Devel::Foreign->throw({
+            message         => "Can't compress archive as " . ($type || 'zip'),
+            module          => 'Archive::Builder',
+            foreign_message => $self->archive->errstr,
+        });
     my ($fh, $filename) = tempfile(SUFFIX => ".$type", UNLINK => 1,);
-    $archive_compressed->save( $filename ) or die $self->archive->errstr;
+    $archive_compressed->save( $filename )
+        or Judoon::Error::Devel::Foreign->throw({
+            message         => "Can't save compressed archive",
+            module          => 'Archive::Builder',
+            foreign_message => $self->archive->errstr,
+        });
     return $filename;
 }
 

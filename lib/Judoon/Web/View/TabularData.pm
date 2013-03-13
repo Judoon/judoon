@@ -1,5 +1,19 @@
 package Judoon::Web::View::TabularData;
 
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::View::TabularData - Serving tabular data from Judoon::Web
+
+=head1 DESCRIPTION
+
+Serve up tabular data as downloads in csv, tab, and Excel formats
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -35,49 +49,105 @@ __PACKAGE__->config(
     },
 );
 
-sub process {
-    my ($self, $c) = @_;
-    my $content = $self->render($c);
-    $c->response->body($content);
-}
 
-sub render {
+=head1 METHODS
+
+=head2 process( $c )
+
+Creates a tab-delimited, comma-delimited, or Excel file from tabular
+data and returns it in the response body, while setting the necessary
+headers.  Configuration and data are stored in the C<tabular_data>
+stash key like so:
+
+ $c->stash->{tabular_data} = {
+     view => 'xls', # type of file to return, one of tab|csv|xls|xlsx
+     name => 'Gene Data', # filename to save as + worksheet name for Excel
+     headers => [qw/A B C/], # arrayref of column titles
+     rows => [[], [], [],], # arrayref of arrayref of table data
+ };
+
+=cut
+
+sub process {
     my ($self, $c) = @_;
 
     my $data_config = $c->stash->{tabular_data};
     my $view_config = $self->config->{content_type}{$data_config->{view}};
 
-    # normalize name
-    my $name = $data_config->{name};
-    $name =~ s/\W/_/g;
-    $name =~ s/__+/_/g;
-    $name =~ s/(?:^_+|_+$)//g;
-    my $ext = $view_config->{extension};
-
     $c->res->headers->header('Content-Type' => $view_config->{mime_type});
+
+    my $name = $self->_normalize_name($data_config->{name});
+    my $ext  = $view_config->{extension};
     $c->res->headers->header(
         'Content-Disposition' => "attachment; filename=$name.$ext"
     );
 
+    $c->response->body( $self->render($c) );
+}
 
-    my $content;
-    my $render_method = $view_config->{render_method};
+
+=head2 render( $c, $render_method, $data_config )
+
+Calls the given render method.
+
+=cut
+
+sub render {
+    my ($self, $c, $render_method, $data_config) = @_;
     return $self->$render_method($c, $data_config);
 }
 
 
+=head2 _normalize_name( $name )
+
+Simplify download file name by replacing non-words chars with
+underscores, then removing extraneous underscores.  If the new name is
+empty, instead return 'untitled'.
+
+=cut
+
+sub _normalize_name {
+    my ($self, $name) = @_;
+    $name =~ s/\W/_/g;
+    $name =~ s/__+/_/g;
+    $name =~ s/(?:^_+|_+$)//g;
+    return $name || 'untitled';
+}
+
+
+=head2 _render_tab
+
+Create a tab-delimited file via Text::CSV::Encoded. Forwards to
+L</_render_xsv>.
+
+=cut
 
 sub _render_tab {
     my ($self, $c, $data_config) = @_;
-    my $xsv_args = {sep_char => "\t",quote_char => undef,};
+    my $xsv_args = {sep_char => "\t", quote_char => undef,};
     return $self->_render_xsv($xsv_args, $data_config);
 }
+
+
+=head2 _render_csv
+
+Create a comma-delimited file via Text::CSV::Encoded. Forwards to
+L</_render_xsv>.
+
+=cut
 
 sub _render_csv {
     my ($self, $c, $data_config) = @_;
     my $xsv_args = {sep_char => ',',};
     return $self->_render_xsv($xsv_args, $data_config);
 }
+
+
+=head2 _render_xsv
+
+Create a delimited file via Text::CSV::Encoded.
+
+=cut
 
 sub _render_xsv {
     my ($self, $xsv_args, $data_config) = @_;
@@ -98,15 +168,37 @@ sub _render_xsv {
     return $output;
 }
 
+
+=head2 _render_xls
+
+Creates an Excel 97-compatible spreadsheet. Calls L</_render_excel>.
+
+=cut
+
 sub _render_xls {
     my ($self, $c, $data_config) = @_;
     return $self->_render_excel('Spreadsheet::WriteExcel', $data_config);
 }
 
+
+=head2 _render_xlsx
+
+Creates an Open XML Excel spreadsheet. Calls L</_render_excel>.
+
+=cut
+
 sub _render_xlsx {
     my ($self, $c, $data_config) = @_;
     return $self->_render_excel('Excel::Writer::XLSX', $data_config);
 }
+
+
+=head2 _render_excel
+
+L<Spreadsheet::WriteExcel> and L<Excel::Writer::XLSX> use the same
+interface, so this method can create spreadsheets via either module.
+
+=cut
 
 sub _render_excel {
     my ($self, $render_class, $data_config) = @_;

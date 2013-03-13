@@ -14,7 +14,7 @@ use Moo;
 extends 'Judoon::Schema::ResultSet';
 
 
-use Judoon::Error;
+use Judoon::Error::Input;
 
 use constant MIN_PASSWORD_LENGTH => 8;
 use constant USERNAME_MAXLEN => 40;
@@ -60,7 +60,7 @@ sub create_user {
         $errmsg = q{Password is not valid!  Must be more than eight characters long.};
     }
 
-    Judoon::Error->throw($errmsg) if ($errmsg);
+    Judoon::Error::Input->throw({message => $errmsg}) if ($errmsg);
 
     my $new_user = $self->create(\%valid);
 

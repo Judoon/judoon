@@ -8,14 +8,41 @@ package Judoon::Web::Controller::Role::TabularData;
 
 Judoon::Web::Controller::Role::TabularData - hand the user tabular data
 
+=head1 SYNOPSIS
+
+ package Judoon::Web::Controller::Dataset
+ with 'Judoon::Web::Controller::Role::TabularData';
+
+ sub view {
+    my ($self, $c) = @_;
+
+    if ( my $view = $c->req->param('view') ) {
+        $self->table_view(
+            $c, $view, $dataset->name,
+            $dataset->headers,
+            $dataset->data,
+        );
+    }
+ }
+
+=head1 DESCRIPTION
+
+C<Judoon::Web::Controller::Role::TabularData> sets up the stash keys
+needed by L<Judoon::Web::View::TabularData>, then forwards to that
+view.
+
 =cut
 
 use Moose::Role;
 use namespace::autoclean;
 
-=head2 table_view( @args? )
+=head1 METHODS
 
-see L</DESCRIPTION>.
+=head2 table_view( $c, $view, $name, \@headers, \@rows )
+
+C<table_view()> makes sure that the requested view is one of our
+supported formats, then sticks the passed arguments into the correct
+stash keys.  It then forwards to L<Judoon::Web::View::TabularData>.
 
 =cut
 
@@ -27,7 +54,7 @@ sub table_view {
     $c->stash->{tabular_data} = {
         view    => $view,
         name    => $name,
-        headers => $headers,,
+        headers => $headers,
         rows    => $rows,
     };
 

@@ -23,12 +23,12 @@ Judoon::Web::Controller::Role::ExtractParams - get keyed parameters
 
 C<Judoon::Web::Controller::Role::ExtractParams> takes a string and a
 hashref of parameters and extracts any key/val pairs where the key
-begins with C<"$string\.">.  It returns a new hash with on;y those
+begins with C<"$string\.">.  It returns a new hash with only those
 key/val pairs, and scrubs C<"string\."> from the keys. e.g.
 
  $self->extract_params(
      'dog',
-     {'dog.name' => 'fido', 'dog.age' => 3, bad => 1}
+     {'dog.name' => 'fido', 'dog.age' => 3, ignored => 1}
  );
  # returns (name => 'fido', age => 3);
 
@@ -37,7 +37,9 @@ key/val pairs, and scrubs C<"string\."> from the keys. e.g.
 use Moose::Role;
 use namespace::autoclean;
 
-=head2 B<C<extract_params($key, \%params)>>
+=head1 METHODS
+
+=head2 extract_params($key, \%params)
 
 see L</DESCRIPTION>.
 

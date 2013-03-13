@@ -1,4 +1,4 @@
-package Judoon::Error::Spreadsheet::InvalidEncoding;
+package Judoon::Error::Spreadsheet::Encoding;
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(Str);

@@ -16,9 +16,9 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::Controller'; }
 with qw(
     Judoon::Web::Controller::Role::ExtractParams
-    Judoon::Web::Controller::Role::GoHere
 );
 
+use Safe::Isa;
 use Try::Tiny;
 
 
@@ -50,7 +50,10 @@ sub signup_POST {
     }
     catch {
         my $e = $_;
-        $self->handle_error($c, $e, {redir_to => ['/user/signup']});
+        $e->$_DOES('Judoon::Error::Input')
+            ? $self->set_error_and_redirect($c, $e->message, ['/user/signup'])
+            : $c->error($e);
+        $c->detach();
     };
 
     $c->authenticate({

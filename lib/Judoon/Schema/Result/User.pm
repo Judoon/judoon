@@ -14,6 +14,9 @@ use Moo;
 extends 'Judoon::Schema::Result';
 
 
+use Judoon::Error::Devel::Arguments;
+use Judoon::Error::Input;
+use Judoon::Error::Input::Filename;
 use Judoon::Spreadsheet;
 
 use constant SCHEMA_PREFIX => 'user_';
@@ -235,7 +238,9 @@ Validates and sets password
 
 sub change_password {
     my ($self, $newpass) = @_;
-    die 'Invalid password.' unless ($self->result_source->resultset->validate_password($newpass));
+    Judoon::Error::Input->throw({
+        message => 'Invalid password.',
+    }) unless ($self->result_source->resultset->validate_password($newpass));
     $self->password($newpass);
     $self->update;
 }
@@ -251,8 +256,17 @@ and insert it into the database.
 
 sub import_data {
     my ($self, $fh, $ext) = @_;
-    die 'import_data() needs a filehandle' unless ($fh);
-    die 'import_data() needs a filetype' unless ($ext);
+
+    Judoon::Error::Devel::Arguments->throw({
+        message  => 'import_data() needs a filehandle',
+        expected => q{filehandle},
+        got      => ($fh // 'undef'),
+    }) unless ($fh);
+    Judoon::Error::Devel::Arguments->throw({
+        message  => 'import_data() needs a filetype',
+        expected => q{string},
+        got      => ($ext // 'undef'),
+    }) unless ($ext);
 
     my $spreadsheet = Judoon::Spreadsheet->new(
         filehandle => $fh, filetype => $ext,
@@ -280,7 +294,10 @@ sub import_data_by_filename {
     my ($self, $filename) = @_;
 
     open my $SPREADSHEET, '<', $filename
-         or die "Can't open test spreadsheet: $!";
+         or Judoon::Error::Input::Filename->throw({
+             message  => "Can't open test spreadsheet: $!",
+             filename => $filename,
+         });
     (my $ext = $filename) =~ s/^.*\.//;
     my $new_ds = $self->import_data($SPREADSHEET, $ext);
     close $SPREADSHEET;

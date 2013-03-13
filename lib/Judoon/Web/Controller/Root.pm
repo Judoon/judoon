@@ -1,4 +1,21 @@
 package Judoon::Web::Controller::Root;
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::Root - Root Controller for Judoon::Web
+
+=head1 DESCRIPTION
+
+This is the Root controller for L<Judoon::Web>.  Default actions, and
+basic actions that don't fit anywhere else go here.
+
+=cut
+
+
 use Moose;
 use namespace::autoclean;
 
@@ -11,19 +28,6 @@ BEGIN { extends 'Judoon::Web::Controller' }
 #
 __PACKAGE__->config(namespace => '');
 
-with 'Judoon::Web::Controller::Role::GoHere';
-
-=pod
-
-=encoding utf8
-
-=head1 NAME
-
-Judoon::Web::Controller::Root - Root Controller for Judoon::Web
-
-=head1 DESCRIPTION
-
-[enter your description here]
 
 =head1 METHODS
 
@@ -35,9 +39,9 @@ The root page (/)
 
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
-
     $c->stash->{template} = 'index.tt2';
 }
+
 
 =head2 default
 
@@ -70,8 +74,10 @@ denied action. should probably return 501
 sub denied :Chained('') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
     if ($c->user_exists) {
-        $c->flash->{alert}{error} = q{You don't have permission to see that page};
-        $self->go_here($c, '/user/edit', [$c->user->username]);
+        $self->set_error_and_redirect(
+            $c, q{You don't have permission to see that page},
+            ['/user/edit', [$c->user->username]],
+        );
     }
     else {
         $c->stash->{template} = 'denied.tt2';

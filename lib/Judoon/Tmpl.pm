@@ -31,6 +31,9 @@ use feature ':5.10';
 use Data::Visitor::Callback;
 use HTML::TreeBuilder;
 use JSON qw(to_json from_json);
+use Judoon::Error::Devel;
+use Judoon::Error::Devel::Arguments;
+use Judoon::Error::Input;
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
 use Judoon::Tmpl::Node::Link;
@@ -153,9 +156,14 @@ type. e.g. a C<Text> node would look like:
 
 sub new_from_data {
     my ($class, $nodelist) = @_;
-    die "Don't call new_from_data() on an object" if (ref($class));
-    die 'Argument to new_from_data() must be an arrayref'
-        unless (ref($nodelist) eq 'ARRAY');
+    Judoon::Error::Devel->throw({
+        message => "Don't call new_from_data() on an object",
+    }) if (ref($class));
+    Judoon::Error::Devel::Arguments->throw({
+        message  => 'Argument to new_from_data() must be an arrayref',
+        expected => 'arrayref',
+        got      => ref($nodelist),
+    }) unless (ref($nodelist) eq 'ARRAY');
 
     my @nodes = map {$class->_new_node($_)} @$nodelist;
     return $class->new({nodes => \@nodes});
@@ -195,9 +203,15 @@ empty string.
 
 sub new_from_jstmpl {
     my ($class, $jstmpl) = @_;
-    die "Don't call new_from_jstmpl() on an object" if (ref($class));
-    die "Cannot parse undef input as javascript template"
-        if (not defined $jstmpl);
+    Judoon::Error::Devel->throw({
+        message => "Don't call new_from_jstmpl() on an object",
+    }) if (ref($class));
+    Judoon::Error::Devel::Arguments->throw({
+        message  => "Cannot parse undef input as javascript template",
+        expected => 'string',
+        got      => 'undef',
+    }) if (not defined $jstmpl);
+
     return $class->new_from_data(
         $jstmpl eq '' ? [] : $class->_parse_js($jstmpl)
     );
@@ -275,7 +289,9 @@ sub _nodes_to_jstmpl {
         else {
             push @text, $node->type eq 'text'     ? $node->value
                       : $node->type eq 'variable' ? '{{' . $node->name . '}}'
-                      :     die "Unrecognized node type! " . $node->type;
+                      : Judoon::Error::Devel->throw({
+                            message => "Unrecognized node type! " . $node->type,
+                        });
         }
 
         if (my @formats = @{$node->formatting}) {
@@ -304,8 +320,11 @@ the C<type> key of C<%node>.
 
 sub _new_node {
     my ($class, $node) = @_;
-    die 'argument to _new_node() must be a hashref'
-        unless (ref($node) eq 'HASH');
+    Judoon::Error::Devel::Arguments->throw({
+        message  => 'Argument to _new_node() must be a hashref',
+        expected => 'hashref',
+        got      => ref($node),
+    }) unless (ref($node) eq 'HASH');
 
     my %node_type_to_class = (
         text => 'Text', variable => 'Variable',
@@ -314,7 +333,9 @@ sub _new_node {
     );
 
     my $node_class = $node_type_to_class{$node->{type}}
-        or die 'Unrecognized node type: ' . $node->{type};
+        or Judoon::Error::Devel->throw({
+            message => "Unrecognized node type! " . $node->{type},
+        });
     $node_class = 'Judoon::Tmpl::Node::' . $node_class;
     return $node_class->new($node);
 }
@@ -368,9 +389,13 @@ sub _get_nodes_from_tree {
         elsif ($element->tag eq 'a') { # add Link node
             my $url_literal   = $element->attr('href');
             my @label_content = $element->content_list;
-            die 'html tags found inside <a></a>' if (@label_content > 1);
-            my $label_literal = $label_content[0];
 
+            Judoon::Error::Input->throw({
+                message => 'html tags found inside <a></a>',
+                got     => $element->as_HTML,
+            }) if (@label_content > 1);
+
+            my $label_literal = $label_content[0];
             my $link_node = {
                 type  => 'link',
                 url   => { $class->_build_varstring($url_literal)   },
@@ -392,8 +417,10 @@ sub _get_nodes_from_tree {
             );
         }
         else {
-            die 'Unsupported tag type in the javascript template: '
-                . $element->tag;
+            Judoon::Error::Input->throw({
+                message => 'Unsupported tag type in the javascript template',
+                got     => $element->tag,
+            });
         }
     }
 

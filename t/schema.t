@@ -307,7 +307,7 @@ subtest 'Result::Page' => sub {
     $good_pcol->template(Judoon::Tmpl->new_from_jstmpl('{{nosuchname}}'));
     $good_pcol->update;
     isa_ok exception { $movie_page->templates_match_dataset },
-        'Judoon::Error::InvalidTemplate',
+        'Judoon::Error::Template',
             q{invalid templates don't match dataset};
 
 };
