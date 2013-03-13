@@ -68,6 +68,7 @@ requires 'MooX::Types::MooseLike';
 requires 'Moose';
 requires 'MooseX::MarkAsMethods';
 requires 'MooseX::MethodAttributes::Role';
+requires 'MooseX::NonMoose';
 requires 'MooseX::Storage';
 requires 'namespace::autoclean';
 requires 'Params::Validate';
