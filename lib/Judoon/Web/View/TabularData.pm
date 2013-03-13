@@ -82,7 +82,9 @@ sub process {
         'Content-Disposition' => "attachment; filename=$name.$ext"
     );
 
-    $c->response->body( $self->render($c) );
+    $c->response->body(
+        $self->render($c, $view_config->{render_method}, $data_config,)
+    );
 }
 
 
