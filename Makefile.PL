@@ -55,6 +55,7 @@ requires 'Excel::Writer::XLSX';
 requires 'File::Spec';
 requires 'File::Temp';
 requires 'FindBin';
+requires 'FileHandle';
 requires 'Getopt::Long';
 requires 'HTML::TreeBuilder';
 requires 'IO::File';

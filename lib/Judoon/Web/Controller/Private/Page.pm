@@ -23,7 +23,7 @@ with qw(
     Judoon::Web::Controller::Role::TabularData
 );
 
-use File::Slurp qw(slurp);
+use FileHandle;
 use Judoon::Standalone;
 
 __PACKAGE__->config(
@@ -121,8 +121,9 @@ after object_GET => sub {
 
         $c->res->headers->header( "Content-Type" => "application/$type" );
         $c->res->headers->header( "Content-Disposition" => "attachment; filename=judoon.$type" );
-        my $archive = slurp($archive_path);
-        $c->res->body($archive);
+        my $archive_fh = FileHandle->new;
+        $archive_fh->open($archive_path, 'r');
+        $c->res->body($archive_fh);
         $c->detach();
     }
     elsif ($view eq 'template') {
