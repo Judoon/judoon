@@ -30,9 +30,54 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'ds_column',
         stash_key    => 'ds_column',
-        api_path     => 'datasetcolumn',
     },
+
+    # DBIC result class
+    class                   =>  'User::DatasetColumn',
+    # Columns required to create
+    create_requires         =>  [qw/dataset_id data_type_id name sort/],
+    # Additional non-required columns that create allows
+    create_allows           =>  [qw/shortname accession_type_id/],
+    # Columns that update allows
+    update_allows           =>  [qw/dataset_id data_type_id accession_type_id name sort shortname/],
+    # Columns that list returns
+    list_returns            =>  [qw/id dataset_id name sort data_type accession_type shortname/],
+
+
+    # Every possible prefetch param allowed
+    list_prefetch_allows    =>  [
+        [qw/ds_columns/], { 'ds_columns' => [qw//] },
+        [qw/pages/],      { 'pages' => [qw/page_columns/] },
+    ],
+
+    # Order of generated list
+    list_ordered_by         => [qw/id/],
+    # columns that can be searched on via list
+    list_search_exposes     => [
+        qw/id dataset_id name sort data_type accession_type shortname/,
+    ],
+
 );
+
+around generate_rs => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+    my $rs = $self->$orig($c);
+    return $rs->for_dataset($c->req->get_chained_object(0)->[0])
+        ->with_lookups();
+};
+
+
+override row_format_output => sub {
+    my ($self, undef, $row) = @_;
+    $row->{data_type} = $row->{data_type_rel}{data_type};
+    if ($row->{accession_type_rel}) {
+        $row->{accession_type} = $row->{accession_type_rel}{accession_type};
+    }
+    return $row;
+};
+
 
 
 before private_base => sub {

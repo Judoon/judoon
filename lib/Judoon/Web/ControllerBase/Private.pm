@@ -15,11 +15,10 @@ This is the poorly-named base class for our RESTish web controllers
 C<Private::PageColumn>).  It uses L<Catalyst::Action::REST> to provide
 REST-like dispatch.
 
-Why RESTish?  This controller is actually an interface to the B<real>
-RESTful controllers that live in the C<API::REST::*> namespace.  This
-controller is specifically for managing an HTML interface to our
-database.  It does things that the REST API doesn't need to, such as
-adding things to the stash where the template expect them and managing
+Why RESTish?  Our urls follow RESTful principles, but since these
+controllers are for human-interaction via HTML, we deviate in a few
+ways. It does things that the REST API doesn't need to, such as adding
+things to the stash where the HTML templates expect them and managing
 redirects after actions are performed.  The other RESTish aspect is
 that it doesn't expect that PUTs and DELETEs will be issued directly,
 instead it looks for POSTs with a parameter called
@@ -29,8 +28,8 @@ DELETE action.  This functionality is provided by
 L<Catalyst::TraitFor::Request::REST::ForBrowsers>.
 
 Inheriting controllers get two paths by default: C<$resource_path> and
-C<$resource_path/$id>.  C<$resource_path> is the path namespace for the
-controller that is set in the L</CONFIG>.  C<$id> is a valid
+C<$resource_path/$id>.  C<$resource_path> is the path namespace for
+the controller that is set in the L</CONFIG>.  C<$id> is a valid
 identifier for the resource.  Here is what happens for each HTTP verb
 on each path:
 
@@ -53,9 +52,14 @@ on each path:
 =cut
 
 use Moose;
+use MooseX::Types::Moose(':all');
 use namespace::autoclean;
 
-BEGIN { extends 'Judoon::Web::Controller'; }
+BEGIN { extends qw/
+    Catalyst::Controller::DBIC::API
+    Judoon::Web::Controller
+/; }
+use Catalyst::Controller::DBIC::API::Request::Chained;
 
 
 =head1 CONFIG
@@ -63,11 +67,10 @@ BEGIN { extends 'Judoon::Web::Controller'; }
 =head2 C<rpc>
 
 This is the config attribute for C<ControllerBase::Private>.  Set the
-C<template_dir>, C<stash_key>, and C<api_path> keys. C<template_dir>
-gives the name of the directory under C</root/src/> where the
-templates can be found. C<stash_key> is where in the stash the object,
-id, or object list should be stored.  C<api_path> is the action path
-to the corresponding C<API::REST> class.
+C<template_dir> and C<stash_key> keys. C<template_dir> gives the name
+of the directory under C</root/src/> where the templates can be
+found. C<stash_key> is key in the stash where the object, object id,
+or object list should be stored.
 
 Consuming classes should set up their path namespace by setting the
 C<action> key in C<< __PACKAGE__->config() >>. Ex:
@@ -79,9 +82,15 @@ C<action> key in C<< __PACKAGE__->config() >>. Ex:
      rpc => {
          template_dir => 'dataset',
          stash_key    => 'dataset',
-         api_path     => 'dataset',
      },
  );
+
+=head2 inheritied config
+
+The C<default>, C<stash_key>, and C<map> config keys are all inherited
+from L<Catalyst::Controller::DBIC::API>.  Since this controller only
+handles html, C<default> is 'text/html' and C<map> sets
+L<Judoon::Web::View::HTML> as the default view.
 
 =cut
 
@@ -90,9 +99,36 @@ __PACKAGE__->config(
     rpc => {
         template_dir => undef,
         stash_key    => undef,
-        api_path     => undef,
+    },
+
+    stash_key => 'response',
+    default   => 'text/html',
+    map       => {
+        'text/html' => [ 'View', 'HTML', ],
     },
 );
+
+
+# enable our Request::Chained module on all requests
+after begin => sub {
+    my ($self, $c) = @_;
+    Catalyst::Controller::DBIC::API::Request::Chained->meta->apply($c->req)
+        unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request::Chained');
+};
+
+
+# I don't know what this is for?
+around update_or_create => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+
+    $self->$orig($c, @_);
+    if ($c->stash->{created_object}) {
+        %{$c->stash->{response}->{new_object}} = $c->stash->{created_object}->get_columns;
+    }
+};
+
 
 =head1  PATH ACTIONS
 
@@ -117,8 +153,7 @@ sub base : Chained('fixme') PathPart('fixme') CaptureArgs(0) {
 }
 sub list : Chained('base') PathPart('') Args(0) ActionClass('REST') {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/objects_no_id");
+    $self->objects_no_id($c);
 }
 sub id : Chained('base') PathPart('') CaptureArgs(1) {
     shift->private_id(@_);
@@ -135,19 +170,21 @@ sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 
 The L</base> action calls this.  Code common to all actions should be
 put here.  Currently applies C<Catalyst::Controller::DBIC::API> roles
-to C<Catalyst::Request> so that it can forward to C<DBIC::API>
+to C<Catalyst::Request> so that it can call C<DBIC::API>
 actions. It also de-namespaces form parameters.
 
 =cut
 
 sub private_base :Private {
     my ($self, $c) = @_;
+
+    # do I need these?
     Catalyst::Controller::DBIC::API::Request->meta->apply($c->req)
           unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request');
     Catalyst::Controller::DBIC::API::Request::Chained->meta->apply($c->req)
         unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request::Chained');
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/deserialize");
+
+    $self->deserialize($c);
 
     # we namespace our form params with $key.$field
     # DBIC::API wants them all to be top level.
@@ -167,16 +204,28 @@ sub private_base :Private {
 
 This method is called when a GET request is made to
 C</$resource_path>.  Generally this method should be used to list the
-collection of the resource.  Forwards to the C<list_objects> action of
-the corresponding C<API::REST> controller.  Default template is
+collection of the resource.  Default template is
 C<$template_dir/list.tt2>.
 
 =cut
 
 sub list_GET :Private {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/list_objects");
+
+    # oops. The C::C::DBIC::API list method is just called 'list',
+    # exactly like the action above.  I don't want to rename my method
+    # right now, so just copy-n-paste the list() code form DBIC::API
+    # here.
+
+    #$self->list($c);
+    $self->list_munge_parameters($c);
+    $self->list_perform_search($c);
+    $self->list_format_output($c);
+    # make sure there are no objects lingering
+    $c->req->clear_objects();
+
+    # end DBIC::API code
+
     my $key = $self->rpc->{stash_key};
     $c->stash->{$key}{list} = $c->stash->{response}{list};
     $c->stash->{template}   = $self->rpc->{template_dir} . '/list.tt2';
@@ -187,15 +236,13 @@ sub list_GET :Private {
 
 This method is called when a POST request is made to
 C</$resource_path>.  This is used to add new members to the list.
-Forwards to C<API::REST>'s C<update_or_create_objects>.  When done,
-redirects to the new object, i.e. C<L</object_GET>>.
+When done, redirects to the new object, i.e. C<L</object_GET>>.
 
 =cut
 
 sub list_POST :Private {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/update_or_create_objects");
+    $self->update_or_create($c);
     my $object = $c->req->get_object(0)->[0];
     $self->go_relative($c, 'object', [@{$c->req->captures}, $object->id]);
 }
@@ -204,48 +251,54 @@ sub list_POST :Private {
 =head2 list_PUT
 
 This method is called when a POST request is made to
-C</$resource_path>.  This is used to update list members.
-Forwards to C<API::REST>'s C<update_or_create_objects>.  When done,
+C</$resource_path>.  This is used to update list members.  When done,
 redirects back to the list (C<L</list_GET>>.
 
 =cut
 
 sub list_PUT :Private {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/update_or_create_objects");
+    $self->update_or_create($c);
     $self->go_relative($c, 'list', $c->req->captures);
 }
 
 
 =head2 private_id
 
-Forwards to C<object_with_id>, <list_one_object>, then stores the
-object and id in the stash namepace.
+Calls C<object_with_id>, <item>, then stores the object and id in the
+stash namepace.
 
 =cut
 
 sub private_id :Private {
     my ($self, $c, $id) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/object_with_id");
-    $c->forward("/api/rest/$api_path/list_one_object");
+    $self->object_with_id($c, $id);
+    $self->item($c);
     my $key = $self->rpc->{stash_key};
     $c->stash->{$key}{object} = $c->stash->{response}{data};
     $c->stash->{$key}{id}     =  $c->stash->{$key}{object}{id};
 }
 
+
 =head2 private_chainpoint
 
-Forwards to C<chainpoint> in the related C<API::REST> controller. Also
-saves the chained object into the stash namespace.
+Saves the current object into the chained object list. Also saves the
+chained object into the stash namespace.
 
 =cut
 
 sub private_chainpoint :Private {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/chainpoint");
+
+    if ($c->req->count_objects != 1) {
+        $c->log->error('No object to chain from!');
+        $self->push_error($c, { message => 'No object to chain from!' });
+        $c->detach();
+    }
+
+    my $object = $c->req->get_object(0);
+    $c->req->add_chained_object($object);
+    $c->req->clear_objects();
 
     my $key = $self->rpc->{stash_key};
     $c->stash->{$key}{object} = {$c->req->get_chained_object(-1)->[0]->get_columns};
@@ -271,15 +324,13 @@ sub object_GET :Private {
 
 This method is called when a PUT request is made to
 C</$resource_path/$id>.  This method is used to update an instance of
-a resource. Forwards to C<update_or_create_one_object>. Redirects back
-to C<object_GET> by default.
+a resource. Redirects back to C<object_GET> by default.
 
 =cut
 
 sub object_PUT :Private {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/update_or_create_one_object");
+    $self->update_or_create($c);
     $self->go_relative($c, 'object');
 }
 
@@ -288,15 +339,13 @@ sub object_PUT :Private {
 
 This method is called when a DELETE request is made to
 C</$resource_path/$id>.  This method is used to delete an instance of
-a resource. Forwards to C<delete_one_object>. Redirects back to
-C<L</list_GET>> by default.
+a resource. Redirects back to C<L</list_GET>> by default.
 
 =cut
 
 sub object_DELETE :Private {
     my ($self, $c) = @_;
-    my $api_path = $self->rpc->{api_path};
-    $c->forward("/api/rest/$api_path/delete_one_object");
+    $self->delete($c);
     my @captures = @{$c->req->captures};
     pop @captures;
     $self->go_relative($c, 'list', \@captures);

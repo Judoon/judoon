@@ -19,9 +19,57 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'page_column',
         stash_key    => 'page_column',
-        api_path     => 'pagecolumn',
     },
+
+    # DBIC result class
+    class                   =>  'User::PageColumn',
+    # Columns required to create
+    create_requires         =>  [qw/page_id template title/],
+    # Additional non-required columns that create allows
+    create_allows           =>  [qw//],
+    # Columns that update allows
+    update_allows           =>  [qw/page_id template title sort/],
+    # Columns that list returns
+    list_returns            =>  [qw/id page_id title template/],
+
+    # Every possible prefetch param allowed
+    list_prefetch_allows    =>  [
+        [qw/datasets/], {  'datasets' => [qw/ds_columns pages/] },
+    ],
+
+    # Order of generated list
+    list_ordered_by         => [qw/id/],
+    # columns that can be searched on via list
+    list_search_exposes     => [
+        qw/id page_id title template/,
+    ],
 );
+
+
+around generate_rs => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+    my $rs   = $self->$orig($c);
+    return $rs->for_page($c->req->get_chained_object(-1)->[0])
+        ->search_rs({}, {order_by => {-asc=>'sort'}});
+};
+
+
+before validate_object => sub {
+    my ($self, $c, $obj) = @_;
+    my ($object, $params) = @$obj;
+    $params->{page_id} //= $c->req->get_chained_object(-1)->[0]->id;
+};
+
+
+before update_or_create => sub {
+    my ($self, $c) = @_;
+    if ($c->req->method eq 'POST') {
+        my $params = $c->req->get_object(-1)->[-1];
+        $params->{template} ||= q{[]};
+    }
+};
 
 
 before private_base => sub {

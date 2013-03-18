@@ -31,12 +31,57 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'dataset',
         stash_key    => 'dataset',
-        api_path     => 'dataset',
     },
+
+    # DBIC result class
+    class                   =>  'User::Dataset',
+    # Columns required to create
+    create_requires         =>  [qw/name notes original permission user_id/],
+    # Additional non-required columns that create allows
+    create_allows           =>  [qw//],
+    # Columns that update allows
+    update_allows           =>  [qw/name notes original permission user_id/],
+    # Columns that list returns
+    list_returns            =>  [qw/id user_id name notes original data permission/],
+
+
+    # Every possible prefetch param allowed
+    list_prefetch_allows    =>  [
+        [qw/ds_columns/], { 'ds_columns' => [qw//] },
+        [qw/pages/],      { 'pages' => [qw/page_columns/] },
+    ],
+
+    # Order of generated list
+    list_ordered_by         => [qw/id/],
+    # columns that can be searched on via list
+    list_search_exposes     => [
+        qw/id user_id name notes original nbr_rows nbr_columns tablename permission/,
+        { 'ds_columns' => [qw/id dataset_id name sort data_type accession_type shortname/] },
+        { 'pages'      => [qw/id dataset_id title preamble postamble permission/] },
+    ],
+
 );
 
 
 my $SPREADSHEET_MAX_SIZE = 10_000_000;
+
+around update_or_create => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $c    = shift;
+
+    if (my $file = $c->req->params->{'dataset.file'}) {
+        my $fh = $c->req->upload('dataset.file')->fh;
+        (my $extension = $file) =~ s/.*\.//;
+        my $dataset = $c->user->obj->import_data($fh, $extension);
+        $dataset->insert;
+        $c->req->clear_objects();
+        $c->req->add_object([$dataset, {}]);
+    }
+    else {
+        $self->$orig($c);
+    }
+};
 
 
 before private_base => sub {
