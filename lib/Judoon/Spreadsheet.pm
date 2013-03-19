@@ -390,6 +390,8 @@ has nbr_columns => (is => 'ro', init_arg => undef, isa => Int, );
 sub _unique_sqlname {
     my ($self, $seen, $name) = @_;
 
+    $name = 'untitled' if (!defined($name) || $name eq '');
+
     $name = unidecode($name);
 
     # stolen from SQL::Translator::Utils::normalize_name
@@ -432,6 +434,8 @@ sub _unique_sqlname {
 # generate a unique column title
 sub _unique_header {
     my ($self, $seen, $header) = @_;
+
+    $header = '(untitled column)' if (!defined($header) || $header eq '');
 
     return $header if (not $seen->{$header}++);
 

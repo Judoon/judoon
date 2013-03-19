@@ -88,4 +88,27 @@ subtest 'encoding' => sub {
 };
 
 
+subtest troublesome => sub {
+    for my $ext (qw(xls csv xlsx)) {
+        subtest "for $ext" => sub {
+            my $js_blank = Judoon::Spreadsheet->new({
+                filename => "${TEST_DATA_DIR}/blank_header.${ext}",
+            });
+            is_deeply [map {$_->{name}} @{ $js_blank->fields }],
+                [q{First Column}, q{(untitled column)}, q{Third Column},
+                 q{(untitled column) (1)},],
+                '  ...blank titles are correct';
+            is_deeply [map {$_->{shortname}} @{ $js_blank->fields }],
+                [q{first_column}, q{untitled}, q{third_column},
+                 q{untitled_01},],
+                '  ...blank sqlnames are correct';
+
+            my $blank_data = $js_blank->data;
+            is $blank_data->[3][0], '', 'first column space is blank';
+            is $blank_data->[2][2], '', 'middle column is blank';
+            is $blank_data->[2][3], '', 'final column is blank';
+        };
+    }
+};
+
 done_testing();
