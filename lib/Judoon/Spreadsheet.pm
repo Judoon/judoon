@@ -230,7 +230,7 @@ sub _build_from_xls {
                     });
             }
 
-            push @row_data, $val;
+            push @row_data, ($val // '');
 
         }
         push @data, \@row_data;
