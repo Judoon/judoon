@@ -296,13 +296,22 @@ sub _build_from_xlsx {
 
     $self->{_parser_obj} = $worksheet;
 
-    my @data;
+
+    my ($maxcol, @data) = (0);
     while ( my $row = $worksheet->next_row() ) {
-        my @row;
-        while ( my $cell = $row->next_cell() ) {
-            push @row, $cell->value();
+        if ($row->{_max_cell_index} > $maxcol) {
+            $maxcol = $row->{_max_cell_index};
         }
-        push @data, \@row;
+        push @data, [$row->values()];
+    }
+
+    # Excel::Reader::XLSX doesn't include empty rows at the end, so
+    # append empty strings to pad out the row to the maximum row
+    # length.
+    for my $row (@data) {
+        if (@$row < $maxcol) {
+            push @$row, ('') x ($maxcol - @$row);
+        }
     }
 
     return ($worksheet->name, \@data);
