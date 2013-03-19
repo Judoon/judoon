@@ -65,6 +65,8 @@ before validate_object => sub {
 
 before update_or_create => sub {
     my ($self, $c) = @_;
+
+    # default to empty template on create
     if ($c->req->method eq 'POST') {
         my $params = $c->req->get_object(-1)->[-1];
         $params->{template} ||= q{[]};
