@@ -107,6 +107,7 @@ on 'test' => sub {
     requires 'Test::More' => '0.88';
     requires 'Test::Fatal';
     requires 'Test::JSON';
+    requires 'Test::NoTabs';
     requires 'Test::Pod';
     requires 'Test::Pod::Coverage';
     requires 'Test::postgresql';
