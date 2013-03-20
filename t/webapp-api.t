@@ -10,7 +10,7 @@ use Test::JSON;
 use t::DB;
 
 use Data::Printer;
-
+use JSON qw(decode_json);
 
 # start test server
 my $mech = t::DB::new_mech();
@@ -30,6 +30,10 @@ subtest 'Basic Tests' => sub {
     my $ds_id = $ds->id;
     $mech->get_ok("/api/datasetdata/$ds_id");
     is_valid_json($mech->content, '  ...response is valid json');
+    my $data = decode_json($mech->content);
+    is_deeply $data->{tmplData}[0],
+        {name => 'Chewie', gender => 'male', age => 5},
+            '   ...expected content';
 };
 
 
