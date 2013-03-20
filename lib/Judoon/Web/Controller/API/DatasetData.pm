@@ -53,7 +53,7 @@ sub object_GET {
     # filter data
     #   sSearch: the search string
     my %where;
-    if (my $search = $params->{sSearch}) {
+    if (my $search = $params->{sSearch} // '') {
         %where = ('-or' => {map {$_ => {-ilike => '%'.$search.'%'}} @fields});
     }
 
@@ -66,7 +66,13 @@ sub object_GET {
     my $max_cols      = @fields;
     $nbr_sort_cols    = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
     for my $i (0..$nbr_sort_cols-1) {
-        my ($colnum, $direction) = @{$params}{("iSortCol_$i", "sSortDir_$i")};
+        my $colnum    = $params->{"iSortCol_$i"} // 0;
+        die "iSortCol_${i} must be a number between 0 and " . scalar(@fields)
+            if ($colnum !~ m/^\d+$/ || $colnum < 0 || $colnum > @fields);
+
+        my $dir_param = $params->{"sSortDir_$i"};
+        my $direction = defined($dir_param) && $dir_param eq 'desc' ? 'desc'
+                      :                                               'asc';
 
         my $field     = $fields[$colnum];
         my $data_type = $ds_cols[$colnum]->{data_type_rel}{data_type};
@@ -88,11 +94,17 @@ sub object_GET {
     );
     my $filtered = %where ? @$results : $total;
 
+
     # paginate data
     #   iDisplayLength: number to show
     #   iDisplayStart: offset to start at
-    my ($limit, $offset) = @{$params}{qw(iDisplayLength iDisplayStart)};
+    my $limit  = $params->{iDisplayLength} // 50;
+    my $offset = $params->{iDisplayStart}  // 0;
+    die "iDisplayLength must be a number" unless ($limit =~ m/^\d+$/);
+    die "iDisplayStart must be a number" unless ($offset =~ m/^\d+$/);
+
     my @tmpl_data = grep {defined} @{$results}[$offset..$offset+$limit];
+
 
     # return results
     $self->status_ok($c,
