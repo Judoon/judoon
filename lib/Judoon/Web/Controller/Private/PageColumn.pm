@@ -155,14 +155,6 @@ before object_PUT => sub {
 };
 
 
-after object_DELETE => sub {
-    my ($self, $c) = @_;
-    my $captures = $c->req->captures;
-    pop @$captures;
-    $self->go_here($c, '/private/pagecolumn/list', $captures);
-};
-
-
 __PACKAGE__->meta->make_immutable;
 
 1;
