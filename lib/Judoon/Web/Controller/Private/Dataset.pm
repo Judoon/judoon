@@ -10,7 +10,7 @@ Judoon::Web::Controller::Private::Dataset - dataset actions
 
 =head1 DESCRIPTION
 
-The RESTful controller for managing actions on one or more datasets.
+The RESTish controller for managing actions on one or more datasets.
 
 =cut
 
@@ -63,7 +63,18 @@ __PACKAGE__->config(
 );
 
 
+# max size in bytes for an uploaded spreadsheet
 my $SPREADSHEET_MAX_SIZE = 10_000_000;
+
+
+=head1 METHODS
+
+=head2 update_or_create (around)
+
+If we get a file upload, call the C<< $user->import_data >> method to
+create our dataset.
+
+=cut
 
 around update_or_create => sub {
     my $orig = shift;
@@ -83,6 +94,12 @@ around update_or_create => sub {
     }
 };
 
+
+=head2 private_base (before)
+
+Restrict access to owners and visitors seeing object_GET.
+
+=cut
 
 before private_base => sub {
     my ($self, $c) = @_;
@@ -107,10 +124,10 @@ override list_GET => sub {
 };
 
 
+=head2 list_POST (before) (after)
 
-=head1 list_POST
-
-Create a basic page for the user after creating the dataset
+Do some sanity-checking on the uploaded file, then create a basic page
+for the user after creating the dataset.
 
 =cut
 
@@ -141,7 +158,9 @@ after list_POST => sub {
 
 =head2 object_GET (after)
 
-Add the dataset's first page to the stash.
+If the user is not the owner, or the 'preview' view has been
+requested, then show the preview (non-edit) page.  Otherwise, add the
+dataset pages to the stash.  Also handle tabular data download requests.
 
 =cut
 
@@ -181,10 +200,9 @@ after object_GET => sub {
 };
 
 
-
 =head2 object_DELETE (after)
 
-return to user overview instead of dataset list
+Return to user overview instead of dataset list
 
 =cut
 

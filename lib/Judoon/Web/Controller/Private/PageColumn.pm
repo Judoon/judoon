@@ -1,5 +1,20 @@
 package Judoon::Web::Controller::Private::PageColumn;
 
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::Private::PageColumn - page_column actions
+
+=head1 DESCRIPTION
+
+The RESTish controller for managing actions on one or more page
+columns.  Currently chains off of ::Private::Page.
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -46,6 +61,14 @@ __PACKAGE__->config(
 );
 
 
+=head1 METHODS
+
+=head2 generate_rs (around)
+
+Restrict rs to C<PageColumns>s for the parent C<Page>.
+
+=cut
+
 around generate_rs => sub {
     my $orig = shift;
     my $self = shift;
@@ -56,12 +79,26 @@ around generate_rs => sub {
 };
 
 
+=head2 validate_object (before)
+
+Set page_id to chained C<Page>.
+
+=cut
+
 before validate_object => sub {
     my ($self, $c, $obj) = @_;
     my ($object, $params) = @$obj;
     $params->{page_id} //= $c->req->get_chained_object(-1)->[0]->id;
 };
 
+
+=head2 update_or_create (around)
+
+On POST (create), if the template param is unset, default it to the
+empty template ("[]").  If it's a PUT request, assume the user knows
+what they're doing.
+
+=cut
 
 before update_or_create => sub {
     my ($self, $c) = @_;
@@ -73,6 +110,12 @@ before update_or_create => sub {
     }
 };
 
+
+=head2 private_base (before)
+
+Restrict access to owners-only.
+
+=cut
 
 before private_base => sub {
     my ($self, $c) = @_;
@@ -87,8 +130,8 @@ before private_base => sub {
 
 =head2 list_GET (after)
 
-Do some postprocessing on the page columns data to get js templates and add
-"dataset columns used" list.
+Do some postprocessing on the page columns data to get sample data and
+js templates.
 
 =cut
 
@@ -105,16 +148,24 @@ after list_GET => sub {
 };
 
 
+=head2 object_GET (after)
+
+The C<PageColumn> edit pages needs lots of extra infor for it to do
+it's job.  Add lots of metadata to stash.
+
+=cut
+
 after object_GET => sub {
     my ($self, $c) = @_;
 
-    my $sitelinker = $c->model('SiteLinker');
-    my $dataset = $c->req->get_chained_object(-2)->[0];
-    my @ds_columns = $dataset->ds_columns_ordered->all;
+    my $dataset                  = $c->req->get_chained_object(-2)->[0];
+    my @ds_columns               = $dataset->ds_columns_ordered->all;
     $c->stash->{ds_column}{list} = \@ds_columns;
-    $c->stash->{url_columns} = [];
-    my @acc_columns = grep {$_->accession_type} @ds_columns;
-    $c->stash->{acc_columns}    = \@acc_columns;
+    $c->stash->{url_columns}     = [];
+
+    my @acc_columns          = grep {$_->accession_type} @ds_columns;
+    $c->stash->{acc_columns} = \@acc_columns;
+    my $sitelinker           = $c->model('SiteLinker');
     for my $acc_column (@acc_columns) {
         my $sites = $sitelinker->mapping->{accession}{$acc_column->accession_type};
         my @links;
@@ -128,30 +179,37 @@ after object_GET => sub {
         }
         $acc_column->{linkset} = \@links;
     }
-    $c->stash->{column_acctype} = encode_json(
-        {map {$_->shortname => $_->accession_type} @acc_columns}
-    );
 
-    $c->stash->{link_site_json} = encode_json(
-        $sitelinker->mapping->{site}
-    );
-    $c->stash->{ds_column_json} = encode_json(
-        [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]
-    );
-    $c->stash->{sitelinker_sites} = encode_json( $sitelinker->sites );
-    $c->stash->{sitelinker_accs}  = encode_json( $sitelinker->accessions );
+    $c->stash({
+        column_acctype => encode_json(
+            {map {$_->shortname => $_->accession_type} @acc_columns}
+        ),
+        ds_column_json => encode_json(
+            [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]
+        ),
 
-    $c->stash->{url_prefixes} = encode_json({});
-
-    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
+        link_site_json   => encode_json( $sitelinker->mapping->{site} ),
+        sitelinker_sites => encode_json( $sitelinker->sites           ),
+        sitelinker_accs  => encode_json( $sitelinker->accessions      ),
+        url_prefixes     => encode_json( {}                           ),
+        sample_data      => encode_json( $dataset->sample_data        ),
+    });
 };
+
+
+=head2 object_PUT (before)
+
+Convert template to native representation before updating.
+
+=cut
 
 before object_PUT => sub {
     my ($self, $c) = @_;
 
-    my $params        = $c->req->get_object(0)->[1];
-    my $template_html = $params->{template} // '[]';
-    $params->{template} = Judoon::Tmpl->new_from_native($template_html)->to_native;
+    my $params          = $c->req->get_object(0)->[1];
+    my $template_html   = $params->{template} // '[]';
+    $params->{template} = Judoon::Tmpl->new_from_native($template_html)
+        ->to_native;
 };
 
 

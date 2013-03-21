@@ -10,7 +10,7 @@ Judoon::Web::Controller::Private::DatasetColumn - dataset column actions
 
 =head1 DESCRIPTION
 
-The RESTful controller for managing actions on one or more dataset
+The RESTish controller for managing actions on one or more dataset
 columns.  Chains off of L</Judoon::Web::Controller::Private::Dataset>.
 
 =cut
@@ -43,7 +43,6 @@ __PACKAGE__->config(
     # Columns that list returns
     list_returns            =>  [qw/id dataset_id name sort data_type accession_type shortname/],
 
-
     # Every possible prefetch param allowed
     list_prefetch_allows    =>  [
         [qw/ds_columns/], { 'ds_columns' => [qw//] },
@@ -59,6 +58,15 @@ __PACKAGE__->config(
 
 );
 
+
+=head1 METHODS
+
+=head2 generate_rs (around)
+
+Restrict rs to C<DatasetColumn>s for the parent C<Dataset>.
+
+=cut
+
 around generate_rs => sub {
     my $orig = shift;
     my $self = shift;
@@ -68,6 +76,12 @@ around generate_rs => sub {
         ->with_lookups();
 };
 
+
+=head2 row_format_output (override)
+
+Set C<accession_type> key in returned data.
+
+=cut
 
 override row_format_output => sub {
     my ($self, undef, $row) = @_;
@@ -79,6 +93,11 @@ override row_format_output => sub {
 };
 
 
+=head2 private_base (before)
+
+Restrict access to owners-only.
+
+=cut
 
 before private_base => sub {
     my ($self, $c) = @_;
@@ -131,7 +150,7 @@ after list_GET => sub {
 
 =head2 object_GET (after)
 
-Add accession types to stash.
+Add column metadata (data type, accession type, etc.) to stash.
 
 =cut
 
@@ -144,6 +163,9 @@ after object_GET => sub {
 
 
 =head2 object_PUT (before)
+
+C::C::DBIC::API doesn't work with my DBIC::Helper::Lookups yet, so
+manually lookup and set lookup table values before update.
 
 =cut
 

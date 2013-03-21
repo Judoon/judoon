@@ -196,8 +196,6 @@ sub list_GET :Private {
     # exactly like the action above.  I don't want to rename my method
     # right now, so just copy-n-paste the list() code form DBIC::API
     # here.
-
-    #$self->list($c);
     $self->list_munge_parameters($c);
     $self->list_perform_search($c);
     $self->list_format_output($c);
@@ -222,7 +220,9 @@ When done, redirects to the new object, i.e. C<L</object_GET>>.
 
 sub list_POST :Private {
     my ($self, $c) = @_;
+
     $self->update_or_create($c);
+
     my $object = $c->req->get_object(0)->[0];
     $self->go_relative($c, 'object', [@{$c->req->captures}, $object->id]);
 }
@@ -252,11 +252,13 @@ stash namepace.
 
 sub private_id :Private {
     my ($self, $c, $id) = @_;
+
     $self->object_with_id($c, $id);
     $self->item($c);
+
     my $key = $self->rpc->{stash_key};
     $c->stash->{$key}{object} = $c->stash->{response}{data};
-    $c->stash->{$key}{id}     =  $c->stash->{$key}{object}{id};
+    $c->stash->{$key}{id}     = $c->stash->{$key}{object}{id};
 }
 
 
@@ -325,7 +327,9 @@ a resource. Redirects back to C<L</list_GET>> by default.
 
 sub object_DELETE :Private {
     my ($self, $c) = @_;
+
     $self->delete($c);
+
     my @captures = @{$c->req->captures};
     pop @captures;
     $self->go_relative($c, 'list', \@captures);

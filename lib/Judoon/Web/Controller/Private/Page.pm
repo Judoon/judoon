@@ -10,8 +10,9 @@ Judoon::Web::Controller::Private::Page - page actions
 
 =head1 DESCRIPTION
 
-The RESTful controller for managing actions on one or more pages.
-Currently chains off of ::Private::Dataset, but this may be changed later.
+The RESTish controller for managing actions on one or more pages.
+Currently chains off of ::Private::Dataset, but this may be changed
+later.
 
 =cut
 
@@ -61,6 +62,13 @@ __PACKAGE__->config(
 );
 
 
+=head1 METHODS
+
+=head2 generate_rs (around)
+
+Restrict rs to C<Pages>s for the parent C<Dataset>.
+
+=cut
 
 around generate_rs => sub {
     my $orig = shift;
@@ -70,6 +78,12 @@ around generate_rs => sub {
     return $rs->for_dataset($c->req->get_chained_object(-1)->[0]);
 };
 
+
+=head2 validate_object (before)
+
+Default C<Page> params to empty strings.
+
+=cut
 
 before validate_object => sub {
     my ($self, $c, $obj) = @_;
@@ -81,7 +95,8 @@ before validate_object => sub {
     $params->{dataset_id} //= $c->req->get_chained_object(-1)->[0]->id;
 };
 
-=head2 update_or_create_objects
+
+=head2 update_or_create (around)
 
 Intercept C<update_or_create_objects> to allow cloning a page from an
 existing page or from a provided template.
@@ -121,6 +136,12 @@ around update_or_create => sub {
 };
 
 
+=head2 private_base (before)
+
+Restrict access to owners and visitors seeing object_GET.
+
+=cut
+
 before private_base => sub {
     my ($self, $c) = @_;
     if (!$c->stash->{user}{is_owner} and $c->req->method ne 'GET') {
@@ -143,6 +164,13 @@ override list_GET => sub {
     $self->go_here($c, '/user/edit', [$c->req->captures->[0]]);
 };
 
+
+=head2 id (after)
+
+Every page that chains from the id actions needs a list of ds_columns
+that have already been used.  Add that to the stash here.
+
+=cut
 
 after id => sub {
     my ($self, $c) = @_;
@@ -168,8 +196,12 @@ after id => sub {
 
 =head2 object_GET (after)
 
-After L<Private/object_GET>, set up the stash parameters the page's edit
-page will need.
+If the user is not the owner, or the 'preview' view has been
+requested, then show the preview (non-edit) page.  Otherwise, add the
+page columns to the stash.  Also handle tabular data download
+requests, standalone application requests, and downloadable template
+requests.
+
 
 =cut
 
