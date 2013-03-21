@@ -94,7 +94,7 @@ L<Judoon::Web::View::HTML> as the default view.
 
 =cut
 
-has rpc => ( is  => 'ro', isa => 'HashRef', );
+has rpc => ( is  => 'ro', isa => HashRef, );
 __PACKAGE__->config(
     rpc => {
         template_dir => undef,
