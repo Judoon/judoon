@@ -116,19 +116,6 @@ after begin => sub {
 };
 
 
-# I don't know what this is for?
-around update_or_create => sub {
-    my $orig = shift;
-    my $self = shift;
-    my $c    = shift;
-
-    $self->$orig($c, @_);
-    if ($c->stash->{created_object}) {
-        %{$c->stash->{response}->{new_object}} = $c->stash->{created_object}->get_columns;
-    }
-};
-
-
 =head1  PATH ACTIONS
 
 =head2 base / list / id / chainpoint / object
