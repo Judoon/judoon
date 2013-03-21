@@ -112,8 +112,7 @@ __PACKAGE__->config(
 # enable our Request::Chained module on all requests
 after begin => sub {
     my ($self, $c) = @_;
-    Catalyst::Controller::DBIC::API::Request::Chained->meta->apply($c->req)
-        unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request::Chained');
+    Moose::Util::ensure_all_roles($c->req, 'Catalyst::Controller::DBIC::API::Request::Chained');
 };
 
 
@@ -177,12 +176,6 @@ actions. It also de-namespaces form parameters.
 
 sub private_base :Private {
     my ($self, $c) = @_;
-
-    # do I need these?
-    Catalyst::Controller::DBIC::API::Request->meta->apply($c->req)
-          unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request');
-    Catalyst::Controller::DBIC::API::Request::Chained->meta->apply($c->req)
-        unless Moose::Util::does_role($c->req, 'Catalyst::Controller::DBIC::API::Request::Chained');
 
     $self->deserialize($c);
 
