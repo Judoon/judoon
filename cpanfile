@@ -102,6 +102,7 @@ on 'test' => sub {
     requires 'HTTP::Request::Common';
     requires 'Plack';
     requires 'Pod::Coverage';
+    requires 'Pod::Coverage::TrustPod';
     requires 'Test::DBIx::Class';
     requires 'Test::Differences';
     requires 'Test::More' => '0.88';
