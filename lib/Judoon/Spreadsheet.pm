@@ -426,11 +426,11 @@ sub _unique_sqlname {
         return $uuid_name if(!$seen->{$uuid_name}++);
     }
 
-    # uncoverable statement count:4
-    Judoon::Error::Devel::Impossible->throw({
-        message => "couldn't generate a unique sql column name: "
-            . p(%{ {name => $name, seen => $seen} }),
-    });
+
+    Judoon::Error::Devel::Impossible->throw({                     # uncoverable statement
+        message => "couldn't generate a unique sql column name: " # uncoverable statement
+            . p(%{ {name => $name, seen => $seen} }),             # uncoverable statement
+    });                                                           # uncoverable statement
 }
 
 
@@ -453,11 +453,10 @@ sub _unique_header {
         return $uuid_name if(not $seen->{$uuid_name}++);
     }
 
-    # uncoverable statement count:4
-    Judoon::Error::Devel::Impossible->throw({
-        message => "couldn't generate a unique column name: "
-            . p(%{ {header => $header, seen => $seen} }),
-    });
+    Judoon::Error::Devel::Impossible->throw({                 # uncoverable statement
+        message => "couldn't generate a unique column name: " # uncoverable statement
+            . p(%{ {header => $header, seen => $seen} }),     # uncoverable statement
+    });                                                       # uncoverable statement
 }
 
 
