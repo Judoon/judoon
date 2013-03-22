@@ -65,6 +65,8 @@ resultsets
 namespace
 namespaces
 API
+api
+jQuery
 RESTful
 RESTish
 Fitz

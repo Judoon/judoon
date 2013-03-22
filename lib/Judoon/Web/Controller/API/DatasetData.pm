@@ -1,4 +1,17 @@
 package Judoon::Web::Controller::API::DatasetData;
+
+=pod
+
+=for stopwords ActionClass Datatables
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::API::DatasetData - Data API Controller
+
+=cut
+
 use Moose;
 use namespace::autoclean;
 
@@ -7,20 +20,21 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 use List::AllUtils qw();
 use SQL::Abstract;
 
-=head1 NAME
 
-Judoon::Web::Controller::API::DatasetData - Catalyst Controller
+=head1 ACTIONS
 
-=head1 DESCRIPTION
+=head2 base
 
-Catalyst Controller.
-
-=head1 METHODS
-
-=cut
-
+Does nothing currently, but calls to the api pass through here.
 
 =head2 index
+
+Return a simple response.
+
+=head2 id
+
+Grabs the dataset id from the url, looks it up in the database, then
+stuffs it into the stash.
 
 =cut
 
@@ -36,6 +50,15 @@ sub id : Chained('base') PathPart('') CaptureArgs(1) {
     $c->stash->{dataset}{object} = $c->model('User::Dataset')->find({id => $ds_id});
     $c->stash->{ds_column}{list} = [$c->stash->{dataset}{object}->ds_columns_ordered->all];
 }
+
+
+=head2 object / object_GET
+
+REST ActionClass action.  Calling GET on this action returns the data
+for the dataset in the stash, filtered by the query parameters.  The
+query parameters are those set by the jQuery Datatables plugin.
+
+=cut
 
 sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
 
@@ -115,10 +138,6 @@ sub object_GET {
         },
     );
 }
-
-
-
-
 
 
 
