@@ -2,6 +2,8 @@ package Judoon::Tmpl;
 
 =pod
 
+=for stopwords VarString
+
 =encoding utf-8
 
 =head1 NAME
@@ -174,7 +176,7 @@ sub new_from_data {
 
 Builds a new C<Judoon::Tmpl> from its serialized representation. This
 is just a wrapper around C<L</new_from_data>> that decodes the given
-input, which is expected to be a vaid JSON string. C<$json_args> is an
+input, which is expected to be a valid JSON string. C<$json_args> is an
 optional hashref or arguments to C<L<JSON/from_json>>.
 
 =cut

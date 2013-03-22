@@ -348,7 +348,7 @@ sub get_cloneable_columns {
 
 =head2 headers
 
-Get an ArrayRef of page headers
+Get an arrayref of page headers
 
 =cut
 
@@ -360,7 +360,7 @@ sub headers {
 
 =head2 data_table
 
-Get and ArrayRef of ArrayRefs of the page data
+Get an arrayref of arrayrefs of the page data
 
 =cut
 

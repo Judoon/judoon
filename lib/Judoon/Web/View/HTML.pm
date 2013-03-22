@@ -6,11 +6,11 @@ package Judoon::Web::View::HTML;
 
 =head1 NAME
 
-Judoon::Web::View::HTML - TT View for Judoon::Web
+Judoon::Web::View::HTML - Template Toolkit View for Judoon::Web
 
 =head1 DESCRIPTION
 
-TT View for Judoon::Web.
+Template Toolkit View for Judoon::Web.
 
 =cut
 

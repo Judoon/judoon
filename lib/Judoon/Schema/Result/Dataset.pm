@@ -2,6 +2,8 @@ package Judoon::Schema::Result::Dataset;
 
 =pod
 
+=for stopwords datastore shortnames tablename
+
 =encoding utf8
 
 =head1 NAME
@@ -198,7 +200,7 @@ __PACKAGE__->register_timestamps;
 
 =head2 delete()
 
-Delete datastore table after deleteing object
+Delete datastore table after deleting object
 
 =cut
 
@@ -373,7 +375,7 @@ sub as_excel {
 
 =head1 DATASTORE
 
-The following methods create and retreive the actual dataset data,
+The following methods create and retrieve the actual dataset data,
 which is stored in a different schema and table.
 
 =head2 data() / _build_data()
@@ -498,7 +500,7 @@ sub _delete_datastore {
 
 =head2 _gen_table_name( $table_name )
 
-Private method to generate a new table name.  This method trys a
+Private method to generate a new table name.  This method tries a
 couple different techniques, but will die if it's unable to find a
 unique name.
 

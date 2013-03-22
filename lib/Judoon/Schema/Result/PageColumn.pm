@@ -2,6 +2,8 @@ package Judoon::Schema::Result::PageColumn;
 
 =pod
 
+=for stopwords InflateColumn
+
 =encoding utf8
 
 =head1 NAME

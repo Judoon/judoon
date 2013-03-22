@@ -47,7 +47,7 @@ __PACKAGE__->config(
     # Columns that list returns
     list_returns            =>  [qw/id page_id title template/],
 
-    # Every possible prefetch param allowed
+    # Every possible prefetch parameter allowed
     list_prefetch_allows    =>  [
         [qw/datasets/], {  'datasets' => [qw/ds_columns pages/] },
     ],
@@ -94,7 +94,7 @@ before validate_object => sub {
 
 =head2 update_or_create (around)
 
-On POST (create), if the template param is unset, default it to the
+On POST (create), if the template parameter is unset, default it to the
 empty template ("[]").  If it's a PUT request, assume the user knows
 what they're doing.
 
@@ -130,7 +130,7 @@ before private_base => sub {
 
 =head2 list_GET (after)
 
-Do some postprocessing on the page columns data to get sample data and
+Do some post-processing on the page columns data to get sample data and
 js templates.
 
 =cut
@@ -150,8 +150,8 @@ after list_GET => sub {
 
 =head2 object_GET (after)
 
-The C<PageColumn> edit pages needs lots of extra infor for it to do
-it's job.  Add lots of metadata to stash.
+The C<PageColumn> edit pages needs lots of extra info for it to do
+its job.  Add lots of metadata to stash.
 
 =cut
 

@@ -2,6 +2,8 @@ package Judoon::SiteLinker;
 
 =pod
 
+=for stopwords vice-versa
+
 =encoding utf8
 
 =head1 NAME

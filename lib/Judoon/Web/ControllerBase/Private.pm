@@ -2,6 +2,8 @@ package Judoon::Web::ControllerBase::Private;
 
 =pod
 
+=for stopwords de-namespaces
+
 =encoding utf8
 
 =head1 NAME
@@ -85,7 +87,7 @@ C<action> key in C<< __PACKAGE__->config() >>. Ex:
      },
  );
 
-=head2 inheritied config
+=head2 inherited config
 
 The C<default>, C<stash_key>, and C<map> config keys are all inherited
 from L<Catalyst::Controller::DBIC::API>.  Since this controller only
@@ -246,7 +248,7 @@ sub list_PUT :Private {
 =head2 private_id
 
 Calls C<object_with_id>, <item>, then stores the object and id in the
-stash namepace.
+stash namespace.
 
 =cut
 

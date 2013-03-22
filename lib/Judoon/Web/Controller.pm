@@ -123,7 +123,7 @@ the full action path.
 
 This method calls L</go_here> with the C<$action> argument replaced
 with the result of C<< $c->controller->action_for($action) >>. The C<<
-\@captures >> and C<< \%query >> are passed unmodifed.
+\@captures >> and C<< \%query >> are passed unmodified.
 
 =cut
 

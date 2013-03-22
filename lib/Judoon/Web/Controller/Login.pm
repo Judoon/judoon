@@ -6,7 +6,7 @@ package Judoon::Web::Controller::Login;
 
 =head1 NAME
 
-Judoon::Web::Controller::Login - manage user logins
+Judoon::Web::Controller::Login - manage user login
 
 =cut
 
@@ -96,7 +96,7 @@ sub login_GET {}
 
 =head3 login_POST
 
-Attepts to login the user with the supplied credentials.  If
+Attempts to login the user with the supplied credentials.  If
 successful, redirects to the user's overview or the previously
 attempted url.  If unsuccessful, displays an error message.
 

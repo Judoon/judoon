@@ -2,6 +2,8 @@ package Judoon::Web::Controller::User;
 
 =pod
 
+=for stopwords user-centric
+
 =encoding utf8
 
 =head1 NAME

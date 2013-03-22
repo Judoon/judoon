@@ -2,6 +2,8 @@ package Judoon::Spreadsheet;
 
 =pod
 
+=for stopwords filetype shortname
+
 =encoding utf8
 
 =head1 NAME
@@ -60,9 +62,9 @@ C<Judoon::Spreadsheet> takes one of two sets of arguments to C<new()>:
  # -or-
  ->new({filehandle => $fh, filetype => 'xls'});
 
-The C<filename> arg will be transformed into the C<filehandle> and
-C<filetype> args.  If you pass all three, the C<filename> arg will
-take precedence.
+The C<filename> argument will be transformed into the C<filehandle>
+and C<filetype> arguments.  If you pass all three, the C<filename>
+argument will take precedence.
 
 The spreadsheet will be read and processed during object construction
 (no laziness here!).  Don't call the C<BUILD> method, that's called
@@ -357,7 +359,7 @@ column and matching against successively more liberal regexes to
 figure out what type of data it is. A tally is kept, and the most
 liberal type wins.  i.e. if a column has ten data that are integers,
 and one that is text, the column will be marked as 'text'.  Current
-heurisitic data types are: 'integer', 'numeric', and 'text'.
+heuristic data types are: 'integer', 'numeric', and 'text'.
 
 =back
 
@@ -424,6 +426,7 @@ sub _unique_sqlname {
         return $uuid_name if(!$seen->{$uuid_name}++);
     }
 
+    # uncoverable statement count:4
     Judoon::Error::Devel::Impossible->throw({
         message => "couldn't generate a unique sql column name: "
             . p(%{ {name => $name, seen => $seen} }),
@@ -450,6 +453,7 @@ sub _unique_header {
         return $uuid_name if(not $seen->{$uuid_name}++);
     }
 
+    # uncoverable statement count:4
     Judoon::Error::Devel::Impossible->throw({
         message => "couldn't generate a unique column name: "
             . p(%{ {header => $header, seen => $seen} }),

@@ -97,7 +97,7 @@ __PACKAGE__->has_many(
 
 Type: many_to_many
 
-Composing rels: L</user_roles> -> user
+Composing relations: L</user_roles> -> user
 
 =cut
 

@@ -31,7 +31,7 @@ __PACKAGE__->load_components(qw(
 
 =head2 _glob_to_like( $kinda_like )
 
-Turn a globby string into a L<SQL::Abstract> LIKE-compatible data
+Turn a glob-like string into a L<SQL::Abstract> LIKE-compatible data
 structure. Ex:
 
  *moo*  ==  {-like => '*moo*'}

@@ -47,7 +47,7 @@ __PACKAGE__->config(
     # Columns that list returns
     list_returns            =>  [qw/id dataset_id title preamble postamble permission/],
 
-    # Every possible prefetch param allowed
+    # Every possible prefetch parameter allowed
     list_prefetch_allows    =>  [
         [qw/page_columns/], {  'page_columns' => [qw//] },
     ],
@@ -81,7 +81,7 @@ around generate_rs => sub {
 
 =head2 validate_object (before)
 
-Default C<Page> params to empty strings.
+Default C<Page> parameters to empty strings.
 
 =cut
 

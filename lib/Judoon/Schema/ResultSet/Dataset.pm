@@ -2,6 +2,8 @@ package Judoon::Schema::ResultSet::Dataset;
 
 =pod
 
+=for stopwords DBIC collapser
+
 =encoding utf8
 
 =head1 NAME

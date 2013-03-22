@@ -2,6 +2,8 @@ package Judoon::Schema::Result::User;
 
 =pod
 
+=for stopwords Blowfish PassphraseColumn
+
 =encoding utf8
 
 =head1 NAME
@@ -178,7 +180,7 @@ __PACKAGE__->has_many(
 
 Type: many_to_many
 
-Composing rels: L</user_roles> -> role
+Composing relations: L</user_roles> -> role
 
 =cut
 
@@ -189,7 +191,7 @@ __PACKAGE__->many_to_many("roles", "user_roles", "role");
 
 =head2 PassphraseColumn
 
-Encrypt C<password> field using Blowfish cypher.
+Encrypt C<password> field using Blowfish cipher.
 
 =cut
 
@@ -249,8 +251,8 @@ sub change_password {
 =head2 import_data( $filehandle, $filetype )
 
 C<import_data()> takes in a filehandle and filetype and attempts to
-turn it into a L<Judoon::Spreadsheet>.  It will then munge the data
-and insert it into the database.
+turn it into a L<Judoon::Spreadsheet>.  A new C<Dataset> is created
+from the C<Spreadsheet> and inserted into the database.
 
 =cut
 

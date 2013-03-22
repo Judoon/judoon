@@ -2,6 +2,8 @@ package Judoon::Web::Model::SiteLinker;
 
 =pod
 
+=for stopwords Adaptor
+
 =encoding utf8
 
 =head1 NAME

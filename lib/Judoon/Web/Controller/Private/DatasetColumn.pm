@@ -112,7 +112,7 @@ before private_base => sub {
 
 =head2 list_GET (after)
 
-Do some postprocessing on the dataset data to get sample data and set
+Do some post-processing on the dataset data to get sample data and set
 up some convenience variables.
 
 =cut
