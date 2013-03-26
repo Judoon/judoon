@@ -5,6 +5,7 @@ use warnings;
 
 use Scalar::Util qw(blessed);
 
+
 sub new_result {
     my ($self, $values) = @_;
     $self->_replace_lookup_values($values);
@@ -189,3 +190,6 @@ with an invalid lookup error, thus preventing insertion of bogus data.
 See L<DBIx::Class::Helper::Row::Lookup> for more information.  This
 module does nothing if the result class has not loaded the
 C<Helper::Row::Lookup> component.
+
+=for Pod::Coverage new_result / update
+

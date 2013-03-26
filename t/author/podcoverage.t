@@ -13,3 +13,5 @@ for my $module (@modules) {
         coverage_class => 'Pod::Coverage::TrustPod',
     });
 }
+
+done_testing();

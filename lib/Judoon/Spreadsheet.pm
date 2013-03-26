@@ -54,7 +54,9 @@ use Text::Unidecode;
 
 =head1 METHODS
 
-=head2 new / BUILD
+=for Pod::Coverage BUILDARGS BUILD
+
+=head2 new
 
 C<Judoon::Spreadsheet> takes one of two sets of arguments to C<new()>:
 
@@ -67,9 +69,7 @@ and C<filetype> arguments.  If you pass all three, the C<filename>
 argument will take precedence.
 
 The spreadsheet will be read and processed during object construction
-(no laziness here!).  Don't call the C<BUILD> method, that's called
-automatically by L<Moo>. I'm just mentioning it to improve my pod
-coverage.
+(no laziness here!).
 
 =head2 filehandle
 

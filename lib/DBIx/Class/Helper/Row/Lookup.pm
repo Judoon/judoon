@@ -224,3 +224,12 @@ Customer/Country schema:
 
 That is, the relationship is C<${foo}_rel>, the lookup accessor is
 C<$foo>, and the foreign key field is C<${foo}_id>.
+
+
+=head1 METHODS
+
+=head2 proxy_to_lookup
+
+Installs the lookup accessors into the Row object.
+
+=for Pod::Coverage update register_relationship

@@ -1,5 +1,39 @@
 package Judoon::Standalone;
 
+=pod
+
+=for stopwords tt
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Standalone - create a standalone webpage for data display
+
+=head1 SYNOPSIS
+
+ use Judoon::Standalone;
+
+ my ($page) = $user->pages_rs->all;
+
+ my $standalone = Judoon::Standalone->new({page => $page});
+ my $path_to_archive = $standalone->compress('zip');
+
+=head1 DESCRIPTION
+
+This module takes an instance of a L<Judoon::Schema::Result::Page> and
+builds an archive that contains the page, its data, a script to query
+the data, and all the support images, css, and javascript needed to
+display the page.
+
+This archive should be able to be unzipped into a web-accessible
+folder and run without modification.  The only requirement is that
+perl v5.8 or greater be installed.  The intention is to make
+installation as easy as possible for non-technical users.
+
+=cut
+
+
 use Moo;
 
 use Archive::Builder;
@@ -8,11 +42,64 @@ use Judoon::Error::Devel::Foreign;
 use Path::Class qw(dir);
 use Template;
 
+
 =head1 ATTRIBUTES
+
+=head2 page
+
+This attribute is an instance of L<Judoon::Schema::Result::Page> for
+which a standalone version should be built. This attribute is required.
 
 =cut
 
 has 'page' => (is => 'ro', required => 1,);
+
+=head2 archive
+
+=cut
+
+has archive => (is => 'lazy',);
+
+
+=head2 MINOR ATTRIBUTES
+
+=head3 standalone_index
+
+Name of the index file, relative to the project root. Default:
+C<index.html>.
+
+=head3 standalone_db
+
+Path to the database file, relative to the project root. Default:
+C<cgi-bin/database.tab>
+
+=head3 standalone_types
+
+Path to the list of data types for each column, relative to the
+project root. Default: C<cgi-bin/datatypes.tab>.
+
+=head3 template_dir
+
+L<Path::Class::Dir> object where the templates are kept.
+
+=head3 skeleton_dir
+
+L<Path::Class::Dir> object where the static files are kept.
+
+=head3 index_tmpl
+
+L<Path::Class::File> object for the index.html template.
+
+=head3 tt
+
+The L<Template::Toolkit> object.
+
+=head3 archive_name
+
+The name of the archive, which will be the subdirectory it unpacks
+to. Default: C<judoon>.
+
+=cut
 
 has standalone_index => (is => 'lazy',);
 sub _build_standalone_index { return 'index.html'; }
@@ -21,7 +108,6 @@ sub _build_standalone_db { return 'cgi-bin/database.tab'; }
 has standalone_types => (is => 'lazy',);
 sub _build_standalone_types { return 'cgi-bin/datatypes.tab'; }
 
-
 has template_dir => (is => 'lazy',);
 sub _build_template_dir { return dir('root/src/standalone'); }
 has skeleton_dir => (is => 'lazy',);
@@ -29,10 +115,13 @@ sub _build_skeleton_dir { return $_[0]->template_dir->subdir('skeleton'); }
 has index_tmpl => (is => 'lazy',);
 sub _build_index_tmpl { return $_[0]->template_dir->file('index.tt2'); }
 
+has tt => (is => 'lazy',);
+sub _build_tt { return Template->new; }
 
 has archive_name => (is => 'lazy',);
 sub _build_archive_name { return 'judoon'; }
-has archive => (is => 'lazy',);
+
+
 sub _build_archive {
     my ($self) = @_;
     my $archive = Archive::Builder->new;
@@ -92,11 +181,13 @@ sub _build_archive {
 }
 
 
-has tt => (is => 'lazy',);
-sub _build_tt { return Template->new; }
-
-
 =head1 METHODS
+
+=head2 compress
+
+Once the archive is built, compress it into either a zip file or a
+gzipped tarball.  The archive is saved into a temporary file and the
+path to the temporary file is returned.
 
 =cut
 

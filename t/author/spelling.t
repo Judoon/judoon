@@ -42,6 +42,7 @@ chainpoint
 timestamp
 subclasses
 prefetch
+Prefetch
 prefetching
 html
 login
@@ -75,3 +76,5 @@ javascript
 js
 signup
 downloadable
+subdirectory
+webpage
