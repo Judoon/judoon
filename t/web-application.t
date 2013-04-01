@@ -160,11 +160,12 @@ subtest 'User Tests' => sub {
         );
         $mech->content_like(qr/Something is missing/i, 'need all three fields');
 
-        $mech->post_ok(
-            '/settings/password',
-            {old_password => 'incorrect', new_password => 'boobooboo', confirm_new_password => 'boobooboo',},
-        );
-        $mech->content_like(qr/old password is incorrect/i, 'cant update password without old password');
+        user_error_like(
+            q{can't change password when old password is wrong},
+            'password_form', {
+                old_password => 'incorrect', new_password => 'boobooboo',
+                confirm_new_password => 'boobooboo',
+            }, qr/old password is incorrect/i);
 
         $mech->post_ok(
             '/settings/password',
