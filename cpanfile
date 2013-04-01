@@ -99,6 +99,7 @@ on 'test' => sub {
     requires 'bareword::filehandles';
     requires 'CGI::Compile';
     requires 'CGI::Emulate::PSGI';
+    requires 'HTML::Selector::XPath::Simple';
     requires 'HTTP::Request::Common';
     requires 'Plack';
     requires 'Pod::Coverage';

@@ -12,6 +12,7 @@ use Config::General;
 use Data::Printer;
 use File::Temp qw(tempdir);
 use FindBin qw($Bin);
+use HTML::Selector::XPath::Simple;
 use List::AllUtils ();
 
 
@@ -577,4 +578,23 @@ sub goto_page {
 
     my @pathsegs = List::AllUtils::zip @$pathparts, @$captures;
     return join '/', ('', @pathsegs);
+}
+
+
+# submit a form with the given args, then check to see if a user error
+# occurred. current $mech->uri should be the page with the form in it.
+sub user_error_like {
+    my ($testname, $form_name, $form_args, $errmsg) = @_;
+
+    subtest $testname => sub {
+        $mech->submit_form_ok({ # form should submit, not return 500 error
+            form_name => $form_name,
+            fields    => $form_args,
+        }, "can submit form without error");
+
+        my $sel = HTML::Selector::XPath::Simple->new($mech->content);
+        my @all_elements = $sel->select('div.alert-error');
+        my $page_error = pop @all_elements;
+        like $page_error, $errmsg, 'got correct error message';
+    }
 }
