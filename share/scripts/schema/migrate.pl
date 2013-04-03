@@ -7,8 +7,8 @@ use FindBin qw($Bin);
 use lib qq{$Bin/../../../lib};
 
 use DBIx::Class::Migration::Script;
-use Judoon::Web;
+use Judoon::Schema;
 
 DBIx::Class::Migration::Script->run_with_options(
-    schema => Judoon::Web->model('User')->schema,
+    schema => Judoon::Schema->connect('Judoon::Schema'),
 );

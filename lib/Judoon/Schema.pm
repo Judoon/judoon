@@ -13,7 +13,7 @@ Judoon::Schema
 use 5.10.1;
 
 use Moo;
-extends 'DBIx::Class::Schema';
+extends 'DBIx::Class::Schema::Config';
 
 
 =head2 C<$VERSION>
