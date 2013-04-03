@@ -24,7 +24,7 @@ sub import {
             quote_char     => q{"},
             name_sep       => q{.},
             pg_enable_utf8 => 1,
-            on_connect_do => 'SET client_min_messages=WARNING;',
+            on_connect_do  => 'SET client_min_messages=WARNING;',
         },
     }, qw(Schema));
     $schema = Schema();
