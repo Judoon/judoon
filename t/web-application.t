@@ -58,12 +58,10 @@ subtest 'Login / Logout' => sub {
     $mech->get_ok('/login', 'get login page');
 
     # bad login
-    $mech->submit_form_ok({
-        form_number => 1,
-        fields => {%credentials, password => 'badpass'},
-    }, 'submitted bad login okay');
-    $mech->content_like(
-        qr{Username or password is incorrect}i, 'denied login'
+    user_error_like(
+        'denied login', 'login_form',
+        {%credentials, password => 'badpass'},
+        qr{Username or password is incorrect}i,
     );
     redirects_to_ok('/settings/profile', '/login');
 
@@ -154,24 +152,28 @@ subtest 'User Tests' => sub {
     subtest 'Password' => sub {
         $mech->get_ok('/settings/password', 'get user password change');
 
-        $mech->post_ok(
-            '/settings/password',
-            {old_password => $newuser{'user.password'},},
+        user_error_like(
+            'need all three fields',
+            'password_form', {old_password => $newuser{'user.password'},},
+            qr/Something is missing/i,
         );
-        $mech->content_like(qr/Something is missing/i, 'need all three fields');
 
         user_error_like(
             q{can't change password when old password is wrong},
             'password_form', {
                 old_password => 'incorrect', new_password => 'boobooboo',
                 confirm_new_password => 'boobooboo',
-            }, qr/old password is incorrect/i);
-
-        $mech->post_ok(
-            '/settings/password',
-            {old_password => $newuser{'user.password'}, new_password => 'boo', confirm_new_password => 'boo',},
+            }, qr/old password is incorrect/i,
         );
-        $mech->content_like(qr/Invalid password/i, 'cant update password with invalid password');
+
+        user_error_like(
+            'cant update password with invalid password',
+            'password_form', {
+                old_password => $newuser{'user.password'},
+                new_password => 'boo',
+                confirm_new_password => 'boo',
+            }, qr/Invalid password/i,
+        );
 
         $mech->post_ok(
             '/settings/password',
