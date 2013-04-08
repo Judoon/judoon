@@ -37,7 +37,7 @@
             <span class="none">( none )</span>
             [% END %]
           </td>
-          <td class="metadata center">[% column.metadata | html %]</td>
+          <td class="metadata center">[%- column.data_type -%][% column.accession_type ? ', accession: ' _ column.accession_type : '' %]</td>
           <td class="annotate center">[%- INCLUDE 'components/action_button.tt2' label="Annotate" url=c.uri_for_action('/private/datasetcolumn/object', c.req.captures.merge([column.id]))  -%]</td>
         </tr>
         [% END %]
