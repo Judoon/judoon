@@ -94,31 +94,31 @@ requires 'Server::Starter' => '0.12';
 requires 'Starman' => '0.3003';
 
 
-on 'test' => sub {
-    requires 'indirect';
-    requires 'multidimensional';
-    requires 'bareword::filehandles';
-    requires 'CGI::Compile';
-    requires 'CGI::Emulate::PSGI';
-    requires 'HTML::Selector::XPath::Simple';
-    requires 'HTTP::Request::Common';
-    requires 'Plack';
-    requires 'Pod::Coverage';
-    requires 'Pod::Coverage::TrustPod';
-    requires 'Test::DBIx::Class';
-    requires 'Test::Differences';
-    requires 'Test::More' => '0.88';
-    requires 'Test::Fatal';
-    requires 'Test::JSON';
-    requires 'Test::NoTabs';
-    requires 'Test::Pod';
-    requires 'Test::Pod::Coverage';
-    requires 'Test::postgresql';
-    requires 'Test::Spelling';
-    requires 'Test::WWW::Mechanize::Catalyst';
-};
+test_requires 'indirect';
+test_requires 'multidimensional';
+test_requires 'bareword::filehandles';
+test_requires 'CGI::Compile';
+test_requires 'CGI::Emulate::PSGI';
+test_requires 'HTML::Selector::XPath::Simple';
+test_requires 'HTTP::Request::Common';
+test_requires 'Plack';
+test_requires 'Pod::Coverage';
+test_requires 'Pod::Coverage::TrustPod';
+test_requires 'Test::DBIx::Class';
+test_requires 'Test::Differences';
+test_requires 'Test::More' => '0.88';
+test_requires 'Test::Fatal';
+test_requires 'Test::JSON';
+test_requires 'Test::NoTabs';
+test_requires 'Test::Pod';
+test_requires 'Test::Pod::Coverage';
+test_requires 'Test::postgresql';
+test_requires 'Test::Spelling';
+test_requires 'Test::WWW::Mechanize::Catalyst';
+
 
 
 on 'develop' => sub {
-   recommends 'Devel::NYTProf';
+   requires 'Devel::NYTProf';
+   requires 'Devel::Cover';
 };
