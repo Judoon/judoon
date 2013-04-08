@@ -93,6 +93,25 @@ override row_format_output => sub {
 };
 
 
+=head2 each_object_inflate (around)
+
+Add C<data_type> and C<accession_type> to fetched objects.
+
+=cut
+
+around each_object_inflate => sub {
+    my $orig   = shift;
+    my $class  = shift;
+    my $c      = shift;
+    my $object = shift;
+
+    my $ds_column                = $class->$orig($c, $object);
+    $ds_column->{data_type}      = $object->data_type;
+    $ds_column->{accession_type} = $object->accession_type;
+    return $ds_column;
+};
+
+
 =head2 private_base (before)
 
 Restrict access to owners-only.
@@ -134,8 +153,6 @@ after list_GET => sub {
             }
         }
     }
-
-    $c->stash->{ds_column}{list} = $columns;
 };
 
 
@@ -147,8 +164,6 @@ Add column metadata (data type, accession type, etc.) to stash.
 
 after object_GET => sub {
     my ($self, $c) = @_;
-    $c->stash->{ds_column}{object}{data_type} = $c->req->get_object(0)->[0]->data_type;
-    $c->stash->{ds_column}{object}{accession_type} = $c->req->get_object(0)->[0]->accession_type;
     $c->stash->{accession_types} = $c->model('SiteLinker')->accession_groups;
 };
 
