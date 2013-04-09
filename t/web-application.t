@@ -191,8 +191,16 @@ subtest 'User Tests' => sub {
 };
 
 
+subtest 'User List' => sub {
+    logout();
+    redirects_to_ok('/user', '/login');
+    login('testuser');
+    redirects_to_ok('/user', '/user/testuser');
+};
+
+
 subtest 'User Overview' => sub {
-    $mech->get('/logout');
+    logout();
     $mech->get_ok('/user/newuser', 'can get others overview w/o login');
     $mech->content_like(qr/newuser/i,
         'got welcome message for visitor w/o login');

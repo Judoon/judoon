@@ -171,6 +171,25 @@ Base action for managing user pages.  Currently does nothing.
 sub base : Chained('/base') PathPart('user') CaptureArgs(0) {}
 
 
+=head2 list
+
+Nothing useful here, redirect elsewhere
+
+=cut
+
+sub list : Chained('base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+
+    if (my $user = $c->user) {
+        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $c->detach();
+    }
+    else {
+        $self->go_here($c, '/login/login');
+    }
+}
+
+
 =head2 id
 
 Pull out the username from the url and search for that user.
