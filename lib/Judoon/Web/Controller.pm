@@ -57,6 +57,19 @@ __PACKAGE__->config(
 
 =head1 METHODS
 
+=head2 set_notice( $c, $notice_msg )
+
+Sets the notice key in the flash.  This is the key used in the
+notification template component.
+
+=cut
+
+sub set_notice {
+    my ($self, $c, $notice_msg) = @_;
+    $c->flash->{alert}{notice} = $notice_msg;
+}
+
+
 =head2 set_error_and_redirect( $c, $errmsg, \@action )
 
 Sets the flash to C<$errmsg> and redirects to the action given by
