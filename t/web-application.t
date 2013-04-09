@@ -33,6 +33,12 @@ my %spreadsheets = (
     clone2      => "$DATA_DIR/clone2.xls",
 );
 
+my %alert_classes = (
+    error  => 'alert-error', notice => 'alert-info',
+    success => 'alert-success', warning => 'alert-block',
+);
+
+
 # start test server
 my $mech = t::DB::new_mech();
 ok $mech, 'created test mech' or BAIL_OUT;
@@ -592,10 +598,19 @@ sub goto_page {
 }
 
 
-# submit a form with the given args, then check to see if a user error
-# occurred. current $mech->uri should be the page with the form in it.
-sub user_error_like {
-    my ($testname, $form_name, $form_args, $errmsg) = @_;
+
+
+# These methods test the user feedback messages after submitting a
+# form.  user_feedback_like() is the generic method, tests should use
+# one of the other user_*_like methods instead.
+#
+# This method will attempt to submit $form_args to the form named
+# $form_name on the current page. It tests to make sure the request
+# submits ok (i.e. no 500 'Internal Server Error').  It then retreives
+# the standard feedback widget for the given feedback type and
+# compares its contents against the $errmsg regex.
+sub user_feedback_like {
+    my ($feedback_type, $testname, $form_name, $form_args, $errmsg) = @_;
 
     subtest $testname => sub {
         $mech->submit_form_ok({ # form should submit, not return 500 error
@@ -604,8 +619,12 @@ sub user_error_like {
         }, "can submit form without error");
 
         my $sel = HTML::Selector::XPath::Simple->new($mech->content);
-        my @all_elements = $sel->select('div.alert-error');
+        my @all_elements = $sel->select('div.' . $alert_classes{$feedback_type});
         my $page_error = pop @all_elements;
         like $page_error, $errmsg, 'got correct error message';
     }
 }
+sub user_error_like   { user_feedback_like('error',   @_); }
+sub user_notice_like  { user_feedback_like('notice',  @_); }
+sub user_success_like { user_feedback_like('success', @_); }
+sub user_warning_like { user_feedback_like('warning', @_); }
