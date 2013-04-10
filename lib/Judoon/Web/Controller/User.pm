@@ -162,15 +162,22 @@ sub password_POST {
 }
 
 
-=head2 base / id /edit
+=head2 base
 
-Actions for managing user pages.  base is currently empty.  id pulls
-the $username out of the URL.  edit is the user overview page
+Base action for managing user pages.  Currently does nothing.
 
 =cut
 
 sub base : Chained('/base') PathPart('user') CaptureArgs(0) {}
-sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {
+
+
+=head2 id
+
+Pull out the username from the url and search for that user.
+
+=cut
+
+sub id : Chained('base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $username) = @_;
     my $user = $c->model('User::User')->find({username => $username});
     if (not $user) {
@@ -185,6 +192,15 @@ sub id   : Chained('base')  PathPart('')   CaptureArgs(1) {
     $c->stash->{user}{id}     = $username;
     $c->stash->{user}{object} = $user;
 }
+
+
+=head2 edit
+
+The user overview page that lists all the datasets and pages owned by
+that user.
+
+=cut
+
 sub edit : Chained('id') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'user/edit.tt2';
