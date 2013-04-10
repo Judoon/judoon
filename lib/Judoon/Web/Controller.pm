@@ -70,6 +70,19 @@ sub set_notice {
 }
 
 
+=head2 set_warning( $c, $warning_msg )
+
+Sets the warning key in the flash.  This is the key used in the
+notification template component.
+
+=cut
+
+sub set_warning {
+    my ($self, $c, $warning_msg) = @_;
+    $c->flash->{alert}{warning} = $warning_msg;
+}
+
+
 =head2 set_error_and_redirect( $c, $errmsg, \@action )
 
 Sets the flash to C<$errmsg> and redirects to the action given by

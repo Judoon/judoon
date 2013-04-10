@@ -93,7 +93,7 @@ action for not yet implemented actions
 
 sub placeholder :Local {
     my ($self, $c) = @_;
-    $c->flash->{message} = "Sorry, this is page is not yet implemented.";
+    $self->set_warning($c, "Sorry, this is page is not yet implemented.");
     $c->res->redirect('/');
 }
 
