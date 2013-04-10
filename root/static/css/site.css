@@ -1,9 +1,6 @@
 /* ========== Basic structure styles ========== */
 
-body {
-    background-color: #eee;
-    padding: 5px;
-}
+body {}
 
 header {
     padding: 0.5em 3em;
@@ -22,9 +19,8 @@ footer p { padding: 2px; }
 
 #middle {
     margin: 0 0 3px 0;
-    padding-top: 2em;
+    padding-top: 1em;
     padding-bottom: 2em;
-    background-color: #fff;
 }
 
 
