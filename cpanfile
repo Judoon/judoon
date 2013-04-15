@@ -21,7 +21,7 @@ requires 'Catalyst::Plugin::Session::Store::Memcached';
 requires 'Catalyst::Plugin::StackTrace';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Plugin::Unicode::Encoding';
-requires 'Catalyst::Runtime' => '5.90013';
+requires 'Catalyst::Runtime' => '5.90030';
 requires 'Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::RoleApplicator';
