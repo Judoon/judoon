@@ -73,7 +73,7 @@ subtest 'Login / Logout' => sub {
 
     # good login
     $mech->submit_form_ok({
-        form_number => 1,
+        form_name => 'login_form',
         fields => \%credentials,
     }, 'submitted login okay');
     no_redirect_ok('/settings/profile', 'can get to profile after login');
@@ -140,6 +140,7 @@ subtest 'User Tests' => sub {
             },
             'can update profile',
         );
+        $mech->form_name('profile_form');
         my ($name_input) = $mech->grep_inputs({name => qr/^user\.name$/});
         is $name_input->value, 'New Name', 'phone number has been updated';
 
@@ -245,7 +246,7 @@ subtest 'Dataset' => sub {
     $mech->get_ok($dataset_uri, 'can get dataset page');
 
     # PUT dataset/object
-    puts_ok('dataset', $dataset_uri, {
+    puts_ok('dataset', $dataset_uri, 'dataset_edit', {
         'dataset.name'       => 'Brand New Name',
         'dataset.notes'      => 'These are some notes',
         'dataset.permission' => 'public',
@@ -311,7 +312,7 @@ subtest 'Page' => sub {
     $mech->get_ok("$page_uri?view=preview", 'get page preview page');
 
     # PUT page/object
-    puts_ok("page", $page_uri, {
+    puts_ok("page", $page_uri, 'page_edit', {
         'page.title'     => 'This is a new page',
         'page.preamble'  => 'Mumble, mumble, preamble',
         'page.postamble' => 'Humble bumblebee postamble',
@@ -352,7 +353,7 @@ subtest 'PageColumn' => sub {
     });
 
     # PUT pagecolumn/object
-    puts_ok("page_column", $pagecol_uri, {
+    puts_ok("page_column", $pagecol_uri, 'pagecol_form', {
         'page_column.title' => 'Chaang Column Update',
     });
 
@@ -459,6 +460,7 @@ subtest 'Complete Coverage' => sub {
         { 'dataset.name' => 'boo', 'x-tunneled-method' => 'PUT', 'dataset.notes' => undef, },
         'can update dataset w/ undef param',
     );
+    $mech->form_name('dataset_edit');
     my ($ds_input) = $mech->grep_inputs({name => qr/^dataset\.notes$/});
     is $ds_input->value, q{}, "ExtractParams sets undef parameter to q{}";
 };
@@ -473,7 +475,7 @@ sub login {
     logout();
     $mech->get('/login');
     $mech->submit_form(
-        form_number => 1,
+        form_name => 'login_form',
         fields => {
             username => $users{$user}->{username},
             password => $users{$user}->{password},
@@ -515,8 +517,9 @@ sub no_redirect_ok {
 
 
 sub puts_ok {
-    my ($object, $edit_uri, $put_args) = @_;
+    my ($object, $edit_uri, $form_name, $put_args) = @_;
 
+    $mech->form_name($form_name);
     $mech->get_ok($edit_uri, "can get $object edit page");
     # PUT dataset/object
     $mech->post_ok(
@@ -525,6 +528,7 @@ sub puts_ok {
         "can update $object",
     );
     $mech->get($edit_uri);
+    $mech->form_name($form_name);
     while (my ($k, $v) = each %$put_args) {
         my ($ds_input) = $mech->grep_inputs({name => qr/^$k$/});
         is $ds_input->value, $v, "$k has been updated";
