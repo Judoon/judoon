@@ -1,31 +1,23 @@
 /* ========== Basic structure styles ========== */
 
-body {
-    background-color: #eee;
-    padding: 5px;
-}
+body {}
 
-header {
-    padding: 0.5em 3em;
-    background: #35D4A4;
-    color: #006D4C;
-    margin-bottom: 3px;
-}
-header a:visited { color: #006D4C; }
-footer {
-    padding: 5px;
-    background: none repeat scroll 0% 0% rgb(104, 154, 211);
-    color: rgb(4, 53, 108);
-    border-color: rgb(13, 86, 166);
-}
-footer p { padding: 2px; }
+#top {}
+#top a.brand { color: #006D4C; }
 
 #middle {
-    margin: 0 0 3px 0;
-    padding-top: 2em;
+    padding-top: 1em;
     padding-bottom: 2em;
-    background-color: #fff;
 }
+
+#footer {
+    border-top: thin #006d4c solid;
+    padding-top: 0.5em;
+}
+#footer p { color: #00a876; }
+#footer a { text-decoration: underline; color: #207e62; }
+
+
 
 
 
