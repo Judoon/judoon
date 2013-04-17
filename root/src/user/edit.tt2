@@ -31,13 +31,7 @@
 <h4>[% user.object.username %] has not publicized any of their data yet</h4>
 [%- ELSIF user.is_owner -%]
   [% PROCESS guide_add_dataset %]
-  [% IF c.req.param('separate_lists') %]
-  [%- INCLUDE 'components/overview/separate-lists.tt2' -%]
-  [% ELSIF c.req.param('nested_lists') %]
-  [%- INCLUDE 'components/overview/nested-lists.tt2' -%]
-  [% ELSE %]
   [%- INCLUDE 'components/overview/tabbed.tt2' -%]
-  [% END %]
 [%- ELSE -%]
   [%- INCLUDE 'components/overview/visitor.tt2' -%]
 [%- END -%]
@@ -56,15 +50,6 @@
   <div class="span7">
     [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
   </div>
-</div>
-
-<div>
-    <ul class="nav nav-pills">
-      <li class="nav-header">Layout:</li>
-      <li class="[% !c.req.param('separate_lists') && !c.req.param('nested_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {tabbed_view=>1}) %]">tabbed view</a></li>
-      <li class="[% c.req.param('separate_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {separate_lists=>1}) %]">separate lists</a></li>
-      <li class="[% c.req.param('nested_lists') ? 'active' : '' %]"><a href="[% c.uri_for_action('/user/edit', [c.user.obj.username], {nested_lists=>1}) %]">nested lists</a></li>
-    </ul>
 </div>
 
 <div id="howto_modal" class="modal hide fade">

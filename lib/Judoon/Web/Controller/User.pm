@@ -270,7 +270,6 @@ sub edit : Chained('id') PathPart('') Args(0) {
         }
 
         $c->stash->{dataset}{list} = \@datasets;
-        $c->stash->{page}{list}    = [map {@{$_->{pages}}} @datasets];
     }
     else {
         my @datasets = $c->stash->{user}{object}->datasets_rs->ordered->public->all;
