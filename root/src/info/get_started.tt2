@@ -1,5 +1,5 @@
 [% WRAPPER components/wrapper.tt2
-  title = 'Welcome'
+  title = 'Get Started'
 %]
 
 [%- INCLUDE 'components/notification.tt2' -%]

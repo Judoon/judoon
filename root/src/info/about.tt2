@@ -1,0 +1,39 @@
+[% WRAPPER components/wrapper.tt2
+  title = 'About Judoon'
+%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+
+<section>
+  <h2>About Judoon</h2>
+  <p>
+    Judoon began as a project of
+    the <a href="http://www.cellmigration.org">Cell Migration
+    Consortium</a> (<abbr title="Cell Migration Consortium"
+    class="initialism">CMC</abbr>).  During the life of
+    the <abbr title="Cell Migration Consortium"
+    class="initialism">CMC</abbr> we received many requests from
+    investigators to take <abbr title="Cell Migration Consortium"
+    class="initialism">CMC</abbr>-generated data and share it on the web.
+    We developed a system for this and produced many pages such as
+    <a href="http://www.cellmigration.org/resource/discovery/montell/dm_vesicle_screen.cgi">this</a>.
+  </p>
+  <p>
+    The drawback to this was that it required a programmer with
+    expertise in databases, CGI, HTML, and Javascript to make it work.
+    Publishing a new dataset took about a week, but since the process
+    was very repetitive (and investigators knew their data better than
+    we did), we decided to build a system that helped researchers
+    publish their spreadsheets on the web.
+  </p>
+
+  <p>
+    If you have any questions, comments, or suggestions we would love
+    to hear from you.  Please email us
+    at <a href="mailto:help@cellmigration.org">help@cellmigration.org</a>.
+  </p>
+
+</section>
+
+
+[% END %]

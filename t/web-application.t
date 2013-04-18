@@ -57,6 +57,8 @@ subtest 'Basic Tests' => sub {
     $mech->get_ok('/placeholder', 'get placeholder page');
     $mech->get_ok('/api');
     $mech->get_ok('/get_started');
+    $mech->get_ok('/about');
+    $mech->get_ok('/news');
 };
 
 

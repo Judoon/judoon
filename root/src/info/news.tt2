@@ -1,0 +1,19 @@
+[% WRAPPER components/wrapper.tt2
+  title = 'News and Updates'
+%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+
+<section>
+  <h2>News and Updates</h2>
+
+  <h4>Thursday, April 18, 2013</h4>
+  <p>
+    <strong>Our site is now searchable!</strong> Type your query in
+    the searchbar at the top of the page, hit enter, and search our
+    news, help pages, and public and private datasets.
+  </p>
+</section>
+
+
+[% END %]
