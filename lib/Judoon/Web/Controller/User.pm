@@ -272,9 +272,30 @@ sub edit : Chained('id') PathPart('') Args(0) {
         $c->stash->{dataset}{list} = \@datasets;
     }
     else {
-        my @datasets = $c->stash->{user}{object}->datasets_rs->ordered->public->all;
+        my @datasets = $c->stash->{user}{object}->datasets_rs->public
+            ->ordered_with_pages_and_pagecols->hri->all;
+
+        my @pages;
+        for my $ds (@datasets) {
+            $ds->{dataset_url} = $c->uri_for_action(
+                '/private/dataset/object',
+                [$c->stash->{user}{object}->username, $ds->{id}],
+            );
+
+            for my $page (@{ $ds->{pages} }) {
+                next unless $page->{permission} eq 'public';
+                $page->{page_url} = $c->uri_for_action(
+                    '/private/page/object',
+                    [$c->stash->{user}{object}->username, $ds->{id}, $page->{id}]
+                );
+
+                push @pages, $page;
+            }
+
+        }
+
         $c->stash->{dataset}{list} = \@datasets;
-        $c->stash->{page}{list}    = [map {$_->pages_rs->ordered->public} @datasets];
+        $c->stash->{page}{list}    = \@pages;
     }
 
 }
