@@ -14,7 +14,7 @@ Filter down to public records
 
 sub public {
     my ($self) = @_;
-    return $self->search({permission => 'public'});
+    return $self->search({$self->me . 'permission' => 'public'});
 }
 
 
