@@ -11,6 +11,7 @@ use Test::JSON;
 use t::DB;
 
 use Data::Printer;
+use DateTime;
 use Judoon::Spreadsheet;
 use Judoon::Tmpl;
 use Spreadsheet::ParseExcel;
@@ -324,6 +325,52 @@ subtest 'Result::PageColumn' => sub {
     my @objects = $page_column->template->get_nodes;
     ok @objects == 1 && ref($objects[0]) eq 'Judoon::Tmpl::Node::Newline',
         '  ...and get correct objects back';
+};
+
+
+subtest 'Result(Set)?::Token' => sub {
+    my $token_rs = ResultSet('Token');
+    my $user  = ResultSet('User')->first;
+
+    my $token = $token_rs->new_result({user => $user});
+    $token->password_reset();
+    $token->insert;
+
+    ok my $token_value = $token->value, 'token has a default value';
+    ok my $expiry = $token->expires, 'token has default expiry';
+
+    my $now  = DateTime->now;
+    my $soon = DateTime->now->add(hours => 24);
+    ok( (($expiry >= $now) && ($expiry <= $soon)), 'expiry is within 24 hours');
+    is $token->password_reset, 'password_reset', 'correctly set action';
+
+    my $dupe_token = $token_rs->new_result({
+        user => $user, value => $token_value, action => 'password_reset',
+    });
+    like exception { $dupe_token->insert }, qr{violates unique constraint},
+        'token insert fails with duplicate value';
+
+    my $found_token = $token_rs->find_by_value($token_value);
+    ok $found_token, 'able to find exisitng token by its value';
+    is $user->related_resultset('tokens')->password_reset->count, 1,
+        'found tokens by RS::password_reset';
+    is $user->related_resultset('tokens')->unexpired->count, 1,
+        'found tokens by RS::unexpired';
+
+    my $second_token = $user->new_reset_token();
+    is_result($second_token);
+    my @all_tokens = $user->valid_reset_tokens;
+    is @all_tokens, 2, 'found both valid reset tokens';
+
+    $all_tokens[0]->expires(DateTime->now->subtract(hours => 100));
+    $all_tokens[0]->update;
+    $all_tokens[1]->action('something else');
+    $all_tokens[1]->update;
+    is $user->valid_reset_tokens, 0, 'no more valid reset tokens';
+    is $user->search_related('tokens')->password_reset->count, 1,
+        'one password_reset token';
+    is $user->search_related('tokens')->unexpired->count, 1,
+        'one unexpired token';
 };
 
 done_testing();

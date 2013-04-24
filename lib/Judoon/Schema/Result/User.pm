@@ -187,6 +187,13 @@ Composing relations: L</user_roles> -> role
 __PACKAGE__->many_to_many("roles", "user_roles", "role");
 
 
+__PACKAGE__->has_many(
+    tokens => '::Token',
+    {'foreign.user_id' => 'self.id'},
+    { cascade_copy => 0, cascade_delete => 0 },
+);
+
+
 =head1 EXTRA COMPONENTS
 
 =head2 PassphraseColumn
@@ -316,6 +323,33 @@ Convenience method to get C<User>'s pages as a resultset.
 sub my_pages {
     my ($self) = @_;
     return $self->datasets_rs->related_resultset('pages');
+}
+
+
+=head2 new_reset_token
+
+Generate a password reset token.
+
+=cut
+
+sub new_reset_token {
+    my ($self) = @_;
+    my $token = $self->new_related('tokens', {});
+    $token->password_reset();
+    $token->insert;
+    return $token;
+}
+
+
+=head2 valid_reset_tokens
+
+Get list of unexpired password reset tokens.
+
+=cut
+
+sub valid_reset_tokens {
+    my ($self) = @_;
+    return $self->search_related('tokens')->password_reset->unexpired->all;
 }
 
 

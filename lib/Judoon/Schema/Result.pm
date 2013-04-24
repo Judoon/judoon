@@ -24,6 +24,7 @@ __PACKAGE__->load_components(qw{
    Helper::Row::Lookup
    InflateColumn::DateTime
    TimeStamp
+   DynamicDefault
    Helper::Row::NumifyGet
    Helper::Row::RelationshipDWIM
 });
