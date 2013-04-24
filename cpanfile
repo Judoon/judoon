@@ -46,6 +46,8 @@ requires 'DBIx::Class::Schema::Config';
 requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::Class::DynamicDefault';
 requires 'DBIx::RunSQL';
+requires 'Email::Sender::Simple';
+requires 'Email::Simple';
 requires 'Excel::Writer::XLSX';
 requires 'File::Spec';
 requires 'File::Temp';

@@ -92,6 +92,44 @@ subtest 'Login / Logout' => sub {
 };
 
 
+subtest 'Password Resend' => sub {
+    logout();
+
+    my $pass_resend_uri = '/user/resend_password';
+    $mech->get_ok($pass_resend_uri, 'get password resend page ok');
+
+    my @errors = (
+        [q{no password reset w/ bad email},    {email_address => 'nope@nope.com'},],
+        [q{no password reset w/ bas username}, {username => 'doesnt_exist'},],
+        [q{no password reset w/o args},        {},],
+    );
+    for my $error (@errors) {
+        my ($msg, $args,) = @$error;
+        user_error_like(
+            $msg, 'resend_password_form', $args, qr{Couldn't find an account},
+        );
+    }
+
+    my @wins = (
+        ['can request password reset by email', {email_address => $users{testuser}->{email_address}},],
+        ['can request password reset by username', {username => 'testuser'},],
+    );
+    for my $win (@wins) {
+        my ($msg, $args) = @$win;
+        $mech->get($pass_resend_uri);
+        user_notice_like(
+            $msg, 'resend_password_form', $args,
+            qr{email has been sent},
+        );
+        like $mech->uri, qr{/login$}, '..then sent to login page';
+    }
+
+    login('testuser');
+    redirects_to_ok($pass_resend_uri, '/user/testuser',);
+    # need to add test for post to /user/resend_password
+};
+
+
 subtest 'User Tests' => sub {
     my $newuser_canon = $users{newuser};
     my %newuser = map {; "user.$_" => $newuser_canon->{$_}}
@@ -162,7 +200,7 @@ subtest 'User Tests' => sub {
         user_error_like(
             'need all three fields',
             'password_form', {old_password => $newuser{'user.password'},},
-            qr/Something is missing/i,
+            qr/New password must not be blank/i,
         );
 
         user_error_like(
@@ -191,6 +229,8 @@ subtest 'User Tests' => sub {
             },
             'able to update password',
         );
+
+        #diag $mech->content;
         $mech->content_like(qr/Your password has been updated/, 'can update password');
         $newuser_canon->{password} = 'newuserisstillme';
     };

@@ -20,6 +20,8 @@ with qw(
     Judoon::Web::Controller::Role::ExtractParams
 );
 
+use Email::Sender::Simple;
+use Email::Simple;
 use Safe::Isa;
 use Try::Tiny;
 
@@ -131,6 +133,7 @@ The action for changing the users password.
 
 sub password : Chained('settings') PathPart('password') Args(0) :ActionClass('REST') {
     my ($self, $c) = @_;
+    $c->stash->{is_reset} = $c->user_in_realm('password_reset') ? 1 : 0;
     $c->stash->{template} = 'settings/password.tt2';
 }
 sub password_GET {}
@@ -138,27 +141,52 @@ sub password_POST {
     my ($self, $c) = @_;
 
     my $params = $c->req->params;
-    my $found = grep {$params->{$_}} qw(old_password new_password confirm_new_password);
-    my $errmsg
-        = $found != 3                                                ? 'something is missing?'
-        : !$c->user->check_password($params->{old_password})         ? 'Your old password is incorrect'
-        : $params->{new_password} ne $params->{confirm_new_password} ? 'Passwords do not match!'
-        : !$c->model('User::User')->validate_password($params->{new_password}) ? 'Invalid password'
-        :                                                               '';
+    my $user   = $c->user;
+    my $errmsg;
+    my @reset_tokens;
+
+    if ($c->user_in_realm('password_reset')) {
+
+        @reset_tokens = $user->valid_reset_tokens;
+        if (not @reset_tokens) {
+            $c->user->logout;
+            $self->set_error($c, <<'ERRMSG');
+Your password reset token has expired. Please request another one.
+ERRMSG
+            $self->go_here($c, '/user/resend_password');
+            $c->detach();
+        }
+
+    }
+    else { # regular password change, must check old_password
+        if (not $user->check_password($params->{old_password})) {
+            $errmsg = 'Your old password is incorrect';
+        }
+    }
+
+    $errmsg
+        ||= not(grep {$params->{$_}} qw(new_password confirm_new_password))      ? 'New password must not be blank'
+          : $params->{new_password} ne $params->{confirm_new_password}           ? 'Passwords do not match!'
+          : !$c->model('User::User')->validate_password($params->{new_password}) ? 'Invalid password'
+          :                                                                        '';
     if ($errmsg) {
         $c->stash->{alert}{error} = $errmsg;
         $c->detach;
     }
 
     try {
-        $c->user->change_password($params->{new_password});
+        $user->change_password($params->{new_password});
     }
     catch {
         $c->stash->{alert}{error} = "Unable to change password: $_";
         $c->detach;
     };
 
-    $c->stash->{alert}{success} = 'Your password has been updated.';
+
+    $_->delete for (@reset_tokens);
+
+    $c->flash->{alert}{success} = 'Your password has been updated.';
+    $self->go_here($c, '/user/edit', [$user->username]);
 }
 
 
@@ -171,6 +199,87 @@ Base action for managing user pages.  Currently does nothing.
 sub base : Chained('/base') PathPart('user') CaptureArgs(0) {}
 
 
+=head2 resend_password / resend_password_GET / resend_password_POST
+
+User forgot their password? Send them a reminder email with a password
+reset link.
+
+=cut
+
+sub resend_password : Chained('base') PathPart('resend_password') Args(0) ActionClass('REST') {
+    my ($self, $c) = @_;
+    if (my $user = $c->user) {
+        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $c->detach();
+    }
+}
+sub resend_password_GET {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'user/resend_password.tt2';
+}
+sub resend_password_POST {
+    my ($self, $c) = @_;
+
+    my $params = $c->req->params;
+    my $user;
+    if (my $email = $params->{email_address}) {
+        $user = $c->model('User::User')->email_exists($email);
+    }
+    elsif (my $username = $params->{username}) {
+        $user = $c->model('User::User')->user_exists($username);
+    }
+
+    if (not $user) {
+        $self->set_error_and_redirect(
+            $c, q{Couldn't find an account with the given information.},
+            ['/user/resend_password'],
+        );
+        $c->detach();
+    }
+
+    my $token     = $user->new_reset_token;
+    my $token_val = $token->value;
+
+    my $reset_uri = $c->uri_for_action('/user/list', [], {value => $token_val});
+    my $email_content = <<"EMAIL";
+To reset your password, please click on the following link:
+
+  $reset_uri
+
+If you have any trouble please contact us at help\@cellmigration.org.
+
+Thanks!
+The Judoon Team
+EMAIL
+
+    try {
+        my $email = Email::Simple->create(
+            header => [
+                From    => '"Judoon" <help@cellmigration.org>',
+                To      => $user->email_address,
+                Subject => 'Judoon password reset',
+            ],
+            body => $email_content,
+        );
+
+        Email::Sender::Simple->send($email);
+    }
+    catch {
+        my ($e) = $_;
+        my $error = <<'EOE';
+We are unable to send an email at the moment.  An admin has
+been notified. Please try again later.
+EOE
+        $self->set_error_and_redirect($c, $error, ['/login/login']);
+        $c->detach;
+    };
+
+
+    $self->set_notice($c, q{An email has been sent to the email address associated with the account.});
+    $self->go_here($c, '/login/login');
+}
+
+
 =head2 list
 
 Nothing useful here, redirect elsewhere
@@ -180,7 +289,18 @@ Nothing useful here, redirect elsewhere
 sub list : Chained('base') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
-    if (my $user = $c->user) {
+    if (my $token = $c->req->params->{value}) {
+        my $token = $c->model('User::Token')->find_by_value($token);
+        if (not $token) {
+            $self->set_error($c, 'No action found for token');
+            $self->go_here($c, '/login/login');
+        }
+        else {
+            $c->authenticate({id => $token->user->id}, 'password_reset');
+            $self->go_here($c, '/user/password', {});
+        }
+    }
+    elsif (my $user = $c->user) {
         $self->go_here($c, '/user/edit', [$user->get('username')]);
         $c->detach();
     }
