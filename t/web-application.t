@@ -220,18 +220,15 @@ subtest 'User Tests' => sub {
             }, qr/Invalid password/i,
         );
 
-        $mech->post_ok(
-            '/settings/password',
-            {
+        user_success_like(
+            'able to update password',
+            'password_form', {
                 old_password         => $newuser{'user.password'},
                 new_password         => 'newuserisstillme',
                 confirm_new_password => 'newuserisstillme',
-            },
-            'able to update password',
+            }, qr/Your password has been updated/,
         );
 
-        #diag $mech->content;
-        $mech->content_like(qr/Your password has been updated/, 'can update password');
         $newuser_canon->{password} = 'newuserisstillme';
     };
 
