@@ -20,8 +20,6 @@ with qw(
     Judoon::Web::Controller::Role::ExtractParams
 );
 
-use Email::Sender::Simple;
-use Email::Simple;
 use Safe::Isa;
 use Try::Tiny;
 
@@ -239,33 +237,19 @@ sub resend_password_POST {
 
     my $token     = $user->new_reset_token;
     my $token_val = $token->value;
-
     my $reset_uri = $c->uri_for_action('/user/list', [], {value => $token_val});
-    my $email_content = <<"EMAIL";
-To reset your password, please click on the following link:
-
-  $reset_uri
-
-If you have any trouble please contact us at help\@cellmigration.org.
-
-Thanks!
-The Judoon Team
-EMAIL
 
     try {
-        my $email = Email::Simple->create(
-            header => [
-                From    => '"Judoon" <help@cellmigration.org>',
-                To      => $user->email_address,
-                Subject => 'Judoon password reset',
-            ],
-            body => $email_content,
+        $c->model('Emailer')->send(
+            $c->model('Email')->new_password_reset({
+                reset_uri => $reset_uri,
+            }),
+            {to => $user->email_address, },
         );
-
-        Email::Sender::Simple->send($email);
     }
     catch {
         my ($e) = $_;
+        $c->log->error($e);
         my $error = <<'EOE';
 We are unable to send an email at the moment.  An admin has
 been notified. Please try again later.
