@@ -1,0 +1,10 @@
+{
+  "renderer": "TT",
+  "header": [
+    { "From": "Judoon <cellmigrationgateway@gmail.com>" },
+    { "Subject": "Judoon password reset" }
+  ],
+  "alternatives": [
+    { "type": "text/plain", "path": "body.txt" }
+  ]
+}

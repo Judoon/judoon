@@ -47,6 +47,8 @@ requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::Class::DynamicDefault';
 requires 'DBIx::RunSQL';
 requires 'Email::Address';
+requires 'Email::MIME::Kit';
+requires 'Email::MIME::Kit::Renderer::TT';
 requires 'Email::Sender::Simple';
 requires 'Email::Simple';
 requires 'Excel::Writer::XLSX';
