@@ -188,7 +188,16 @@ subtest 'Password Resend' => sub {
 };
 
 
-subtest 'User Tests' => sub {
+subtest 'Account' => sub {
+
+    subtest 'Account List' => sub {
+        logout();
+        redirects_to_ok('/account', '/login');
+        login('testuser');
+        redirects_to_ok('/account', '/user/testuser');
+    };
+
+
     my $newuser_canon = $users{newuser};
     my %newuser = map {; "user.$_" => $newuser_canon->{$_}}
         keys %$newuser_canon;
