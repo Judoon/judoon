@@ -227,10 +227,9 @@ sub password_POST {
         @reset_tokens = $user->valid_reset_tokens;
         if (not @reset_tokens) {
             $c->user->logout;
-            $self->set_error($c, <<'ERRMSG');
+            $self->set_error_and_redirect($c, <<'ERRMSG', ['/acccount/resend_password']);
 Your password reset token has expired. Please request another one.
 ERRMSG
-            $self->go_here($c, '/acccount/resend_password');
             $c->detach();
         }
 
