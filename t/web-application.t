@@ -98,7 +98,7 @@ subtest 'Login / Logout' => sub {
 };
 
 
-subtest 'Password Resend' => sub {
+subtest 'Password Reset' => sub {
     logout();
 
     my $pass_resend_uri = '/account/password_reset';
@@ -141,6 +141,15 @@ subtest 'Password Resend' => sub {
     login('testuser');
     redirects_to_ok($pass_resend_uri, '/user/testuser',);
     logout();
+
+
+    my $bad_reset_uri = $reset_uri;
+    $bad_reset_uri .= 'totally_bogus';
+    $mech->get($bad_reset_uri);
+    like $mech->uri(), qr{/login$},
+        'bad login token sends you to the login page';
+    # fixme: add user_error_like test, once decoupled from submit_form_ok
+
 
     $mech->get_ok($reset_uri, 'can get uri reset page');
     like $mech->content(), qr{Confirm New Password}, '  ...make sure we have correct page';

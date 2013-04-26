@@ -47,8 +47,7 @@ sub list : Chained('base') PathPart('') Args(0) {
     if (my $token = $c->req->params->{value}) {
         my $token = $c->model('User::Token')->find_by_value($token);
         if (not $token) {
-            $self->set_error($c, 'No action found for token');
-            $self->go_here($c, '/login/login');
+            $self->set_error_and_redirect($c, 'No action found for token', ['/login/login', {}]);
         }
         else {
             $c->authenticate({id => $token->user->id}, 'password_reset');
