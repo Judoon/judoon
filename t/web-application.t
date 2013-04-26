@@ -5,11 +5,17 @@ use warnings;
 
 use lib q{t/lib};
 
+BEGIN {
+    $ENV{EMAIL_SENDER_TRANSPORT} = 'Test';
+}
+
+
 use Test::More;
 use t::DB;
 
 use Config::General;
 use Data::Printer;
+use Email::Sender::Simple;
 use File::Temp qw(tempdir);
 use FindBin qw($Bin);
 use HTML::Selector::XPath::Simple;
@@ -100,7 +106,7 @@ subtest 'Password Resend' => sub {
 
     my @errors = (
         [q{no password reset w/ bad email},    {email_address => 'nope@nope.com'},],
-        [q{no password reset w/ bas username}, {username => 'doesnt_exist'},],
+        [q{no password reset w/ bad username}, {username => 'doesnt_exist'},],
         [q{no password reset w/o args},        {},],
     );
     for my $error (@errors) {
@@ -114,6 +120,7 @@ subtest 'Password Resend' => sub {
         ['can request password reset by email', {email_address => $users{testuser}->{email_address}},],
         ['can request password reset by username', {username => 'testuser'},],
     );
+    my $reset_uri;
     for my $win (@wins) {
         my ($msg, $args) = @$win;
         $mech->get($pass_resend_uri);
@@ -122,10 +129,61 @@ subtest 'Password Resend' => sub {
             qr{email has been sent},
         );
         like $mech->uri, qr{/login$}, '..then sent to login page';
+
+        my ($reset_email) = Email::Sender::Simple->default_transport->deliveries;
+        my $body = $reset_email->{email}->as_string;
+        like $body, qr{judoon password reset}i, 'password reset email sent';
+        ($reset_uri) = ($body =~ m{http://[^/]+(/\S+)});
+        Email::Sender::Simple->default_transport->clear_deliveries;
     }
 
+    # make sure we can log in as normal user even after passwd reset
     login('testuser');
     redirects_to_ok($pass_resend_uri, '/user/testuser',);
+    logout();
+
+    $mech->get_ok($reset_uri, 'can get uri reset page');
+    like $mech->content(), qr{Confirm New Password}, '  ...make sure we have correct page';
+    unlike $mech->content(), qr{Old Password}, '  ...dont ask for old password';
+
+    user_error_like(
+        q{can't change password when new passwords don't match},
+        'password_form', {
+            new_password         => 'this',
+            confirm_new_password => 'that',
+        }, qr/passwords do not match/i,
+    );
+
+    user_error_like(
+        q{can't change password when one of new passwords is blank},
+        'password_form', {
+            new_password         => '',
+            confirm_new_password => '',
+        }, qr/password must not be blank/i,
+    );
+
+    user_error_like(
+        q{can't change password when passwords are invalid},
+        'password_form', {
+            new_password         => 'this',
+            confirm_new_password => 'this',
+        }, qr/invalid password/i,
+    );
+
+
+    $mech->submit_form_ok({
+        form_name => 'password_form',
+        fields => {qw(new_password newpasswd confirm_new_password newpasswd)},
+    }, 'submit password reset okay');
+
+    like $mech->uri, qr{/user/testuser$}, 'sent to testuser overview page';
+
+    logout();
+    $users{testuser}->{password} = 'newpasswd';
+    login('testuser');
+    like $mech->uri, qr{/user/testuser}, 'Password successfully reset';
+
+
     # need to add test for post to /user/resend_password
 };
 
