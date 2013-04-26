@@ -101,7 +101,7 @@ subtest 'Login / Logout' => sub {
 subtest 'Password Resend' => sub {
     logout();
 
-    my $pass_resend_uri = '/user/resend_password';
+    my $pass_resend_uri = '/account/password_reset';
     $mech->get_ok($pass_resend_uri, 'get password resend page ok');
 
     my @errors = (
@@ -184,7 +184,7 @@ subtest 'Password Resend' => sub {
     like $mech->uri, qr{/user/testuser}, 'Password successfully reset';
 
 
-    # need to add test for post to /user/resend_password
+    # need to add test for post to /account/password_reset
 };
 
 
@@ -194,10 +194,10 @@ subtest 'User Tests' => sub {
         keys %$newuser_canon;
 
     subtest 'Signup' => sub {
-        $mech->get_ok('/signup', 'got signup page');
+        $mech->get_ok('/account/signup', 'got signup page');
 
         $newuser{'user.confirm_password'} = 'wontmatch';
-        $mech->post_ok('/signup', \%newuser);
+        $mech->post_ok('/account/signup', \%newuser);
         $mech->content_like(
             qr{passwords do not match}i,
             q{can't create user w/o matching passwords},
@@ -205,7 +205,7 @@ subtest 'User Tests' => sub {
 
         $newuser{'user.confirm_password'} = $newuser{'user.password'};
         $newuser{'user.username'}         = 'testuser';
-        $mech->post_ok('/signup', \%newuser);
+        $mech->post_ok('/account/signup', \%newuser);
         $mech->content_like(
             qr{this username is already taken}i,
             q{can't create user w/ same name as current user},
@@ -213,7 +213,7 @@ subtest 'User Tests' => sub {
 
 
         $newuser{'user.username'} = 'newuser';
-        $mech->post_ok('/signup', \%newuser, 'can create new user');
+        $mech->post_ok('/account/signup', \%newuser, 'can create new user');
         like $mech->uri, qr{/user/newuser},
             '  ...and send new user to their datasets';
     };

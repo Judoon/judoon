@@ -13,9 +13,9 @@
   <input type="password" form="login_form" name="password" id="password" class="input-small" placeholder="Password" tabindex="2" />
   <button type="submit" form="login_form" class="btn">Submit</button>
 </form>
-<p><a href="[% c.uri_for_action('/user/resend_password') %]">Forgot your password?</a></p>
+<p><a href="[% c.uri_for_action('/account/resend_password') %]">Forgot your password?</a></p>
 </div>
 
-<p>Don't have an account?  <a href="[% c.uri_for_action('/user/signup') %]">Sign up here!</a></p>
+<p>Don't have an account?  <a href="[% c.uri_for_action('/account/signup') %]">Sign up here!</a></p>
 
 [% END %]
