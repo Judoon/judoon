@@ -1,11 +1,52 @@
 package Judoon::Emailer;
 
+=pod
+
+=for stopwords VERP judoon VERPify VERP'd
+
+=encoding utf-8
+
+=head1 NAME
+
+Judoon::Emailer - Send emails with automatic VERP generation
+
+=head1 SYNOPSIS
+
+ use Judoon::Emailer;
+
+ my $email = Judoon::Email->new_password_reset({
+     reset_uri => 'http://example.com/reset?token=deadbeef
+ });
+
+=head1 DESCRIPTION
+
+C<Judoon::Emailer> sends email via L<Email::Sender::Simple>, first
+processing it to set a VERP from on the envelope.
+
+=cut
+
 use Moo;
 use MooX::Types::MooseLike::Base qw(Str RegexpRef);
 
 use Email::Address;
 use Email::Sender::Simple;
 
+
+=head1 ATTRIBUTES
+
+=head2 verp_id / _build_verp_id
+
+The prefix to our VERP from address. Default: 'judoon'
+
+=head2 verp_domain / _build_verp_domain
+
+The domain for our VERP from address. Default: 'cellmigration.org'
+
+=head2 verp_regex / _build_verp_regex
+
+A regex to recognize addressed that have already been VERP'd.
+
+=cut
 
 has verp_id => (
     is  => 'lazy',
@@ -31,6 +72,18 @@ sub _build_verp_regex {
 }
 
 
+=head1 METHODS
+
+=head2 send( $email, \%args )
+
+This works like the L<Email::Sender::Simple> C<send> method, but first
+tries to set a VERP from address on the envelope.  If a C<from>
+argument is already specified in C<%args>, it respects that and does
+nothing.  Otherwise, VERPify C<< $args->{to} >>, or if that doesn't
+exist, the C<To:> header in C<$email>.
+
+=cut
+
 sub send {
     my ($self, $email, $args) = @_;
 
@@ -46,6 +99,12 @@ sub send {
 }
 
 
+=head2 make_verp_address( $to_addr )
+
+Turns an email address into a VERP address.
+
+=cut
+
 sub make_verp_address {
     my ($self, $to_addr) = @_;
     my $address   = Email::Address->new(undef, $to_addr);
@@ -54,6 +113,12 @@ sub make_verp_address {
     return $verp_addr;
 }
 
+
+=head2 already_verp( $address )
+
+Return true if C<$address> looks like it has already been VERP'd.
+
+=cut
 
 sub already_verp {
     my ($self, $address) = @_;

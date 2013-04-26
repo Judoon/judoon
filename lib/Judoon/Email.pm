@@ -8,22 +8,20 @@ package Judoon::Email;
 
 =head1 NAME
 
-Judoon::Email - Send judoon-related emails
+Judoon::Email - Construct Judoon-related emails
 
 =head1 SYNOPSIS
 
  use Judoon::Email;
 
- Judoon::Email->new->send_email(
-   to => 'soandso@example.com',
-   from_nick => 'webapp',
-   subject => 'Heere yo go',
-   content => $content_of_email,
- );
+ my $email = Judoon::Email->new_password_reset({
+     reset_uri => 'http://example.com/reset?token=deadbeef
+ });
 
 =head1 DESCRIPTION
 
-C<Judoon::Email> is an object that sends email for us.
+C<Judoon::Email> is an object that builds emails. It abstracts away
+the common configuration elements.
 
 =cut
 
@@ -33,12 +31,29 @@ use MooX::Types::MooseLike::Base qw(Str);
 use Email::MIME::Kit;
 
 
+=head1 ATTRIBUTES
+
+=head2 kit_path
+
+Path to the L<Email::MIME::Kit> kits. Required.
+
+=cut
+
 has kit_path => (
     is       => 'ro',
     isa      => Str,
     required => 1,
 );
 
+
+=head1 METHODS
+
+=head2 new_password_reset( \%args )
+
+Builds and returns a new 'Reset your password' email.  L<args> must
+have a C<reset_uri> key.
+
+=cut
 
 sub new_password_reset {
     my ($self, $vars) = @_;
@@ -50,7 +65,6 @@ sub new_password_reset {
     });
     return $kit->assemble($vars);
 }
-
 
 
 1;
