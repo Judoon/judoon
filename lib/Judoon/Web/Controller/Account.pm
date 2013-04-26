@@ -35,6 +35,36 @@ Base action for managing accounts.  Currently does nothing.
 sub base : Chained('/base') PathPart('account') CaptureArgs(0) {}
 
 
+=head2 list
+
+Handle password-reset tokens, otherwise redirect to more useful pages.
+
+=cut
+
+sub list : Chained('base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+
+    if (my $token = $c->req->params->{value}) {
+        my $token = $c->model('User::Token')->find_by_value($token);
+        if (not $token) {
+            $self->set_error($c, 'No action found for token');
+            $self->go_here($c, '/login/login');
+        }
+        else {
+            $c->authenticate({id => $token->user->id}, 'password_reset');
+            $self->go_here($c, '/account/password', {});
+        }
+    }
+    elsif (my $user = $c->user) {
+        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $c->detach();
+    }
+    else {
+        $self->go_here($c, '/login/login');
+    }
+}
+
+
 =head2 signup / signup_GET / signup_POST
 
 Get/submit the new user signup page.
@@ -121,7 +151,7 @@ sub resend_password_POST {
 
     my $token     = $user->new_reset_token;
     my $token_val = $token->value;
-    my $reset_uri = $c->uri_for_action('/user/list', [], {value => $token_val});
+    my $reset_uri = $c->uri_for_action('/account/list', [], {value => $token_val});
 
     try {
         $c->model('Emailer')->send(

@@ -44,20 +44,8 @@ Nothing useful here, redirect elsewhere
 sub list : Chained('base') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
-    if (my $token = $c->req->params->{value}) {
-        my $token = $c->model('User::Token')->find_by_value($token);
-        if (not $token) {
-            $self->set_error($c, 'No action found for token');
-            $self->go_here($c, '/login/login');
-        }
-        else {
-            $c->authenticate({id => $token->user->id}, 'password_reset');
-            $self->go_here($c, '/account/password', {});
-        }
-    }
-    elsif (my $user = $c->user) {
+    if (my $user = $c->user) {
         $self->go_here($c, '/user/edit', [$user->get('username')]);
-        $c->detach();
     }
     else {
         $self->go_here($c, '/login/login');
