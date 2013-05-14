@@ -214,8 +214,10 @@ subtest 'Password Reset' => sub {
     like $mech->uri, qr{/login},
         'expired reset tokens sends us back to login';
 
+    # needed tests:
+    #   sending email fails: resend_password_POST
+    #     not sure how to do this, look at Email::Sender::Transport::Failable
 
-    # need to add test for post to /account/password_reset
 };
 
 
