@@ -193,6 +193,28 @@ subtest 'Password Reset' => sub {
     like $mech->uri, qr{/user/testuser}, 'Password successfully reset';
 
 
+
+    logout();
+    $mech->get($pass_resend_uri);
+    $mech->submit_form(
+        form_name => 'resend_password_form',
+        fields    => {username => 'testuser'},
+    );
+    my ($expired_reset_email, @others) = Email::Sender::Simple->default_transport->deliveries;
+    my $expired_reset_body = $expired_reset_email->{email}->as_string;
+    my ($expired_reset_uri) = ($expired_reset_body =~ m{http://[^/]+(/\S+)});
+    Email::Sender::Simple->default_transport->clear_deliveries;
+    my ($expired_reset_token) = ($expired_reset_uri =~ m/value=(\S+)/);
+
+    my $expired_token = t::DB::ResultSet('Token')->find({value => $expired_reset_token});
+    $expired_token->expires( DateTime->new(year => 2000, day => 1, month => 1) );
+    $expired_token->update;
+
+    $mech->get($reset_uri);
+    like $mech->uri, qr{/login},
+        'expired reset tokens sends us back to login';
+
+
     # need to add test for post to /account/password_reset
 };
 
