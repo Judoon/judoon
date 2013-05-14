@@ -371,6 +371,9 @@ subtest 'Result(Set)?::Token' => sub {
         'one password_reset token';
     is $user->search_related('tokens')->unexpired->count, 1,
         'one unexpired token';
+
+    ok $all_tokens[0]->is_expired(), 'is_expired() works';
+
 };
 
 done_testing();

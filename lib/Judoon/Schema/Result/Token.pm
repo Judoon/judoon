@@ -83,4 +83,15 @@ Sets the C<action> column to 'password_reset'.
 sub password_reset { return $_[0]->action('password_reset'); }
 
 
+=head2 is_expired
+
+Return true if C<Token>'s C<expires> field is less than now.
+
+=cut
+
+sub is_expired {
+    my ($self) = @_;
+    return DateTime->compare($self->expires, DateTime->now) != 1;
+}
+
 1;
