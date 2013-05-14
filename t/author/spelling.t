@@ -78,3 +78,5 @@ signup
 downloadable
 subdirectory
 webpage
+Adaptor
+cellmigration

@@ -8,8 +8,8 @@
 <section>
   <h3>What would you like to update?</h3>
   <ul class="nav nav-pills nav-stacked"> 
-    <li><a href="[% c.uri_for_action('/user/profile') %]">Profile</a></li>
-    <li><a href="[% c.uri_for_action('/user/password') %]">Password</a></li>
+    <li><a href="[% c.uri_for_action('/account/profile') %]">Profile</a></li>
+    <li><a href="[% c.uri_for_action('/account/password') %]">Password</a></li>
   </ul>
 <section>
 
