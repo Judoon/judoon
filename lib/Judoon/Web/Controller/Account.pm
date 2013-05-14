@@ -48,6 +48,14 @@ sub list : Chained('base') PathPart('') Args(0) {
         my $token = $c->model('User::Token')->find_by_value($token);
         if (not $token) {
             $self->set_error_and_redirect($c, 'No action found for token', ['/login/login', {}]);
+            $c->detach();
+        }
+        elsif ($token->is_expired) {
+            $token->delete;
+            $self->set_error_and_redirect($c, <<'ERRMSG', ['/account/resend_password']);
+Your password reset token has expired. Please request another one.
+ERRMSG
+            $c->detach();
         }
         else {
             $c->authenticate({id => $token->user->id}, 'password_reset');
@@ -249,21 +257,9 @@ sub password_POST {
     my $params = $c->req->params;
     my $user   = $c->user;
     my $errmsg;
-    my @reset_tokens;
 
-    if ($c->user_in_realm('password_reset')) {
-
-        @reset_tokens = $user->valid_reset_tokens;
-        if (not @reset_tokens) {
-            $c->user->logout;
-            $self->set_error_and_redirect($c, <<'ERRMSG', ['/acccount/resend_password']);
-Your password reset token has expired. Please request another one.
-ERRMSG
-            $c->detach();
-        }
-
-    }
-    else { # regular password change, must check old_password
+    if (not $c->user_in_realm('password_reset')) {
+        # regular password change, must check old_password
         if (not $user->check_password($params->{old_password})) {
             $errmsg = 'Your old password is incorrect';
         }
@@ -287,8 +283,9 @@ ERRMSG
         $c->detach;
     };
 
-
-    $_->delete for (@reset_tokens);
+    if ($c->user_in_realm('password_reset')) {
+        $user->tokens_rs->password_reset->delete;
+    }
 
     $c->flash->{alert}{success} = 'Your password has been updated.';
     $self->go_here($c, '/user/edit', [$user->username]);

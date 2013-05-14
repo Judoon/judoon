@@ -191,10 +191,11 @@ subtest 'Password Reset' => sub {
     $users{testuser}->{password} = 'newpasswd';
     login('testuser');
     like $mech->uri, qr{/user/testuser}, 'Password successfully reset';
-
-
-
     logout();
+    $mech->get($reset_uri);
+    like $mech->uri, qr{/login},
+        'reset token deleted after successful password reset';
+
     $mech->get($pass_resend_uri);
     $mech->submit_form(
         form_name => 'resend_password_form',
@@ -210,14 +211,15 @@ subtest 'Password Reset' => sub {
     $expired_token->expires( DateTime->new(year => 2000, day => 1, month => 1) );
     $expired_token->update;
 
-    $mech->get($reset_uri);
-    like $mech->uri, qr{/login},
+    $mech->get($expired_reset_uri);
+    like $mech->uri, qr{/account/password_reset},
         'expired reset tokens sends us back to login';
+    # fixme: after factoring our status message tests, add test for message
 
     # needed tests:
     #   sending email fails: resend_password_POST
     #     not sure how to do this, look at Email::Sender::Transport::Failable
-
+    #   after password reset, reset tokens are deleted.
 };
 
 
