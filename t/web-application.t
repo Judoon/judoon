@@ -70,11 +70,11 @@ subtest 'Login / Logout' => sub {
     $mech->get_ok('/login', 'get login page');
 
     # bad login
-    user_error_like(
-        'denied login', 'login_form',
-        {%credentials, password => 'badpass'},
-        qr{Username or password is incorrect}i,
-    );
+    $mech->submit_form_ok({
+        form_name => 'login_form',
+        fields    => {%credentials, password => 'badpass'},
+    }, "can submit login form with bad data without error");
+    user_error_like(qr{Username or password is incorrect}i);
     redirects_to_ok('/settings/profile', '/login');
 
     # good login
@@ -111,9 +111,10 @@ subtest 'Password Reset' => sub {
     );
     for my $error (@errors) {
         my ($msg, $args,) = @$error;
-        user_error_like(
-            $msg, 'resend_password_form', $args, qr{Couldn't find an account},
-        );
+        $mech->submit_form_ok({
+            form_name => 'resend_password_form', fields => $args,
+        }, "submit_ok: $msg");
+        user_error_like(qr{Couldn't find an account});
     }
 
     my @wins = (
@@ -124,10 +125,10 @@ subtest 'Password Reset' => sub {
     for my $win (@wins) {
         my ($msg, $args) = @$win;
         $mech->get($pass_resend_uri);
-        user_notice_like(
-            $msg, 'resend_password_form', $args,
-            qr{email has been sent},
-        );
+        $mech->submit_form_ok({
+            form_name => 'resend_password_form', fields => $args,
+        }, "submit_ok: $msg");
+        user_notice_like(qr{email has been sent});
         like $mech->uri, qr{/login$}, '..then sent to login page';
 
         my ($reset_email) = Email::Sender::Simple->default_transport->deliveries;
@@ -155,36 +156,37 @@ subtest 'Password Reset' => sub {
     like $mech->content(), qr{Confirm New Password}, '  ...make sure we have correct page';
     unlike $mech->content(), qr{Old Password}, '  ...dont ask for old password';
 
-    user_error_like(
-        q{can't change password when new passwords don't match},
-        'password_form', {
+    $mech->submit_form_ok({
+        form_name => 'password_form',
+        fields    => {
             new_password         => 'this',
             confirm_new_password => 'that',
-        }, qr/passwords do not match/i,
-    );
+        },
+    }, "submit_ok: can't change password when new passwords don't match");
+    user_error_like(qr/passwords do not match/i);
 
-    user_error_like(
-        q{can't change password when one of new passwords is blank},
-        'password_form', {
+    $mech->submit_form_ok({
+        form_name => 'password_form',
+        fields    => {
             new_password         => '',
             confirm_new_password => '',
-        }, qr/password must not be blank/i,
-    );
+        },
+    }, q{can't change password when one of new passwords is blank},);
+    user_error_like(qr/password must not be blank/i);
 
-    user_error_like(
-        q{can't change password when passwords are invalid},
-        'password_form', {
+    $mech->submit_form_ok({
+        form_name => 'password_form',
+        fields    => {
             new_password         => 'this',
             confirm_new_password => 'this',
-        }, qr/invalid password/i,
-    );
-
+        },
+    }, q{can't change password when passwords are invalid},);
+    user_error_like(qr/invalid password/i);
 
     $mech->submit_form_ok({
         form_name => 'password_form',
         fields => {qw(new_password newpasswd confirm_new_password newpasswd)},
     }, 'submit password reset okay');
-
     like $mech->uri, qr{/user/testuser$}, 'sent to testuser overview page';
 
     logout();
@@ -299,37 +301,40 @@ subtest 'Account' => sub {
     subtest 'Password' => sub {
         $mech->get_ok('/settings/password', 'get user password change');
 
-        user_error_like(
-            'need all three fields',
-            'password_form', {old_password => $newuser{'user.password'},},
-            qr/New password must not be blank/i,
-        );
+        $mech->submit_form_ok({
+            form_name => 'password_form',
+            fields    => {old_password => $newuser{'user.password'},},
+        }, 'submit_ok: need all three fields');
+        user_error_like(qr/New password must not be blank/i);
 
-        user_error_like(
-            q{can't change password when old password is wrong},
-            'password_form', {
+        $mech->submit_form_ok({
+            form_name => 'password_form',
+            fields    => {
                 old_password => 'incorrect', new_password => 'boobooboo',
                 confirm_new_password => 'boobooboo',
-            }, qr/old password is incorrect/i,
-        );
+            },
+        }, q{submit_ok: can't change password when old password is wrong},);
+        user_error_like(qr/old password is incorrect/i);
 
-        user_error_like(
-            'cant update password with invalid password',
-            'password_form', {
+        $mech->submit_form_ok({
+            form_name => 'password_form',
+            fields    => {
                 old_password => $newuser{'user.password'},
                 new_password => 'boo',
                 confirm_new_password => 'boo',
-            }, qr/Invalid password/i,
-        );
+            },
+        }, 'submit_ok: cant update password with invalid password',);
+        user_error_like(qr/Invalid password/i);
 
-        user_success_like(
-            'able to update password',
-            'password_form', {
+        $mech->submit_form_ok({
+            form_name => 'password_form',
+            fields    => {
                 old_password         => $newuser{'user.password'},
                 new_password         => 'newuserisstillme',
                 confirm_new_password => 'newuserisstillme',
-            }, qr/Your password has been updated/,
-        );
+            },
+        }, 'submit_ok: able to update password');
+        user_success_like(qr/Your password has been updated/);
 
         $newuser_canon->{password} = 'newuserisstillme';
     };
@@ -719,19 +724,11 @@ sub add_new_object_ok {
 # the standard feedback widget for the given feedback type and
 # compares its contents against the $errmsg regex.
 sub user_feedback_like {
-    my ($feedback_type, $testname, $form_name, $form_args, $errmsg) = @_;
-
-    subtest $testname => sub {
-        $mech->submit_form_ok({ # form should submit, not return 500 error
-            form_name => $form_name,
-            fields    => $form_args,
-        }, "can submit form without error");
-
-        my $sel = HTML::Selector::XPath::Simple->new($mech->content);
-        my @all_elements = $sel->select('div.' . $alert_classes{$feedback_type});
-        my $page_error = pop @all_elements;
-        like $page_error, $errmsg, 'got correct error message';
-    }
+    my ($feedback_type, $errmsg) = @_;
+    my $sel = HTML::Selector::XPath::Simple->new($mech->content);
+    my @all_elements = $sel->select('div.' . $alert_classes{$feedback_type});
+    my $page_error = pop @all_elements;
+    like $page_error, $errmsg, 'got correct error message';
 }
 sub user_error_like   { user_feedback_like('error',   @_); }
 sub user_notice_like  { user_feedback_like('notice',  @_); }
