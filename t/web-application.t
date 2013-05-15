@@ -572,7 +572,7 @@ subtest 'Page Cloning' => sub {
     my @pages = map {$_->pages->all} ($clone1_ds, $clone2_ds);
 
     login('testuser');
-    $mech->get(goto_page('dataset', ['testuser', $clone2_ds->id]));
+    $mech->get('/user/testuser/dataset/'. $clone2_ds->id);
 
     my $cloneable_page = $clone1_ds->pages_rs->search({title => {like => '%All Time'}})->first;
     $mech->submit_form(
@@ -707,40 +707,6 @@ sub add_new_object_ok {
         qq{got new $args->{object}'s edit page};
     return $new_uri;
 }
-
-
-sub goto_page {
-    my ($page, $captures) = @_;
-
-    my %path = (
-        'users' => [['user'], 0,],
-        'user'  => [['user'], 1,],
-
-        'datasets' => [['user', 'dataset'], 1,],
-        'dataset'  => [['user', 'dataset'], 2,],
-
-        'dataset_columns' => [['user', 'dataset', 'column'], 2,],
-        'dataset_column'  => [['user', 'dataset', 'column'], 3,],
-
-        'pages' => [['user', 'dataset', 'page'], 2,],
-        'page'  => [['user', 'dataset', 'page'], 3,],
-
-        'page_columns' => [['user', 'dataset', 'page', 'column'], 3,],
-        'page_column'  => [['user', 'dataset', 'page', 'column'], 4,],
-    );
-
-    my $pathspec = $path{$page};
-    die "unknown page $page" unless ($pathspec);
-
-    my ($pathparts, $nbr_captures) = @$pathspec;
-    die "wrong number of captures to goto_page('$page')"
-        unless (scalar( @$captures ) == $nbr_captures);
-
-    my @pathsegs = List::AllUtils::zip @$pathparts, @$captures;
-    return join '/', ('', @pathsegs);
-}
-
-
 
 
 # These methods test the user feedback messages after submitting a
