@@ -98,133 +98,6 @@ subtest 'Login / Logout' => sub {
 };
 
 
-subtest 'Password Reset' => sub {
-    logout();
-
-    my $pass_resend_uri = '/account/password_reset';
-    $mech->get_ok($pass_resend_uri, 'get password resend page ok');
-
-    my @errors = (
-        [q{no password reset w/ bad email},    {email_address => 'nope@nope.com'},],
-        [q{no password reset w/ bad username}, {username => 'doesnt_exist'},],
-        [q{no password reset w/o args},        {},],
-    );
-    for my $error (@errors) {
-        my ($msg, $args,) = @$error;
-        $mech->submit_form_ok({
-            form_name => 'resend_password_form', fields => $args,
-        }, "submit_ok: $msg");
-        user_error_like(qr{Couldn't find an account});
-    }
-
-    my @wins = (
-        ['can request password reset by email', {email_address => $users{testuser}->{email_address}},],
-        ['can request password reset by username', {username => 'testuser'},],
-    );
-    my $reset_uri;
-    for my $win (@wins) {
-        my ($msg, $args) = @$win;
-        $mech->get($pass_resend_uri);
-        $mech->submit_form_ok({
-            form_name => 'resend_password_form', fields => $args,
-        }, "submit_ok: $msg");
-        user_notice_like(qr{email has been sent});
-        like $mech->uri, qr{/login$}, '..then sent to login page';
-
-        my ($reset_email) = Email::Sender::Simple->default_transport->deliveries;
-        my $body = $reset_email->{email}->as_string;
-        like $body, qr{judoon password reset}i, 'password reset email sent';
-        ($reset_uri) = ($body =~ m{http://[^/]+(/\S+)});
-        Email::Sender::Simple->default_transport->clear_deliveries;
-    }
-
-    # make sure we can log in as normal user even after passwd reset
-    login('testuser');
-    redirects_to_ok($pass_resend_uri, '/user/testuser',);
-    logout();
-
-
-    my $bad_reset_uri = $reset_uri;
-    $bad_reset_uri .= 'totally_bogus';
-    $mech->get($bad_reset_uri);
-    like $mech->uri(), qr{/login$},
-        'bad login token sends you to the login page';
-    # fixme: add user_error_like test, once decoupled from submit_form_ok
-
-
-    $mech->get_ok($reset_uri, 'can get uri reset page');
-    like $mech->content(), qr{Confirm New Password}, '  ...make sure we have correct page';
-    unlike $mech->content(), qr{Old Password}, '  ...dont ask for old password';
-
-    $mech->submit_form_ok({
-        form_name => 'password_form',
-        fields    => {
-            new_password         => 'this',
-            confirm_new_password => 'that',
-        },
-    }, "submit_ok: can't change password when new passwords don't match");
-    user_error_like(qr/passwords do not match/i);
-
-    $mech->submit_form_ok({
-        form_name => 'password_form',
-        fields    => {
-            new_password         => '',
-            confirm_new_password => '',
-        },
-    }, q{can't change password when one of new passwords is blank},);
-    user_error_like(qr/password must not be blank/i);
-
-    $mech->submit_form_ok({
-        form_name => 'password_form',
-        fields    => {
-            new_password         => 'this',
-            confirm_new_password => 'this',
-        },
-    }, q{can't change password when passwords are invalid},);
-    user_error_like(qr/invalid password/i);
-
-    $mech->submit_form_ok({
-        form_name => 'password_form',
-        fields => {qw(new_password newpasswd confirm_new_password newpasswd)},
-    }, 'submit password reset okay');
-    like $mech->uri, qr{/user/testuser$}, 'sent to testuser overview page';
-
-    logout();
-    $users{testuser}->{password} = 'newpasswd';
-    login('testuser');
-    like $mech->uri, qr{/user/testuser}, 'Password successfully reset';
-    logout();
-    $mech->get($reset_uri);
-    like $mech->uri, qr{/login},
-        'reset token deleted after successful password reset';
-
-    $mech->get($pass_resend_uri);
-    $mech->submit_form(
-        form_name => 'resend_password_form',
-        fields    => {username => 'testuser'},
-    );
-    my ($expired_reset_email, @others) = Email::Sender::Simple->default_transport->deliveries;
-    my $expired_reset_body = $expired_reset_email->{email}->as_string;
-    my ($expired_reset_uri) = ($expired_reset_body =~ m{http://[^/]+(/\S+)});
-    Email::Sender::Simple->default_transport->clear_deliveries;
-    my ($expired_reset_token) = ($expired_reset_uri =~ m/value=(\S+)/);
-
-    my $expired_token = t::DB::ResultSet('Token')->find({value => $expired_reset_token});
-    $expired_token->expires( DateTime->new(year => 2000, day => 1, month => 1) );
-    $expired_token->update;
-
-    $mech->get($expired_reset_uri);
-    like $mech->uri, qr{/account/password_reset},
-        'expired reset tokens sends us back to login';
-    user_error_like(qr/your password reset token has expired/i);
-
-    # needed tests:
-    #   sending email fails: resend_password_POST
-    #     not sure how to do this, look at Email::Sender::Transport::Failable
-    #   after password reset, reset tokens are deleted.
-};
-
-
 subtest 'Account' => sub {
 
     subtest 'Account List' => sub {
@@ -339,6 +212,144 @@ subtest 'Account' => sub {
         $newuser_canon->{password} = 'newuserisstillme';
     };
 
+};
+
+
+subtest 'Password Reset' => sub {
+    logout();
+
+    my $pass_resend_uri = '/account/password_reset';
+    $mech->get_ok($pass_resend_uri, 'get password resend page ok');
+
+    subtest 'Request Failures' => sub {
+        my @errors = (
+            [q{no password reset w/ bad email},    {email_address => 'nope@nope.com'},],
+            [q{no password reset w/ bad username}, {username => 'doesnt_exist'},],
+            [q{no password reset w/o args},        {},],
+        );
+        for my $error (@errors) {
+            my ($msg, $args,) = @$error;
+            $mech->submit_form_ok({
+                form_name => 'resend_password_form', fields => $args,
+            }, "submit_ok: $msg");
+            user_error_like(qr{Couldn't find an account});
+        }
+    };
+
+    my $bad_reset_uri;
+    subtest 'Request Successes' => sub {
+        my @wins = (
+            ['can request password reset by email', {email_address => $users{testuser}->{email_address}},],
+            ['can request password reset by username', {username => 'testuser'},],
+        );
+
+        for my $win (@wins) {
+            my ($msg, $args) = @$win;
+            $mech->get($pass_resend_uri);
+            $mech->submit_form_ok({
+                form_name => 'resend_password_form', fields => $args,
+            }, "submit_ok: $msg");
+            user_notice_like(qr{email has been sent});
+            like $mech->uri, qr{/login$}, '..then sent to login page';
+
+            my ($reset_email) = Email::Sender::Simple->default_transport->deliveries;
+            Email::Sender::Simple->default_transport->clear_deliveries;
+            my $body = $reset_email->{email}->as_string;
+            like $body, qr{judoon password reset}i, 'password reset email sent';
+            my ($reset_uri) = ($body =~ m{http://[^/]+(/\S+)});
+            $bad_reset_uri  ||= $reset_uri . 'totally_bogus';
+
+            # make sure we can log in as normal user even after passwd reset
+            login('testuser');
+            redirects_to_ok($pass_resend_uri, '/user/testuser',);
+            logout();
+
+            $mech->get_ok($reset_uri, 'can get uri reset page');
+            like $mech->content(), qr{Confirm New Password},
+                '  ...make sure we have correct page';
+            unlike $mech->content(), qr{Old Password},
+                '  ...dont ask for old password';
+
+            $mech->submit_form_ok({
+                form_name => 'password_form',
+                fields    => {
+                    new_password         => 'this',
+                    confirm_new_password => 'that',
+                },
+            }, "submit_ok: can't change password when new passwords don't match");
+            user_error_like(qr/passwords do not match/i);
+
+            $mech->submit_form_ok({
+                form_name => 'password_form',
+                fields    => {
+                    new_password         => '',
+                    confirm_new_password => '',
+                },
+            }, q{can't change password when one of new passwords is blank},);
+            user_error_like(qr/password must not be blank/i);
+
+            $mech->submit_form_ok({
+                form_name => 'password_form',
+                fields    => {
+                    new_password         => 'this',
+                    confirm_new_password => 'this',
+                },
+            }, q{can't change password when passwords are invalid},);
+            user_error_like(qr/invalid password/i);
+
+            $mech->submit_form_ok({
+                form_name => 'password_form',
+                fields => {qw(new_password newpasswd confirm_new_password newpasswd)},
+            }, 'submit password reset okay');
+            like $mech->uri, qr{/user/testuser$}, 'sent to testuser overview page';
+
+            logout();
+            $users{testuser}->{password} = 'newpasswd';
+            login('testuser');
+            like $mech->uri, qr{/user/testuser}, 'Password successfully reset';
+            logout();
+
+            $mech->get($reset_uri);
+            like $mech->uri, qr{/login},
+                'reset token deleted after successful password reset';
+            # fixme: add user_error_like test
+        }
+    };
+
+
+    subtest 'Reset Failures' => sub {
+        $mech->get($bad_reset_uri);
+        like $mech->uri(), qr{/login$},
+            'bad login token sends you to the login page';
+        # fixme: add user_error_like test, once decoupled from submit_form_ok
+
+        # forcibly expire token and test app response
+        $mech->get($pass_resend_uri);
+        $mech->submit_form(
+            form_name => 'resend_password_form',
+            fields    => {username => 'testuser'},
+        );
+        my ($expired_reset_email) = Email::Sender::Simple->default_transport->deliveries;
+        Email::Sender::Simple->default_transport->clear_deliveries;
+        my $expired_reset_body = $expired_reset_email->{email}->as_string;
+        my ($expired_reset_uri) = ($expired_reset_body =~ m{http://[^/]+(/\S+)});
+        my ($expired_reset_token) = ($expired_reset_uri =~ m/value=(\S+)/);
+
+        my $expired_token = t::DB::ResultSet('Token')->find({value => $expired_reset_token});
+        $expired_token->expires( DateTime->new(year => 2000, day => 1, month => 1) );
+        $expired_token->update;
+
+        $mech->get($expired_reset_uri);
+        like $mech->uri, qr{/account/password_reset},
+            'expired reset tokens sends us back to login';
+        user_error_like(qr/your password reset token has expired/i);
+    };
+
+
+    # needed tests:
+    #   sending email fails: resend_password_POST
+    #     not sure how to do this, look at Email::Sender::Transport::Failable
+    #   after password reset, reset tokens are deleted.
 };
 
 
