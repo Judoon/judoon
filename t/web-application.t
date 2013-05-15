@@ -216,7 +216,7 @@ subtest 'Password Reset' => sub {
     $mech->get($expired_reset_uri);
     like $mech->uri, qr{/account/password_reset},
         'expired reset tokens sends us back to login';
-    # fixme: after factoring our status message tests, add test for message
+    user_error_like(qr/your password reset token has expired/i);
 
     # needed tests:
     #   sending email fails: resend_password_POST
