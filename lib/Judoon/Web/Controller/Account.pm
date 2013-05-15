@@ -293,7 +293,7 @@ sub password_POST {
         $user->tokens_rs->password_reset->delete;
     }
 
-    $c->flash->{alert}{success} = 'Your password has been updated.';
+    $self->set_success($c, 'Your password has been updated.');
     $self->go_here($c, '/user/edit', [$user->username]);
 }
 
