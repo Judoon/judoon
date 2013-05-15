@@ -252,8 +252,7 @@ subtest 'Password Reset' => sub {
             user_notice_like(qr{email has been sent});
             like $mech->uri, qr{/login$}, '..then sent to login page';
 
-            my ($reset_email) = Email::Sender::Simple->default_transport->deliveries;
-            Email::Sender::Simple->default_transport->clear_deliveries;
+            my ($reset_email) = get_emails();
             my $body = $reset_email->{email}->as_string;
             like $body, qr{judoon password reset}i, 'password reset email sent';
             my ($reset_uri) = ($body =~ m{http://[^/]+(/\S+)});
@@ -328,8 +327,7 @@ subtest 'Password Reset' => sub {
             form_name => 'resend_password_form',
             fields    => {username => 'testuser'},
         );
-        my ($expired_reset_email) = Email::Sender::Simple->default_transport->deliveries;
-        Email::Sender::Simple->default_transport->clear_deliveries;
+        my ($expired_reset_email) = get_emails();
         my $expired_reset_body = $expired_reset_email->{email}->as_string;
         my ($expired_reset_uri) = ($expired_reset_body =~ m{http://[^/]+(/\S+)});
         my ($expired_reset_token) = ($expired_reset_uri =~ m/value=(\S+)/);
@@ -742,3 +740,11 @@ sub user_error_like   { user_feedback_like('error',   @_); }
 sub user_notice_like  { user_feedback_like('notice',  @_); }
 sub user_success_like { user_feedback_like('success', @_); }
 sub user_warning_like { user_feedback_like('warning', @_); }
+
+
+# fetch emails from the Email::Sender test queue, then clear queue
+sub get_emails {
+    my @emails = Email::Sender::Simple->default_transport->deliveries;
+    Email::Sender::Simple->default_transport->clear_deliveries;
+    return @emails;
+}
