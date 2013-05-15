@@ -127,7 +127,8 @@ page.
 sub login_redirect {
     my ($self, $c, $message) = @_;
     $c->session->{redirect_to_after_login} = $c->req->uri->as_string;
-    $self->set_error_and_redirect($c, $message, ['/login/login']);
+    $self->set_error($c, $message);
+    $self->go_here($c, '/login/login');
     $c->detach;
 }
 

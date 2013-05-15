@@ -47,14 +47,16 @@ sub list : Chained('base') PathPart('') Args(0) {
     if (my $token = $c->req->params->{value}) {
         my $token = $c->model('User::Token')->find_by_value($token);
         if (not $token) {
-            $self->set_error_and_redirect($c, 'No action found for token', ['/login/login', {}]);
+            $self->set_error($c, 'No action found for token');
+            $self->go_here($c, '/login/login', {});
             $c->detach();
         }
         elsif ($token->is_expired) {
             $token->delete;
-            $self->set_error_and_redirect($c, <<'ERRMSG', ['/account/resend_password']);
+            $self->set_error($c, <<'ERRMSG');
 Your password reset token has expired. Please request another one.
 ERRMSG
+            $self->go_here($c, '/account/resend_password');
             $c->detach();
         }
         else {
@@ -101,7 +103,10 @@ sub signup_POST {
     catch {
         my $e = $_;
         $e->$_DOES('Judoon::Error::Input')
-            ? $self->set_error_and_redirect($c, $e->message, ['/account/signup'])
+            ? do {
+                $self->set_error($c, $e->message);
+                $self->go_here($c, '/account/signup');
+            }
             : $c->error($e);
         $c->detach();
     };
@@ -149,10 +154,10 @@ sub resend_password_POST {
     }
 
     if (not $user) {
-        $self->set_error_and_redirect(
+        $self->set_error(
             $c, q{Couldn't find an account with the given information.},
-            ['/account/resend_password'],
         );
+        $self->go_here($c, '/account/resend_password');
         $c->detach();
     }
 
@@ -175,7 +180,8 @@ sub resend_password_POST {
 We are unable to send an email at the moment.  An admin has
 been notified. Please try again later.
 EOE
-        $self->set_error_and_redirect($c, $error, ['/login/login']);
+        $self->set_error($c, $error);
+        $self->go_here($c, '/login/login');
         $c->detach;
     };
 

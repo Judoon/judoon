@@ -145,9 +145,8 @@ Restrict access to owners and visitors seeing object_GET.
 before private_base => sub {
     my ($self, $c) = @_;
     if (!$c->stash->{user}{is_owner} and $c->req->method ne 'GET') {
-        $self->set_error_and_redirect(
-            $c, 'You must be the owner to do this', ['/login/login', [],],
-        );
+        $self->set_error($c, 'You must be the owner to do this');
+        $self->go_here($c, '/login/login', [],);
         $c->detach;
     }
 };

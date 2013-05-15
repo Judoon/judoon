@@ -104,9 +104,10 @@ Restrict access to owners and visitors seeing object_GET.
 before private_base => sub {
     my ($self, $c) = @_;
     if (!$c->stash->{user}{is_owner} and $c->req->method ne 'GET') {
-        $self->set_error_and_redirect(
-            $c, 'You must be the owner to do this', ['/login/login', [],],
+        $self->set_error(
+            $c, 'You must be the owner to do this',
         );
+        $self->go_here($c, '/login/login', [],);
         $c->detach;
     }
 };
@@ -134,17 +135,15 @@ for the user after creating the dataset.
 before list_POST => sub {
     my ($self, $c) = @_;
     if (not $c->req->params->{'dataset.file'}) {
-        $self->set_error_and_redirect(
-            $c, 'No file provided',
-            ['/user/edit', [$c->stash->{user}{id}]],
-        );
+        $self->set_error($c, 'No file provided');
+        $self->go_here($c, '/user/edit', [$c->stash->{user}{id}]);
         $c->detach();
     }
     elsif ($c->req->upload('dataset.file')->size > $SPREADSHEET_MAX_SIZE)  {
-        $self->set_error_and_redirect(
+        $self->set_error(
             $c, 'Your spreadsheet is too big. It must be less than 10 megabytes.',
-            ['/user/edit', [$c->stash->{user}{id}]],
         );
+        $self->go_here($c, '/user/edit', [$c->stash->{user}{id}]);
         $c->detach();
     }
 };

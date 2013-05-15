@@ -18,9 +18,8 @@ Judoon::Web::Controller - base controller for Judoon
     # ...add new user...
     if ($@) { #error
         # sets the flash and redirects to /user/new
-        $self->set_error_and_redirect(
-            $c, 'unable to add user', ['/user/new'],
-        );
+        $self->set_error($c, 'unable to add user');
+        $self->go_here($c, '/user/new');
     }
     elsif ($newuser) {
         # redirects to /user/$id/edit
@@ -81,21 +80,6 @@ sub set_warning {
 sub set_error {
     my ($self, $c, $msg) = @_;
     $c->flash->{alert}{error} = $msg;
-}
-
-
-=head2 set_error_and_redirect( $c, $errmsg, \@action )
-
-Sets the flash to C<$errmsg> and redirects to the action given by
-C<\@action>, where C<\@action> is an arrayref of args suitable for
-passing to C<< $c->uri_for_action >>.
-
-=cut
-
-sub set_error_and_redirect {
-    my ($self, $c, $error, $action_ar) = @_;
-    $c->flash->{alert}{error} = $error;
-    $self->go_here($c, @$action_ar);
 }
 
 
