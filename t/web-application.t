@@ -312,16 +312,15 @@ subtest 'Password Reset' => sub {
             $mech->get($reset_uri);
             like $mech->uri, qr{/login},
                 'reset token deleted after successful password reset';
-            # fixme: add user_error_like test
+            user_error_like(qr{No action found for token});
         }
     };
-
 
     subtest 'Reset Failures' => sub {
         $mech->get($bad_reset_uri);
         like $mech->uri(), qr{/login$},
             'bad login token sends you to the login page';
-        # fixme: add user_error_like test, once decoupled from submit_form_ok
+        user_error_like(qr{No action found for token});
 
         # forcibly expire token and test app response
         $mech->get($pass_resend_uri);
@@ -345,11 +344,9 @@ subtest 'Password Reset' => sub {
         user_error_like(qr/your password reset token has expired/i);
     };
 
-
     # needed tests:
     #   sending email fails: resend_password_POST
     #     not sure how to do this, look at Email::Sender::Transport::Failable
-    #   after password reset, reset tokens are deleted.
 };
 
 
