@@ -57,29 +57,30 @@ __PACKAGE__->config(
 
 =head1 METHODS
 
-=head2 set_notice( $c, $notice_msg )
+=head2 set_success / set_notice / set_warning / set_error ( $c, $msg )
 
-Sets the notice key in the flash.  This is the key used in the
-notification template component.
+Set the various user notification fields to C<$msg>.
 
 =cut
 
-sub set_notice {
-    my ($self, $c, $notice_msg) = @_;
-    $c->flash->{alert}{notice} = $notice_msg;
+sub set_success {
+    my ($self, $c, $msg) = @_;
+    $c->flash->{alert}{success} = $msg;
 }
 
-
-=head2 set_warning( $c, $warning_msg )
-
-Sets the warning key in the flash.  This is the key used in the
-notification template component.
-
-=cut
+sub set_notice {
+    my ($self, $c, $msg) = @_;
+    $c->flash->{alert}{notice} = $msg;
+}
 
 sub set_warning {
-    my ($self, $c, $warning_msg) = @_;
-    $c->flash->{alert}{warning} = $warning_msg;
+    my ($self, $c, $msg) = @_;
+    $c->flash->{alert}{warning} = $msg;
+}
+
+sub set_error {
+    my ($self, $c, $msg) = @_;
+    $c->flash->{alert}{error} = $msg;
 }
 
 
