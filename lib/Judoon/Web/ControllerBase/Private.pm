@@ -136,6 +136,10 @@ __PACKAGE__->config(
 );
 
 
+=for Pod::Coverage begin
+
+=cut
+
 # enable our Request::Chained module on all requests
 sub begin :Private {
     my ($self, $c) = @_;
@@ -492,6 +496,34 @@ sub object_DELETE :Private {
 
 
 # stolen / modified from Catalyst::Controller::DBIC::API
+
+=begin Pod::Coverage
+
+ delete
+ delete_object
+ delete_objects
+ each_object_inflate
+ generate_rs
+ inflate_request
+ insert_object_from_params
+ item
+ list_format_output
+ list_munge_parameters
+ list_perform_search
+ object_lookup
+ row_format_output
+ save_object
+ save_objects
+ transact_objects
+ update_object_from_params
+ update_object_relation
+ update_or_create
+ validate_object
+ validate_objects
+
+=end Pod::Coverage
+
+=cut
 
 sub generate_rs {
     my ($self, $c) = @_;
