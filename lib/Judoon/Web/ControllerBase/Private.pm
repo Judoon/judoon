@@ -8,16 +8,16 @@ package Judoon::Web::ControllerBase::Private;
 
 =head1 NAME
 
-Judoon::Web::ControllerBase::Private - base class for RESTish HTML controllers
+Judoon::Web::ControllerBase::Private - base class for CRUD-y HTML controllers
 
 =head1 DESCRIPTION
 
-This is the poorly-named base class for our RESTish web controllers
+This is the poorly-named base class for our CRUD web controllers
 (C<Private::Dataset>, C<Private::DatasetColumn>, C<Private::Page>,
 C<Private::PageColumn>).  It uses L<Catalyst::Action::REST> to provide
 REST-like dispatch.
 
-Why RESTish?  Our urls follow RESTful principles, but since these
+Why REST-like?  Our urls follow RESTful principles, but since these
 controllers are for human-interaction via HTML, we deviate in a few
 ways. It does things that the REST API doesn't need to, such as adding
 things to the stash where the HTML templates expect them and managing
@@ -140,7 +140,7 @@ __PACKAGE__->config(
 
 =cut
 
-# enable our Request::Chained module on all requests
+# enable our DBIC::API::Request* roles on all requests
 sub begin :Private {
     my ($self, $c) = @_;
     Moose::Util::ensure_all_roles($c->req, 'Catalyst::Controller::DBIC::API::Request');
@@ -441,6 +441,8 @@ sub private_chainpoint :Private {
 
 
 =head2 private_object
+
+Currently does nothing.
 
 =cut
 
