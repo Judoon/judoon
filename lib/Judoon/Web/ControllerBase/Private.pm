@@ -303,9 +303,7 @@ sub private_list {
                 $c->req->add_object([$self->object_lookup($c, $val->{id}), $val]);
             }
             catch {
-                $c->log->error($_);
-                $c->error($_);
-                $c->detach();
+                $c->detach('/default');
             };
         }
     }
@@ -397,12 +395,7 @@ sub private_id :Private {
         $c->req->add_object([$self->object_lookup($c, $id), $vals]);
     }
     catch {
-        $id //= '';
-        $self->set_error($c, "Unable to find object with id: '$id'");
-        my $captures = $c->req->captures;
-        pop @$captures;
-        $self->go_relative($c, 'list', $captures);
-        $c->detach();
+        $c->detach('/default');
     };
 
 
