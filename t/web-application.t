@@ -379,9 +379,10 @@ subtest 'User Overview' => sub {
 subtest 'Dataset' => sub {
     login('testuser');
 
+    my $dataset_list_uri = '/user/testuser/dataset';
+
     # GET dataset/list
-    #redirects_to_ok('/user/testuser/dataset','/user/testuser');
-    $mech->get_ok('/user/testuser/dataset','can get dataset list');
+    redirects_to_ok($dataset_list_uri, '/user/testuser');
 
     # POST dataset/list
     $mech->get('/user/testuser');
@@ -392,8 +393,24 @@ subtest 'Dataset' => sub {
         }, page_uri_re => qr{/user/testuser/dataset/\d+},
     });
 
+    # fixme: PUT dataset/list
+    # $mech->put($dataset_list_uri);
+    # is $mech->status(), 405, 'no PUT to dataset/list';
+    # $mech->post($dataset_list_uri, {'x-tunneled-method' => 'PUT'});
+    # is $mech->status(), 405, 'no tunneled PUT to dataset/list';
+
+    # DELETE dataset/list
+    $mech->delete($dataset_list_uri, {},);
+    is $mech->status(), 405, 'no DELETE to dataset/list';
+    $mech->post($dataset_list_uri, {'x-tunneled-method' => 'DELETE'});
+    is $mech->status(), 405, 'no tunneled DELETE to dataset/list';
+
     # GET dataset/object
     $mech->get_ok($dataset_uri, 'can get dataset page');
+
+    # POST dataset/object
+    $mech->post($dataset_uri, {},);
+    is $mech->status(), 405, 'no POST to dataset/object';
 
     # PUT dataset/object
     puts_ok('dataset', $dataset_uri, 'dataset_edit', {
@@ -409,6 +426,12 @@ subtest 'Dataset' => sub {
         object_uri => $dataset_uri, list_uri => '/user/testuser',
         form_prefix => 'delete_dataset_',
     });
+
+    # GET dataset/bad_object
+    $mech->get('/user/testuser/dataset/999999999');
+    is $mech->status, 404, "don't die on nonexistent page (valid id type)";
+    $mech->get('/user/testuser/dataset/moo');
+    is $mech->status, 404, "don't die on nonexistent page (invalid id type)";
 };
 
 
@@ -429,24 +452,53 @@ subtest 'DatasetColumns' => sub {
     my $dscol_list_uri = get_link_like_ok("dataset column list",
          qr{/user/testuser/dataset/\d+/column$});
 
-    # PUT datasetcolumn/list
-    # todo: add delete column test
+    # POST   datasetcolumn/list
+    $mech->post($dscol_list_uri, {},);
+    is $mech->status(), 405, 'no POST to dataset_column/list (immutable)';
+
+    # fixme: PUT    datasetcolumn/list
+
+    # DELETE datasetcolumn/list
+    $mech->delete($dscol_list_uri, {},);
+    is $mech->status(), 405, 'no DELETE to dataset_column/list';
+    $mech->post($dscol_list_uri, {'x-tunneled-method' => 'DELETE'});
+    is $mech->status(), 405, 'no tunneled DELETE to dataset_column/list';
 
     # GET datasetcolumn/object
+    $mech->get($dscol_list_uri);
     my $dscol_uri = get_link_like_ok("dataset column",
          qr{/user/testuser/dataset/\d+/column/\d+$});
 
-    # DISABLED UNTIL dscolumn edit page rework
-    # PUT datatsetcolumn/object
-    # puts_ok('dataset_column', $dscol_uri, {});
-    # $mech->get($dscol_list_uri);
-    # $mech->content_like(qr{url: http://www.google.com/},
-    #                     'can update dataset column');
+    # POST   datasetcolumn/object
+    $mech->post($dscol_uri, {},);
+    is $mech->status(), 405, 'no POST to dataset_column/object';
+
+    # PUT    datasetcolumn/object
+    puts_ok('dataset_column', $dscol_uri, 'dscolumn_edit', {
+        'ds_column.data_type'      => 'numeric',
+        'ds_column.accession_type' => '',
+    });
+    $mech->content_like(
+        qr{value="numeric" selected}, 'can update dataset column'
+    );
+
+    # DELETE datasetcolumn/object
+    $mech->delete($dscol_uri, {},);
+    is $mech->status(), 405, 'no DELETE to dataset_column/object';
+
+    # GET datasetcolumn/bad_object
+    $mech->get($dscol_uri . '99999999');
+    is $mech->status, 404, "don't die on nonexistent page (valid id type)";
+    $mech->get($dscol_uri . 'moo');
+    is $mech->status, 404, "don't die on nonexistent page (invalid id type)";
+
 };
 
 
 subtest 'Page' => sub {
     login('testuser');
+
+    # fixme: PUT    page/list
 
     # POST page/list
     my $page_uri = add_new_object_ok({
@@ -454,6 +506,17 @@ subtest 'Page' => sub {
         form_name => 'add_page_1', form_args => {},
         page_uri_re => qr{/user/testuser/dataset/\d+/page/\d+},
     });
+
+    (my $page_list_uri = $page_uri) =~ s{/\d+$}{};
+
+    # GET page/list
+    redirects_to_ok($page_list_uri, '/user/testuser');
+
+    # DELETE page/list
+    $mech->delete($page_list_uri, {},);
+    is $mech->status(), 405, 'no DELETE to page/list';
+    $mech->post($page_list_uri, {'x-tunneled-method' => 'DELETE'});
+    is $mech->status(), 405, 'no tunneled DELETE to page/list';
 
     # GET page/object
     $mech->get_ok($page_uri, 'get page edit page');
@@ -468,6 +531,10 @@ subtest 'Page' => sub {
         'page.postamble' => 'Humble bumblebee postamble',
     });
 
+    # POST page/object
+    $mech->post($page_uri, {},);
+    is $mech->status(), 405, 'no POST to page/object';
+
     # DELETE page/object
     my ($page_id) = ($page_uri =~ m{(\d+)$});
     delete_ok({
@@ -475,6 +542,12 @@ subtest 'Page' => sub {
         object_uri => $page_uri, list_uri => '/user/testuser',
         form_prefix => 'delete_page_',
     });
+
+    # GET page/bad_object
+    $mech->get($page_uri . '99999999');
+    is $mech->status, 404, "don't die on nonexistent page (valid id type)";
+    $mech->get($page_uri . 'moo');
+    is $mech->status, 404, "don't die on nonexistent page (invalid id type)";
 };
 
 
@@ -502,7 +575,16 @@ subtest 'PageColumn' => sub {
         }, page_uri_re => qr{/user/testuser/dataset/\d+/page/\d+/column/\d+},
     });
 
+    # fixme: PUT    pagecolumn/list
+
+    # DELETE pagecolumn/list
+    $mech->delete($pagecol_list_uri->url(), {},);
+    is $mech->status(), 405, 'no DELETE to page_column/list';
+    $mech->post($pagecol_list_uri->url(), {'x-tunneled-method' => 'DELETE'});
+    is $mech->status(), 405, 'no tunneled DELETE to page_column/list';
+
     # PUT pagecolumn/object
+    $mech->get($pagecol_uri);
     puts_ok("page_column", $pagecol_uri, 'pagecol_form', {
         'page_column.title' => 'Chaang Column Update',
     });
@@ -513,6 +595,10 @@ subtest 'PageColumn' => sub {
         url_regex => qr{/page/\d+/column/\d+},
     }, 'can get all pagecolumn links');
 
+    # POST page_column/object
+    $mech->post($pagecol_uri, {},);
+    is $mech->status(), 405, 'no POST to page_columnt/object';
+
     # DELETE pagecolumn/object
     my ($pagecol_id) = ($pagecol_uri =~ m{(\d+)$});
     delete_ok({
@@ -520,6 +606,12 @@ subtest 'PageColumn' => sub {
         object_uri => $pagecol_uri, list_uri => $pagecol_list_uri,
         form_prefix => 'delete_page_column_',
     });
+
+    # GET  page_column/bad_object
+    $mech->get($pagecol_uri . '99999999');
+    is $mech->status, 404, "don't die on nonexistent page (valid id type)";
+    $mech->get($pagecol_uri . 'moo');
+    is $mech->status, 404, "don't die on nonexistent page (invalid id type)";
 };
 
 
