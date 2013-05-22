@@ -473,7 +473,14 @@ subtest 'DatasetColumns' => sub {
     $mech->post($dscol_uri, {},);
     is $mech->status(), 405, 'no POST to dataset_column/object';
 
-    # fixme: PUT    datasetcolumn/object
+    # PUT    datasetcolumn/object
+    puts_ok('dataset_column', $dscol_uri, 'dscolumn_edit', {
+        'ds_column.data_type'      => 'numeric',
+        'ds_column.accession_type' => '',
+    });
+    $mech->content_like(
+        qr{value="numeric" selected}, 'can update dataset column'
+    );
 
     # DELETE datasetcolumn/object
     $mech->delete($dscol_uri, {},);
@@ -485,12 +492,6 @@ subtest 'DatasetColumns' => sub {
     $mech->get($dscol_uri . 'moo');
     is $mech->status, 404, "don't die on nonexistent page (invalid id type)";
 
-    # DISABLED UNTIL dscolumn edit page rework
-    # PUT datatsetcolumn/object
-    # puts_ok('dataset_column', $dscol_uri, {});
-    # $mech->get($dscol_list_uri);
-    # $mech->content_like(qr{url: http://www.google.com/},
-    #                     'can update dataset column');
 };
 
 
