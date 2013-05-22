@@ -155,6 +155,22 @@ after list_GET => sub {
 };
 
 
+=head2 list_POST (before)
+
+C<DatasetColumn>s cannot be manually created or deleted.
+
+=cut
+
+before list_POST => sub {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/plain');
+    $c->response->status(405);
+    $c->response->header( 'Allow' => [qw(GET PUT)] );
+    $c->response->body("Method DELETE not implemented");
+    $c->detach();
+};
+
+
 =head2 object_GET (after)
 
 Add column metadata (data type, accession type, etc.) to stash.
@@ -196,6 +212,22 @@ before object_PUT => sub {
 
 
     return;
+};
+
+
+=head2 object_DELETE (before)
+
+C<DatasetColumn>s cannot be manually created or deleted.
+
+=cut
+
+before object_DELETE => sub {
+    my ($self, $c) = @_;
+    $c->response->content_type('text/plain');
+    $c->response->status(405);
+    $c->response->header( 'Allow' => [qw(GET PUT)] );
+    $c->response->body("Method DELETE not implemented");
+    $c->detach();
 };
 
 

@@ -452,7 +452,10 @@ subtest 'DatasetColumns' => sub {
     my $dscol_list_uri = get_link_like_ok("dataset column list",
          qr{/user/testuser/dataset/\d+/column$});
 
-    # fixme: POST   datasetcolumn/list
+    # POST   datasetcolumn/list
+    $mech->post($dscol_list_uri, {},);
+    is $mech->status(), 405, 'no POST to dataset_column/list (immutable)';
+
     # fixme: PUT    datasetcolumn/list
 
     # DELETE datasetcolumn/list
@@ -471,7 +474,10 @@ subtest 'DatasetColumns' => sub {
     is $mech->status(), 405, 'no POST to dataset_column/object';
 
     # fixme: PUT    datasetcolumn/object
-    # fixme: DELETE datasetcolumn/object
+
+    # DELETE datasetcolumn/object
+    $mech->delete($dscol_uri, {},);
+    is $mech->status(), 405, 'no DELETE to dataset_column/object';
 
     # GET datasetcolumn/bad_object
     $mech->get($dscol_uri . '99999999');
