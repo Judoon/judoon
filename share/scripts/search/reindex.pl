@@ -51,11 +51,15 @@ main: {
             $sel->select('#content p');
 
         (my $title = $sel->select('title')) =~ s/ \| Judoon//;
+        my $description = join '', map {$_->{content}}
+             $sel->{tree}->findnodes('//meta[@name="description"]');
+
         my $webpage = $domain->create(
             webpage => {
-                title => $title,
-                url   => Judoon::Web->uri_for("/$static_page"), # . "",
-                body  => $content,
+                title       => $title,
+                url         => Judoon::Web->uri_for("/$static_page"),
+                body        => $content,
+                description => $description,
 
                 content => $content,
             }
@@ -77,6 +81,7 @@ main: {
                     '/private/dataset/object', [$dataset->user->username, $dataset->id]
                 ),
                 body   => $dataset->notes,
+                description => $dataset->notes,
 
                 id => $dataset->id,
 
@@ -105,6 +110,7 @@ main: {
                     [$page->dataset->user->username, $page->dataset->id, $page->id,]
                 ),
                 body   => $page->preamble,
+                description => $page->preamble,
 
                 id => $page->id,
                 #notes  => $page->preamble,

@@ -23,6 +23,13 @@ has body => (
     required => 1,
     index    => 'analyzed',
 );
+has description => (
+    traits   => ['ElasticField'],
+    is       => 'ro',
+    isa      => Str,
+    required => 1,
+    index    => 'analyzed',
+);
 has url => (
     traits   => ['ElasticField'],
     is       => 'ro',
