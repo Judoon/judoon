@@ -16,14 +16,14 @@ has title => (
     required => 1,
     index    => 'analyzed',
 );
-has body => (
+has description => (
     traits   => ['ElasticField'],
     is       => 'ro',
     isa      => Str,
     required => 1,
     index    => 'analyzed',
 );
-has description => (
+has content => (
     traits   => ['ElasticField'],
     is       => 'ro',
     isa      => Str,

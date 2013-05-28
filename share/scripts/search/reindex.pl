@@ -57,11 +57,9 @@ main: {
         my $webpage = $domain->create(
             webpage => {
                 title       => $title,
-                url         => Judoon::Web->uri_for("/$static_page"),
-                body        => $content,
                 description => $description,
-
-                content => $content,
+                content     => $content,
+                url         => Judoon::Web->uri_for("/$static_page"),
             }
         );
     }
@@ -76,14 +74,13 @@ main: {
     while ( my $dataset = $ds_rs->next ) {
         my $ds_doc = $domain->create(
             dataset => {
-                title  => $dataset->name,
-                url    => Judoon::Web->uri_for_action(
-                    '/private/dataset/object', [$dataset->user->username, $dataset->id]
-                ),
-                body   => $dataset->notes,
+                title       => $dataset->name,
                 description => $dataset->notes,
-
-                id => $dataset->id,
+                content     => $dataset->notes,
+                url         => Judoon::Web->uri_for_action(
+                    '/private/dataset/object',
+                    [$dataset->user->username, $dataset->id]
+                ),
 
                 private => $dataset->is_private,
 
@@ -104,16 +101,14 @@ main: {
     while ( my $page = $page_rs->next ) {
         my $page_doc = $domain->create(
             page => {
-                title  => $page->title,
-                url    => Judoon::Web->uri_for_action(
-                    '/private/page/object',
-                    [$page->dataset->user->username, $page->dataset->id, $page->id,]
-                ),
-                body   => $page->preamble,
+                title       => $page->title,
                 description => $page->preamble,
-
-                id => $page->id,
-                #notes  => $page->preamble,
+                content     => $page->preamble . $page->postamble,
+                url         => Judoon::Web->uri_for_action(
+                    '/private/page/object',
+                    [$page->dataset->user->username,
+                     $page->dataset->id, $page->id,]
+                ),
 
                 private => $page->is_private,
 
