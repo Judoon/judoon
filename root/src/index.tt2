@@ -1,5 +1,6 @@
 [% WRAPPER components/wrapper.tt2
   title = 'Welcome'
+  description = 'Judoon is a project that makes it easy to share and customize your scientific data on the web.'
 %]
 
 [%- INCLUDE 'components/notification.tt2' -%]

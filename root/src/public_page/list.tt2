@@ -1,5 +1,6 @@
 [%- WRAPPER components/wrapper.tt2
   title = 'Public Pages'
+  description = 'See a list of publicly available pages'
 -%]
 
 [%- INCLUDE 'components/notification.tt2' -%]

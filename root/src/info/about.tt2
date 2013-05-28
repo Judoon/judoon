@@ -1,5 +1,6 @@
 [% WRAPPER components/wrapper.tt2
   title = 'About Judoon'
+  description = 'History of the Judoon data-sharing project'
 %]
 
 [%- INCLUDE 'components/notification.tt2' -%]

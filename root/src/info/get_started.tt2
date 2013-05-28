@@ -1,5 +1,6 @@
 [% WRAPPER components/wrapper.tt2
   title = 'Get Started'
+  description = 'How to start sharing your data with Judoon'
 %]
 
 [%- INCLUDE 'components/notification.tt2' -%]
