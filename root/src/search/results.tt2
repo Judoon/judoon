@@ -62,13 +62,15 @@
             <a href="[% this_result.url %]">[% this_result.title %]</a>
           </div>
           <div class="byline muted"><small>Created by: [% this_result.owner.name || this.owner.username %][% IF this_result.organization %], [% this_result.organization %][% END %] on [% this_result.created_fmt %]</small></div>
-          <div class="synopsis">[% this_result.description.substr(0, 50) _ '...' || 'No description available' %]</div>
+          [% USE String %]
+          [% descr_string = String.new(this_result.description) %]
+          <div class="synopsis">[% descr_string.truncate(100, '...') || 'No description available' %]</div>
+          [% IF this_result.context.size %]
           <div class="context muted">
-            [% this_result.context.join('... ') || 'Nope' %]
+            [% this_result.context.join('... ') || 'No context' %]
           </div>
-          </div>
+          [% END %]
           <div class="retrieved"><small>Retrieved on [% this_result.retrieved_fmt %]</small></div>
-
 [% END %]
 
 [% BLOCK web_layout %]
