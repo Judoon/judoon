@@ -68,6 +68,19 @@ main: {
     # index contents of our database.
     my $schema = Judoon::Schema->connect('Judoon::Schema');
 
+    my $user_rs = $schema->resultset('User');
+    my %user_map;
+    while (my $user = $user_rs->next) {
+        my $user_doc = $domain->create(
+            user => {
+                username => $user->username,
+                name     => $user->name,
+                email_address => $user->email_address,
+            },
+        );
+        $user_map{$user->username} = $user_doc;
+    }
+
     # start with datasets
     print "  datasets...";
     my $ds_rs = $schema->resultset('Dataset');
@@ -84,7 +97,7 @@ main: {
 
                 private     => $dataset->is_private,
 
-                owner       => $dataset->user->username,
+                owner       => $user_map{$dataset->user->username},
                 data        => $dataset->data,
                 headers     => [$dataset->long_headers],
                 nbr_rows    => $dataset->nbr_rows,
@@ -112,7 +125,7 @@ main: {
 
                 private     => $page->is_private,
 
-                owner       => $page->dataset->user->username,
+                owner       => $user_map{$page->dataset->user->username},
                 data        => $page->data_table,
                 headers     => $page->headers,
                 nbr_rows    => $page->nbr_rows,

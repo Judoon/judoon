@@ -9,7 +9,8 @@ use MooseX::Types::Moose qw(Str ArrayRef);
 has owner => (
     traits => ['ElasticField'],
     is     => 'ro',
-    isa    => Str
+    isa    => 'Judoon::Search::Document::User',
+    include_attrs => [qw(username name email_address)],
 );
 
 has headers => (

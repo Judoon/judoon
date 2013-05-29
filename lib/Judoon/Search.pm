@@ -4,6 +4,7 @@ use Elastic::Model;
 
 has_namespace 'judoon' => {
     webpage => 'Judoon::Search::Document::Webpage',
+    user    => 'Judoon::Search::Document::User',
     dataset => 'Judoon::Search::Document::Dataset',
     page    => 'Judoon::Search::Document::Page',
 };
