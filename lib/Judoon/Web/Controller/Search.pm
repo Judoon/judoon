@@ -17,6 +17,7 @@ sub base : Chained('/') PathPart('search') CaptureArgs(0) {
         pre_tags  => [ '<strong>',  ],
         post_tags => [ '</strong>', ],
         encoder   => 'html',
+        fragment_size => 50,
     );
 
     my $web_search = $web_view->type('webpage')->queryb({_all => $data->{q},});
@@ -34,8 +35,8 @@ sub base : Chained('/') PathPart('search') CaptureArgs(0) {
     $c->stash->{search}{web_results} = \@web_results;
 
 
-    my $data_search = $web_view->type('page')->queryb({_all => $data->{q},});
-        # ->filterb(private => 0);
+    my $data_search = $web_view->type('page')->queryb({_all => $data->{q},})
+        ->filterb(private => 0);
     my $data_iter   = $data_search->search->as_results();
     my @data_results;
     while (my $result = $data_iter->next) {
