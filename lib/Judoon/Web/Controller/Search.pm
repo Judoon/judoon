@@ -13,37 +13,39 @@ sub base : Chained('/') PathPart('search') CaptureArgs(0) {
 
     my $domain     = $c->model('Search')->domain('judoon');
     my $view       = $domain->view;
+    my $web_view   = $view->highlight(qw(title content))->highlighting(
+        pre_tags  =>  [ '<em>',  '<b>'  ],
+        post_tags =>  [ '</em>', '</b>' ],
+        encoder   => 'html',
+    );
 
-    my $web_search = $view->type('webpage')->queryb({_all => $data->{q},})
-        ->highlight('body')->highlighting(
-            pre_tags    =>  [ '<em>',  '<b>'  ],
-            post_tags   =>  [ '</em>', '</b>' ],
-            encoder     => 'html',
-        );
+    my $web_search = $web_view->type('webpage')->queryb({_all => $data->{q},});
     my $web_iter   = $web_search->search->as_results();
     my @web_results;
     while (my $result = $web_iter->next) {
+        my $raw = $result->result->{_source};
+        my $object = $result->object;
         push @web_results, {
-            webmeta    => $result->result->{_source},
-            highlights => [$result->highlight('body')],
-            body       => substr($result->result->{_source}{content}, 0, 100) . '...',
+            %$raw,
+            context => [$result->highlight('title'), $result->highlight('content')],
+            retrieved_fmt => $object->retrieved->ymd,
         };
     }
     $c->stash->{search}{web_results} = \@web_results;
 
 
-    my @data_indexes = ('public_data');
-    push @data_indexes, 'private_data' if( $c->user_exists );
-
-    my $data_search = $view->type('dataset')->queryb({_all => $data->{q},});
+    my $data_search = $web_view->type('page')->queryb({_all => $data->{q},});
         # ->filterb(private => 0);
     my $data_iter   = $data_search->search->as_results();
     my @data_results;
     while (my $result = $data_iter->next) {
+        my $raw    = $result->result->{_source};
+        my $object = $result->object;
         push @data_results, {
-            webmeta    => $result->result->{_source},
-            highlights => [$result->highlight('body')],
-            body       => substr($result->result->{_source}{content}, 0, 100) . '...',
+            %$raw,
+            context => [$result->highlight('title'), $result->highlight('content')],
+            retrieved_fmt => $object->retrieved->ymd,
+            created_fmt   => $object->created->ymd,
         };
     }
     $c->stash->{search}{data_results} = \@data_results;
