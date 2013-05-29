@@ -14,8 +14,8 @@ sub base : Chained('/') PathPart('search') CaptureArgs(0) {
     my $domain     = $c->model('Search')->domain('judoon');
     my $view       = $domain->view;
     my $web_view   = $view->highlight(qw(title content))->highlighting(
-        pre_tags  =>  [ '<em>',  '<b>'  ],
-        post_tags =>  [ '</em>', '</b>' ],
+        pre_tags  => [ '<strong>',  ],
+        post_tags => [ '</strong>', ],
         encoder   => 'html',
     );
 
