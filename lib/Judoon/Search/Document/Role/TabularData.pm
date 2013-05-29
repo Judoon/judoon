@@ -7,21 +7,23 @@ use MooseX::Types::DateTime qw(DateTime);
 use MooseX::Types::Moose qw(Str ArrayRef);
 
 has owner => (
-    traits => ['ElasticField'],
-    is     => 'ro',
-    isa    => 'Judoon::Search::Document::User',
+    traits        => ['ElasticField'],
+    is            => 'ro',
+    isa           => 'Judoon::Search::Document::User',
     include_attrs => [qw(username name email_address)],
 );
 
 has headers => (
     traits => ['ElasticField'],
     is     => 'ro',
-    isa    => ArrayRef[Str],
+    isa    => Str,
+    index  => 'analyzed',
 );
 has data => (
     traits => ['ElasticField'],
     is     => 'ro',
-    isa    => ArrayRef[ArrayRef],
+    isa    => Str,
+    index  => 'analyzed',
 );
 
 has nbr_rows => (

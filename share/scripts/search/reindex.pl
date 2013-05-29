@@ -99,8 +99,8 @@ main: {
                 private     => $dataset->is_private,
 
                 owner       => $user_map{$dataset->user->username},
-                data        => $dataset->data,
-                headers     => [$dataset->long_headers],
+                data        => join("\n", map { join("\t", map {$_ // q()} @$_) } @{$dataset->data}),
+                headers     => join("\t", $dataset->long_headers),
                 nbr_rows    => $dataset->nbr_rows,
                 nbr_columns => $dataset->nbr_columns,
                 created     => $dataset->created,
@@ -133,8 +133,8 @@ main: {
                 private     => $page->is_private,
 
                 owner       => $user_map{$page->dataset->user->username},
-                data        => $page->data_table,
-                headers     => $page->headers,
+                data        => join("\n", map { join("\t", map {$_ // q()} @$_) } @{$page->data_table}),
+                headers     => join("\t", map {$_ // q()} @{$page->headers}),
                 nbr_rows    => $page->nbr_rows,
                 nbr_columns => $page->nbr_columns,
                 created     => $page->created,
