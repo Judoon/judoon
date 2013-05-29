@@ -82,7 +82,7 @@ main: {
                     [$dataset->user->username, $dataset->id]
                 ),
 
-                private => $dataset->is_private,
+                private     => $dataset->is_private,
 
                 owner       => $dataset->user->username,
                 data        => $dataset->data,
@@ -103,14 +103,14 @@ main: {
             page => {
                 title       => $page->title,
                 description => $page->preamble,
-                content     => $page->preamble . $page->postamble,
+                content     => join(' ', ($page->preamble, $page->postamble)),
                 url         => Judoon::Web->uri_for_action(
                     '/private/page/object',
                     [$page->dataset->user->username,
                      $page->dataset->id, $page->id,]
                 ),
 
-                private => $page->is_private,
+                private     => $page->is_private,
 
                 owner       => $page->dataset->user->username,
                 data        => $page->data_table,
