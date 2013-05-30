@@ -1,5 +1,6 @@
 [%- WRAPPER components/wrapper.tt2
   title = 'Public Datasets'
+  description = 'See a list of publicly available datasets'
 -%]
 
 [%- INCLUDE 'components/notification.tt2' -%]

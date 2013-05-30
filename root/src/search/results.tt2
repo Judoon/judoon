@@ -1,0 +1,86 @@
+[% WRAPPER components/wrapper.tt2
+  title = 'Search'
+%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+
+
+<div class="row-fluid" style="display: none;">
+  <div class="span10">
+    <a href="" class="btn"><i class="icon-th"></i> Public Data ([%- search.data_results.size -%])</a>
+    <a href="" class="btn"><i class="icon-question-sign"></i> Site Pages ([%- search.web_results.size -%])</a>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+  <h3>Search results for &quot;<strong>[% c.req.param('q') %]</strong>&quot;:</h3>
+
+  [%
+    PROCESS search_results
+      meta    = { title => 'Public Data', }
+      results = search.data_results
+      layout  = 'data_layout'
+  %]
+
+  [%
+    PROCESS search_results
+      meta    = { title => 'Site Results', }
+      results = search.web_results
+      layout  = 'web_layout'
+  %]
+
+  </div>
+</div>
+
+[% END %]
+
+[% BLOCK search_results %]
+<div class="row-fluid">
+  <div class="span10 offset1">
+    <h4>[% meta.title %] ([%- results.size -%]):</h4>
+    [% IF results.size %]
+    <table class="table">
+      [% FOR result IN results %]
+      <tr>
+        <td>
+          [% INCLUDE "$layout" this_result=result %]
+        </td>
+      </tr>
+      [% END %]
+    </table>
+    [% ELSE %]
+    <h5>Nothing found.</h5>
+    [% END %]
+  </div>
+</div>
+<br>
+[% END %]
+
+[% BLOCK data_layout %]
+          <div class="title">
+            <a href="[% this_result.url %]">[% this_result.title %]</a>
+          </div>
+          <div class="byline muted"><small>Created by: [% this_result.owner.name || this.owner.username %][% IF this_result.organization %], [% this_result.organization %][% END %] on [% this_result.created_fmt %]</small></div>
+          [% USE String %]
+          [% descr_string = String.new(this_result.description) %]
+          <div class="synopsis">[% descr_string.truncate(100, '...') || 'No description available' %]</div>
+          [% IF this_result.context.size %]
+          <div class="context muted">
+            [% this_result.context.join('... ') || 'No context' %]
+          </div>
+          [% END %]
+          <div class="retrieved"><small>Retrieved on [% this_result.retrieved_fmt %]</small></div>
+[% END %]
+
+[% BLOCK web_layout %]
+          <div><a href="[% this_result.webmeta.url %]">[% this_result.title %]</a></div>
+          <div class="synopsis">
+            [% this_result.description || 'No description available' %]
+          </div>
+          <div class="context muted">
+            [% this_result.context.join('... ') %]
+          </div>
+          <div><small>On [% this_result.retrieved_fmt %]</small></div>
+
+[% END %]

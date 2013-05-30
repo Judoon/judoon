@@ -96,18 +96,6 @@ sub placeholder :Local {
 }
 
 
-=head2 get_started
-
-Show user the "getting started" page
-
-=cut
-
-sub get_started :Local {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'intro.tt2';
-}
-
-
 =head2 end
 
 Attempt to render a view, if needed.
