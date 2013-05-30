@@ -1,0 +1,65 @@
+[% WRAPPER components/wrapper.tt2
+  title = 'Search'
+%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+
+
+<div class="row-fluid" style="display: none;">
+  <div class="span10">
+    <a href="" class="btn"><i class="icon-th"></i> Public Data ([%- search.data_results.size -%])</a>
+    <a href="" class="btn"><i class="icon-question-sign"></i> Site Pages ([%- search.web_results.size -%])</a>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+  <h3>Search results for &quot;<strong>[% c.req.param('q') %]</strong>&quot;:</h3>
+
+  [%
+    PROCESS search_results
+      meta = {title => 'Public Data', }
+      results = search.data_results
+  %]
+
+  [%
+    PROCESS search_results
+      meta = {title => 'Site Results', }
+      results = search.web_results
+  %]
+
+  </div>
+</div>
+
+[% END %]
+
+[% BLOCK search_results %]
+<div class="row-fluid">
+  <div class="span10 offset1">
+    <h4>[% meta.title %] ([%- results.size -%]):</h4>
+    [% IF results.size %]
+    <table class="table">
+      [% FOR result IN results %]
+      <tr>
+        <td>
+          <div><a href="[% result.webmeta.url %]">[% result.webmeta.title %]</a></div>
+          <div class="muted">
+            [% IF result.highlights %]
+              [% result.highlights.join('...<br>') %]
+            [% ELSE %]
+              [% result.body || '&lt;no description&gt;' %]
+            [% END %]
+
+          </div>
+          <div><small>On [% result.webmeta.retrieved %]</small></div>
+        </td>
+      </tr>
+      [% END %]
+    </table>
+    [% ELSE %]
+    <h5>Nothing found.</h5>
+    [% END %]
+  </div>
+</div>
+<br>
+[% END %]
