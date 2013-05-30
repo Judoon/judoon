@@ -327,7 +327,7 @@ sub data_table {
     my ($self, $args) = @_;
     return [
         [map {$args->{shortname} ? $_->shortname : $_->name}
-             sort {$a->sort <=> $b->sort} $self->ds_columns_ordered->all],
+             $self->ds_columns_ordered->all],
         @{$self->data},
     ];
 }
