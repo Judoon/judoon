@@ -58,6 +58,7 @@ requires 'FindBin';
 requires 'FileHandle';
 requires 'Getopt::Long';
 requires 'HTML::TreeBuilder';
+requires 'IO::All';
 requires 'IO::File';
 requires 'JSON';
 requires 'JSON::XS';
