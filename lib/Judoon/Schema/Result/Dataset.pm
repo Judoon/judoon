@@ -372,6 +372,29 @@ sub as_excel {
 }
 
 
+=head2 long_headers
+
+Return list of the human-readable C<DatasetColumn> names.
+
+=cut
+
+sub long_headers {
+    my ($self) = @_;
+    return map {$_->name} $self->ds_columns_ordered->all;
+}
+
+
+=head2 short_headers
+
+Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
+
+=cut
+
+sub short_headers {
+    my ($self) = @_;
+    return map {$_->shortname} $self->ds_columns_ordered->all;
+}
+
 
 =head1 DATASTORE
 
