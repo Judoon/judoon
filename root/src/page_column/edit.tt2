@@ -28,7 +28,7 @@
     <div class="control-group">
       <label class="control-label" for="page_column.template">Cell Layout:</label>
       <div class="controls">
-        <div id="column_canvas" class="well" style="height: 8em; width: 50em;">
+        <div id="column_canvas" class="well">
           <div id="canvas_cursor"></div>
         </div>
         <input type="hidden" form="pagecol_form" name="page_column.template" />

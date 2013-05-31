@@ -64,6 +64,8 @@ body {}
 
 /* ========== PageColumn edit ========= */
 
+#column_canvas { min-height: 8em; }
+
 #canvas_cursor {
     border: thin #aaa solid;
     height: 1em;
