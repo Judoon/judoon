@@ -44,5 +44,8 @@
 
   </fieldset>
 
+  <div class="form-actions">
+    <a class="btn" href="[% c.uri_for_action('/private/dataset/object', c.req.captures) %]"><i class="icon arrow-right"></i>Return to dataset</a>
+  </div>
 
 [% END %]
