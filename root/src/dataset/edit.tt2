@@ -34,7 +34,11 @@
       </div>
     </div>
 
-    [%- INCLUDE 'components/forms/permission.tt2' prefix="dataset" current_permission=dataset.object.permission -%]
+    [%- INCLUDE 'components/forms/permission.tt2'
+        prefix="dataset"
+        width_class = "span2"
+        current_permission=dataset.object.permission
+    -%]
 
     <input type="hidden" name="x-tunneled-method" value="PUT" form="dataset_edit">
 

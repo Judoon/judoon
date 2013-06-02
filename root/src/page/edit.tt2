@@ -16,7 +16,7 @@
 <div class="row-fluid">
   <div class="span6">
 <form name="page_edit" id="page_edit" action="[% c.uri_for_action('/private/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
-  <fieldset>
+  <fieldset style="min-width: 0px;">
     <legend>Page Layout</legend>
 
 
@@ -41,7 +41,11 @@
       </div>
     </div>
 
-    [%- INCLUDE 'components/forms/permission.tt2' prefix="page" current_permission=page.object.permission -%]
+    [%- INCLUDE 'components/forms/permission.tt2'
+        prefix="page"
+        width_class = "input-block-level"
+        current_permission=page.object.permission
+     -%]
 
     <input type="hidden" form="page_edit" name="x-tunneled-method" value="PUT">
     
