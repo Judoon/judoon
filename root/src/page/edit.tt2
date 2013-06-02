@@ -23,21 +23,21 @@
     <div class="control-group">
       <label class="control-label" for="page.title">Title: </label>
       <div class="controls">
-        <input type="text" form="page_edit" name="page.title" id="page.title" value="[% page.object.title %]" />
+        <input type="text" class="input-block-level" form="page_edit" name="page.title" id="page.title" value="[% page.object.title %]" />
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.preamble">Preamble: </label>
       <div class="controls">
-        <textarea form="page_edit" name="page.preamble">[% page.object.preamble %]</textarea>
+        <textarea form="page_edit" name="page.preamble" class="input-block-level">[% page.object.preamble %]</textarea>
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.postamble">Postamble:</label>
       <div class="controls">
-        <textarea form="page_edit" name="page.postamble">[% page.object.postamble %]</textarea>
+        <textarea form="page_edit" name="page.postamble" class="input-block-level">[% page.object.postamble %]</textarea>
       </div>
     </div>
 
