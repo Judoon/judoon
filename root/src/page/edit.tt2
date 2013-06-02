@@ -68,7 +68,7 @@
 <section id="actions">
   <h4>Actions</h4>
   [% INCLUDE 'components/action_button.tt2' label="Preview Page" url=c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'}, ) -%]
-  [% INCLUDE 'components/action_button.tt2' label="Edit Columns" url=c.uri_for_action('/private/pagecolumn/list', c.req.captures) -%]
+  [% INCLUDE 'components/action_button.tt2' label=" Add or Edit Columns" url=c.uri_for_action('/private/pagecolumn/list', c.req.captures) -%]
   [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', c.req.captures), method="DELETE" form_name="delete_page" -%]
 </section>
 
