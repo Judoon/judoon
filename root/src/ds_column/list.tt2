@@ -8,24 +8,37 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
+<style type="text/css">
+  #outer { width: 99%; }
+  #inner { overflow-x: scroll; }
+  fieldset { min-width: auto; }
+
+  #dataset td {
+     vertical-align: top;
+     text-align: center;
+  }
+  #dataset th, #dataset td { border-top: none; }
+  #dataset th { white-space: nowrap; }
+
+</style>
+
   <fieldset>
     <legend>[% dataset.object.name %] dataset columns</legend>
 
-    <table id="dataset" class="table table-striped table-condensed">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Column</th>
-          <th>Sample Data</th>
-          <th>Column Type</th>
-          <th>Annotate</th>
-        </tr>
-      </thead>
+    <div id="outer">
+    <div id="inner">
+    <table id="dataset" class="table table-striped table-bordered">
       <tbody>
-        [% FOREACH column IN ds_column.list %]
-        <tr class="[% loop.count % 2 ? 'odd' : 'even' %]">
-          <td>[% loop.count %]</td>
-          <td class="header">[% column.name | html %]</td>
+        <tr class="odd">
+          <th class="header">Column</th>
+          [% FOREACH column IN ds_column.list %]
+          <td class="name"><span class="label">[%- column.name | html -%]</span></td>
+          [% END %]
+        </tr>
+
+        <tr class="even">
+          <th class="header">Sample Data</th>
+          [% FOREACH column IN ds_column.list %]
           <td class="sample_data">
             [% IF column.samples.size %]
             [% FOREACH sample IN column.samples %]
@@ -35,12 +48,34 @@
             <span class="none">( none )</span>
             [% END %]
           </td>
-          <td class="metadata center">[%- column.data_type -%][% column.accession_type ? ', accession: ' _ column.accession_type : '' %]</td>
-          <td class="annotate center">[%- INCLUDE 'components/action_button.tt2' label="Annotate" url=c.uri_for_action('/private/datasetcolumn/object', c.req.captures.merge([column.id]))  -%]</td>
+          [% END %]
         </tr>
-        [% END %]
+
+        <tr class="odd">
+          <th class="header">Accession Type</th>
+          [% FOREACH column IN ds_column.list %]
+          <td class="metadata">[% column.accession_type || '&nbsp;' %]</td>
+          [% END %]
+        </tr>
+
+        <tr class="even">
+          <th class="header">Column Type</th>
+          [% FOREACH column IN ds_column.list %]
+          <td class="metadata">[% column.data_type || '&nbsp;' %]</td>
+          [% END %]
+        </tr>
+
+        <tr class="odd">
+          <th class="header">Actions</th>
+          [% FOREACH column IN ds_column.list %]
+          <td class="annotate center">[%- INCLUDE 'components/action_button.tt2' label="Annotate" url=c.uri_for_action('/private/datasetcolumn/object', c.req.captures.merge([column.id]))  -%]</td>
+          [% END %]
+        </tr>
+
       </tbody>
     </table>
+    </div>
+    </div>
 
   </fieldset>
 
