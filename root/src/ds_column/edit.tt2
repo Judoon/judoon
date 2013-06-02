@@ -12,18 +12,6 @@
   <fieldset>
     <legend>Annotate column "[% ds_column.object.name %]"</legend>
 
-    <h4>Data Type</h4>
-    <div class="control-group">
-      <label class="control-label" for="ds_column.data_type">Data type:</label>
-      <div class="controls">
-        <select form="dscolumn_edit" name="ds_column.data_type" id="ds_column.data_type">
-          [% FOREACH data_type IN ['text', 'numeric'] %]
-          <option value="[% data_type %]" [% IF data_type == ds_column.object.data_type %]selected[% END %]>[% data_type.ucfirst %]</option>
-          [% END %]
-        </select>
-      </div>
-    </div>
-
     <h4>Accessions</h4>
     <div class="control-group">
       <label class="control-label" for="ds_column.accession_type">Accession type:</label>
@@ -40,6 +28,19 @@
         </select>
       </div>
     </div>
+
+    <h4>Data Type</h4>
+    <div class="control-group">
+      <label class="control-label" for="ds_column.data_type">Data type:</label>
+      <div class="controls">
+        <select form="dscolumn_edit" name="ds_column.data_type" id="ds_column.data_type">
+          [% FOREACH data_type IN ['text', 'numeric'] %]
+          <option value="[% data_type %]" [% IF data_type == ds_column.object.data_type %]selected[% END %]>[% data_type.ucfirst %]</option>
+          [% END %]
+        </select>
+      </div>
+    </div>
+
 
     <input type="hidden" form="dscolumn_edit" name="x-tunneled-method" value="PUT">
 
