@@ -31,6 +31,8 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'dataset',
         stash_key    => 'dataset',
+        name         => 'dataset',
+        name_plural  => 'datasets',
     },
 
     # DBIC result class
@@ -59,7 +61,6 @@ __PACKAGE__->config(
         { 'ds_columns' => [qw/id dataset_id name sort data_type accession_type shortname/] },
         { 'pages'      => [qw/id dataset_id title preamble postamble permission/] },
     ],
-
 );
 
 

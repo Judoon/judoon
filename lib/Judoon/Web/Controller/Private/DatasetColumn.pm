@@ -30,6 +30,8 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'ds_column',
         stash_key    => 'ds_column',
+        name         => 'dataset column',
+        name_plural  => 'dataset columns',
     },
 
     # DBIC result class

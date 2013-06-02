@@ -353,6 +353,7 @@ sub list_POST :Private {
 
     $self->update_or_create($c);
 
+    $self->set_success($c, ucfirst($self->rpc->{name}) . ' created.');
     my $object = $c->req->get_object(0)->[0];
     $self->go_relative($c, 'object', [@{$c->req->captures}, $object->id]);
 }
@@ -369,6 +370,7 @@ redirects back to the list (C<L</list_GET>>.
 sub list_PUT :Private {
     my ($self, $c) = @_;
     $self->update_or_create($c);
+    $self->set_success($c, ucfirst($self->rpc->{name_plural}) . ' updated.');
     $self->go_relative($c, 'list', $c->req->captures);
 }
 
@@ -467,6 +469,7 @@ a resource. Redirects back to C<object_GET> by default.
 sub object_PUT :Private {
     my ($self, $c) = @_;
     $self->update_or_create($c);
+    $self->set_success($c, ucfirst($self->rpc->{name}) . ' updated.');
     $self->go_relative($c, 'object');
 }
 
@@ -484,6 +487,7 @@ sub object_DELETE :Private {
 
     $self->delete($c);
 
+    $self->set_success($c, ucfirst($self->rpc->{name}) . ' deleted.');
     my @captures = @{$c->req->captures};
     pop @captures;
     $self->go_relative($c, 'list', \@captures);

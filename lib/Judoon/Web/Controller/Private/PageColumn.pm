@@ -34,6 +34,8 @@ __PACKAGE__->config(
     rpc => {
         template_dir => 'page_column',
         stash_key    => 'page_column',
+        name         => 'page column',
+        name_plural  => 'page columns',
     },
 
     # DBIC result class
