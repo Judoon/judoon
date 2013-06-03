@@ -164,6 +164,9 @@ after object_GET => sub {
     $c->stash->{ds_column}{list} = \@ds_columns;
     $c->stash->{url_columns}     = [];
 
+    my $page = $c->req->get_chained_object(-1)->[0];
+    $c->stash->{page_column}{list} = [$page->page_columns_ordered->hri->all];
+
     my @acc_columns          = grep {$_->accession_type} @ds_columns;
     $c->stash->{acc_columns} = \@acc_columns;
     my $sitelinker           = $c->model('SiteLinker');

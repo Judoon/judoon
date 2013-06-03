@@ -54,10 +54,12 @@
 
     judoon.preview_column();
     $('#btn_preview').on('click', function() { judoon.preview_column(); });
-    $('#column_canvas').on('change', 'input',                  function() {delay( function() {judoon.preview_column();}, 500 );});
-    $('#column_canvas').on('keyup',  'input',                  function() {delay( function() {judoon.preview_column();}, 500 );});
-    $('#column_canvas').on('click',  'ul.dropdown-menu li a',  function() {delay( function() {judoon.preview_column();}, 500 );});
-    $('#actions .btn').on( 'click',                            function() {delay( function() {judoon.preview_column();}, 500 );});
+    $('#page_column_title').on('change',                       function() {delay( function() {judoon.preview_column();}, 300 );});
+    $('#page_column_title').on('keyup',                        function() {delay( function() {judoon.preview_column();}, 300 );});
+    $('#column_canvas').on('change', 'input',                  function() {delay( function() {judoon.preview_column();}, 300 );});
+    $('#column_canvas').on('keyup',  'input',                  function() {delay( function() {judoon.preview_column();}, 300 );});
+    $('#column_canvas').on('click',  'ul.dropdown-menu li a',  function() {delay( function() {judoon.preview_column();}, 300 );});
+    $('#actions .btn').on( 'click',                            function() {delay( function() {judoon.preview_column();}, 300 );});
 
   });
 </script>

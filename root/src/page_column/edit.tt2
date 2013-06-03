@@ -12,6 +12,21 @@
 
 <style type="text/css">
   fieldset { min-width: 0; }
+
+  #preview_table .current_column {
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+
+    border-color: rgba(82, 168, 236, 0.8);
+    outline: 0;
+    outline: thin dotted 9;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+
+  }
 </style>
 
 <form id="pagecol_form" name="pagecol_form" action="[% c.uri_for_action('/private/pagecolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
@@ -69,21 +84,23 @@
 
     <div class="control-group">
       <label class="control-label" for="page_column.preview">Preview:</label>
-      <div class="controls">
-        <div id="preview_space" class="span3" style="border: 1px solid #ddd; border-radius: 3px;">
-          <table id="preview_table" class="display data_table table table-striped table-condensed dataTable">
-            <thead>
-              <tr>
-                <th id="preview_column_title"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="odd">
-                <td id="preview_content"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div  id="preview_space" class="controls">
+        <table id="preview_table" class="table table-striped table-bordered table-condensed" style="clear: none;">
+          <thead>
+            <tr>
+              [% FOREACH preview_col IN page_column.list %]
+              <th [% IF preview_col.id == page_column.id %]id="preview_column_title" class="current_column"[% END %]>[% preview_col.title | html %]</th>
+              [% END %]
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="odd">
+              [% FOREACH preview_col IN page_column.list %]
+              <td [% IF preview_col.id == page_column.id %]id="preview_content" class="acurrent_column"[% END %]></td>
+              [% END %]
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
