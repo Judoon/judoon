@@ -1,4 +1,27 @@
-[% extra_js = BLOCK %][% INCLUDE 'components/pagecolumn/edit_js.tt2' %][% END %]
+[% extra_js = BLOCK %]
+[% INCLUDE 'components/pagecolumn/edit_js.tt2' %]
+
+<script src="/static/js/vendor/handlebars.min.js"></script>
+
+[% FOREACH column IN page_column.list %]
+<script class="hb_template_[% column.id %]" type="x/text-handlebars-template">
+[%- column.js_template -%]
+</script>
+[% END %]
+
+<script>
+  $(document).ready(function () {
+
+    $('script[type="x/text-handlebars-template"]').each(
+      function (idx) {
+        var template = Handlebars.compile($(this).html());
+        $('#preview_table tr td.' + $(this).attr('class')).html( template(sample_data) );
+      }
+    );
+  });
+</script>
+
+[% END %]
 [% WRAPPER components/wrapper.tt2
   title = "Add column to page for &quot;$dataset.object.name&quot;"
   extra_javascript = extra_js
@@ -84,7 +107,7 @@
 
     <div class="control-group">
       <label class="control-label" for="page_column.preview">Preview:</label>
-      <div  id="preview_space" class="controls">
+      <div id="preview_space" class="controls">
         <table id="preview_table" class="table table-striped table-bordered table-condensed" style="clear: none;">
           <thead>
             <tr>
@@ -96,11 +119,44 @@
           <tbody>
             <tr class="odd">
               [% FOREACH preview_col IN page_column.list %]
-              <td [% IF preview_col.id == page_column.id %]id="preview_content" class="acurrent_column"[% END %]></td>
+              <td [% IF preview_col.id == page_column.id %]id="preview_content"[% END %] class="hb_template_[% preview_col.id %]"></td>
               [% END %]
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="">Spreadsheet Columns:</label>
+      <div class="controls">
+    [% unused_ds_cols = [] %]
+    [% used_ds_cols   = [] %]
+    [% FOREACH header IN dataset.headers_used %][% header.used_in ? used_ds_cols.push(header) : unused_ds_cols.push(header) %][% END %]
+
+    <ul class="inline">
+      <li><strong>Unused:</strong></li>
+      [% IF unused_ds_cols.size %]
+      [% FOREACH header IN unused_ds_cols %]
+      <li>&#x2717; [%- header.title | html -%]</li>
+      [% END %]
+      [% ELSE %]
+      <li>none</li>
+      [% END %]
+    </ul>
+
+    <ul class="inline">
+      <li><strong>Used:</strong></li>
+      [% IF used_ds_cols.size %]
+      [% FOREACH header IN used_ds_cols %]
+      <li class="muted"><abbr title="[% header.used_in | html %]">&#x2713;</abbr> [%- header.title | html -%]</li>
+      [% END %]
+      [% ELSE %]
+      <li>none</li>
+      [% END %]
+
+    </ul>
+l
       </div>
     </div>
 

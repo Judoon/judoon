@@ -169,7 +169,6 @@
       [% ELSE %]
       <li>none</li>
       [% END %]
-
     </ul>
   </div>
 </div>

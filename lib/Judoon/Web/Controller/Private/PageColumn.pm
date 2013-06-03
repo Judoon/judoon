@@ -166,6 +166,10 @@ after object_GET => sub {
 
     my $page = $c->req->get_chained_object(-1)->[0];
     $c->stash->{page_column}{list} = [$page->page_columns_ordered->hri->all];
+    for my $column (@{$c->stash->{page_column}{list}}) {
+        my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
+        $column->{js_template} = $tmpl->to_jstmpl;
+    }
 
     my @acc_columns          = grep {$_->accession_type} @ds_columns;
     $c->stash->{acc_columns} = \@acc_columns;
