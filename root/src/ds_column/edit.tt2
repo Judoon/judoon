@@ -26,6 +26,13 @@
           </optgroup>
           [% END %]
         </select>
+
+        <span class="help-block">
+          An <strong>accession</strong> is a well-known identifier
+          such as an Entrez Gene ID or a Uniprot ID.  By marking your
+          field as an accession, we can provide links to other popular
+          sites automatically.
+        </span>
       </div>
     </div>
 
@@ -38,6 +45,11 @@
           <option value="[% data_type %]" [% IF data_type == ds_column.object.data_type %]selected[% END %]>[% data_type.ucfirst %]</option>
           [% END %]
         </select>
+
+        <span class="help-block">
+          The <strong>data type</strong> of your field defines how it
+          will be sorted in your constructed tables.
+        </span>
       </div>
     </div>
 
