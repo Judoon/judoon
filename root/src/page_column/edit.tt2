@@ -130,7 +130,7 @@
               </div>
               <div class="span4">
                 <div class="btn-group">
-                  <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Backspace</a>
+                  <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Delete</a>
                 </div>
               </div>
             </div>
