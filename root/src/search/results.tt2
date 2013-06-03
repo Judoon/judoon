@@ -74,7 +74,7 @@
 [% END %]
 
 [% BLOCK web_layout %]
-          <div><a href="[% this_result.webmeta.url %]">[% this_result.title %]</a></div>
+          <div><a href="[% this_result.url %]">[% this_result.title %]</a></div>
           <div class="synopsis">
             [% this_result.description || 'No description available' %]
           </div>
