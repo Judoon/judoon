@@ -42,13 +42,15 @@
 
 [%- BLOCK guide_add_dataset -%]
 <div class="row-fluid">
-  <div class="span5">
+  <div class="span2">
     <p class="help-inline">
       <a href="#howto_modal" data-toggle="modal">What now?</a>
     </p>
   </div>
-  <div class="span7">
+  <div class="span10">
+    <div class="pull-right">
     [%- INCLUDE 'components/forms/upload_dataset.tt2' -%]
+    </div>
   </div>
 </div>
 
