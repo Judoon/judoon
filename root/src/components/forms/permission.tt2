@@ -1,7 +1,7 @@
     <div class="control-group">
       <label class="control-label" for="[% prefix %]_permission">Public</label>
       <div class="controls">
-        <select name="[% prefix %].permission" id="[% prefix %]_permission">
+        <select name="[% prefix %].permission" id="[% prefix %]_permission" class="[% width_class %]">
           <option value="public"   [% IF current_permission == 'public'   %]selected[% END %]>Yes</option>
           <option value="private"  [% IF current_permission == 'private'  %]selected[% END %]>No</option>
         </select>

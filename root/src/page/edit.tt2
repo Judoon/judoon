@@ -16,32 +16,36 @@
 <div class="row-fluid">
   <div class="span6">
 <form name="page_edit" id="page_edit" action="[% c.uri_for_action('/private/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
-  <fieldset>
+  <fieldset style="min-width: 0px;">
     <legend>Page Layout</legend>
 
 
     <div class="control-group">
       <label class="control-label" for="page.title">Title: </label>
       <div class="controls">
-        <input type="text" form="page_edit" name="page.title" id="page.title" value="[% page.object.title %]" />
+        <input type="text" class="input-block-level" form="page_edit" name="page.title" id="page.title" value="[% page.object.title %]" />
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.preamble">Preamble: </label>
       <div class="controls">
-        <textarea form="page_edit" name="page.preamble">[% page.object.preamble %]</textarea>
+        <textarea form="page_edit" name="page.preamble" class="input-block-level">[% page.object.preamble %]</textarea>
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="page.postamble">Postamble:</label>
       <div class="controls">
-        <textarea form="page_edit" name="page.postamble">[% page.object.postamble %]</textarea>
+        <textarea form="page_edit" name="page.postamble" class="input-block-level">[% page.object.postamble %]</textarea>
       </div>
     </div>
 
-    [%- INCLUDE 'components/forms/permission.tt2' prefix="page" current_permission=page.object.permission -%]
+    [%- INCLUDE 'components/forms/permission.tt2'
+        prefix="page"
+        width_class = "input-block-level"
+        current_permission=page.object.permission
+     -%]
 
     <input type="hidden" form="page_edit" name="x-tunneled-method" value="PUT">
     
@@ -64,7 +68,7 @@
 <section id="actions">
   <h4>Actions</h4>
   [% INCLUDE 'components/action_button.tt2' label="Preview Page" url=c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'}, ) -%]
-  [% INCLUDE 'components/action_button.tt2' label="Edit Columns" url=c.uri_for_action('/private/pagecolumn/list', c.req.captures) -%]
+  [% INCLUDE 'components/action_button.tt2' label=" Add or Edit Columns" url=c.uri_for_action('/private/pagecolumn/list', c.req.captures) -%]
   [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', c.req.captures), method="DELETE" form_name="delete_page" -%]
 </section>
 

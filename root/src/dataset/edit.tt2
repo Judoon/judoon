@@ -23,18 +23,22 @@
     <div class="control-group">
       <label class="control-label" for="dataset.name">Name</label>
       <div class="controls">
-        <input id="dataset.name" class="span3" name="dataset.name" form="dataset_edit" type="text" value="[% dataset.object.name %]" />
+        <input id="dataset.name" class="span6" name="dataset.name" form="dataset_edit" type="text" value="[% dataset.object.name %]" />
       </div>
     </div>
 
     <div class="control-group">
       <label class="control-label" for="dataset.notes">Notes</label>
       <div class="controls">
-        <textarea style="width: 34em;" form="dataset_edit" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
+        <textarea class="span6" form="dataset_edit" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
       </div>
     </div>
 
-    [%- INCLUDE 'components/forms/permission.tt2' prefix="dataset" current_permission=dataset.object.permission -%]
+    [%- INCLUDE 'components/forms/permission.tt2'
+        prefix="dataset"
+        width_class = "span2"
+        current_permission=dataset.object.permission
+    -%]
 
     <input type="hidden" name="x-tunneled-method" value="PUT" form="dataset_edit">
 
