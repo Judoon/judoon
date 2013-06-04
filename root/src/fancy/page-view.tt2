@@ -1,115 +1,103 @@
+[% extra_js = BLOCK %]
+
+[% FOREACH p_column IN page_column.list %]
+<script id="column_tmpl_[% loop.count %]" type="text/x-handlebars-template">
+[% p_column.js_template %]
+</script>
+[% END %]
+
+
+<script src="/static/js/vendor/jquery.dataTables.min.js"></script>
+<script src="/static/js/vendor/handlebars.min.js"></script>
+<script src="/static/js/judoon.js"></script>
+<script>
+  $(document).ready(function() {
+      judoon.datatables.bootstrap_init();
+
+      var compiled_templates = [];
+      $('script[type="text/x-handlebars-template"]').each( function( idx ) {
+          compiled_templates[idx] = Handlebars.compile($(this).html());
+      });
+
+      $('#data_table').dataTable({
+          "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",
+          "fnServerData" : function ( sSource, aoData, fnCallback ) {
+            $.ajax( {
+                "dataType": "json",
+                "type": "GET",
+                "url": sSource,
+                "data": aoData,
+                "success": [
+                     function(data) {
+                        var new_data = [];
+                        for (var i = 0; i < data.tmplData.length; i++) {
+                            new_data[i] = [];
+                            for (var j = 0; j < compiled_templates.length; j++) {
+                                new_data[i][j] = compiled_templates[j](data.tmplData[i]);
+                            }
+                        }
+                        data.aaData = new_data;
+                     },
+                     fnCallback
+                ],
+            } );
+          },
+          "bAutoWidth": false,
+          "bServerSide": true,
+          "bProcessing" : true,
+          "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+          "sPaginationType": "bootstrap",
+          "oLanguage": {
+              "sLengthMenu": "_MENU_ records per page"
+          }
+      });
+  });
+</script>
+
+
+[% END %]
 [% WRAPPER components/wrapper.tt2
   title = "Edit Page"
+  extra_javascript = extra_js
 %]
 
-<div class="navbar">
-  <div class="navbar-inner">
-    <ul class="nav">
-      <li class="active"><a href="#">Preview</a></li>
-      <li><a href="#">Edit</a></li>
+[%- INCLUDE 'fancy/actionbar.tt2' we_are_static=0 -%]
 
-      <li class="divider-vertical"></li>
-      <li><a></a></li>
-      <li class="divider-vertical"></li>
+[% IF welcome_message %]
+[% BLOCK welcome_spiel %]
+<p>
+  <strong>Your dataset has been imported.</strong> Here is the page
+  we've created for you.  Click <strong>Edit</strong> above to make
+  changes, or <strong>Share</strong> to make the page public.
+</p>
+[% END %]
+[%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]
+[% END %]
 
-      <li><a href="#">Update Source Data</a></li>
+<h3 class="page_title">[%- page.object.title -%]</h1>
 
-      <li class="divider-vertical"></li>
-
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Save  <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li class="dropdown-submenu">
-            <a tabindex="-1" href="#">As data</a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Excel (.xls)</a></li>
-              <li><a href="#">Excel (.xlsx)</a></li>
-              <li><a href="#">CSV (.csv)</a></li>
-              <li><a href="#">Tab-separated (.tab)</a></li>
-            </ul>
-          </li>
-
-          <li class="dropdown-submenu">
-            <a tabindex="-1" href="#">As app</a>
-            <ul class="dropdown-menu">
-              <li><a href="#">zip</a></li>
-              <li><a href="#">tar.gz</a></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li><a href="">Share</a></li>
-
-
-    </ul>
-  </div>
-</div>
-
-<h3 class="page_title">Drosophila Migration Screen</h1>
+<br>
 
 <div class="page_preamble">
-
-  <h4>Genes encoding cytoskeleton-associated proteins enriched in migratory cells</h3>
-
-  <p>
-    The genes in the table below were assembled by searching the
-    Affymetrix-assigned GO terms (biological process, cellular
-    component and molecular function) associated with each of the
-    migratory cell enriched genes for the terms "cytoskeleton" or
-    "actin". This list is not identical to the list of genes
-    associated with the cytoskeleton in the GO-Slim function of
-    Genespring (See Experimental procedures). Abbreviations: ADF-actin
-    depolymerizing factor domain, CH-Calponin homology, PH-Plextrin
-    homology, SH3- src homology 3, PTP-protein tyrosine phosphatase,
-    CAP-cytoskeleton associated protein, MYSc-Myosin motor domain.
-  </p>
+  [%- page.object.preamble -%]
 </div>
 
-<table class="table table-striped">
+<br>
+
+<table id="data_table" class="table table-striped table-condensed table-border">
   <thead>
-    <th>Demo</th>
-    <th>Table</th>
-    <th>Example</th>
+    [% FOREACH p_column IN page_column.list %]
+    <th>[% p_column.title | html %]</th>
+    [% END %]
   </thead>
   <tbody>
-    <tr>
-      <td>1</td>
-      <td>2</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <td>A</td>
-      <td>B</td>
-      <td>C</td>
-    </tr>
-    <tr>
-      <td>Moo</td>
-      <td>Quack</td>
-      <td>Grr</td>
-    </tr>
-    <tr>
-      <td>$</td>
-      <td>%</td>
-      <td>*</td>
-    </tr>
   </tbody>
 </table>
 
+<br>
+
 <div class="postamble">
-
-  <h5>Abbreviations</h5>
-
-  <dl class="dl-horizontal">
-    <dt>V</dt> <dd>cytoplasmic vesicle</dd>
-    <dt>ER</dt> <dd>endoplasmic reticulum</dd>
-    <dt>G</dt> <dd>golgi apparatus</dd>
-    <dt>E</dt> <dd>endosome</dd>
-  </dl>
-
-  <p>
-    Developed with the support of the Cell Migration Consortium.
-  </p>
-
+  [%- page.object.postamble -%]
 </div>
 
 
