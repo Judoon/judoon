@@ -1,0 +1,116 @@
+[% WRAPPER components/wrapper.tt2
+  title = "Edit Page"
+%]
+
+<div class="navbar">
+  <div class="navbar-inner">
+    <ul class="nav">
+      <li class="active"><a href="#">Preview</a></li>
+      <li><a href="#">Edit</a></li>
+
+      <li class="divider-vertical"></li>
+      <li><a></a></li>
+      <li class="divider-vertical"></li>
+
+      <li><a href="#">Update Source Data</a></li>
+
+      <li class="divider-vertical"></li>
+
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Save  <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-submenu">
+            <a tabindex="-1" href="#">As data</a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Excel (.xls)</a></li>
+              <li><a href="#">Excel (.xlsx)</a></li>
+              <li><a href="#">CSV (.csv)</a></li>
+              <li><a href="#">Tab-separated (.tab)</a></li>
+            </ul>
+          </li>
+
+          <li class="dropdown-submenu">
+            <a tabindex="-1" href="#">As app</a>
+            <ul class="dropdown-menu">
+              <li><a href="#">zip</a></li>
+              <li><a href="#">tar.gz</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="">Share</a></li>
+
+
+    </ul>
+  </div>
+</div>
+
+<h3 class="page_title">Drosophila Migration Screen</h1>
+
+<div class="page_preamble">
+
+  <h4>Genes encoding cytoskeleton-associated proteins enriched in migratory cells</h3>
+
+  <p>
+    The genes in the table below were assembled by searching the
+    Affymetrix-assigned GO terms (biological process, cellular
+    component and molecular function) associated with each of the
+    migratory cell enriched genes for the terms "cytoskeleton" or
+    "actin". This list is not identical to the list of genes
+    associated with the cytoskeleton in the GO-Slim function of
+    Genespring (See Experimental procedures). Abbreviations: ADF-actin
+    depolymerizing factor domain, CH-Calponin homology, PH-Plextrin
+    homology, SH3- src homology 3, PTP-protein tyrosine phosphatase,
+    CAP-cytoskeleton associated protein, MYSc-Myosin motor domain.
+  </p>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <th>Demo</th>
+    <th>Table</th>
+    <th>Example</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>A</td>
+      <td>B</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <td>Moo</td>
+      <td>Quack</td>
+      <td>Grr</td>
+    </tr>
+    <tr>
+      <td>$</td>
+      <td>%</td>
+      <td>*</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="postamble">
+
+  <h5>Abbreviations</h5>
+
+  <dl class="dl-horizontal">
+    <dt>V</dt> <dd>cytoplasmic vesicle</dd>
+    <dt>ER</dt> <dd>endoplasmic reticulum</dd>
+    <dt>G</dt> <dd>golgi apparatus</dd>
+    <dt>E</dt> <dd>endosome</dd>
+  </dl>
+
+  <p>
+    Developed with the support of the Cell Migration Consortium.
+  </p>
+
+</div>
+
+
+[% END %]

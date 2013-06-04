@@ -1,0 +1,8 @@
+[% WRAPPER components/wrapper.tt2
+  title = "Fancy Base"
+%]
+
+
+<h1>Fancy Base!</h1>
+
+[% END %]
