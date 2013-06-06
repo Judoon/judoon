@@ -54,6 +54,29 @@
   });
 </script>
 
+<script type="text/javascript">
+
+  $(document).ready( function() {
+    $("#preview_mode").on('click', function () { disable_editing(); });
+    $("#edit_mode").on('click', function () { enable_editing(); });
+  });
+
+  function enable_editing () {
+    $("#preview_mode").parent("li").removeClass("active");
+    $("#edit_mode").parent("li").addClass("active");
+    $(".editable").addClass("edit_outline").attr('contenteditable','true');
+    $(".editable_label").removeClass("hidden");
+  }
+
+  function disable_editing() {
+    $("#preview_mode").parent("li").addClass("active");
+    $("#edit_mode").parent("li").removeClass("active");
+    $(".editable").removeClass("edit_outline").attr('contenteditable');
+    $(".editable_label").addClass("hidden");
+  }
+
+</script>
+
 
 [% END %]
 [% WRAPPER components/wrapper.tt2
@@ -74,11 +97,28 @@
 [%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]
 [% END %]
 
-<h3 class="page_title">[%- page.object.title -%]</h1>
+<style type="text/css">
+  .edit_outline {
+    border: 3px blue dashed;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+  .editable_label {
+     font-size: 90%;
+     color: #fff;
+     background-color: blue;
+     padding-left: 0.5em;
+     margin-right: 75em;
+  }
+</style>
 
+
+<div class="editable_label hidden" style="margin-bottom: -10px;">Page Title:</div>
+<h3 class="page_title editable inline_editable">[%- page.object.title -%]</h3>
 <br>
 
-<div class="page_preamble">
+<div class="editable_label hidden">Preamble:</div>
+<div class="page_preamble editable block_editable">
   [%- page.object.preamble -%]
 </div>
 
@@ -96,7 +136,8 @@
 
 <br>
 
-<div class="postamble">
+<div class="editable_label hidden">Postamble:</div>
+<div class="postamble editable block_editable">
   [%- page.object.postamble -%]
 </div>
 

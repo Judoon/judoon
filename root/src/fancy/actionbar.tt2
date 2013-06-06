@@ -2,8 +2,8 @@
 <div class="navbar">
   <div class="navbar-inner">
     <ul class="nav">
-      <li class="active"><a href="#">Preview</a></li>
-      <li><a href="#">Edit</a></li>
+      <li class="active"><a id="preview_mode" href="#">Preview</a></li>
+      <li><a id="edit_mode" href="#">Edit</a></li>
 
       <li class="divider-vertical"></li>
       <li><a></a></li>
