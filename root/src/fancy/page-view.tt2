@@ -114,11 +114,11 @@
 
 
 <div class="editable_label hidden" style="margin-bottom: -10px;">Page Title:</div>
-<h3 class="page_title editable inline_editable">[%- page.object.title -%]</h3>
+<h3 id="page_title" class="editable inline_editable">[%- page.object.title -%]</h3>
 <br>
 
 <div class="editable_label hidden">Preamble:</div>
-<div class="page_preamble editable block_editable">
+<div id="page_preamble" class="editable block_editable">
   [%- page.object.preamble -%]
 </div>
 
@@ -137,7 +137,7 @@
 <br>
 
 <div class="editable_label hidden">Postamble:</div>
-<div class="postamble editable block_editable">
+<div id="page_postamble" class="editable block_editable">
   [%- page.object.postamble -%]
 </div>
 
