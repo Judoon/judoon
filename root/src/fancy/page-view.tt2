@@ -8,6 +8,7 @@
 
 
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
+<script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
 <script src="/static/js/vendor/handlebars.min.js"></script>
 <script src="/static/js/judoon.js"></script>
 <script>
@@ -64,14 +65,22 @@
   function enable_editing () {
     $("#preview_mode").parent("li").removeClass("active");
     $("#edit_mode").parent("li").addClass("active");
-    $(".editable").addClass("edit_outline").attr('contenteditable','true');
+    $(".editable").addClass("edit_outline").attr('contenteditable','true')
+      .each( function () {
+        var e = $(this);
+        e.data('editor', CKEDITOR.inline( e.attr('id') ));
+      });
     $(".editable_label").removeClass("hidden");
   }
 
   function disable_editing() {
     $("#preview_mode").parent("li").addClass("active");
     $("#edit_mode").parent("li").removeClass("active");
-    $(".editable").removeClass("edit_outline").attr('contenteditable');
+    $(".editable").removeClass("edit_outline").removeAttr('contenteditable')
+      .each( function () {
+        var e = $(this);
+        e.data('editor').destroy();
+      });
     $(".editable_label").addClass("hidden");
   }
 
