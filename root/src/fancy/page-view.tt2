@@ -62,13 +62,42 @@
     $("#edit_mode").on('click', function () { enable_editing(); });
   });
 
+  var cke_inline_config = {
+    toolbar: [
+      { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat",'-','Undo','Redo'] }
+    ]
+  };
+  var cke_block_config = {
+    toolbar: [
+      { name: 'clipboard', items: ['Cut','Copy','Paste','PasteText','PasteWord','-','Undo','Redo'] },
+      { name: 'editing',   items: ['Find','Replace','-','SelectAll','-','Scayt'] },
+      { name: 'links',     items: ['Link','Unlink','Anchor'] },
+      { name: 'insert',    items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+      { name: 'groups',    items: ["NumberedList", "BulletedList", "DefinitionList", "Outdent", "Indent", "Blockquote", ] },
+      '/',
+      { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat"] },
+      { name: 'paragraph',  items: ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock" ] },
+      { name: 'styles',     items: ["Format", "Font", "FontSize", "TextColor", "BGColor" ] },
+      { name: 'about',      items: ["About"] }
+    ],
+    removePlugins: 'smiley,flash,iframe,pagebreak',
+    extraAllowedContent: 'ul ol li dl dd dt'
+  };
+  var postamble_config = {
+    extraAllowedContent: 'ul ol li dl dd dt'
+  };
   function enable_editing () {
     $("#preview_mode").parent("li").removeClass("active");
     $("#edit_mode").parent("li").addClass("active");
     $(".editable").addClass("edit_outline").attr('contenteditable','true')
       .each( function () {
         var e = $(this);
-        e.data('editor', CKEDITOR.inline( e.attr('id') ));
+        var config = e.hasClass('inline_editable') ? cke_inline_config
+                                                   : cke_block_config;
+        if (e.attr('id') === 'page_postamble') {
+          config = postamble_config;
+        }
+        e.data('editor', CKEDITOR.inline(e.attr('id'), config ));
       });
     $(".editable_label").removeClass("hidden");
   }
