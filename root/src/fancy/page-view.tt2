@@ -147,6 +147,8 @@
      background-color: blue;
      padding-left: 0.5em;
      margin-right: 75em;
+     border-top-left-radius: 3px;
+     border-top-right-radius: 3px;
   }
 </style>
 
