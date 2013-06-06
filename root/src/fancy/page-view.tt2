@@ -123,8 +123,8 @@
 
 
 <div class="editable_label hidden" style="margin-bottom: -10px;">Page Title:</div>
-<h3 id="page_title" class="editable inline_editable">[%- page.object.title -%]</h3>
-<br>
+<h2 id="page_title" class="editable inline_editable">[%- page.object.title -%]</h2>
+
 
 <div class="editable_label hidden">Preamble:</div>
 <div id="page_preamble" class="editable block_editable">
