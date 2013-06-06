@@ -8,6 +8,7 @@
 
 
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
+<script src="/static/js/vendor/datatables/ColReorder.min.js"></script>
 <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
 <script src="/static/js/vendor/handlebars.min.js"></script>
 <script src="/static/js/judoon.js"></script>
@@ -46,7 +47,7 @@
           "bAutoWidth": false,
           "bServerSide": true,
           "bProcessing" : true,
-          "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+          "sDom": "R<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
           "sPaginationType": "bootstrap",
           "oLanguage": {
               "sLengthMenu": "_MENU_ records per page"
@@ -100,6 +101,7 @@
         e.data('editor', CKEDITOR.inline(e.attr('id'), config ));
       });
     $(".editable_label").removeClass("hidden");
+    $("#data_table thead th").addClass('editmode');
   }
 
   function disable_editing() {
@@ -111,6 +113,7 @@
         e.data('editor').destroy();
       });
     $(".editable_label").addClass("hidden");
+    $("#data_table thead th").removeClass('editmode');
   }
 
 </script>
@@ -150,6 +153,14 @@
      border-top-left-radius: 3px;
      border-top-right-radius: 3px;
   }
+
+  #data_table thead th.editmode {
+
+  }
+
+  #data_table .column_actions { display: none; }
+  #data_table .editmode .column_actions { display: block; }
+
 </style>
 
 
@@ -164,10 +175,15 @@
 
 <br>
 
-<table id="data_table" class="table table-striped table-condensed table-border">
+<table id="data_table" class="table table-striped table-condensed table-bordered">
   <thead>
     [% FOREACH p_column IN page_column.list %]
-    <th>[% p_column.title | html %]</th>
+    <th>
+      [% p_column.title | html %]
+      <div class="column_actions btn-group">
+        <a href="#" class="btn btn-mini"><i class="icon-pencil"></i></a><a href="#" class="btn btn-mini"><i class="icon-trash"></i></a>
+      </div>
+    </th>
     [% END %]
   </thead>
   <tbody>
