@@ -6,6 +6,17 @@
 </script>
 [% END %]
 
+<script id="edit_console_tmpl" type="text/x-handlebars-template">
+  <tbody id="column_edit_console">
+    <tr class="odd" style="background-color: #fff;">
+      <td colspan="[% page_column.list.size %]">
+        <div class="well"><p>Editor goes here.</p></div>
+        <div class="pull-right"><a class="btn btn-mini" onclick="close_column_editor(); return false;"><i class="icon-remove"></i></a></div>
+      </td>
+    </tr>
+  </tbody>
+</script>
+
 
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
 <script src="/static/js/vendor/datatables/ColReorder.min.js"></script>
@@ -18,6 +29,9 @@
 
       var compiled_templates = [];
       $('script[type="text/x-handlebars-template"]').each( function( idx ) {
+          if ( $(this).attr('id') === 'edit_console_tmpl' ) {
+            return;
+          }
           compiled_templates[idx] = Handlebars.compile($(this).html());
       });
 
@@ -61,6 +75,8 @@
   $(document).ready( function() {
     $("#preview_mode").on('click', function () { disable_editing(); });
     $("#edit_mode").on('click', function () { enable_editing(); });
+
+    $(".edit_column_btn").on('click', function () { open_column_editor(); } );
   });
 
   var cke_inline_config = {
@@ -87,6 +103,7 @@
   var postamble_config = {
     extraAllowedContent: 'ul ol li dl dd dt'
   };
+
   function enable_editing () {
     $("#preview_mode").parent("li").removeClass("active");
     $("#edit_mode").parent("li").addClass("active");
@@ -114,8 +131,16 @@
       });
     $(".editable_label").addClass("hidden");
     $("#data_table thead th").removeClass('editmode');
+    close_column_editor();
   }
 
+  var edit_console_tmpl = Handlebars.compile($('#edit_console_tmpl').html());
+  function open_column_editor () {
+    $('#data_table thead').after( edit_console_tmpl({}) );
+  }
+  function close_column_editor () {
+    $('#column_edit_console').detach();
+  }
 </script>
 
 
@@ -181,7 +206,7 @@
     <th>
       [% p_column.title | html %]
       <div class="column_actions btn-group">
-        <a href="#" class="btn btn-mini"><i class="icon-pencil"></i></a><a href="#" class="btn btn-mini"><i class="icon-trash"></i></a>
+        <a href="#" class="btn btn-mini edit_column_btn"><i class="icon-pencil"></i></a><a href="#" class="btn btn-mini"><i class="icon-trash"></i></a>
       </div>
     </th>
     [% END %]
