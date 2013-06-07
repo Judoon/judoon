@@ -154,7 +154,7 @@ after list_POST => sub {
     my $dataset = $c->req->get_object(0)->[0];
     my $page = $dataset->create_basic_page();
 
-    $c->stash->{welcome_message} = 1;
+    $c->flash->{welcome_message} = 1;
     $self->go_here($c, '/fancy/page_view', [$c->user->username, $page->id]);
 };
 

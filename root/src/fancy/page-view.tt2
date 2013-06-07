@@ -153,7 +153,7 @@
 [%- INCLUDE 'fancy/actionbar.tt2' we_are_static=0 -%]
 
 [% IF welcome_message %]
-[% BLOCK welcome_spiel %]
+[% welcome_spiel = BLOCK %]
 <p>
   <strong>Your dataset has been imported.</strong> Here is the page
   we've created for you.  Click <strong>Edit</strong> above to make
