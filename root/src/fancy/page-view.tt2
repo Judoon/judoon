@@ -10,11 +10,70 @@
   <tbody id="column_edit_console">
     <tr class="odd" style="background-color: #fff;">
       <td colspan="[% page_column.list.size %]">
-        <div class="well"><p>Editor goes here.</p></div>
+        <div class="well"><p>Close your eyes and pretend I'm a column editor.</p></div>
         <div class="pull-right"><a class="btn btn-mini" onclick="close_column_editor(); return false;"><i class="icon-remove"></i></a></div>
       </td>
     </tr>
   </tbody>
+</script>
+
+<script id="column_edit" type="text/x-handlebars-template">
+<form id="pagecol_form" name="pagecol_form" action="[% c.uri_for_action('/private/pagecolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
+  <fieldset>
+    <legend>Page Column</legend>
+
+    <div class="control-group">
+      <label class="control-label" for="page_column.title">Column Title:</label>
+      <div class="controls">
+        <input type="text" form="pagecol_form" class="span6" name="page_column.title" id="page_column_title" value="[% page_column.object.title %]" />
+        <p class="help-block">This will be the header for the column</p>
+      </div>
+    </div>
+
+
+    <div class="control-group">
+      <label class="control-label" for="page_column.template">Cell Layout:</label>
+      <div class="controls">
+        <div id="column_canvas" class="well well-small" style="margin-bottom: 0;">
+          <div id="canvas_cursor"></div>
+        </div>
+        <input type="hidden" form="pagecol_form" name="page_column.template" />
+
+        <div id="actions" class="row-fluid">
+          <div class="span4">
+            <h6>Add Elements <small> - <a href="#element_guide" data-toggle="modal">What is this?</a></small></h6>
+            <div class="btn-group">
+              <a class="btn" id="btn_add_text">Text</a>
+              <a class="btn" id="btn_add_data">Data</a>
+              <a class="btn" id="btn_add_link">Link</a>
+              <a class="btn" id="btn_add_newline">Newline</a>
+            </div>
+          </div>
+          <div class="span4">
+            <h6>Move Cursor</h6>
+            <div class="btn-group">
+              <a class="btn" id="btn_cursor_up"><i class="icon-arrow-up"></i> Up</a>
+              <a class="btn" id="btn_cursor_down"><i class="icon-arrow-down"></i> Down</a>
+              <a class="btn" id="btn_cursor_left"><i class="icon-arrow-left"></i> Left</a>
+              <a class="btn" id="btn_cursor_right"><i class="icon-arrow-right"></i> Right</a>
+            </div>
+          </div>
+          <div class="span2">
+            <h6>Actions</h6>
+            <div class="btn-group">
+              <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Delete</a>
+            </div>
+          </div>
+          <div class="span2">
+            <h6>&nbsp;</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </fieldset>
+</form>
+
 </script>
 
 

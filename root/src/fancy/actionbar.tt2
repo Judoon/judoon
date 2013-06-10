@@ -6,7 +6,7 @@
       <li><a id="edit_mode" href="#">Edit</a></li>
 
       <li class="divider-vertical"></li>
-      <li><a></a></li>
+      <li><a href="#">New from existing</a></li>
       <li class="divider-vertical"></li>
 
       <li><a href="#">Update Source Data</a></li>
