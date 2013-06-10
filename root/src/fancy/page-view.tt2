@@ -1,7 +1,7 @@
 [% extra_js = BLOCK %]
 
 [% FOREACH p_column IN page_column.list %]
-<script id="column_tmpl_[% loop.count %]" type="text/x-handlebars-template">
+<script id="column_tmpl_[% loop.count %]" class="column_tmpl" type="text/x-handlebars-template">
 [% p_column.js_template %]
 </script>
 [% END %]
@@ -28,10 +28,7 @@
       judoon.datatables.bootstrap_init();
 
       var compiled_templates = [];
-      $('script[type="text/x-handlebars-template"]').each( function( idx ) {
-          if ( $(this).attr('id') === 'edit_console_tmpl' ) {
-            return;
-          }
+      $("script.column_tmpl").each( function( idx ) {
           compiled_templates[idx] = Handlebars.compile($(this).html());
       });
 
@@ -76,7 +73,7 @@
     $("#preview_mode").on('click', function () { disable_editing(); });
     $("#edit_mode").on('click', function () { enable_editing(); });
 
-    $(".edit_column_btn").on('click', function () { open_column_editor(); } );
+    $(".edit_column_btn").on('click', function (event) { open_column_editor(event.currentTarget); } );
   });
 
   var cke_inline_config = {
@@ -135,8 +132,10 @@
   }
 
   var edit_console_tmpl = Handlebars.compile($('#edit_console_tmpl').html());
-  function open_column_editor () {
+  function open_column_editor (me) {
+    close_column_editor();
     $('#data_table thead').after( edit_console_tmpl({}) );
+    $('#column_edit_console tr td div.well').before('<h6>'+$(me).parent().parent().text()+'</h6>');
   }
   function close_column_editor () {
     $('#column_edit_console').detach();
