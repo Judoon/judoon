@@ -44,10 +44,5 @@ sub page_view : Chained('page_id') PathPart('') Args(0) {
     $c->stash->{template} = 'fancy/page-view.tt2';
 }
 
-sub page_static : Chained('page_id') PathPart('static') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'fancy/page-view-static.tt2';
-}
-
 1;
 __END__

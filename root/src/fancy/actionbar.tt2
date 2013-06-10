@@ -37,15 +37,6 @@
       </li>
       <li><a href="">Share</a></li>
     </ul>
-
-    <ul class="nav pull-right">
-      [% IF we_are_static %]
-      <li class=""><a href="[% c.uri_for_action('/fancy/page_view', c.req.captures) %]">Dynamic page</a></li>
-      [% ELSE %]
-      <li class=""><a href="[% c.uri_for_action('/fancy/page_static', c.req.captures) %]">Static page</a></li>
-      [% END %]
-    </ul>
-
     </ul>
   </div>
 </div>
