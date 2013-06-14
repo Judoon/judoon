@@ -45,15 +45,6 @@ use Judoon::Error::Devel::Arguments;
 use Safe::Isa;
 
 
-# use ActionRole::DetachOnDie, so we don't keep running though the
-# action chain after a die.
-__PACKAGE__->config(
-   action => {
-      '*' => { Does => 'DetachOnDie' },
-   },
-);
-
-
 =head1 METHODS
 
 =head2 set_success / set_notice / set_warning / set_error ( $c, $msg )
