@@ -27,7 +27,6 @@ use Catalyst qw/
     Session::Store::Memcached
     Session::State::Cookie
     StackTrace
-    Unicode::Encoding
 /;
 use CatalystX::RoleApplicator;
 
@@ -51,12 +50,12 @@ our $VERSION = '0.01';
 # local deployment.
 
 __PACKAGE__->config(
-    name => 'Judoon::Web',
+    name         => 'Judoon::Web',
+    default_view => 'HTML',
+    encoding     => 'UTF-8',
+
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
-    enable_catalyst_header => 1, # Send X-Catalyst header
-    default_view => 'HTML',
-    encoding => 'UTF-8',
 );
 
 __PACKAGE__->config(
