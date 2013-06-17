@@ -19,7 +19,7 @@ requires 'Catalyst::Plugin::Session::Store::File';
 requires 'Catalyst::Plugin::Session::Store::Memcached';
 requires 'Catalyst::Plugin::StackTrace';
 requires 'Catalyst::Plugin::Static::Simple';
-requires 'Catalyst::Runtime' => '5.90040';
+requires 'Catalyst::Runtime' => '5.90042';
 requires 'Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::RoleApplicator';
