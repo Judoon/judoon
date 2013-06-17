@@ -48,7 +48,7 @@ use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
-use Text::CSV::Encoded coder_class => 'Text::CSV::Encoded::Coder::EncodeGuess';
+use Text::CSV::Encoded;
 use Text::Unidecode;
 
 
@@ -259,6 +259,7 @@ sub _build_from_csv {
     my $parser = Text::CSV::Encoded->new({
         encoding_in  => ['utf-8','cp1252'],
         encoding_out => 'utf-8',
+        coder_class  => 'Text::CSV::Encoded::Coder::EncodeGuess',
     }) or Judoon::Error::Devel::Foreign->throw({
         message => q{Couldn't create CSV decoder object'},
         module  => 'Text::CSV::Encoded',
@@ -266,14 +267,13 @@ sub _build_from_csv {
     });
     $self->{_parser_obj} = $parser;
 
-    my $data = $parser->getline_all( $self->filehandle )
-        or Judoon::Error::Devel::Foreign->throw({
-            message => q{Couldn't create write CSV line'},
-            module  => 'Text::CSV::Encoded',
-            foreign_message => Text::CSV::Encoded->error_diag,
-        });
+    my @data;
+    while (my $row = $parser->getline( $self->filehandle )) {
+        push @data, $row;
+    }
+
     my $name = 'IO';
-    return ($name, $data);
+    return ($name, \@data);
 }
 
 sub _get_csv_data_type { return 'text'; }
