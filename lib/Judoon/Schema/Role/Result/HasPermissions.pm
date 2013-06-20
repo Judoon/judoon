@@ -15,8 +15,12 @@ Register the permissions relationship with the composing class.
 sub register_permissions {
     my ($class) = @_;
     $class->add_columns(
-        "permission",
-        { data_type => "text", is_nullable => 0, default_value => 'private', },
+        "permission", {
+            data_type       => "text",
+            is_nullable     => 0,
+            default_value   => 'private',
+            is_serializable => 1,
+        },
     );
 }
 

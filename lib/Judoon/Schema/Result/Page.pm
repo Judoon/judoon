@@ -74,16 +74,19 @@ __PACKAGE__->add_columns(
         is_nullable    => 0,
     },
     title => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     preamble => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     postamble => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
 );
 
@@ -406,5 +409,14 @@ sub data_table {
 }
 
 
+sub TO_JSON {
+    my ($self) = @_;
+    return {
+        nbr_rows    => 0+$self->nbr_rows,
+        nbr_columns => 0+$self->nbr_columns,
+        columns => [ map {$_->TO_JSON} $self->page_columns_ordered->all],
+        %{ $self->next::method },
+    };
+}
 
 1;

@@ -85,24 +85,28 @@ __PACKAGE__->add_columns(
     },
     username => {
         data_type   => "varchar",
-        size => 40,
+        size        => 40,
         is_nullable => 0,
     },
     password => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 0,
     },
     password_expires => {
-        data_type   => "timestamp",
-        is_nullable => 1,
+        data_type       => "timestamp",
+        is_nullable     => 1,
+        is_serializable => 0,
     },
     name => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     email_address => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
 );
 

@@ -76,12 +76,14 @@ __PACKAGE__->add_columns(
         is_nullable    => 0,
     },
     name => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     shortname => {
-        data_type   => "text",
-        is_nullable => 1,
+        data_type       => "text",
+        is_nullable     => 1,
+        is_serializable => 1,
     },
     sort => {
         data_type   => "integer",
@@ -222,6 +224,14 @@ Add <created> and <modified> columns to C<DatasetColumn>.
 with qw(Judoon::Schema::Role::Result::HasTimestamps);
 __PACKAGE__->register_timestamps;
 
+
+sub TO_JSON {
+    my ($self) = @_;
+    my $json = $self->next::method();
+    $json->{data_type} = $self->data_type;
+    $json->{accession_type} = $self->accession_type;
+    return $json;
+}
 
 
 1;

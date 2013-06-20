@@ -31,5 +31,16 @@ sub register_timestamps {
 
 
 
+around TO_JSON => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $ret = $self->$orig();
+    $ret->{created}  = $self->created . "";
+    $ret->{modified} = $self->modified . "";
+    return $ret;
+};
+
+
 1;
 __END__
