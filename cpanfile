@@ -133,6 +133,7 @@ test_requires 'Test::NoTabs';
 test_requires 'Test::Pod';
 test_requires 'Test::Pod::Coverage';
 test_requires 'Test::postgresql';
+test_requires 'Test::Roo';
 test_requires 'Test::Spelling';
 test_requires 'Test::WWW::Mechanize::Catalyst';
 
