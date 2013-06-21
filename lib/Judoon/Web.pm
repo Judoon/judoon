@@ -86,6 +86,17 @@ __PACKAGE__->config(
                     role_field    => 'name',
                 },
             },
+            api => {
+                credential => {
+                    class => 'NoPassword',
+                },
+                store => {
+                    class         => 'DBIx::Class',
+                    user_model    => 'User::User',
+                    role_relation => 'roles',
+                    role_field    => 'name',
+                },
+            },
         },
     },
     'Plugin::Session' => {
