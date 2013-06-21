@@ -23,7 +23,9 @@ extends 'DBIx::Class::ResultSet';
 __PACKAGE__->load_components(qw(
     Helper::ResultSet::IgnoreWantarray
     Helper::ResultSet::Me
+    Helper::ResultSet::SearchOr
     Helper::ResultSet::Shortcut
+    Helper::ResultSet::SetOperations
 ));
 
 

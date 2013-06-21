@@ -69,8 +69,9 @@ __PACKAGE__->add_columns(
         is_nullable    => 0,
     },
     title => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     template => {
         data_type   => "text",
@@ -168,6 +169,14 @@ sub get_cloneable_columns {
     return %me;
 }
 
+
+sub TO_JSON {
+    my ($self) = @_;
+    return {
+        template => $self->template->to_jstmpl,
+        %{ $self->next::method },
+    };
+}
 
 
 1;

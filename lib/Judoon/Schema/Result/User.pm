@@ -85,24 +85,28 @@ __PACKAGE__->add_columns(
     },
     username => {
         data_type   => "varchar",
-        size => 40,
+        size        => 40,
         is_nullable => 0,
     },
     password => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 0,
     },
     password_expires => {
-        data_type   => "timestamp",
-        is_nullable => 1,
+        data_type       => "timestamp",
+        is_nullable     => 1,
+        is_serializable => 0,
     },
     name => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     email_address => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
 );
 
@@ -350,6 +354,30 @@ Get list of unexpired password reset tokens.
 sub valid_reset_tokens {
     my ($self) = @_;
     return $self->search_related('tokens')->password_reset->unexpired->all;
+}
+
+
+=head2 new_or_refresh_access_token
+
+Either create a new access token or extend the expiry of the current one.
+
+=cut
+
+sub new_or_refresh_access_token {
+    my ($self) = @_;
+
+    my $token = $self->tokens_rs->access_token->single;
+    if (not $token) {
+        $token = $self->new_related('tokens', {});
+        $token->access_token;
+        $token->insert();
+    }
+    else {
+        $token->extend();
+        $token->update();
+    }
+
+    return $token;
 }
 
 

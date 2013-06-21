@@ -110,6 +110,8 @@ sub login_POST {
         $c->res->redirect($self->redirect_after_login_uri($c));
         $c->extend_session_expires(999999999999)
             if $p->{remember};
+
+        $c->user->new_or_refresh_access_token();
     }
     else {
         $c->stash->{alert}{error} = 'Username or password is incorrect.';

@@ -21,7 +21,12 @@ ok $mech, 'created test mech' or BAIL_OUT;
 # START TESTING!!!!
 
 subtest 'Basic Tests' => sub {
-    $mech->get_ok('/api', 'get /api');
+
+    for my $uri (qw(/api /api/)) {
+        $mech->get_ok($uri, "get $uri");
+        is $mech->uri, 'http://localhost/', '  ...redirects to root';
+    }
+
     $mech->get_ok('/api/datasetdata', 'get /api/datasetdata');
 
     my $schema = t::DB::get_schema();

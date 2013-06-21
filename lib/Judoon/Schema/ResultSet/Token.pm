@@ -24,7 +24,11 @@ Find a token with a given value
 
 =head2 password_reset()
 
-Find all tokens with a password_reset action.
+Find all tokens with a C<password_reset> action.
+
+=head2 access()
+
+Find all tokens with an C<access> action.
 
 =head2 unexpired()
 
@@ -34,6 +38,7 @@ Find all tokens that have not yet expired.
 
 sub find_by_value  { shift->find({value => shift}); }
 sub password_reset { shift->search({action => 'password_reset'}); }
+sub access_token   { shift->search({action => 'access_token'}); }
 sub unexpired      {
     my ($self) = @_;
     my $dtf = $self->result_source->schema->storage->datetime_parser;

@@ -18,5 +18,17 @@ sub public {
 }
 
 
+=head2 private
+
+Filter down to private records
+
+=cut
+
+sub private {
+    my ($self) = @_;
+    return $self->search({$self->me . 'permission' => 'private'});
+}
+
+
 1;
 __END__

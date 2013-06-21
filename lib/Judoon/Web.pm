@@ -27,7 +27,6 @@ use Catalyst qw/
     Session::Store::Memcached
     Session::State::Cookie
     StackTrace
-    Unicode::Encoding
 /;
 use CatalystX::RoleApplicator;
 
@@ -41,22 +40,14 @@ __PACKAGE__->apply_request_class_roles(qw[
 
 our $VERSION = '0.01';
 
-# Configure the application.
-#
-# Note that settings in judoon_web.conf (or other external
-# configuration file that you set up manually) take precedence
-# over this when using ConfigLoader. Thus configuration
-# details given here can function as a default configuration,
-# with an external configuration file acting as an override for
-# local deployment.
-
 __PACKAGE__->config(
-    name => 'Judoon::Web',
+    name                     => 'Judoon::Web',
+    default_view             => 'HTML',
+    encoding                 => 'UTF-8',
+    abort_chain_on_error_fix => 1,
+
     # Disable deprecated behavior needed by old applications
     disable_component_resolution_regex_fallback => 1,
-    enable_catalyst_header => 1, # Send X-Catalyst header
-    default_view => 'HTML',
-    encoding => 'UTF-8',
 );
 
 __PACKAGE__->config(
@@ -85,6 +76,17 @@ __PACKAGE__->config(
                 },
             },
             password_reset => {
+                credential => {
+                    class => 'NoPassword',
+                },
+                store => {
+                    class         => 'DBIx::Class',
+                    user_model    => 'User::User',
+                    role_relation => 'roles',
+                    role_field    => 'name',
+                },
+            },
+            api => {
                 credential => {
                     class => 'NoPassword',
                 },

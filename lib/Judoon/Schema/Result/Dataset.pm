@@ -90,12 +90,14 @@ __PACKAGE__->add_columns(
         is_nullable    => 0,
     },
     name => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     notes => {
-        data_type   => "text",
-        is_nullable => 0,
+        data_type       => "text",
+        is_nullable     => 0,
+        is_serializable => 1,
     },
     original => {
         data_type   => "text",
@@ -393,6 +395,15 @@ Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
 sub short_headers {
     my ($self) = @_;
     return map {$_->shortname} $self->ds_columns_ordered->all;
+}
+
+
+sub TO_JSON {
+    my ($self) = @_;
+
+    my $json = $self->next::method();
+    $json->{description} = delete $json->{notes};
+    return $json;
 }
 
 

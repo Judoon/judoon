@@ -16,28 +16,30 @@ use namespace::autoclean;
 BEGIN {extends 'Catalyst::Controller'; }
 
 
+
 =head1 ACTIONS
 
-=head2 base / index
-
-Does nothing currently.
-
-=cut
-
-sub base  :Chained('/base') PathPart('api') CaptureArgs(0) {}
-sub index :Chained('base')  PathPart('')    Args(0) {
-    my ($self, $c) = @_;
-    $c->res->body('got here');
-}
-
-=head2 api_base
+=head2 base
 
 Our base chained actions for api actions
 
 =cut
 
-sub api_base : Chained('/') PathPart('api') CaptureArgs(0) {
+sub base : Chained('/') PathPart('api') CaptureArgs(0) {
     my ( $self, $c ) = @_;
+
+    if (!$c->user && (my $access_token = $c->req->param('access_token'))) {
+        my $token = $c->model('User::Token')->find_by_value($access_token);
+
+        if ($token && !$token->is_expired) {
+            $c->authenticate({dbix_class => {result => $token->user}}, 'api');
+        }
+    }
+}
+
+sub list : Chained('base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->res->redirect('/');
 }
 
 

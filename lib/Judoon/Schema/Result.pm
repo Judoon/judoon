@@ -27,6 +27,7 @@ __PACKAGE__->load_components(qw{
    DynamicDefault
    Helper::Row::NumifyGet
    Helper::Row::RelationshipDWIM
+   Helper::Row::ToJSON
 });
 
 

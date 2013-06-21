@@ -14,6 +14,8 @@ use Moo;
 extends 'Judoon::Schema::ResultSet';
 with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
+use Scalar::Util qw(blessed);
+
 
 =head1 METHODS
 
@@ -43,5 +45,23 @@ sub for_dataset {
     return $self->search_rs({dataset_id => $dataset->id});
 }
 
+
+=head2 for_user
+
+Pages for a particular user.
+
+=cut
+
+sub for_user {
+    my ($self, $id_or_user) = @_;
+
+    my $id = blessed($id_or_user) ? $id_or_user->id
+           : ref($id_or_user)     ? $id_or_user->{id}
+           :                        $id_or_user;
+    return $self->search(
+        {'dataset.user_id' => $id},
+        {join => 'dataset'},
+    );
+}
 
 1;

@@ -17,6 +17,9 @@ extends 'Judoon::Schema::ResultSet';
 with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
 
+use Scalar::Util qw(blessed);
+
+
 =head1 METHODS
 
 =head2 ordered
@@ -75,5 +78,23 @@ sub ordered_with_pages_and_pagecols {
         },
     );
 }
+
+
+=head2 for_user
+
+Datasets for a particular user.
+
+=cut
+
+sub for_user {
+    my ($self, $id_or_user) = @_;
+
+    my $id = blessed($id_or_user) ? $id_or_user->id
+           : ref($id_or_user)     ? $id_or_user->{id}
+           :                        $id_or_user;
+    return $self->search({user_id => $id});
+}
+
+
 
 1;
