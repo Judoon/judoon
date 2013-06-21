@@ -15,7 +15,7 @@ use Archive::Extract;
 use File::Spec;
 use File::Temp qw(tempdir);
 use HTTP::Request::Common;
-use JSON qw(decode_json);
+use JSON::MaybeXS;
 use Judoon::Standalone;
 use Plack::App::CGIBin;
 use Plack::App::File;

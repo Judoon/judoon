@@ -10,7 +10,7 @@ use Test::JSON;
 use t::DB;
 
 use Data::Printer;
-use JSON qw(decode_json);
+use JSON::MaybeXS;
 
 # start test server
 my $mech = t::DB::new_mech();

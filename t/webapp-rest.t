@@ -8,7 +8,7 @@ use lib 't/lib';
 with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp';
 
 use HTTP::Request::Common qw(GET POST PUT DELETE);
-use JSON qw(decode_json encode_json);
+use JSON::MaybeXS;
 use Test::JSON;
 
 my ($user_rs, $testuser, $otheruser, $otheruser_tkn,
