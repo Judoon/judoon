@@ -65,39 +65,7 @@ test 'dataset' => sub {
         $ds->{json} = $obj->TO_JSON;
     }
 
-    my ($public, $private, $restricted)
-        = @datasets{qw(public private restricted)};
-
-    subtest 'no auth' => sub {
-        $self->logout();
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url}, 'forbidden for private url');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url'),
-    };
-
-    subtest 'with login' => sub {
-        $self->login(qw(otheruser otheruser));
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url}, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url');
-        $self->logout();
-    };
-
-    subtest 'with access token' => sub {
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url} . $access_token, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url} . $access_token, 'forbidden for restricted url');
-    };
-
-    subtest 'login takes priority' => sub {
-        $self->logout;
-        $self->login(qw(testuser), $self->testuser->{password});
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url} . $access_token, 'forbidden for private url');
-        $self->_get_json_ok($restricted->{url} . $access_token, $restricted->{json}, 'can GET testuser object');
-        $self->logout();
-    };
-
+    $self->_access_control_ok(@datasets{qw(public private restricted)});
 };
 
 
@@ -116,40 +84,7 @@ test 'dataset column' => sub {
         $ds_col->{json} = $obj->TO_JSON;
     }
 
-    my ($public, $private, $restricted)
-        = @ds_cols{qw(public private restricted)};
-
-    subtest 'no auth' => sub {
-        $self->logout();
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url}, 'forbidden for private url');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url'),
-    };
-
-    subtest 'with login' => sub {
-        $self->login(qw(otheruser otheruser));
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url}, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url');
-        $self->logout();
-    };
-
-    subtest 'with access token' => sub {
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url} . $access_token, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url} . $access_token, 'forbidden for restricted url');
-    };
-
-    subtest 'login takes priority' => sub {
-        $self->logout;
-        $self->login(qw(testuser), $self->testuser->{password});
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url} . $access_token, 'forbidden for private url');
-        $self->_get_json_ok($restricted->{url} . $access_token, $restricted->{json}, 'can GET testuser object');
-        $self->logout();
-    };
-
-
+    $self->_access_control_ok(@ds_cols{qw(public private restricted)});
 };
 
 
@@ -169,40 +104,9 @@ test 'page' => sub {
         $page->{json} = $obj->TO_JSON,
     }
 
-    my ($public, $private, $restricted)
-        = @pages{qw(public private restricted)};
+    $self->_access_control_ok(@pages{qw(public private restricted)});
 
-    subtest 'no auth' => sub {
-        $self->logout();
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url}, 'forbidden for private url');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url'),
-    };
-
-    subtest 'with login' => sub {
-        $self->login(qw(otheruser otheruser));
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url}, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url');
-        $self->logout();
-    };
-
-    subtest 'with access token' => sub {
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url} . $access_token, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url} . $access_token, 'forbidden for restricted url');
-    };
-
-    subtest 'login takes priority' => sub {
-        $self->logout;
-        $self->login(qw(testuser), $self->testuser->{password});
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url} . $access_token, 'forbidden for private url');
-        $self->_get_json_ok($restricted->{url} . $access_token, $restricted->{json}, 'can GET testuser object');
-        $self->logout();
-    };
-
-
+    my $private = $pages{private};
     subtest 'new page' => sub {
         my $new_page = {
             dataset_id => 0+$private->{obj}->dataset->id,
@@ -260,39 +164,7 @@ test 'page column' => sub {
         $page_col->{json} = $obj->TO_JSON;
     }
 
-    my ($public, $private, $restricted)
-        = @page_cols{qw(public private restricted)};
-
-    subtest 'no auth' => sub {
-        $self->logout();
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url}, 'forbidden for private url');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url'),
-    };
-
-    subtest 'with login' => sub {
-        $self->login(qw(otheruser otheruser));
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url}, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url');
-        $self->logout();
-    };
-
-    subtest 'with access token' => sub {
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url} . $access_token, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url} . $access_token, 'forbidden for restricted url');
-    };
-
-    subtest 'login takes priority' => sub {
-        $self->logout;
-        $self->login(qw(testuser), $self->testuser->{password});
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url} . $access_token, 'forbidden for private url');
-        $self->_get_json_ok($restricted->{url} . $access_token, $restricted->{json}, 'can GET testuser object');
-        $self->logout();
-    };
-
+    $self->_access_control_ok(@page_cols{qw(public private restricted)});
 };
 
 
@@ -358,4 +230,40 @@ sub _DELETE_json {
     my ($self, $url) = @_;
     my $r = DELETE($url, 'Accept' => 'application/json',);
     $self->mech->request($r);
+}
+
+
+sub _access_control_ok {
+    my ($self, $public, $private, $restricted) = @_;
+
+    subtest 'no auth' => sub {
+        $self->logout();
+        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
+        $self->_not_found_ok($private->{url}, 'forbidden for private url');
+        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url'),
+    };
+
+    subtest 'with login' => sub {
+        $self->login(qw(otheruser otheruser));
+        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
+        $self->_get_json_ok($private->{url}, $private->{json}, 'can GET private object');
+        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url');
+        $self->logout();
+    };
+
+    subtest 'with access token' => sub {
+        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
+        $self->_get_json_ok($private->{url} . $access_token, $private->{json}, 'can GET private object');
+        $self->_not_found_ok($restricted->{url} . $access_token, 'forbidden for restricted url');
+    };
+
+    subtest 'login takes priority' => sub {
+        $self->logout;
+        $self->login(qw(testuser), $self->testuser->{password});
+        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
+        $self->_not_found_ok($private->{url} . $access_token, 'forbidden for private url');
+        $self->_get_json_ok($restricted->{url} . $access_token, $restricted->{json}, 'can GET testuser object');
+        $self->logout();
+    };
+
 }
