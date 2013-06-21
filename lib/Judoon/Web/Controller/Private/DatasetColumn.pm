@@ -21,7 +21,6 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(Judoon::Web::Controller::Role::ExtractParams);
 
-use JSON::XS qw(decode_json);
 
 __PACKAGE__->config(
     action => {

@@ -70,23 +70,10 @@ use Catalyst::Controller::DBIC::API::Request;
 use Catalyst::Controller::DBIC::API::Request::Chained;
 use CGI::Expand ();
 use DBIx::Class::ResultClass::HashRefInflator;
-use JSON ();
 use Moose::Util;
 use Scalar::Util('blessed', 'reftype');
 use Test::Deep::NoTest('eq_deeply');
 use Try::Tiny;
-
-
-has '_json' => (
-    is => 'ro',
-    isa => 'JSON',
-    lazy_build => 1,
-);
-
-sub _build__json {
-    # no ->utf8 here because the request params get decoded by Catalyst
-    return JSON->new;
-}
 
 
 =head1 CONFIG
@@ -197,51 +184,11 @@ sub private_base :Private {
     my ($self, $c) = @_;
 
     my $req_params;
-
     if ($c->req->data && scalar(keys %{$c->req->data})) {
         $req_params = $c->req->data;
     }
     else {
         $req_params = CGI::Expand->expand_hash($c->req->params);
-
-        my @param_list = @{[
-            $self->search_arg, $self->count_arg, $self->page_arg,
-            $self->offset_arg, $self->ordered_by_arg, $self->grouped_by_arg,
-            $self->prefetch_arg,
-        ]};
-        foreach my $param (@param_list) {
-            # these params can also be composed of JSON
-            # but skip if the parameter is not provided
-            next if not exists $req_params->{$param};
-
-            # find out if CGI::Expand was involved
-            if (ref $req_params->{$param} eq 'HASH') {
-                for my $key ( keys %{$req_params->{$param}} ) {
-                    # copy the value because JSON::XS will alter it
-                    # even if decoding failed
-                    my $value = $req_params->{$param}->{$key};
-                    try {
-                        my $deserialized = $self->_json->decode($value);
-                        $req_params->{$param}->{$key} = $deserialized;
-                    }
-                    catch {
-                        $c->log->debug("Param '$param.$key' did not deserialize appropriately: $_")
-                            if $c->debug;
-                    };
-                }
-            }
-            else {
-                try {
-                    my $value = $req_params->{$param};
-                    my $deserialized = $self->_json->decode($value);
-                    $req_params->{$param} = $deserialized;
-                }
-                catch {
-                    $c->log->debug("Param '$param' did not deserialize appropriately: $_")
-                        if $c->debug;
-                };
-            }
-        }
     }
 
     $self->inflate_request($c, $req_params);
@@ -730,7 +677,7 @@ sub validate_object {
             }
 
             # check for multiple values
-            if (ref($value) && !(reftype($value) eq reftype(JSON::true))) {
+            if (ref($value) && !(reftype($value) eq 'SCALAR')) {
                 require Data::Dumper;
                 die "Multiple values for '${key}': ${\Data::Dumper::Dumper($value)}";
             }
@@ -788,7 +735,7 @@ sub update_object_from_params {
 
     foreach my $key (keys %$params) {
         my $value = $params->{$key};
-        if (ref($value) && !(reftype($value) eq reftype(JSON::true))) {
+        if (ref($value) && !(reftype($value) eq 'SCALAR')) {
             $self->update_object_relation($c, $object, delete $params->{$key}, $key);
         }
         # accessor = colname
@@ -812,7 +759,7 @@ sub update_object_relation {
     if ($row) {
         foreach my $key (keys %$related_params) {
             my $value = $related_params->{$key};
-            if (ref($value) && !(reftype($value) eq reftype(JSON::true))) {
+            if (ref($value) && !(reftype($value) eq 'SCALAR')) {
                 $self->update_object_relation($c, $row, delete $related_params->{$key}, $key);
             }
             # accessor = colname
@@ -837,7 +784,7 @@ sub insert_object_from_params {
 
     my %rels;
     while (my ($key, $value) = each %{ $params }) {
-        if (ref($value) && !(reftype($value) eq reftype(JSON::true))) {
+        if (ref($value) && !(reftype($value) eq 'SCALAR')) {
             $rels{$key} = $value;
         }
         # accessor = colname

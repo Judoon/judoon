@@ -19,10 +19,12 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
-with qw(Judoon::Web::Controller::Role::ExtractParams);
+with qw(
+    Judoon::Web::Controller::Role::ExtractParams
+    Judoon::Role::JsonEncoder
+);
 
 
-use JSON qw(encode_json);
 use Judoon::Tmpl;
 use List::AllUtils ();
 
@@ -140,7 +142,7 @@ after list_GET => sub {
     my ($self, $c) = @_;
 
     my $dataset              = $c->req->get_chained_object(0)->[0];
-    $c->stash->{sample_data} = encode_json( $dataset->sample_data );
+    $c->stash->{sample_data} = $self->encode_json( $dataset->sample_data );
 
     for my $column (@{$c->stash->{page_column}{list}}) {
         my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
@@ -189,18 +191,18 @@ after object_GET => sub {
     }
 
     $c->stash({
-        column_acctype => encode_json(
+        column_acctype => $self->encode_json(
             {map {$_->shortname => $_->accession_type} @acc_columns}
         ),
-        ds_column_json => encode_json(
+        ds_column_json => $self->encode_json(
             [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]
         ),
 
-        link_site_json   => encode_json( $sitelinker->mapping->{site} ),
-        sitelinker_sites => encode_json( $sitelinker->sites           ),
-        sitelinker_accs  => encode_json( $sitelinker->accessions      ),
-        url_prefixes     => encode_json( {}                           ),
-        sample_data      => encode_json( $dataset->sample_data        ),
+        link_site_json   => $self->encode_json( $sitelinker->mapping->{site} ),
+        sitelinker_sites => $self->encode_json( $sitelinker->sites           ),
+        sitelinker_accs  => $self->encode_json( $sitelinker->accessions      ),
+        url_prefixes     => $self->encode_json( {}                           ),
+        sample_data      => $self->encode_json( $dataset->sample_data        ),
     });
 };
 

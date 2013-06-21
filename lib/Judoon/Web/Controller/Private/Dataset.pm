@@ -20,9 +20,9 @@ use namespace::autoclean;
 BEGIN { extends 'Judoon::Web::ControllerBase::Private'; }
 with qw(
     Judoon::Web::Controller::Role::TabularData
+    Judoon::Role::JsonEncoder
 );
 
-use JSON qw(encode_json);
 
 __PACKAGE__->config(
     action => {
@@ -173,7 +173,7 @@ after object_GET => sub {
     if (!$c->stash->{user}{is_owner} || $view eq 'preview') {
         my @ds_columns = $dataset->ds_columns_ordered->all;
         $c->stash->{dataset_column}{list} = \@ds_columns;
-        $c->stash->{column_names_json} = encode_json([map {$_->shortname} @ds_columns]);
+        $c->stash->{column_names_json} = $self->encode_json([map {$_->shortname} @ds_columns]);
         $c->stash->{template} = 'dataset/preview.tt2';
         $c->detach();
     }

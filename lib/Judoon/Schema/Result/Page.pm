@@ -12,16 +12,12 @@ Judoon::Schema::Result::Page
 
 use Judoon::Schema::Candy;
 use Moo;
+with 'Judoon::Role::JsonEncoder';
 
 
-use JSON qw(to_json from_json);
 use Judoon::Error::Devel::Foreign;
 use Judoon::Error::Template;
 use Template;
-
-# default options for serializing C<Page> objects as JSON.
-# this gets passed to to_json().
-my $json_opts = {utf8 => 1, pretty => 1,};
 
 
 table 'pages';
@@ -215,7 +211,8 @@ sub dump_to_user {
         push @{ $page{page_columns} }, \%page_cols;
     }
 
-    return to_json(\%page, $json_opts);
+    $self->_json_encoder->pretty(1);
+    return $self->encode_json(\%page);
 }
 
 
@@ -228,7 +225,7 @@ Clone a new page from a json dump of a previous page.
 sub clone_from_dump {
     my ($self, $page_json) = @_;
 
-    my $other_page = from_json($page_json, $json_opts);
+    my $other_page = $self->decode_json($page_json);
     $self->result_source->schema->txn_do(
         sub {
 
