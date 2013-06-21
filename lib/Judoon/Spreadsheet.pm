@@ -34,6 +34,7 @@ use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef FileHandle);
 use Data::Printer;
 use Data::UUID;
 use Encode qw(decode);
+use Encode::Guess;
 use Excel::Reader::XLSX;
 use IO::File ();
 use Judoon::Error::Devel::Arguments;
@@ -48,7 +49,7 @@ use List::Util ();
 use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
-use Text::CSV::Encoded;
+use Text::CSV;
 use Text::Unidecode;
 
 
@@ -256,20 +257,29 @@ sub _get_xls_data_type {
 sub _build_from_csv {
     my ($self) = @_;
 
-    my $parser = Text::CSV::Encoded->new({
-        encoding_in  => ['utf-8','cp1252'],
-        encoding_out => 'utf-8',
-        coder_class  => 'Text::CSV::Encoded::Coder::EncodeGuess',
-    }) or Judoon::Error::Devel::Foreign->throw({
-        message => q{Couldn't create CSV decoder object'},
-        module  => 'Text::CSV::Encoded',
-        foreign_message => Text::CSV::Encoded->error_diag,
-    });
+    my $parser = Text::CSV->new({binary => 1})
+        or Judoon::Error::Devel::Foreign->throw({
+            message => q{Couldn't create CSV decoder object'},
+            module  => 'Text::CSV',
+            foreign_message => Text::CSV->error_diag,
+        });
     $self->{_parser_obj} = $parser;
 
     my @data;
     while (my $row = $parser->getline( $self->filehandle )) {
-        push @data, $row;
+        my @decoded;
+        for my $cell (@$row) {
+            if (!defined($cell) || ($cell eq '')) {
+                push @decoded, $cell;
+            }
+            else {
+                my $enc = guess_encoding($cell, qw(utf-8 cp1252));
+                ref($enc) or die qq{Can't guess encoding for: $cell};
+                push @decoded,
+                    $enc->name eq 'utf8' ? $cell : $enc->decode($cell);
+            }
+        }
+        push @data, \@decoded;
     }
 
     my $name = 'IO';
