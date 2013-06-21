@@ -83,6 +83,15 @@ Sets the C<action> column to 'password_reset'.
 sub password_reset { return $_[0]->action('password_reset'); }
 
 
+=head2 access_token()
+
+Sets the C<action> column to 'access'.
+
+=cut
+
+sub access_token { return $_[0]->action('access'); }
+
+
 =head2 is_expired
 
 Return true if C<Token>'s C<expires> field is less than now.
@@ -92,6 +101,19 @@ Return true if C<Token>'s C<expires> field is less than now.
 sub is_expired {
     my ($self) = @_;
     return DateTime->compare($self->expires, DateTime->now) != 1;
+}
+
+
+=head2 extend
+
+Extened expiry for another default period;
+
+=cut
+
+sub extend {
+    my ($self) = @_;
+    $self->expires( $self->_build_expires() );
+    return;
 }
 
 1;

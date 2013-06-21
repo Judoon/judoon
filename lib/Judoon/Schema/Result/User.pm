@@ -357,4 +357,28 @@ sub valid_reset_tokens {
 }
 
 
+=head2 new_or_refresh_access_token
+
+Either create a new access token or extend the expiry of the current one.
+
+=cut
+
+sub new_or_refresh_access_token {
+    my ($self) = @_;
+
+    my $token = $self->tokens_rs->access_token->single;
+    if (not $token) {
+        $token = $self->new_related('tokens', {});
+        $token->access_token;
+        $token->insert();
+    }
+    else {
+        $token->extend();
+        $token->update();
+    }
+
+    return $token;
+}
+
+
 1;
