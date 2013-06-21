@@ -12,53 +12,45 @@ Judoon::Schema::Result::Token - unique action tokens
 
 =cut
 
+use Judoon::Schema::Candy;
 use Moo;
-extends 'Judoon::Schema::Result';
-
 
 use Data::Entropy::Algorithms qw/rand_bits/;
 use DateTime;
 use MIME::Base64 qw/encode_base64url/;
 
 
-__PACKAGE__->table("tokens");
-__PACKAGE__->add_columns(
-    id => {
-        data_type         => "integer",
-        is_auto_increment => 1,
-        is_nullable       => 0,
-    },
-    value => {
-        data_type     => "text",
-        is_nullable   => 0,
-        dynamic_default_on_create => \&_build_value,
-    },
-    expires => {
-        data_type     => 'timestamp with time zone',
-        is_nullable   => 0,
-        dynamic_default_on_create => \&_build_expires,
-    },
-    action => {
-        data_type   => "text",
-        is_nullable => 0,
-    },
-    user_id => {
-        data_type      => "integer",
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
-);
+table 'tokens';
+
+primary_column id => {
+    data_type         => "integer",
+    is_auto_increment => 1,
+    is_nullable       => 0,
+};
+unique_column value => {
+    data_type     => "text",
+    is_nullable   => 0,
+    dynamic_default_on_create => \&_build_value,
+};
+column expires => {
+    data_type     => 'timestamp with time zone',
+    is_nullable   => 0,
+    dynamic_default_on_create => \&_build_expires,
+};
+column action => {
+    data_type   => "text",
+    is_nullable => 0,
+};
+column user_id => {
+    data_type      => "integer",
+    is_foreign_key => 1,
+    is_nullable    => 0,
+};
 
 
-__PACKAGE__->set_primary_key("id");
-__PACKAGE__->add_unique_constraint("token_value_is_uniq", ["value"]);
-
-
-__PACKAGE__->belongs_to(
-    user => "::User",
+belongs_to user => "::User",
     { "foreign.id" => "self.user_id" },
-    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" };
 
 
 sub _build_value {

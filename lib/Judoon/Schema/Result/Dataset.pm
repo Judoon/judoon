@@ -12,8 +12,8 @@ Judoon::Schema::Result::Dataset
 
 =cut
 
+use Judoon::Schema::Candy;
 use Moo;
-extends 'Judoon::Schema::Result';
 
 
 use Data::UUID;
@@ -25,157 +25,60 @@ use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 
 
-=head1 TABLE: C<datasets>
+table 'datasets';
 
-=cut
-
-__PACKAGE__->table("datasets");
-
-
-=head1 ACCESSORS
-
-=head2 id
-
-  data_type: 'integer'
-  is_auto_increment: 1
-  is_nullable: 0
-
-=head2 user_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
-=head2 name
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 notes
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 original
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 tablename
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 nbr_rows
-
-  data_type: 'integer'
-  is_nullable: 0
-
-=head2 nbr_columns
-
-  data_type: 'integer'
-  is_nullable: 0
-
-=cut
-
-__PACKAGE__->add_columns(
-    id => {
-        data_type         => "integer",
-        is_auto_increment => 1,
-        is_nullable       => 0,
-    },
-    user_id => {
-        data_type      => "integer",
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
-    name => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-    notes => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-    original => {
-        data_type   => "text",
-        is_nullable => 0,
-    },
-    tablename => {
-        data_type   => "text",
-        is_nullable => 0,
-    },
-    nbr_rows => {
-        data_type   => "integer",
-        is_nullable => 0,
-        is_numeric  => 1,
-    },
-    nbr_columns => {
-        data_type   => "integer",
-        is_nullable => 0,
-        is_numeric  => 1,
-    },
-);
+primary_column id => {
+    data_type         => "integer",
+    is_auto_increment => 1,
+    is_nullable       => 0,
+};
+column user_id => {
+    data_type      => "integer",
+    is_foreign_key => 1,
+    is_nullable    => 0,
+};
+column name => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+column notes => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+column original => {
+    data_type   => "text",
+    is_nullable => 0,
+};
+column tablename => {
+    data_type   => "text",
+    is_nullable => 0,
+};
+column nbr_rows => {
+    data_type   => "integer",
+    is_nullable => 0,
+    is_numeric  => 1,
+};
+column nbr_columns => {
+    data_type   => "integer",
+    is_nullable => 0,
+    is_numeric  => 1,
+};
 
 
-=head1 PRIMARY KEY
-
-=over 4
-
-=item * L</id>
-
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("id");
-
-
-=head1 RELATIONS
-
-=head2 ds_columns
-
-Type: has_many
-
-Related object: L<Judoon::Schema::Result::DatasetColumn>
-
-=cut
-
-__PACKAGE__->has_many(
-    ds_columns => "::DatasetColumn",
+has_many ds_columns => "::DatasetColumn",
     { "foreign.dataset_id" => "self.id" },
-    { cascade_copy => 0, cascade_delete => 1 },
-);
+    { cascade_copy => 0, cascade_delete => 1 };
 
-=head2 pages
-
-Type: has_many
-
-Related object: L<Judoon::Schema::Result::Page>
-
-=cut
-
-__PACKAGE__->has_many(
-    pages => "::Page",
+has_many pages => "::Page",
     { "foreign.dataset_id" => "self.id" },
-    { cascade_copy => 0, cascade_delete => 1 },
-);
+    { cascade_copy => 0, cascade_delete => 1 };
 
-=head2 user
-
-Type: belongs_to
-
-Related object: L<Judoon::Schema::Result::User>
-
-=cut
-
-__PACKAGE__->belongs_to(
-    user => "::User",
+belongs_to user => "::User",
     { id => "user_id" },
-    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" };
+
 
 
 =head1 EXTRA COMPONENTS

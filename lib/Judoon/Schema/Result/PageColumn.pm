@@ -12,106 +12,43 @@ Judoon::Schema::Result::PageColumn
 
 =cut
 
+use Judoon::Schema::Candy;
 use Moo;
-extends 'Judoon::Schema::Result';
-
 
 use Judoon::Tmpl;
 
 
-=head1 TABLE: C<page_columns>
-
-=cut
-
-__PACKAGE__->table("page_columns");
+table 'page_columns';
 
 
-=head1 ACCESSORS
-
-=head2 id
-
-  data_type: 'integer'
-  is_auto_increment: 1
-  is_nullable: 0
-
-=head2 page_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
-=head2 title
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 template
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 sort
-
-  data_type: 'integer'
-  is_nullable: 0
-
-=cut
-
-__PACKAGE__->add_columns(
-    id => {
-        data_type         => "integer",
-        is_auto_increment => 1,
-        is_nullable       => 0,
-    },
-    page_id => {
-        data_type      => "integer",
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
-    title => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-    template => {
-        data_type   => "text",
-        is_nullable => 0,
-    },
-    sort => {
-        data_type   => "integer",
-        is_nullable => 0,
-    },
-);
+primary_column id => {
+    data_type         => "integer",
+    is_auto_increment => 1,
+    is_nullable       => 0,
+};
+column page_id => {
+    data_type      => "integer",
+    is_foreign_key => 1,
+    is_nullable    => 0,
+};
+column title => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+column template => {
+    data_type   => "text",
+    is_nullable => 0,
+};
+column sort => {
+    data_type   => "integer",
+    is_nullable => 0,
+};
 
 
-=head1 PRIMARY KEY
-
-=over 4
-
-=item * L</id>
-
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("id");
-
-
-=head1 RELATIONS
-
-=head2 page
-
-Type: belongs_to
-
-Related object: L<Judoon::Schema::Result::Page>
-
-=cut
-
-__PACKAGE__->belongs_to(
-    page => "::Page",
+belongs_to page => "::Page",
     { id => "page_id" },
-    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" };
 
 
 =head1 EXTRA COMPONENTS

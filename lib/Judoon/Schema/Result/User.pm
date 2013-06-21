@@ -12,8 +12,8 @@ Judoon::Schema::Result::User
 
 =cut
 
+use Judoon::Schema::Candy;
 use Moo;
-extends 'Judoon::Schema::Result';
 
 
 use Judoon::Error::Devel::Arguments;
@@ -23,179 +23,58 @@ use Judoon::Spreadsheet;
 
 use constant SCHEMA_PREFIX => 'user_';
 
-=head1 TABLE: C<users>
 
-=cut
+table 'users';
 
-__PACKAGE__->table("users");
-
-
-=head1 ACCESSORS
-
-=head2 id
-
-  data_type: 'integer'
-  is_auto_increment: 1
-  is_nullable: 0
-
-=head2 active
-
-  data_type: 'boolean'
-  default_value: true
-  is_nullable: 0
-
-=head2 username
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 password
-
-  data_type: 'character varying'
-  size: 40
-  is_nullable: 0
-
-=head2 password_expires
-
-  data_type: 'timestamp'
-  is_nullable: 1
-
-=head2 name
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 email_address
-
-  data_type: 'text'
-  is_nullable: 0
-
-=cut
-
-__PACKAGE__->add_columns(
-    id => {
-        data_type         => "integer",
-        is_auto_increment => 1,
-        is_nullable       => 0,
-    },
-    active => {
-        data_type     => "boolean",
-        default_value => \'true',
-        is_nullable   => 0,
-    },
-    username => {
-        data_type   => "varchar",
-        size        => 40,
-        is_nullable => 0,
-    },
-    password => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 0,
-    },
-    password_expires => {
-        data_type       => "timestamp",
-        is_nullable     => 1,
-        is_serializable => 0,
-    },
-    name => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-    email_address => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-);
+primary_column id => {
+    data_type         => "integer",
+    is_auto_increment => 1,
+    is_nullable       => 0,
+};
+unique_column username => {
+    data_type   => "varchar",
+    size        => 40,
+    is_nullable => 0,
+};
+column password => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 0,
+};
+column password_expires => {
+    data_type       => "timestamp",
+    is_nullable     => 1,
+    is_serializable => 0,
+};
+column name => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+unique_column email_address => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+column active => {
+    data_type     => "boolean",
+    default_value => \'true',
+    is_nullable   => 0,
+};
 
 
-=head1 PRIMARY KEY
-
-=over 4
-
-=item * L</id>
-
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("id");
-
-
-=head1 UNIQUE CONSTRAINTS
-
-=head2 C<username_unique>
-
-=over 4
-
-=item * L</username>
-
-=back
-
-=head2 C<email_address_unique>
-
-=over 4
-
-=item * L</email_address>
-
-=back
-
-
-=cut
-
-__PACKAGE__->add_unique_constraint("username_unique", ["username"]);
-__PACKAGE__->add_unique_constraint("email_address_unique", ["email_address"]);
-
-
-
-=head1 RELATIONS
-
-=head2 datasets
-
-Type: has_many
-
-Related object: L<Judoon::Schema::Result::Dataset>
-
-=cut
-
-__PACKAGE__->has_many(
-    datasets => "::Dataset",
+has_many datasets => "::Dataset",
     { "foreign.user_id" => "self.id" },
-    { cascade_copy => 0, cascade_delete => 0 },
-);
+    { cascade_copy => 0, cascade_delete => 0 };
 
-=head2 user_roles
-
-Type: has_many
-
-Related object: L<Judoon::Schema::Result::UserRole>
-
-=cut
-
-__PACKAGE__->has_many(
-    user_roles => "::UserRole",
+has_many user_roles => "::UserRole",
     { "foreign.user_id" => "self.id" },
-    { cascade_copy => 0, cascade_delete => 0 },
-);
+    { cascade_copy => 0, cascade_delete => 0 };
+many_to_many roles => 'user_roles', 'role';
 
-=head2 roles
-
-Type: many_to_many
-
-Composing relations: L</user_roles> -> role
-
-=cut
-
-__PACKAGE__->many_to_many("roles", "user_roles", "role");
-
-
-__PACKAGE__->has_many(
-    tokens => '::Token',
+has_many tokens => '::Token',
     {'foreign.user_id' => 'self.id'},
-    { cascade_copy => 0, cascade_delete => 0 },
-);
+    { cascade_copy => 0, cascade_delete => 0 };
 
 
 =head1 EXTRA COMPONENTS

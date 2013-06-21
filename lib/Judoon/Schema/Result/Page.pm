@@ -10,8 +10,8 @@ Judoon::Schema::Result::Page
 
 =cut
 
+use Judoon::Schema::Candy;
 use Moo;
-extends 'Judoon::Schema::Result';
 
 
 use JSON qw(to_json from_json);
@@ -24,115 +24,42 @@ use Template;
 my $json_opts = {utf8 => 1, pretty => 1,};
 
 
-=head1 TABLE: C<pages>
+table 'pages';
 
-=cut
-
-__PACKAGE__->table("pages");
-
-
-=head1 ACCESSORS
-
-=head2 id
-
-  data_type: 'integer'
-  is_auto_increment: 1
-  is_nullable: 0
-
-=head2 dataset_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
-=head2 title
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 preamble
-
-  data_type: 'text'
-  is_nullable: 0
-
-=head2 postamble
-
-  data_type: 'text'
-  is_nullable: 0
-
-=cut
-
-__PACKAGE__->add_columns(
-    id => {
-        data_type         => "integer",
-        is_auto_increment => 1,
-        is_nullable       => 0,
-    },
-    dataset_id => {
-        data_type      => "integer",
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
-    title => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-    preamble => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-    postamble => {
-        data_type       => "text",
-        is_nullable     => 0,
-        is_serializable => 1,
-    },
-);
+primary_column id => {
+    data_type         => "integer",
+    is_auto_increment => 1,
+    is_nullable       => 0,
+};
+column dataset_id => {
+    data_type      => "integer",
+    is_foreign_key => 1,
+    is_nullable    => 0,
+};
+column title => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+column preamble => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
+column postamble => {
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 1,
+};
 
 
-=head1 PRIMARY KEY
-
-=over 4
-
-=item * L</id>
-
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("id");
-
-
-=head1 RELATIONS
-
-=head2 dataset
-
-Type: belongs_to
-
-Related object: L<Judoon::Schema::Result::Dataset>
-
-=cut
-
-__PACKAGE__->belongs_to(
-    dataset => "::Dataset",
+belongs_to dataset => "::Dataset",
     { id => "dataset_id" },
-    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" };
 
-=head2 page_columns
-
-Type: has_many
-
-Related object: L<Judoon::Schema::Result::PageColumn>
-
-=cut
-
-__PACKAGE__->has_many(
-    page_columns => "::PageColumn",
+has_many page_columns => "::PageColumn",
     { "foreign.page_id" => "self.id" },
-    { cascade_copy => 0, cascade_delete => 1 },
-);
+    { cascade_copy => 0, cascade_delete => 1 };
 
 
 =head1 EXTRA COMPONENTS

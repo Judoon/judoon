@@ -10,92 +10,31 @@ Judoon::Schema::Result::UserRole
 
 =cut
 
+use Judoon::Schema::Candy;
 use Moo;
-extends 'Judoon::Schema::Result';
 
+table 'user_roles';
 
-=head1 TABLE: C<user_roles>
+column user_id => {
+    data_type      => "integer",
+    is_foreign_key => 1,
+    is_nullable    => 0,
+},
+column role_id => {
+    data_type      => "integer",
+    is_foreign_key => 1,
+    is_nullable    => 0,
+};
 
-=cut
+primary_key "user_id", "role_id";
 
-__PACKAGE__->table("user_roles");
-
-
-=head1 ACCESSORS
-
-=head2 user_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
-=head2 role_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
-=cut
-
-__PACKAGE__->add_columns(
-    user_id => {
-        data_type      => "integer",
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
-    role_id => {
-        data_type      => "integer",
-        is_foreign_key => 1,
-        is_nullable    => 0,
-    },
-);
-
-
-=head1 PRIMARY KEY
-
-=over 4
-
-=item * L</user_id>
-
-=item * L</role_id>
-
-=back
-
-=cut
-
-__PACKAGE__->set_primary_key("user_id", "role_id");
-
-
-=head1 RELATIONS
-
-=head2 role
-
-Type: belongs_to
-
-Related object: L<Judoon::Schema::Result::Role>
-
-=cut
-
-__PACKAGE__->belongs_to(
-    role => "::Role",
+belongs_to role => "::Role",
     { id => "role_id" },
-    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" };
 
-=head2 user
-
-Type: belongs_to
-
-Related object: L<Judoon::Schema::Result::User>
-
-=cut
-
-__PACKAGE__->belongs_to(
-    user => "::User",
+belongs_to user => "::User",
     { id => "user_id" },
-    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
-);
-
+    { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" };
 
 
 1;
