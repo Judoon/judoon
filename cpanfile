@@ -62,6 +62,7 @@ requires 'HTML::TreeBuilder';
 requires 'IO::All';
 requires 'IO::File';
 requires 'JSON';
+requires 'JSON::MaybeXS';
 requires 'JSON::XS';
 requires 'List::AllUtils';
 requires 'MIME::Base64';
@@ -96,6 +97,8 @@ requires 'Text::Unidecode';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 requires 'URI';
+requires 'Web::Machine';
+
 
 # Excel::Reader::XLSX deps
 requires 'Archive::Zip';
