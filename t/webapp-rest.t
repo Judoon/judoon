@@ -5,10 +5,11 @@ use v5.16;
 
 use lib 't/lib';
 
-with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp';
+with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp',
+    'Judoon::Role::JsonEncoder';
+
 
 use HTTP::Request::Common qw(GET POST PUT DELETE);
-use JSON::MaybeXS;
 use Test::JSON;
 
 my ($user_rs, $testuser, $otheruser, $otheruser_tkn,
@@ -47,6 +48,34 @@ after setup => sub {
 
 };
 #after each_test => sub { $_[0]->reset_fixtures(); };
+
+
+test 'Basic Tests' => sub {
+    my ($self) = @_;
+
+    for my $uri (qw(/api /api/)) {
+        $self->mech->get_ok($uri, "get $uri");
+        is $self->mech->uri, 'http://localhost/', '  ...redirects to root';
+    }
+
+    $self->mech->get_ok('/api/datasetdata', 'get /api/datasetdata');
+};
+
+
+test 'dataset data' => sub {
+    my ($self) = @_;
+
+    my $dataset = $self->schema->resultset('Dataset')->first;
+    $self->_GET_json("/api/datasetdata/" . $dataset->id);
+    ok $self->mech->success, 'can get dataset data';
+
+    my $response = $self->mech->content;
+    is_valid_json($response, '  ...response is valid json');
+    my $data = $self->decode_json($response);
+    is_deeply $data->{tmplData}[0],
+        {name => 'Chewie', gender => 'male', age => 5},
+            '   ...expected content';
+};
 
 
 test 'dataset' => sub {
@@ -124,7 +153,7 @@ test 'page' => sub {
             dataset_id => 0+$private->{obj}->dataset->id,
             id => 0+($new_url =~ s{.+/}{}r),
         };
-        my $got = decode_json($self->mech->content);
+        my $got = $self->decode_json($self->mech->content);
         delete @{$got}{qw(created modified)};
         is_deeply $got, $expected, ' ..new page has expected contents';
 
@@ -134,7 +163,7 @@ test 'page' => sub {
         $self->_PUT_json($new_url, $update);
         ok($self->mech->success, 'successfully PUTed update');
         $self->_GET_json($new_url);
-        my $got_put = decode_json($self->mech->content);
+        my $got_put = $self->decode_json($self->mech->content);
         delete @{$got_put}{qw(created modified)};
         is_deeply $got_put, {%$expected, title=>$update->{title}},
             '  ..new page has expected contents';
@@ -188,7 +217,7 @@ sub _get_json_ok {
     ok($self->mech->success, $descr,);
     my $response = $self->mech->content;
     is_valid_json($response, q{  ...and it's valid json});
-    is_json($response, encode_json($object_json),
+    is_json($response, $self->encode_json($object_json),
             q{  ...and it matches what we expect});
 }
 
@@ -211,7 +240,7 @@ sub _POST_json {
     my $r = POST(
         $url, 'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        Content => encode_json($object),
+        Content => $self->encode_json($object),
     );
     $self->mech->request($r);
 }
@@ -221,7 +250,7 @@ sub _PUT_json {
     my $r = PUT(
         $url, 'Accept' => 'application/json',
         'Content-Type' => 'application/json',
-        Content => encode_json($object),
+        Content => $self->encode_json($object),
     );
     $self->mech->request($r);
 }
