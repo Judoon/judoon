@@ -37,6 +37,11 @@ sub base : Chained('/') PathPart('api') CaptureArgs(0) {
     }
 }
 
+sub list : Chained('base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $c->res->redirect('/');
+}
+
 
 =head1 AUTHOR
 
