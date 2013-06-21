@@ -29,10 +29,9 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef ConsumerOf RegexpRef InstanceOf);
 use feature ':5.10';
 
-
 use Data::Visitor::Callback;
 use HTML::TreeBuilder;
-use JSON qw(to_json from_json);
+use JSON::MaybeXS;
 use Judoon::Error::Devel;
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Input;
@@ -42,9 +41,6 @@ use Judoon::Tmpl::Node::Link;
 use Judoon::Tmpl::Node::Newline;
 use Judoon::Tmpl::Node::VarString;
 use Params::Validate qw(:all);
-
-# default args to to_json and from_json
-my $default_json_args = {utf8 => 1,};
 
 
 
@@ -172,23 +168,19 @@ sub new_from_data {
 }
 
 
-=head2 new_from_native( $json, \%json_args? )
+=head2 new_from_native( $json )
 
 Builds a new C<Judoon::Tmpl> from its serialized representation. This
 is just a wrapper around C<L</new_from_data>> that decodes the given
-input, which is expected to be a valid JSON string. C<$json_args> is an
-optional hashref or arguments to C<L<JSON/from_json>>.
+input, which is expected to be a valid utf8-encoded JSON string.
 
 =cut
 
 sub new_from_native {
-    my ($class, $json, $json_args) = validate_pos(
-        @_,
-        {type => SCALAR,},
-        {type => SCALAR,},
-        {type => HASHREF, optional => 1, default => $default_json_args},
+    my ($class, $json) = validate_pos(
+        @_, {type => SCALAR,}, {type => SCALAR,},
     );
-    my $nodelist = from_json($json, $json_args);
+    my $nodelist = decode_json($json);
     return $class->new_from_data($nodelist);
 }
 
@@ -239,18 +231,16 @@ sub to_data {
 }
 
 
-=head2 to_native( \%json_args? )
+=head2 to_native()
 
 Output our template as a serialized data structure. This method calls
-C<L</to_data>> and JSON-encodes the output. C<$json_args> is an
-optional hashref of arguments to C<L<JSON>>'s C<to_json> function;
+C<L</to_data>> and JSON+utf8-encodes the output.
 
 =cut
 
 sub to_native {
-    my ($self, $json_args) = @_;
-    $json_args ||= $default_json_args;
-    return to_json($self->to_data, $json_args);
+    my ($self) = @_;
+    return encode_json($self->to_data);
 }
 
 

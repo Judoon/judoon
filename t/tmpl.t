@@ -11,7 +11,7 @@ use Test::Fatal;
 use Data::Section::Simple qw(get_data_section);
 use Encode;
 use Judoon::Tmpl;
-use JSON qw(decode_json from_json);
+use JSON::MaybeXS;
 
 
 subtest 'basic tests' => sub {
@@ -65,36 +65,19 @@ subtest 'from / to formats' => sub {
     unlike(Judoon::Tmpl->new_from_data($formats{data})->to_native,
         qr{__CLASS__}, '__CLASS__ keys have been scrubbed from data');
 
-
-    my $perl_text   = '[{"type":"text","value":"resumé","formatting":[]}]';
-    my $utf8_text   = encode("utf-8", $perl_text);
-    my $latin1_text = encode("latin1", $perl_text);
-    my $utf8_to_utf8 = Judoon::Tmpl->new_from_native($utf8_text)
-        ->to_native();
-    my $latin1_to_utf8 = Judoon::Tmpl->new_from_native($latin1_text, {latin1 => 1})
-        ->to_native();
-    my $latin1_to_latin1 = Judoon::Tmpl->new_from_native($latin1_text, {latin1 => 1})
-        ->to_native({latin1 => 1});
-    my $utf8_to_latin1 = Judoon::Tmpl->new_from_native($utf8_text)
-        ->to_native({latin1 => 1});
-
-    my @things = (
-        ['utf8',   $utf8_text,   $utf8_to_utf8,     ],
-        ['utf8',   $utf8_text,   $latin1_to_utf8,   ],
-        ['latin1', $latin1_text, $latin1_to_latin1, ],
-        ['latin1', $latin1_text, $utf8_to_latin1,   ],
-    );
-
-    for my $thing (@things) {
-        my ($encoding, $expected, $output) = @$thing;
-
-        my $json_args = {$encoding => 1, canonical => 1};
+    {
+        my $perl_text    = '[{"type":"text","value":"resumé","formatting":[]}]';
+        my $utf8_text    = encode("utf-8", $perl_text);
+        my $utf8_to_utf8 = Judoon::Tmpl->new_from_native($utf8_text)
+            ->to_native();
+        my $json = JSON->new->utf8->canonical;
         my $output_canon;
-        ok !exception { $output_canon = from_json($output, $json_args); },
-            "output is properly encoded as $encoding";
+        ok !exception { $output_canon = $json->decode($utf8_to_utf8); },
+            "output is properly encoded as utf8";
 
-        my $expected_canon = from_json($expected, $json_args);
-        eq_or_diff $output_canon, $expected_canon, ' ..and has correct structure';
+        my $expected_canon = $json->decode($utf8_text);
+        eq_or_diff $output_canon, $expected_canon,
+            ' ..and has correct structure';
     }
 
     like exception { Judoon::Tmpl->new_from_jstmpl(); },
