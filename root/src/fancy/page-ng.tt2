@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/static/css/bootstrap.css" />
     <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
     <link rel="stylesheet" href="/static/css/site.css" />
+    <link rel="stylesheet" href="/static/css/app.css" />
 
     <script src="/static/js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
     <script src="/static/js/vendor/angular/angular.js"></script>
@@ -91,31 +92,6 @@
           [% END %]
           [%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]
           [% END %]
-
-          <style type="text/css">
-            .edit_outline {
-            border: 3px blue dashed;
-            padding-left: 0.5em;
-            padding-right: 0.5em;
-            }
-            .editable_label {
-            font-size: 90%;
-            color: #fff;
-            background-color: blue;
-            padding-left: 0.5em;
-            margin-right: 75em;
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-            }
-
-            #data_table thead th.editmode {
-
-            }
-
-            #data_table .column_actions { display: none; }
-            #data_table .editmode .column_actions { display: block; }
-
-          </style>
 
           <input type="hidden" ng-model="pageId" value="[% page.object.id %]">
 

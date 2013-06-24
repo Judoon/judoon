@@ -1,0 +1,22 @@
+
+.edit_outline {
+    border: 3px blue dashed;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+.editable_label {
+    font-size: 90%;
+    color: #fff;
+    background-color: blue;
+    padding-left: 0.5em;
+    margin-right: 75em;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+#data_table thead th.editmode {
+
+}
+
+#data_table .column_actions { display: none; }
+#data_table .editmode .column_actions { display: block; }
