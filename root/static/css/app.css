@@ -9,10 +9,15 @@
     color: #fff;
     background-color: blue;
     padding-left: 0.5em;
+    margin-top: 1em;
     margin-right: 75em;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
+
+
+.fullwidth { width: 100%; min-height: 8em; }
+
 
 #data_table thead th.editmode {
 

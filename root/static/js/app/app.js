@@ -30,88 +30,69 @@ var judoonApp = angular.module('judoon', ['ngSanitize']);
     });
 
 
+CKEDITOR.plugins.registered['save'] = {
+  init: function(editor) {
+    var command = editor.addCommand('save', {
+      modes: {wysiwyg: 1, source: 1},
+      readOnly: 1,
+      exec: function(editor) {
+        editor.fire('save');
+      }
+    });
 
-function Ctrl($scope) {
+    editor.ui.addButton('Save', {
+      label : editor.lang.save,
+      command : 'save'
+    });
+  }
+};
 
-    
-    $scope.columnDefs = [ 
-        { "mDataProp": "category", "aTargets":[0]},
-        { "mDataProp": "name", "aTargets":[1] },
-        { "mDataProp": "price", "aTargets":[2] }
-    ]; 
-  
-    
-    $scope.sampleProductCategories = [
-        
-        {
-            "name": "1948 Porsche 356-A Roadster",
-                "price": 53.9,
-                  "category": "Classic Cars",
-                  "action":"x"
-              },
-              {
-                "name": "1948 Porsche Type 356 Roadster",
-                "price": 62.16,
-            "category": "Classic Cars",
-                  "action":"x"
-              },
-              {
-                "name": "1949 Jaguar XK 120",
-                "price": 47.25,
-            "category": "Classic Cars",
-                  "action":"x"
-              }
-              ,
-              {
-                "name": "1936 Harley Davidson El Knucklehead",
-                "price": 24.23,
-            "category": "Motorcycles",
-                  "action":"x"
-              },
-              {
-                "name": "1957 Vespa GS150",
-                "price": 32.95,
-            "category": "Motorcycles",
-                  "action":"x"
-              },
-              {
-                "name": "1960 BSA Gold Star DBD34",
-                "price": 37.32,
-            "category": "Motorcycles",
-                  "action":"x"
-              }
-           ,
-              {
-                "name": "1900s Vintage Bi-Plane",
-                "price": 34.25,
-            "category": "Planes",
-                  "action":"x"
-              },
-              {
-                "name": "1900s Vintage Tri-Plane",
-                "price": 36.23,
-            "category": "Planes",
-                  "action":"x"
-              },
-              {
-                "name": "1928 British Royal Navy Airplane",
-                "price": 66.74,
-            "category": "Planes",
-                  "action":"x"
-              },
-              {
-                "name": "1980s Black Hawk Helicopter",
-                "price": 77.27,
-            "category": "Planes",
-                  "action":"x"
-              },
-              {
-                "name": "ATA: B757-300",
-                "price": 59.33,
-            "category": "Planes",
-                  "action":"x"
-              }
-          
-        ];            
-            
-}
+    judoonApp.directive('judoonCk', function() {
+        return {
+            require: '?ngModel',
+            link: function(scope, elm, attr, ngModel) {
+                var ckConfig;
+                if (attr.ckEditType === "inline") {
+                    ckConfig = {
+                        toolbar: [
+                            { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat",'-','Undo','Redo'] }
+                        ],
+                        height: '3em',
+                        removePlugins: 'elementspath',
+                        resize_enabled: false,
+                        contentsCss: ''
+                    };
+                }
+                else {
+                    ckConfig = {
+                        toolbar: [
+                            { name: 'clipboard', items: ['Cut','Copy','Paste','PasteText','PasteWord','-','Undo','Redo'] },
+                            { name: 'editing',   items: ['Find','Replace','-','SelectAll','-','Scayt'] },
+                            { name: 'links',     items: ['Link','Unlink','Anchor'] },
+                            { name: 'insert',    items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+                            { name: 'groups',    items: ["NumberedList", "BulletedList", "DefinitionList", "Outdent", "Indent", "Blockquote", ] },
+                            '/',
+                            { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat"] },
+                            { name: 'paragraph',  items: ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock" ] },
+                            { name: 'styles',     items: ["Format", "Font", "FontSize", "TextColor", "BGColor" ] },
+                            { name: 'about',      items: ["About"] }
+                        ],
+                        removePlugins: 'smiley,flash,iframe,pagebreak',
+                        extraAllowedContent: 'ul ol li dl dd dt',
+                        contentsCss: ''
+
+                    };
+                }
+
+                var ck = CKEDITOR.replace(elm[0], ckConfig);
+
+                if (!ngModel) return;
+
+                ck.on('save', function() {
+                    scope.$apply(function() {
+                        ngModel.$setViewValue(ck.getData());
+                    });
+                });
+            }
+        };
+    });

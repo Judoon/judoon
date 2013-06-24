@@ -3,6 +3,8 @@
 /* Controllers */
 
 function PageCtrl($scope, $http) {
+
+    $scope.editmode = 0;
     $scope.pageId = 49;
     $scope.page = {};
 
