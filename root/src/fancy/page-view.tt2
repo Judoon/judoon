@@ -78,13 +78,14 @@
 
 
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
+<script src="/static/js/vendor/dataTables.bootstrap.js"></script>
 <script src="/static/js/vendor/datatables/ColReorder.min.js"></script>
 <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
 <script src="/static/js/vendor/handlebars.min.js"></script>
 <script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
-      judoon.datatables.bootstrap_init();
+      //judoon.datatables.bootstrap_init();
 
       var compiled_templates = [];
       $("script.column_tmpl").each( function( idx ) {
@@ -117,11 +118,11 @@
           "bAutoWidth": false,
           "bServerSide": true,
           "bProcessing" : true,
-          "sDom": "R<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-          "sPaginationType": "bootstrap",
-          "oLanguage": {
+//          "sDom": "R<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+          "sPaginationType": "bootstrap"
+/*          "oLanguage": {
               "sLengthMenu": "_MENU_ records per page"
-          }
+          }*/
       });
   });
 </script>
