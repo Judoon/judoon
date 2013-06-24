@@ -60,22 +60,37 @@ var judoonApp = angular.module('judoon', ['ngSanitize']);
                     };
                 }
 
-                var ck = CKEDITOR.inline(elm[0], ckConfig);
+                scope.$watch('editmode', function() {
+                    if (scope.editmode == 1) {
+                        elm.attr('contenteditable', 'true');
 
-                if (!ngModel) return;
+                        var ck = CKEDITOR.inline(elm[0], ckConfig);
+                        elm.data('editor', ck);
 
-                ck.on('pasteState', function() {
-                    scope.$apply(function() {
-                        ngModel.$setViewValue(ck.getData());
-                    });
+                        if (!ngModel) return;
+
+                        ck.on('pasteState', function() {
+                            scope.$apply(function() {
+                                ngModel.$setViewValue(ck.getData());
+                            });
+                        });
+
+                        ngModel.$render = function() {
+                            ck.setData(ngModel.$viewValue);
+                        };
+
+                        // load init value from DOM
+                        ngModel.$render();
+                    }
+                    else {
+                        var ck = elm.data('editor');
+                        if (ck) {
+                            ck.destroy();
+                        }
+
+                        elm.attr('contenteditable', 'false');
+                    }
                 });
-
-                ngModel.$render = function() {
-                    ck.setData(ngModel.$viewValue);
-                };
-
-                // load init value from DOM
-                ngModel.$render();
 
             }
         };
