@@ -142,8 +142,8 @@
 
           <div ng-switch="editmode">
             <div ng-switch-when="1">
-              <div class="editable_label">Page Title:</div>
-              <h2 judoon-ck ck-edit-type="inline" contenteditable="true" id="page_title" ng-model="page.title" contenteditable="true" class="editable edit_outline inline_editable" ng-bind-html="page.title"></h2>
+              <div class="editable_label" style="margin-bottom: -10px;">Page Title:</div>
+              <h2 judoon-ck ck-edit-type="inline" contenteditable="true" ng-model="page.title" id="page_title" contenteditable="true" class="editable edit_outline inline_editable" ng-bind-html="page.title"></h2>
             </div>
             <h2 ng-switch-when="0" id="page_title" class="editable inline_editable" ng-bind-html="page.title"></h2>
           </div>
@@ -151,7 +151,7 @@
           <div ng-switch="editmode">
             <div ng-switch-when="1">
               <div class="editable_label">Preamble:</div>
-              <textarea judoon-ck ck-edit-type="block" contenteditable="true" ng-model="page.preamble" class="fullwidth"></textarea>
+              <div judoon-ck ck-edit-type="block" id="page_preamble2" ng-model="page.preamble" contenteditable="true" class="editable edit_outline block_editable" ng-bind-html="page.preamble"></div>
             </div>
             <div ng-switch-when="0" id="page_preamble" class="editable block_editable" ng-bind-html="page.preamble"></div>
           </div>

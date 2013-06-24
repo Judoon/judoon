@@ -29,24 +29,6 @@ var judoonApp = angular.module('judoon', ['ngSanitize']);
         };
     });
 
-
-CKEDITOR.plugins.registered['save'] = {
-  init: function(editor) {
-    var command = editor.addCommand('save', {
-      modes: {wysiwyg: 1, source: 1},
-      readOnly: 1,
-      exec: function(editor) {
-        editor.fire('save');
-      }
-    });
-
-    editor.ui.addButton('Save', {
-      label : editor.lang.save,
-      command : 'save'
-    });
-  }
-};
-
     judoonApp.directive('judoonCk', function() {
         return {
             require: '?ngModel',
@@ -56,11 +38,7 @@ CKEDITOR.plugins.registered['save'] = {
                     ckConfig = {
                         toolbar: [
                             { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat",'-','Undo','Redo'] }
-                        ],
-                        height: '3em',
-                        removePlugins: 'elementspath',
-                        resize_enabled: false,
-                        contentsCss: ''
+                        ]
                     };
                 }
                 else {
@@ -78,21 +56,27 @@ CKEDITOR.plugins.registered['save'] = {
                             { name: 'about',      items: ["About"] }
                         ],
                         removePlugins: 'smiley,flash,iframe,pagebreak',
-                        extraAllowedContent: 'ul ol li dl dd dt',
-                        contentsCss: ''
-
+                        extraAllowedContent: 'h5 h6 ul ol li dl dd dt'
                     };
                 }
 
-                var ck = CKEDITOR.replace(elm[0], ckConfig);
+                var ck = CKEDITOR.inline(elm[0], ckConfig);
 
                 if (!ngModel) return;
 
-                ck.on('save', function() {
+                ck.on('pasteState', function() {
                     scope.$apply(function() {
                         ngModel.$setViewValue(ck.getData());
                     });
                 });
+
+                ngModel.$render = function() {
+                    ck.setData(ngModel.$viewValue);
+                };
+
+                // load init value from DOM
+                ngModel.$render();
+
             }
         };
     });
