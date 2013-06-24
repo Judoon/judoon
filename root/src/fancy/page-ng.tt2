@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Edit Page | Judoon</title>
+    <meta name="description" content="[% description %]">
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="stylesheet" href="/static/css/bootstrap.css" />
+    <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="/static/css/site.css" />
+
+    <script src="/static/js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
+    <script src="/static/js/vendor/angular/angular.js"></script>
+    <script src="/static/js/app/controllers.js"></script>
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+        <![endif]-->
+    
+    <div id="top" class="navbar navbar-static-top">
+      <div class="navbar-inner">
+        <div class="container">
+
+          <a class="brand" href="[% c.uri_for_action('/index') %]">Judoon</a>
+
+          <ul class="nav pull-left">
+            <li>
+              <form class="navbar-search" action="/search" method="get">
+                <input type="text" name="q" placeholder="Search" class="search-query">
+              </form>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Browse <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="[% c.uri_for_action('/dataset/list') %]">Public Datasets</a></li>
+                <li><a href="[% c.uri_for_action('/page/list') %]">Public Pages</a></li>
+                <li class="divider"></li>
+                <li><a href="[% c.uri_for_action('/info/get_started') %]">Get Started</a></li>
+                <li><a href="[% c.uri_for_action('/info/news') %]">News</a></li>
+                <li><a href="[% c.uri_for_action('/info/about') %]">About</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="nav pull-right">
+            [% IF !c.user_exists %]
+            <li><a href="[% c.uri_for_action('/login/login') %]">Login</a></li>
+            <li><a href="[% c.uri_for_action('/account/signup') %]">Signup</a></li>
+            [% ELSE %][% user_this = user.object || c.user %]
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-user"></i> [%- user_this.username -%] <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="[% c.uri_for_action('/user/edit', [user_this.username]) %]">Overview</a></li>
+                <li><a href="[% c.uri_for_action('/account/profile') %]">Profile</a></li>
+                <li><a href="[% c.uri_for_action('/account/settings_view') %]">Settings</a></li>
+              </ul>
+            </li>
+            <li><a href="[% c.uri_for_action('/login/logout') %]">Logout</a></li>
+            [% END %]
+          </ul>
+
+        </div>
+      </div>
+    </div> <!-- end navbar -->
+
+    <div id="middle" class="container-fluid" ng-app>
+      <div class="row-fluid">
+        <div class="span10 offset1" id="content" ng-controller="PageCtrl">
+
+          [%- INCLUDE 'fancy/actionbar.tt2' we_are_static=0 -%]
+
+          [% IF welcome_message %]
+          [% welcome_spiel = BLOCK %]
+          <p>
+            <strong>Your dataset has been imported.</strong> Here is the page
+            we've created for you.  Click <strong>Edit</strong> above to make
+            changes, or <strong>Share</strong> to make the page public.
+          </p>
+          [% END %]
+          [%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]
+          [% END %]
+
+          <style type="text/css">
+            .edit_outline {
+            border: 3px blue dashed;
+            padding-left: 0.5em;
+            padding-right: 0.5em;
+            }
+            .editable_label {
+            font-size: 90%;
+            color: #fff;
+            background-color: blue;
+            padding-left: 0.5em;
+            margin-right: 75em;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            }
+
+            #data_table thead th.editmode {
+
+            }
+
+            #data_table .column_actions { display: none; }
+            #data_table .editmode .column_actions { display: block; }
+
+          </style>
+
+          <input type="hidden" ng-model="pageId" value="[% page.object.id %]">
+
+          <div class="editable_label hidden" style="margin-bottom: -10px;">Page Title:</div>
+          <h2 id="page_title" class="editable inline_editable">{{ page.title }}</h2>
+
+
+          <div class="editable_label hidden">Preamble:</div>
+          <div id="page_preamble" class="editable block_editable">
+            {{ page.preamble }}
+          </div>
+
+          <br>
+
+          <table id="data_table" class="table table-striped table-condensed table-bordered">
+            <thead>
+              [% FOREACH p_column IN page_column.list %]
+              <th>
+                [% p_column.title | html %]
+                <div class="column_actions btn-group">
+                  <a href="#" class="btn btn-mini edit_column_btn"><i class="icon-pencil"></i></a><a href="#" class="btn btn-mini"><i class="icon-trash"></i></a>
+                </div>
+              </th>
+              [% END %]
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+
+          <br>
+
+          <div class="editable_label hidden">Postamble:</div>
+          <div id="page_postamble" class="editable block_editable">
+            {{ page.postamble }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="footer-wrapper">
+      <div id="footer" class="container">
+        <p class="pull-right">&copy; 2013 Cell Migration Consortium</p>
+        <p class="pull-left">Have questions? Need help?  <a href="mailto:help@cellmigration.org">E-mail us</a>.</p>
+      </div>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-1.8.1.min.js"><\/script>')</script>
+      <script src="/static/js/vendor/bootstrap.min.js"></script>
+
+      <script src="/static/js/plugins.js"></script>
+
+      [% FOREACH p_column IN page_column.list %]
+      <script id="column_tmpl_[% loop.count %]" class="column_tmpl" type="text/x-handlebars-template">
+        [% p_column.js_template %]
+      </script>
+      [% END %]
+
+      <script id="edit_console_tmpl" type="text/x-handlebars-template">
+        <tbody id="column_edit_console">
+          <tr class="odd" style="background-color: #fff;">
+            <td colspan="[% page_column.list.size %]">
+              <div class="well"><p>Close your eyes and pretend I'm a column editor.</p></div>
+              <div class="pull-right"><a class="btn btn-mini" onclick="close_column_editor(); return false;"><i class="icon-remove"></i></a></div>
+            </td>
+          </tr>
+        </tbody>
+      </script>
+
+      <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
+      <script src="/static/js/vendor/datatables/ColReorder.min.js"></script>
+      <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
+      <script src="/static/js/vendor/handlebars.min.js"></script>
+      <script src="/static/js/judoon.js"></script>
+      <script>
+        $(document).ready(function() {
+        judoon.datatables.bootstrap_init();
+
+        var compiled_templates = [];
+        $("script.column_tmpl").each( function( idx ) {
+        compiled_templates[idx] = Handlebars.compile($(this).html());
+        });
+
+        $('#data_table').dataTable({
+        "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",
+        "fnServerData" : function ( sSource, aoData, fnCallback ) {
+        $.ajax( {
+        "dataType": "json",
+        "type": "GET",
+        "url": sSource,
+        "data": aoData,
+        "success": [
+        function(data) {
+        var new_data = [];
+        for (var i = 0; i < data.tmplData.length; i++) {
+                            new_data[i] = [];
+                            for (var j = 0; j < compiled_templates.length; j++) {
+                                                new_data[i][j] = compiled_templates[j](data.tmplData[i]);
+                                                }
+                                                }
+                                                data.aaData = new_data;
+                                                },
+                                                fnCallback
+                                                ],
+                                                } );
+                                                },
+                                                "bAutoWidth": false,
+                                                "bServerSide": true,
+                                                "bProcessing" : true,
+                                                "sDom": "R<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                                                "sPaginationType": "bootstrap",
+                                                "oLanguage": {
+                                                "sLengthMenu": "_MENU_ records per page"
+                                                }
+                                                });
+                                                });
+                                                </script>
+
+      <script type="text/javascript">
+
+        $(document).ready( function() {
+        $("#preview_mode").on('click', function () { disable_editing(); });
+        $("#edit_mode").on('click', function () { enable_editing(); });
+
+        $(".edit_column_btn").on('click', function (event) { open_column_editor(event.currentTarget); } );
+        });
+
+        var cke_inline_config = {
+        toolbar: [
+        { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat",'-','Undo','Redo'] }
+        ]
+        };
+        var cke_block_config = {
+        toolbar: [
+        { name: 'clipboard', items: ['Cut','Copy','Paste','PasteText','PasteWord','-','Undo','Redo'] },
+        { name: 'editing',   items: ['Find','Replace','-','SelectAll','-','Scayt'] },
+        { name: 'links',     items: ['Link','Unlink','Anchor'] },
+        { name: 'insert',    items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+        { name: 'groups',    items: ["NumberedList", "BulletedList", "DefinitionList", "Outdent", "Indent", "Blockquote", ] },
+        '/',
+        { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat"] },
+        { name: 'paragraph',  items: ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock" ] },
+        { name: 'styles',     items: ["Format", "Font", "FontSize", "TextColor", "BGColor" ] },
+        { name: 'about',      items: ["About"] }
+        ],
+        removePlugins: 'smiley,flash,iframe,pagebreak',
+        extraAllowedContent: 'ul ol li dl dd dt'
+        };
+        var postamble_config = {
+        extraAllowedContent: 'ul ol li dl dd dt'
+        };
+
+        function enable_editing () {
+        $("#preview_mode").parent("li").removeClass("active");
+        $("#edit_mode").parent("li").addClass("active");
+        $(".editable").addClass("edit_outline").attr('contenteditable','true')
+        .each( function () {
+        var e = $(this);
+        var config = e.hasClass('inline_editable') ? cke_inline_config
+        : cke_block_config;
+        if (e.attr('id') === 'page_postamble') {
+        config = postamble_config;
+        }
+        e.data('editor', CKEDITOR.inline(e.attr('id'), config ));
+        });
+        $(".editable_label").removeClass("hidden");
+        $("#data_table thead th").addClass('editmode');
+        }
+
+        function disable_editing() {
+        $("#preview_mode").parent("li").addClass("active");
+        $("#edit_mode").parent("li").removeClass("active");
+        $(".editable").removeClass("edit_outline").removeAttr('contenteditable')
+        .each( function () {
+        var e = $(this);
+        e.data('editor').destroy();
+        });
+        $(".editable_label").addClass("hidden");
+        $("#data_table thead th").removeClass('editmode');
+        close_column_editor();
+        }
+
+        var edit_console_tmpl = Handlebars.compile($('#edit_console_tmpl').html());
+        function open_column_editor (me) {
+        close_column_editor();
+        $('#data_table thead').after( edit_console_tmpl({}) );
+        $('#column_edit_console tr td div.well').before('<h6>'+$(me).parent().parent().text()+'</h6>');
+        }
+        function close_column_editor () {
+        $('#column_edit_console').detach();
+        }
+      </script>
+
+      <script>
+        var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+      </script>
+  </body>
+</html>

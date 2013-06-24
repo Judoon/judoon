@@ -41,8 +41,11 @@ sub page_view : Chained('page_id') PathPart('') Args(0) {
         $column->{js_template} = $tmpl->to_jstmpl;
     }
 
-    $c->stash->{template} = 'fancy/page-view.tt2';
+    $c->stash->{template} = $c->req->param('angular')
+        ? 'fancy/page-ng.tt2' : 'fancy/page-view.tt2';
 }
+
+
 
 1;
 __END__
