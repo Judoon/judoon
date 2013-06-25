@@ -1,13 +1,22 @@
 
+/*
+ Handy colors:
+ #006d4c - brand color
+ #0064dc - aint bad
+*/
+
 .edit_outline {
-    border: 3px blue dashed;
+    border: 2px #0064dc dashed;
     padding-left: 0.5em;
     padding-right: 0.5em;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
-.editable_label {
+
+.editable_label { 
     font-size: 90%;
     color: #fff;
-    background-color: blue;
+    background-color: #0064dc;
     padding-left: 0.5em;
     margin-top: 1em;
     margin-right: 75em;
@@ -19,9 +28,6 @@
 .fullwidth { width: 100%; min-height: 8em; }
 
 
-#data_table thead th.editmode {
-
-}
-
+#data_table thead th.editmode {}
 #data_table .column_actions { display: none; }
 #data_table .editmode .column_actions { display: block; }
