@@ -22,11 +22,13 @@
     <script src="/static/js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
     <script src="/static/js/vendor/angular/angular.js"></script>
     <script src="/static/js/vendor/angular/angular-sanitize.js"></script>
+    <script src="/static/js/vendor/angular/angular-resource.js"></script>
 
     <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
 
     <script src="/static/js/app/app.js"></script>
     <script src="/static/js/app/controllers.js"></script>
+    <script src="/static/js/app/services.js"></script>
   </head>
 
   <body>

@@ -2,17 +2,14 @@
 
 /* Controllers */
 
-function PageCtrl($scope, $http) {
+function PageCtrl($scope, Page) {
 
     $scope.editmode = 0;
     $scope.pageId = 49;
-    $scope.page = {};
-
-    var init = $http.get('/api/page/'+$scope.pageId).success(function(data) {
-        $scope.page = data;
-        for (var idx in $scope.page.columns) {
-            $scope.page.columns[idx].compiled = Handlebars.compile(
-                $scope.page.columns[idx].template
+    $scope.page = Page.get({pageId: $scope.pageId}, function (page) {
+        for (var idx in page.columns) {
+            page.columns[idx].compiled = Handlebars.compile(
+                page.columns[idx].template
             );
         }
     });
