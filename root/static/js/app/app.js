@@ -2,7 +2,7 @@ var judoonApp = angular.module('judoon', ['ngSanitize','judoonServices']);
 
 judoonApp.directive('judoonTable', function() {
     return function($scope, element, attrs) {
-        $scope.$watch('page', function() {
+        $scope.$watch('page.columns', function() {
             if (!$scope.page.columns) {
                 return;
             }
@@ -85,9 +85,7 @@ judoonApp.directive('judoonCk', function() {
                 else {
                     var ck = elm.data('editor');
                     if (ck) {
-                        scope.$apply(function() {
-                            ngModel.$setViewValue(ck.getData());
-                        });
+                        ngModel.$setViewValue(ck.getData());
                         ck.destroy();
                     }
 
