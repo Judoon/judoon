@@ -69,11 +69,11 @@ var judoonApp = angular.module('judoon', ['ngSanitize']);
 
                         if (!ngModel) return;
 
-                        ck.on('pasteState', function() {
-                            scope.$apply(function() {
-                                ngModel.$setViewValue(ck.getData());
-                            });
-                        });
+                        // ck.on('pasteState', function() {
+                        //     scope.$apply(function() {
+                        //         ngModel.$setViewValue(ck.getData());
+                        //     });
+                        // });
 
                         ngModel.$render = function() {
                             ck.setData(ngModel.$viewValue);
@@ -84,6 +84,10 @@ var judoonApp = angular.module('judoon', ['ngSanitize']);
                     }
                     else {
                         var ck = elm.data('editor');
+                        scope.$apply(function() {
+                            ngModel.$setViewValue(ck.getData());
+                        });
+
                         if (ck) {
                             ck.destroy();
                         }
