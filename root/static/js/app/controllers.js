@@ -52,3 +52,10 @@ function PageCtrl($scope, Page) {
         } );
     };
 }
+
+
+function ColumnCtrl($scope) {
+
+    $scope.currentColumn;
+
+}
