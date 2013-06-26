@@ -2,11 +2,11 @@
 
 /* Controllers */
 
-function PageCtrl($scope, Page) {
+function PageCtrl($scope, $routeParams, Page) {
 
     $scope.editmode = 0;
 
-    $scope.pageId = 49;
+    $scope.pageId = $routeParams.pageId;
     $scope.pageLoaded = 0;
     $scope.page = Page.get({id: $scope.pageId}, function (page) {
         for (var idx in page.columns) {

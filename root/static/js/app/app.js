@@ -1,4 +1,11 @@
 var judoonApp = angular.module('judoon', ['ngSanitize','judoonServices']);
+judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
+    $locationProvider.html5Mode(true);
+    $routeProvider
+        .when('/user/:userName/fancy/page/:pageId', {templateUrl: '/static/html/partials/page.html', controller: PageCtrl})
+        .otherwise({redirectTo: '/'});
+}]);
+
 
 judoonApp.directive('judoonTable', function() {
     return function($scope, element, attrs) {

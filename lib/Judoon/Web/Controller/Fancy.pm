@@ -31,16 +31,6 @@ sub page_id : Chained('base') PathPart('page') CaptureArgs(1) {
 sub page_view : Chained('page_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
-    my $page = $c->stash->{page}{object};
-
-    $c->stash->{dataset}{id} = $page->dataset->id;
-
-    $c->stash->{page_column}{list} = [$page->page_columns_ordered->hri->all];
-    for my $column (@{$c->stash->{page_column}{list}}) {
-        my $tmpl = Judoon::Tmpl->new_from_native($column->{template});
-        $column->{js_template} = $tmpl->to_jstmpl;
-    }
-
     $c->stash->{template} = $c->req->param('angular')
         ? 'fancy/page-ng.tt2' : 'fancy/page-view.tt2';
 }
