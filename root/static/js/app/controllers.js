@@ -5,14 +5,22 @@
 function PageCtrl($scope, Page) {
 
     $scope.editmode = 0;
+
     $scope.pageId = 49;
+    $scope.pageLoaded = 0;
     $scope.page = Page.get({pageId: $scope.pageId}, function (page) {
         for (var idx in page.columns) {
             page.columns[idx].compiled = Handlebars.compile(
                 page.columns[idx].template
             );
         }
+        $scope.pageLoaded = 1;
     });
+
+    $scope.pageDirty = 0;
+    $scope.$watch('page', function () { if ($pageLoaded) { $scope.pageDirty = 1; } },);
+
+    $scope.update = function(){Page.update($scope.page);}
 
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {

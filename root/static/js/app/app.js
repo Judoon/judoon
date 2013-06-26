@@ -2,8 +2,8 @@ var judoonApp = angular.module('judoon', ['ngSanitize','judoonServices']);
 
 judoonApp.directive('judoonTable', function() {
     return function($scope, element, attrs) {
-        $scope.$watch('page.columns', function() {
-            if (!$scope.page.columns) {
+        $scope.$watch('pageLoaded', function() {
+            if (!$scope.pageLoaded) {
                 return;
             }
 
@@ -25,7 +25,7 @@ judoonApp.directive('judoonTable', function() {
 
             // apply the plugin
             var dataTable = element.dataTable(options);
-        }, true);
+        });
     };
 });
 
