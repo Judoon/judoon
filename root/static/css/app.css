@@ -31,3 +31,6 @@
 #data_table thead th.editmode {}
 #data_table .column_actions { display: none; }
 #data_table .editmode .column_actions { display: block; }
+
+.navbar .nav > li > a.save-ready    { color: #468847; }
+.navbar .nav > li > a.save-disabled { color: #b94a48; }

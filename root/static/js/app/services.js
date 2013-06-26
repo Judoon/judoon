@@ -1,6 +1,6 @@
 angular.module('judoonServices',['ngResource'])
     .factory('Page', function($resource) {
-        return $resource('/api/page/:pageId', {}, {
-            query: {method: 'GET', params: {pageId:'???'}, isArray: true}
+        return $resource('/api/page/:id', {id: '@id'}, {
+            update: {method: 'PUT'}
         });
     });

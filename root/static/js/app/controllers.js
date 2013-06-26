@@ -8,7 +8,7 @@ function PageCtrl($scope, Page) {
 
     $scope.pageId = 49;
     $scope.pageLoaded = 0;
-    $scope.page = Page.get({pageId: $scope.pageId}, function (page) {
+    $scope.page = Page.get({id: $scope.pageId}, function (page) {
         for (var idx in page.columns) {
             page.columns[idx].compiled = Handlebars.compile(
                 page.columns[idx].template
@@ -18,9 +18,17 @@ function PageCtrl($scope, Page) {
     });
 
     $scope.pageDirty = 0;
-    $scope.$watch('page', function () { if ($pageLoaded) { $scope.pageDirty = 1; } },);
+    $scope.$watch('page', function () { if ($scope.pageLoaded) { $scope.pageDirty = 1; } });
 
-    $scope.update = function(){Page.update($scope.page);}
+    $scope.updatePage = function(){
+        Page.update({
+            id:         $scope.pageId,
+            title:      $scope.page.title,
+            preamble:   $scope.page.preamble,
+            postamble:  $scope.page.postamble,
+            dataset_id: $scope.page.dataset_id,
+        });
+    };
 
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {
