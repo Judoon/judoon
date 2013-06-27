@@ -30,9 +30,9 @@ function PageCtrl($scope, $routeParams, Page) {
         });
     };
 
-
+    var emptyTemplate = Handlebars.compile('');
     $scope._addColumn = function(columnTitle) {
-        var newColumn = {title: columnTitle, template: ''};
+        var newColumn = {title: columnTitle, template: '', compiled: emptyTemplate};
         $scope.page.columns.push(newColumn);
         return newColumn;
     };

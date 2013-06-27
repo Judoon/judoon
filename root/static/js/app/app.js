@@ -7,33 +7,62 @@ judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvi
 }]);
 
 
-judoonApp.directive('judoonTable', function() {
-    return function($scope, element, attrs) {
-        $scope.$watch('pageLoaded', function() {
-            if (!$scope.pageLoaded) {
-                return;
-            }
+judoonApp.directive('judoonTable', function($timeout) {
+    return {
+        link: function($scope, element, attrs) {
 
-            // apply DataTable options, use defaults if none specified by user
-            var options = {
-                "bAutoWidth": false,
-                "bServerSide": true,
-                "bProcessing" : true,
-                "sPaginationType": "bootstrap",
-                "bDeferRender" : true
+            var dataTable;
+            var defaultOptions = {
+                "bAutoWidth"      : false,
+                "bServerSide"     : true,
+                "bProcessing"     : true,
+                "sPaginationType" : "bootstrap",
+                "bDeferRender"    : true,
+                "fnServerData"    : $scope.getServerData
             };
 
-            options["aoColumns"] = [];
-            for (idx in $scope.page.columns) {
-                options["aoColumns"][idx] = $scope.page.columns[idx].title;
+            var dataset_id;
+
+            function rebuildTable() {
+                if (dataTable) {
+                    dataTable.fnDestroy();
+                }
+
+                var tableOptions = {};
+                for (var prop in defaultOptions) {
+                    if (defaultOptions.hasOwnProperty(prop)) {
+                        tableOptions[prop] = defaultOptions[prop];
+                    }
+                }
+
+
+                tableOptions["aoColumns"] = [];
+                for (idx in $scope.page.columns) {
+                    tableOptions["aoColumns"][idx] = $scope.page.columns[idx].title;
+                }
+
+                dataTable = element.dataTable(tableOptions);
             }
 
-            options["sAjaxSource"] = "/api/datasetdata/" + $scope.page.dataset_id;
-            options["fnServerData"] = $scope.getServerData;
 
-            // apply the plugin
-            var dataTable = element.dataTable(options);
-        });
+            $scope.$watch('pageLoaded', function() {
+                if (!$scope.pageLoaded) {
+                    return;
+                }
+
+                // this won't change over life of the directive
+                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + $scope.page.dataset_id;
+            });
+
+            $scope.$watch('page.columns', function() {
+                if (!$scope.pageLoaded) {
+                    return; // too soon.
+                }
+
+                // run rebuild table after digest
+                $timeout(function() { rebuildTable(); }, 0, false);
+            }, true);
+        }
     };
 });
 
