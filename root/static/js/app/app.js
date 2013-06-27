@@ -19,7 +19,8 @@ judoonApp.directive('judoonTable', function() {
                 "bAutoWidth": false,
                 "bServerSide": true,
                 "bProcessing" : true,
-                "sPaginationType": "bootstrap"
+                "sPaginationType": "bootstrap",
+                "bDeferRender" : true
             };
 
             options["aoColumns"] = [];

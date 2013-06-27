@@ -49,10 +49,10 @@
   <br>
 
   <div ng-show="editmode" class="table_edit_ctrls well well-small" ng-controller="ColumnCtrl">
-    <form style="display: inline-block; margin-bottom: 5px;">
+    <form ng-submit="addColumn()" style="display: inline-block; margin-bottom: 5px;">
       <h6>Add new column</h6>
       <div class="input-append">
-        <input type="text" placeholder="Column name">
+        <input type="text" placeholder="Column name" required  ng-model="newColumnName">
         <button type="submit" class="btn">Add</button>
       </div>
     </form>
@@ -66,7 +66,23 @@
       </div>
     </form>
     <hr>
-    <p class="text-center muted">No column selected.</p>
+
+    <form ng-show="currentColumn">
+      <div class="control-group">
+        <label class="control-label" for="page.title">Title: </label>
+        <div class="controls">
+          <input type="text" class="input-block-level" required name="page.title" id="page.title" ng-model="currentColumn.title">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="page.layout">Layout: </label>
+        <div class="controls">
+          <input type="text" class="input-block-level" name="page.layout" id="page.layout" ng-model="currentColumn.template">
+        </div>
+      </div>
+    </form>
+    <p ng-show="!currentColumn" class="text-center muted">No column selected.</p>
   </div>
 
   <table judoon-table="" id="data_table" class="table table-striped table-condensed table-bordered">
