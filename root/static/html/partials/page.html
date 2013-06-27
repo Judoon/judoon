@@ -62,7 +62,15 @@
       <div class="input-append">
         <select ng-model="currentColumn" ng-options="c.title for c in page.columns">
         </select>
-        <button type="submit" class="btn">Update</button>
+      </div>
+    </form>
+    <span style="margin-left: 2em; margin-right: 2em;">-or-</span>
+    <form style="display: inline-block; margin-bottom: 5px;">
+      <h6 class="text-warning">Delete a column</h6>
+      <div class="input-append">
+        <select ng-model="deleteColumn" ng-options="c.title for c in page.columns">
+        </select>
+        <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
       </div>
     </form>
     <hr>

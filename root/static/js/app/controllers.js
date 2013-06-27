@@ -36,10 +36,18 @@ function PageCtrl($scope, $routeParams, Page) {
         $scope.page.columns.push(newColumn);
         return newColumn;
     };
-
     $scope.$watch('page.columns', function() {
         compile_templates($scope.page.columns);
     }, true);
+
+
+    $scope._rmColumn = function(deleteColumn) {
+        for (var idx in $scope.page.columns) {
+            if ($scope.page.columns[idx] === deleteColumn) {
+                $scope.page.columns.splice(idx, 1);
+            }
+        }
+    };
 
 
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
@@ -82,10 +90,26 @@ function ColumnCtrl($scope) {
 
     $scope.currentColumn;
     $scope.newColumnName;
-
+    $scope.deleteColumn;
 
     $scope.addColumn = function () {
         $scope.currentColumn = $scope.$parent._addColumn($scope.newColumnName);
+    }
+
+
+    $scope.removeColumn = function() {
+        if (!$scope.deleteColumn) {
+            return false;
+        }
+
+        var deleteColumn = confirm("Are you sure you want to delete this column?");
+        if (deleteColumn) {
+            if ($scope.currentColumn === $scope.deleteColumn) {
+                $scope.currentColumn = null;
+            }
+
+            $scope.$parent._rmColumn($scope.deleteColumn);
+        }
     }
 }
 
