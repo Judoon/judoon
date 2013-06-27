@@ -112,26 +112,7 @@
     </div>
 
       <script src="/static/js/vendor/bootstrap.min.js"></script>
-
       <script src="/static/js/plugins.js"></script>
-
-      [% FOREACH p_column IN page_column.list %]
-      <script id="column_tmpl_[% loop.count %]" class="column_tmpl" type="text/x-handlebars-template">
-        [% p_column.js_template %]
-      </script>
-      [% END %]
-
-      <script id="edit_console_tmpl" type="text/x-handlebars-template">
-        <tbody id="column_edit_console">
-          <tr class="odd" style="background-color: #fff;">
-            <td colspan="[% page_column.list.size %]">
-              <div class="well"><p>Close your eyes and pretend I'm a column editor.</p></div>
-              <div class="pull-right"><a class="btn btn-mini" onclick="close_column_editor(); return false;"><i class="icon-remove"></i></a></div>
-            </td>
-          </tr>
-        </tbody>
-      </script>
-
       <script src="/static/js/vendor/jquery.dataTables.js"></script>
       <script src="/static/js/vendor/dataTables.bootstrap.js"></script>
       <script src="/static/js/vendor/datatables/ColReorder.min.js"></script>
