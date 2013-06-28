@@ -74,11 +74,9 @@ function PageCtrl($scope, $routeParams, Page) {
 
     function compile_templates(columns) { 
         for (var idx in columns) {
-            if (columns[idx].template) {
-                columns[idx].compiled = Handlebars.compile(
-                    columns[idx].template
-                );
-            }
+            columns[idx].compiled = Handlebars.compile(
+                columns[idx].template
+            );
         }
     }
 
