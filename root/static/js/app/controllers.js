@@ -9,7 +9,6 @@ function PageCtrl($scope, $routeParams, Page) {
     $scope.pageId = $routeParams.pageId;
     $scope.pageLoaded = 0;
     $scope.page = Page.get({id: $scope.pageId}, function (page) {
-        compile_templates(page.columns);
         $scope.pageLoaded = 1;
     });
 
@@ -30,16 +29,11 @@ function PageCtrl($scope, $routeParams, Page) {
         });
     };
 
-    var emptyTemplate = Handlebars.compile('');
     $scope._addColumn = function(columnTitle) {
-        var newColumn = {title: columnTitle, template: '', compiled: emptyTemplate};
+        var newColumn = {title: columnTitle, template: ''};
         $scope.page.columns.push(newColumn);
         return newColumn;
     };
-    $scope.$watch('page.columns', function() {
-        compile_templates($scope.page.columns);
-    }, true);
-
 
     $scope._rmColumn = function(deleteColumn) {
         for (var idx in $scope.page.columns) {
@@ -49,7 +43,6 @@ function PageCtrl($scope, $routeParams, Page) {
         }
     };
 
-
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {
             "dataType": "json",
@@ -58,11 +51,20 @@ function PageCtrl($scope, $routeParams, Page) {
             "data": aoData,
             "success": [
                 function(data) {
+                    var templates = [];
+                    for (var idx in $scope.page.columns) {
+                        templates.push(
+                            Handlebars.compile(
+                                $scope.page.columns[idx].template
+                            )
+                        );
+                    }
+
                     var new_data = [];
                     for (var i = 0; i < data.tmplData.length; i++) {
                         new_data[i] = [];
-                        for (var j = 0; j < $scope.page.columns.length; j++) {
-                            new_data[i][j] = $scope.page.columns[j].compiled(data.tmplData[i]);
+                        for (var j = 0; j < templates.length; j++) {
+                            new_data[i][j] = templates[j](data.tmplData[i]);
                         }
                     }
                     data.aaData = new_data;
@@ -71,16 +73,6 @@ function PageCtrl($scope, $routeParams, Page) {
             ],
         } );
     };
-
-    function compile_templates(columns) { 
-        for (var idx in columns) {
-            columns[idx].compiled = Handlebars.compile(
-                columns[idx].template
-            );
-        }
-    }
-
-
 }
 
 
