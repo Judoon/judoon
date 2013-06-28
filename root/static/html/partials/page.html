@@ -48,7 +48,8 @@
   <div judoon-ck ck-edit-type="block" ng-class="{edit_outline: editmode}" id="page_preamble" ng-model="page.preamble" contenteditable="true" class="editable block_editable" ng-bind-html="page.preamble"></div>
   <br>
 
-  <div ng-show="editmode" class="table_edit_ctrls well well-small" ng-controller="ColumnCtrl">
+  <div ng-controller="ColumnCtrl">
+  <div ng-show="editmode" class="table_edit_ctrls well well-small">
     <form ng-submit="addColumn()" style="display: inline-block; margin-bottom: 5px;">
       <h6>Add a new column</h6>
       <div class="input-append">
@@ -69,6 +70,7 @@
       <h6 class="text-warning">Delete a column</h6>
       <div class="input-append">
         <select ng-model="deleteColumn" ng-options="c.title for c in page.columns">
+          <option value=""></option>
         </select>
         <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
       </div>
@@ -95,11 +97,12 @@
 
   <table judoon-table="" id="data_table" class="table table-striped table-condensed table-bordered">
     <thead>
-      <th ng-repeat="column in page.columns">{{ column.title }}</th>
+      <th ng-class="{highlight: editmode&&column.title==currentColumn.title, 'highlight-danger': editmode&&column==deleteColumn}" ng-repeat="column in page.columns">{{ column.title }}</th>
     </thead>
     <tbody>
     </tbody>
   </table>
+  </div>
 
   <br>
 
