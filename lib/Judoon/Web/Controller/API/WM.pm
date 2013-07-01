@@ -57,14 +57,15 @@ sub datasets : Chained('dataset_base') PathPart('') Args(0) ActionClass('FromPSG
 }
 sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
-    $c->stash->{dataset_id} = $id;
+
+    $c->stash->{dataset_id}     = $id;
+    $c->stash->{dataset_object} = $c->stash->{dataset_rs}->find({id => $id});
 }
 sub dataset : Chained('dataset_id') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
-    my $item = $c->stash->{dataset_rs}->find($c->stash->{dataset_id});
     return $self->wm(
         $c, 'Judoon::API::Resource::Dataset', {
-            item     => $item,
+            item     => $c->stash->{dataset_object},
             writable => !!$c->stash->{authd_user},
         }
     );
@@ -74,8 +75,7 @@ sub dataset : Chained('dataset_id') PathPart('') Args(0) ActionClass('FromPSGI')
 
 sub dscol_base : Chained('dataset_id') PathPart('column') CaptureArgs(0) {
     my ($self, $c) = @_;
-    $c->stash->{dscol_rs} = $c->stash->{dataset_rs}
-        ->related_resultset('ds_columns');
+    $c->stash->{dscol_rs} = $c->stash->{dataset_object}->ds_columns_ordered;
 }
 sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
@@ -126,17 +126,15 @@ sub pages : Chained('page_base') PathPart('') Args(0) ActionClass('FromPSGI') {
 }
 sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
-    $c->stash->{page_id} = $id;
+
+    $c->stash->{page_id}     = $id;
+    $c->stash->{page_object} = $c->stash->{page_rs}->find({id => $id});
 }
 sub page : Chained('page_id') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
-
-    my $item = $c->stash->{page_rs}->find(
-        {id => $c->stash->{page_id}}
-    );
     return $self->wm(
         $c, 'Judoon::API::Resource::Page', {
-            item     => $item,
+            item     => $c->stash->{page_object},
             writable => !!$c->stash->{authd_user},
         }
     );
@@ -145,8 +143,7 @@ sub page : Chained('page_id') PathPart('') Args(0) ActionClass('FromPSGI') {
 
 sub pagecol_base : Chained('page_id') PathPart('column') CaptureArgs(0) {
     my ($self, $c) = @_;
-    $c->stash->{pagecol_rs} = $c->stash->{page_rs}
-        ->related_resultset('page_columns');
+    $c->stash->{pagecol_rs} = $c->stash->{page_object}->page_columns_ordered;
     return;
 }
 sub pagecols : Chained('pagecol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
