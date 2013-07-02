@@ -338,7 +338,6 @@ sub TO_JSON {
     return {
         nbr_rows    => 0+$self->nbr_rows,
         nbr_columns => 0+$self->nbr_columns,
-        columns => [ map {$_->TO_JSON} $self->page_columns_ordered->all],
         %{ $self->next::method },
     };
 }
