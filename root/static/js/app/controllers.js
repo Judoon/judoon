@@ -12,6 +12,7 @@ function PageCtrl($scope, $routeParams, Page, PageColumn) {
     Page.get({id: $scope.pageId}, function (page) {
         $scope.page = page;
         $scope.pageLoaded = 1;
+        $scope.pageOriginal = angular.copy($scope.page);
     });
 
     $scope.pageDirty = 0;

@@ -7,7 +7,7 @@ judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvi
 }]);
 
 
-judoonApp.directive('judoonTable', function($timeout) {
+judoonApp.directive('judoonDataTable', function($timeout) {
     return {
         link: function(scope, element, attrs) {
 
@@ -59,7 +59,7 @@ judoonApp.directive('judoonTable', function($timeout) {
     };
 });
 
-judoonApp.directive('judoonCk', function() {
+judoonApp.directive('judoonCkeditor', function() {
     return {
         link: function(scope, elm, attr) {
             var ckConfig;
