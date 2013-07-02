@@ -17,15 +17,6 @@ has writable => (
    is => 'ro',
 );
 
-has post_redirect_template => (
-   is      => 'ro',
-   lazy    => 1,
-   builder => '_build_post_redirect_template',
-);
-sub _build_post_redirect_template {
-   $_[0]->request->request_uri . '%i'
-}
-
 sub allowed_methods {
    [
       qw(GET HEAD),
@@ -48,7 +39,6 @@ sub to_json {
 }
 sub render_item { $_[1]->TO_JSON; }
 
-
 sub from_json {
     my ($self) = @_;
     $self->request->env->{'psgix.input.buffered'} = 1;
@@ -59,20 +49,6 @@ sub from_json {
         )
     );
     $self->_set_obj($obj);
-    $self->redirect_to_new_resource($obj);
-}
-
-sub redirect_to_new_resource {
-    my $self = shift;
-    $self->response->header(
-        Location => $self->_post_redirect($_[0])
-    );
-}
-
-sub _post_redirect {
-   sprintf $_[0]->post_redirect_template,
-      map $_[1]->get_column($_),
-         $_[1]->result_source->primary_columns
 }
 
 sub create_resource { $_[0]->set->create($_[1]) }
