@@ -28,18 +28,11 @@ judoonApp.directive('judoonTable', function($timeout) {
                     dataTable.fnDestroy();
                 }
 
-                var tableOptions = {};
-                for (var prop in defaultOptions) {
-                    if (defaultOptions.hasOwnProperty(prop)) {
-                        tableOptions[prop] = defaultOptions[prop];
-                    }
-                }
-
-
+                var tableOptions = angular.copy(defaultOptions);
                 tableOptions["aoColumns"] = [];
-                for (idx in $scope.page.columns) {
-                    tableOptions["aoColumns"][idx] = $scope.page.columns[idx].title;
-                }
+                angular.forEach($scope.page.columns, function (value, key) {
+                    tableOptions["aoColumns"][key] = value.title;
+                } );
 
                 dataTable = element.dataTable(tableOptions);
             }

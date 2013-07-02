@@ -38,13 +38,9 @@ function PageCtrl($scope, $routeParams, Page) {
             "success": [
                 function(data) {
                     var templates = [];
-                    for (var idx in $scope.page.columns) {
-                        templates.push(
-                            Handlebars.compile(
-                                $scope.page.columns[idx].template
-                            )
-                        );
-                    }
+                    angular.forEach($scope.page.columns, function (value, key) {
+                        templates.push( Handlebars.compile(value.template) );
+                    } );
 
                     var new_data = [];
                     for (var i = 0; i < data.tmplData.length; i++) {
@@ -104,15 +100,15 @@ function ColumnCtrl($scope, PageColumn) {
             PageColumn.delete(
                 {}, {page_id: $scope.deleteColumn.page_id, id: $scope.deleteColumn.id},
                 function() {
-                    if ($scope.currentColumn === $scope.deleteColumn) {
+                    if (angular.equals($scope.currentColumn, $scope.deleteColumn)) {
                         $scope.currentColumn = null;
                     }
 
-                    for (var idx in $scope.$parent.page.columns) {
-                        if ($scope.$parent.page.columns[idx] === $scope.deleteColumn) {
-                            $scope.$parent.page.columns.splice(idx, 1);
+                    angular.forEach($scope.$parent.page.columns, function (value, key) {
+                        if ( angular.equals(value, $scope.deleteColumn) ) {
+                            $scope.$parent.page.columns.splice(key, 1);
                         }
-                    }
+                    } );
                 }
             );
         }
