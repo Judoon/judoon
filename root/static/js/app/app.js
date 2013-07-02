@@ -9,7 +9,7 @@ judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvi
 
 judoonApp.directive('judoonTable', function($timeout) {
     return {
-        link: function($scope, element, attrs) {
+        link: function(scope, element, attrs) {
 
             var dataTable;
             var defaultOptions = {
@@ -18,7 +18,7 @@ judoonApp.directive('judoonTable', function($timeout) {
                 "bProcessing"     : true,
                 "sPaginationType" : "bootstrap",
                 "bDeferRender"    : true,
-                "fnServerData"    : $scope.getServerData
+                "fnServerData"    : scope.getServerData
             };
 
             var dataset_id;
@@ -30,7 +30,7 @@ judoonApp.directive('judoonTable', function($timeout) {
 
                 var tableOptions = angular.copy(defaultOptions);
                 tableOptions["aoColumns"] = [];
-                angular.forEach($scope.pageColumns, function (value, key) {
+                angular.forEach(scope.pageColumns, function (value, key) {
                     tableOptions["aoColumns"][key] = value.title;
                 } );
 
@@ -38,17 +38,17 @@ judoonApp.directive('judoonTable', function($timeout) {
             }
 
 
-            $scope.$watch('pageLoaded', function() {
-                if (!$scope.pageLoaded) {
+            scope.$watch('pageLoaded', function() {
+                if (!scope.pageLoaded) {
                     return;
                 }
 
                 // this won't change over life of the directive
-                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + $scope.page.dataset_id;
+                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.page.dataset_id;
             });
 
-            $scope.$watch('pageColumns', function() {
-                if (!$scope.pageLoaded) {
+            scope.$watch('pageColumns', function() {
+                if (!scope.pageLoaded) {
                     return; // too soon.
                 }
 
