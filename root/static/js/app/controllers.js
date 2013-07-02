@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-function PageCtrl($scope, $routeParams, Page) {
+function PageCtrl($scope, $routeParams, Page, PageColumn) {
 
     // Attributes
     $scope.editmode = 0;
@@ -21,6 +21,13 @@ function PageCtrl($scope, $routeParams, Page) {
         }
     }, true);
 
+    $scope.newColumnName;
+    $scope.currentColumn;
+    $scope.deleteColumn;
+    PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
+        $scope.pageColumns = columns;
+    });
+
 
     // Methods
     $scope.updatePage = function(){
@@ -31,23 +38,17 @@ function PageCtrl($scope, $routeParams, Page) {
             postamble:  $scope.page.postamble,
             dataset_id: $scope.page.dataset_id,
         });
+
+        angular.forEach($scope.pageColumns, function (value, key) {
+            PageColumn.update({
+                page_id:  value.page_id,
+                id:       value.id,
+                title:    value.title,
+                template: value.template
+            });
+        } );
     };
 
-}
-
-
-function ColumnCtrl($scope, PageColumn) {
-
-    // Attributes
-    $scope.newColumnName;
-    $scope.currentColumn;
-    $scope.deleteColumn;
-    PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
-        $scope.pageColumns = columns;
-    });
-
-
-    // Methods
     $scope.addColumn = function() {
         var newColumn = {
             title: $scope.newColumnName,

@@ -48,7 +48,6 @@
   <div judoon-ck ck-edit-type="block" ng-class="{edit_outline: editmode}" id="page_preamble" ng-model="page.preamble" contenteditable="true" class="editable block_editable" ng-bind-html="page.preamble"></div>
   <br>
 
-  <div ng-controller="ColumnCtrl">
   <div ng-show="editmode" class="table_edit_ctrls well well-small">
     <form ng-submit="addColumn()" style="display: inline-block; margin-bottom: 5px;">
       <h6>Add a new column</h6>
@@ -104,7 +103,6 @@
     <tbody>
     </tbody>
   </table>
-  </div>
 
   <br>
 
