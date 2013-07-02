@@ -10,28 +10,47 @@ function PageCtrl($scope, $routeParams, Page, PageColumn) {
     $scope.pageId = $routeParams.pageId;
     $scope.pageLoaded = 0;
     Page.get({id: $scope.pageId}, function (page) {
+        $scope.pageOriginal = angular.copy(page);
         $scope.page = page;
         $scope.pageLoaded = 1;
-        $scope.pageOriginal = angular.copy($scope.page);
     });
-
     $scope.pageDirty = 0;
     $scope.$watch('page', function () {
-        if ($scope.pageLoaded) {
+        if (!$scope.pageLoaded || $scope.pageDirty) {
+            return;
+        }
+
+        if (!angular.equals($scope.page, $scope.pageOriginal)) {
             $scope.pageDirty = 1;
         }
     }, true);
+
 
     $scope.newColumnName;
     $scope.currentColumn;
     $scope.deleteColumn;
     PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
+        $scope.pageColumnsOriginal = angular.copy(columns);
         $scope.pageColumns = columns;
+        $scope.pageColumnsLoaded = 1;
     });
+    $scope.$watch('pageColumns', function () {
+        if (!$scope.pageColumnsLoaded || $scope.pageDirty) {
+            return;
+        }
+
+        if (!angular.equals($scope.pageColumns, $scope.pageColumnsOriginal)) {
+            $scope.pageDirty = 1;
+        }
+    }, true);
 
 
     // Methods
-    $scope.updatePage = function(){
+    $scope.updatePage = function() {
+        if (!$scope.pageDirty) {
+            return;
+        }
+
         Page.update({
             id:         $scope.pageId,
             title:      $scope.page.title,
@@ -48,6 +67,10 @@ function PageCtrl($scope, $routeParams, Page, PageColumn) {
                 template: value.template
             });
         } );
+
+        $scope.pageDirty = 0;
+        $scope.pageOriginal = angular.copy($scope.page);
+        $scope.pageColumnsOriginal = angular.copy($scope.pageColumns);
     };
 
     $scope.addColumn = function() {

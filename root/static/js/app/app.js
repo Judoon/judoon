@@ -48,7 +48,7 @@ judoonApp.directive('judoonDataTable', function($timeout) {
             });
 
             scope.$watch('pageColumns', function() {
-                if (!scope.pageLoaded) {
+                if (!scope.pageColumnsLoaded || !scope.pageLoaded) {
                     return; // too soon.
                 }
 
