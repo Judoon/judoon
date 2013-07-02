@@ -1,8 +1,8 @@
 'use strict';
 
-/* Controllers */
+var judoonCtrl = angular.module('judoon.controllers', []);
 
-function PageCtrl($scope, $routeParams, Page, PageColumn) {
+judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', function ($scope, $routeParams, Page, PageColumn) {
 
     // Attributes
     $scope.editmode = 0;
@@ -137,5 +137,5 @@ function PageCtrl($scope, $routeParams, Page, PageColumn) {
         } );
     };
 
-}
+}]);
 
