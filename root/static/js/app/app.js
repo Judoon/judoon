@@ -30,7 +30,7 @@ judoonApp.directive('judoonTable', function($timeout) {
 
                 var tableOptions = angular.copy(defaultOptions);
                 tableOptions["aoColumns"] = [];
-                angular.forEach($scope.page.columns, function (value, key) {
+                angular.forEach($scope.pageColumns, function (value, key) {
                     tableOptions["aoColumns"][key] = value.title;
                 } );
 
@@ -47,7 +47,7 @@ judoonApp.directive('judoonTable', function($timeout) {
                 defaultOptions["sAjaxSource"] = "/api/datasetdata/" + $scope.page.dataset_id;
             });
 
-            $scope.$watch('page.columns', function() {
+            $scope.$watch('pageColumns', function() {
                 if (!$scope.pageLoaded) {
                     return; // too soon.
                 }

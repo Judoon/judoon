@@ -4,11 +4,13 @@
 
 function PageCtrl($scope, $routeParams, Page) {
 
+    // Attributes
     $scope.editmode = 0;
 
     $scope.pageId = $routeParams.pageId;
     $scope.pageLoaded = 0;
-    $scope.page = Page.get({id: $scope.pageId}, function (page) {
+    Page.get({id: $scope.pageId}, function (page) {
+        $scope.page = page;
         $scope.pageLoaded = 1;
     });
 
@@ -19,6 +21,8 @@ function PageCtrl($scope, $routeParams, Page) {
         }
     }, true);
 
+
+    // Methods
     $scope.updatePage = function(){
         Page.update({
             id:         $scope.pageId,
@@ -27,6 +31,58 @@ function PageCtrl($scope, $routeParams, Page) {
             postamble:  $scope.page.postamble,
             dataset_id: $scope.page.dataset_id,
         });
+    };
+
+}
+
+
+function ColumnCtrl($scope, PageColumn) {
+
+    // Attributes
+    $scope.newColumnName;
+    $scope.currentColumn;
+    $scope.deleteColumn;
+    PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
+        $scope.pageColumns = columns;
+    });
+
+
+    // Methods
+    $scope.addColumn = function() {
+        var newColumn = {
+            title: $scope.newColumnName,
+            template: '',
+            page_id: $scope.pageId
+        };
+
+        PageColumn.saveAndFetch(newColumn, function(fullCol) {
+            $scope.pageColumns.push(fullCol);
+            $scope.currentColumn = fullCol;
+        } );
+    };
+
+    $scope.removeColumn = function() {
+        if (!$scope.deleteColumn) {
+            return false;
+        }
+
+        var confirmed = confirm("Are you sure you want to delete this column?");
+        if (confirmed) {
+            PageColumn.delete(
+                {}, {page_id: $scope.pageId, id: $scope.deleteColumn.id},
+                function() {
+                    if (angular.equals($scope.currentColumn, $scope.deleteColumn)) {
+                        $scope.currentColumn = null;
+                    }
+
+                    angular.forEach($scope.pageColumns, function (value, key) {
+                        if ( angular.equals(value, $scope.deleteColumn) ) {
+                            $scope.pageColumns.splice(key, 1);
+                        }
+                    } );
+                }
+            );
+        }
     };
 
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
@@ -38,7 +94,7 @@ function PageCtrl($scope, $routeParams, Page) {
             "success": [
                 function(data) {
                     var templates = [];
-                    angular.forEach($scope.page.columns, function (value, key) {
+                    angular.forEach($scope.pageColumns, function (value, key) {
                         templates.push( Handlebars.compile(value.template) );
                     } );
 
@@ -55,51 +111,6 @@ function PageCtrl($scope, $routeParams, Page) {
             ],
         } );
     };
-}
 
-
-function ColumnCtrl($scope, PageColumn) {
-
-    $scope.newColumnName;
-    $scope.currentColumn;
-    $scope.deleteColumn;
-
-
-    $scope.addColumn = function() {
-        var newColumn = {
-            title: $scope.newColumnName,
-            template: '',
-            page_id: $scope.pageId
-        };
-
-        PageColumn.saveAndFetch(newColumn, function(fullCol) {
-            $scope.$parent.page.columns.push(fullCol);
-            $scope.currentColumn = fullCol;
-        } );
-    };
-
-    $scope.removeColumn = function() {
-        if (!$scope.deleteColumn) {
-            return false;
-        }
-
-        var confirmed = confirm("Are you sure you want to delete this column?");
-        if (confirmed) {
-            PageColumn.delete(
-                {}, {page_id: $scope.deleteColumn.page_id, id: $scope.deleteColumn.id},
-                function() {
-                    if (angular.equals($scope.currentColumn, $scope.deleteColumn)) {
-                        $scope.currentColumn = null;
-                    }
-
-                    angular.forEach($scope.$parent.page.columns, function (value, key) {
-                        if ( angular.equals(value, $scope.deleteColumn) ) {
-                            $scope.$parent.page.columns.splice(key, 1);
-                        }
-                    } );
-                }
-            );
-        }
-    };
 }
 

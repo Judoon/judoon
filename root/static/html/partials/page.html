@@ -61,7 +61,7 @@
     <form style="display: inline-block; margin-bottom: 5px;">
       <h6>Update an existing column</h6>
       <div class="input-append">
-        <select ng-model="currentColumn" ng-options="c.title for c in page.columns">
+        <select ng-model="currentColumn" ng-options="c.title for c in pageColumns">
           <option value=""></option>
         </select>
       </div>
@@ -70,7 +70,7 @@
     <form style="display: inline-block; margin-bottom: 5px;">
       <h6 class="text-warning">Delete a column</h6>
       <div class="input-append">
-        <select ng-model="deleteColumn" ng-options="c.title for c in page.columns">
+        <select ng-model="deleteColumn" ng-options="c.title for c in pageColumns">
           <option value=""></option>
         </select>
         <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
@@ -99,7 +99,7 @@
 
   <table judoon-table="" id="data_table" class="table table-striped table-condensed table-bordered">
     <thead>
-      <th ng-class="{highlight: editmode&&column.title==currentColumn.title, 'highlight-danger': editmode&&column==deleteColumn}" ng-repeat="column in page.columns">{{ column.title }}</th>
+      <th ng-class="{highlight: editmode&&column.title==currentColumn.title, 'highlight-danger': editmode&&column==deleteColumn}" ng-repeat="column in pageColumns">{{ column.title }}</th>
     </thead>
     <tbody>
     </tbody>
