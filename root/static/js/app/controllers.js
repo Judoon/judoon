@@ -58,10 +58,10 @@ function PageCtrl($scope, $routeParams, Page) {
 }
 
 
-function ColumnCtrl($scope, PageColumn, $http) {
+function ColumnCtrl($scope, PageColumn) {
 
-    $scope.currentColumn;
     $scope.newColumnName;
+    $scope.currentColumn;
     $scope.deleteColumn;
 
 
@@ -72,17 +72,10 @@ function ColumnCtrl($scope, PageColumn, $http) {
             page_id: $scope.pageId
         };
 
-        PageColumn.save(newColumn, function(data, getResponseHeaders) {
-            var headers = getResponseHeaders();
-            $http.get(headers.location).success(
-                function(fullCol) {
-                    $scope.$parent.page.columns.push(fullCol);
-                    $scope.currentColumn = fullCol;
-                }
-            );
+        PageColumn.saveAndFetch(newColumn, function(fullCol) {
+            $scope.$parent.page.columns.push(fullCol);
+            $scope.currentColumn = fullCol;
         } );
-
-        var thonk = 3;
     };
 
     $scope.removeColumn = function() {

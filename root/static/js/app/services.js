@@ -15,14 +15,11 @@ judoonSrv.factory('PageColumn', function($resource, $http) {
         }
     );
 
-    angular.extend(PageCol.prototype, {
-        saveAndFetch: function(column, cb) {
-            this.$save(column, function(data,  getResponseHeaders) {
-                var headers = getResponseHeaders();
-                $http.get(headers.location).success(cb);
-            });
-        }
-    });
+    PageCol.saveAndFetch = function(column, cb) {
+        this.save(column, function(data,  getResponseHeaders) {
+            $http.get(getResponseHeaders('Location')).success(cb);
+        });
+    };
 
     return PageCol;
 });
