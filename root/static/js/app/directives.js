@@ -16,8 +16,6 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 "fnServerData"    : scope.getServerData
             };
 
-            var dataset_id;
-
             function rebuildTable() {
                 if (dataTable) {
                     dataTable.fnDestroy();
@@ -33,13 +31,14 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
             }
 
 
-            scope.$watch('pageLoaded', function() {
+            var unbindDsIdWatch = scope.$watch('pageLoaded', function() {
                 if (!scope.pageLoaded) {
                     return;
                 }
 
                 // this won't change over life of the directive
                 defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.page.dataset_id;
+                unbindDsIdWatch();
             });
 
             scope.$watch('pageColumns', function() {
