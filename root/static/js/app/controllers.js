@@ -110,6 +110,50 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
         }
     };
 
+    $scope.firstColumn = function() {
+        return $scope.pageColumns && angular.equals($scope.currentColumn, $scope.pageColumns[0]);
+    };
+
+    $scope.lastColumn = function() {
+        return $scope.pageColumns && angular.equals(
+            $scope.currentColumn,
+            $scope.pageColumns[ $scope.pageColumns.length - 1 ]
+        );
+    };
+
+    $scope.currentIdx = function() {
+        var idx;
+        for (idx=0; idx<$scope.pageColumns.length; idx++) {
+            if (angular.equals($scope.currentColumn, $scope.pageColumns[idx])) {
+                break;
+            }
+        }
+        return idx;
+    };
+
+    $scope.columnLeft = function() {
+        if ($scope.firstColumn()) {
+            return;
+        }
+
+        var currentIdx = $scope.currentIdx();
+        $scope.pageColumns[currentIdx] = $scope.pageColumns.splice(
+            currentIdx-1, 1, $scope.pageColumns[currentIdx]
+        )[0];
+    };
+
+    $scope.columnRight = function() {
+        if ($scope.lastColumn()) {
+            return;
+        }
+
+        var currentIdx = $scope.currentIdx();
+        $scope.pageColumns[currentIdx] = $scope.pageColumns.splice(
+            currentIdx+1, 1, $scope.pageColumns[currentIdx]
+        )[0];
+    };
+
+
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {
             "dataType": "json",

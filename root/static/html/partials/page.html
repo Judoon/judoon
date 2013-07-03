@@ -49,6 +49,7 @@
   <br>
 
   <div ng-show="editmode" class="table_edit_ctrls well well-small">
+
     <form ng-submit="addColumn()" style="display: inline-block; margin-bottom: 5px;">
       <h6>Add a new column</h6>
       <div class="input-append">
@@ -56,7 +57,9 @@
         <button type="submit" class="btn">Add</button>
       </div>
     </form>
+
     <span style="margin-left: 2em; margin-right: 2em;">-or-</span>
+
     <form style="display: inline-block; margin-bottom: 5px;">
       <h6>Update an existing column</h6>
       <div class="input-append">
@@ -65,7 +68,9 @@
         </select>
       </div>
     </form>
+
     <span style="margin-left: 2em; margin-right: 2em;">-or-</span>
+
     <form style="display: inline-block; margin-bottom: 5px;">
       <h6 class="text-warning">Delete a column</h6>
       <div class="input-append">
@@ -91,6 +96,11 @@
         <div class="controls">
           <input type="text" class="span6" name="page.layout" id="page.layout" ng-model="currentColumn.template">
         </div>
+      </div>
+
+      <div class="control-group">
+        <a href="#" ng-click="columnLeft()"  ng-class="{disabled: firstColumn()}" class="btn"><i class="icon-arrow-left"></i> Move Left</a>
+        <a href="#" ng-click="columnRight()" ng-class="{disabled: lastColumn()}" class="btn">Move Right <i class="icon-arrow-right"></i></a>
       </div>
     </form>
     <p ng-show="!currentColumn" class="text-center muted">No column selected.</p>
