@@ -99,8 +99,11 @@
       </div>
 
       <div class="control-group">
-        <a href="#" ng-click="columnLeft()"  ng-class="{disabled: firstColumn()}" class="btn"><i class="icon-arrow-left"></i> Move Left</a>
-        <a href="#" ng-click="columnRight()" ng-class="{disabled: lastColumn()}" class="btn">Move Right <i class="icon-arrow-right"></i></a>
+        <label class="control-label">Column Positioning: </label>
+        <div class="controls">
+          <a href="#" ng-click="columnLeft()"  ng-class="{disabled: firstColumn()}" class="btn"><i class="icon-arrow-left"></i> Move Left</a>
+          <a href="#" ng-click="columnRight()" ng-class="{disabled: lastColumn()}" class="btn">Move Right <i class="icon-arrow-right"></i></a>
+        </div>
       </div>
     </form>
     <p ng-show="!currentColumn" class="text-center muted">No column selected.</p>
