@@ -125,6 +125,10 @@ sub edit : Chained('id') PathPart('') Args(0) {
                 $page->{nbr_rows}    = $dataset->{nbr_rows};
                 $page->{nbr_columns} = scalar @{$page->{page_columns}};
 
+                $page->{jsapp_url} = $c->uri_for_action(
+                    '/jsapp/page_view',
+                    [$c->stash->{user}{object}->username, $page->{id}],
+                );
                 $page->{edit_url} = $c->uri_for_action(
                     '/private/page/object',
                     [$c->stash->{user}{object}->username, $dataset->{id}, $page->{id}],
