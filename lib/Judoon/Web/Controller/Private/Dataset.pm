@@ -155,7 +155,7 @@ after list_POST => sub {
     my $page = $dataset->create_basic_page();
 
     $c->flash->{welcome_message} = 1;
-    $self->go_here($c, '/fancy/page_view', [$c->user->username, $page->id]);
+    $self->go_here($c, '/jsapp/page_view', [$c->user->username, $page->id]);
 };
 
 

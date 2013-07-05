@@ -5,6 +5,6 @@ var judoonApp = angular.module('judoon', ['judoon.services','judoon.controllers'
 judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
     $locationProvider.html5Mode(true);
     $routeProvider
-        .when('/user/:userName/fancy/page/:pageId', {templateUrl: '/static/html/partials/page.html', controller: 'PageCtrl'})
+        .when('/user/:userName/page/:pageId', {templateUrl: '/static/html/partials/page.html', controller: 'PageCtrl'})
         .otherwise({redirectTo: '/'});
 }]);
