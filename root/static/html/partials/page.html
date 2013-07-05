@@ -5,38 +5,6 @@
         <li ng-class="{active: !editmode}"><a ng-click="editmode = 0" id="preview_mode" href="#">Preview</a></li>
         <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
         <li><a ng-class="{'save-disabled': !pageDirty, 'save-ready': pageDirty}" ng-click="updatePage()" href="#">Save</a></li>
-
-        <li class="divider-vertical"></li>
-        <li><a href="#">New from existing</a></li>
-        <li class="divider-vertical"></li>
-
-        <li><a href="#">Update Source Data</a></li>
-
-        <li class="divider-vertical"></li>
-
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Download <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li class="dropdown-submenu">
-              <a tabindex="-1" href="#">As data</a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Excel (.xls)</a></li>
-                <li><a href="#">Excel (.xlsx)</a></li>
-                <li><a href="#">CSV (.csv)</a></li>
-                <li><a href="#">Tab-separated (.tab)</a></li>
-              </ul>
-            </li>
-
-            <li class="dropdown-submenu">
-              <a tabindex="-1" href="#">As app</a>
-              <ul class="dropdown-menu">
-                <li><a href="#">zip</a></li>
-                <li><a href="#">tar.gz</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li><a href="">Share</a></li>
       </ul>
     </div>
   </div>
