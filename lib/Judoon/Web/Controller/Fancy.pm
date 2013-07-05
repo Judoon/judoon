@@ -30,9 +30,7 @@ sub page_id : Chained('base') PathPart('page') CaptureArgs(1) {
 
 sub page_view : Chained('page_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
-
-    $c->stash->{template} = $c->req->param('angular')
-        ? 'fancy/page-ng.tt2' : 'fancy/page-view.tt2';
+    $c->stash->{template} = 'fancy/page-ng.tt2';
 }
 
 
