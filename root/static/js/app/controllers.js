@@ -14,15 +14,9 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
         $scope.page = page;
         $scope.pageLoaded = 1;
     });
-    $scope.pageDirty = 0;
-    $scope.$watch('page', function () {
-        if (!$scope.pageLoaded || $scope.pageDirty) {
-            return;
-        }
 
-        if (!angular.equals($scope.page, $scope.pageOriginal)) {
-            $scope.pageDirty = 1;
-        }
+    $scope.$watch('page', function () {
+        $scope.pageDirty = !angular.equals($scope.page, $scope.pageOriginal);
     }, true);
 
 
@@ -35,13 +29,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
         $scope.pageColumnsLoaded = 1;
     });
     $scope.$watch('pageColumns', function () {
-        if (!$scope.pageColumnsLoaded || $scope.pageDirty) {
-            return;
-        }
-
-        if (!angular.equals($scope.pageColumns, $scope.pageColumnsOriginal)) {
-            $scope.pageDirty = 1;
-        }
+        $scope.pageDirty = !angular.equals($scope.pageColumns, $scope.pageColumnsOriginal);
     }, true);
 
 
