@@ -1,0 +1,35 @@
+[% extra_js = BLOCK %]
+    <script src="/static/js/vendor/angular/angular.js"></script>
+    <script src="/static/js/vendor/angular/angular-resource.js"></script>
+
+    <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
+    <script src="/static/js/vendor/jquery.dataTables.js"></script>
+    <script src="/static/js/vendor/dataTables.bootstrap.js"></script>
+    <script src="/static/js/vendor/handlebars.min.js"></script>
+
+    <script src="/static/js/app/app.js"></script>
+    <script src="/static/js/app/services.js"></script>
+    <script src="/static/js/app/controllers.js"></script>
+    <script src="/static/js/app/directives.js"></script>
+[% END %]
+[% WRAPPER components/wrapper.tt2
+  title = "Edit Page"
+  extra_javascript = extra_js
+%]
+
+          <div ng-cloak ng-app="judoon">
+            [% IF welcome_message %]
+            [% welcome_spiel = BLOCK %]
+            <p>
+              <strong>Your dataset has been imported.</strong> Here is the page
+              we've created for you.  Click <strong>Edit</strong> above to make
+              changes, or <strong>Share</strong> to make the page public.
+            </p>
+            [% END %]
+            [%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]
+            [% END %]
+
+            <div ng-view></div>
+          </div>
+
+[% END %]

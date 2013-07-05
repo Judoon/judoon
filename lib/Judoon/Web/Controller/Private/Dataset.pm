@@ -152,7 +152,10 @@ before list_POST => sub {
 after list_POST => sub {
     my ($self, $c) = @_;
     my $dataset = $c->req->get_object(0)->[0];
-    $dataset->create_basic_page();
+    my $page = $dataset->create_basic_page();
+
+    $c->flash->{welcome_message} = 1;
+    $self->go_here($c, '/jsapp/page_view', [$c->user->username, $page->id]);
 };
 
 

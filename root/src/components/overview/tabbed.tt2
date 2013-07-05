@@ -75,7 +75,7 @@
             <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
             <td>
               <p style="display: inline-block;">
-                <a href="[% page_obj.edit_url %]">[%- page_obj.title | html -%]</a>
+                <a href="[% page_obj.jsapp_url %]">[%- page_obj.title | html -%]</a>
                 - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
               </p>
               <div class="btn-toolbar pull-right">
@@ -88,16 +88,9 @@
                 <div class="btn-toolbar" style="margin-bottom: 20px;">
                   <div class="btn-group">
                     [%- INCLUDE "components/action_button.tt2"
-                        label         = "Edit"
+                        label         = "Advanced Edit"
                         url           = page_obj.edit_url
                         extra_classes = "action_edit_page"
-                    -%]
-                  </div>
-                  <div class="btn-group">
-                    [%- INCLUDE "components/action_button.tt2"
-                        label         = "Preview"
-                        url           = page_obj.edit_url _ "?view=preview"
-                        extra_classes = "action_preview_page"
                     -%]
                   </div>
                   <div class="btn-group">
