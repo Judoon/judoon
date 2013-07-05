@@ -19,7 +19,7 @@
     background-color: #0064dc;
     padding-left: 0.5em;
     margin-top: 1em;
-    margin-right: 75em;
+    max-width: 15em;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
 }
