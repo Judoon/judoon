@@ -98,7 +98,7 @@ sub is_expired {
 
 =head2 extend
 
-Extened expiry for another default period;
+Extended expiry for another default period;
 
 =cut
 

@@ -80,3 +80,5 @@ subdirectory
 webpage
 Adaptor
 cellmigration
+AngularJS
+utf
