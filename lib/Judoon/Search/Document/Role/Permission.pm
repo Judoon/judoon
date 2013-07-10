@@ -13,3 +13,26 @@ has private => (
 
 1;
 __END__
+
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Search::Document::Role::Permission - Is this Document public?
+
+=head1 DESCRIPTION
+
+A Document that consumes this role can indicate whether it is a public
+or private resource.
+
+=head1 ATTRIBUTES
+
+=head2 private
+
+Boolean.  True if this document is private and should not be search by
+default.
+
+=cut
