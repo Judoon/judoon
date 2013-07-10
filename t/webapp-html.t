@@ -388,12 +388,21 @@ subtest 'Dataset' => sub {
 
     # POST dataset/list
     $mech->get('/user/testuser');
-    my $dataset_uri = add_new_object_ok({
-        object => 'dataset', list_uri => '/user/testuser',
-        form_name => 'add_dataset', form_args => {
+    $mech->submit_form_ok({
+        form_name => 'add_dataset',
+        fields    => {
             'dataset.file' => [$spreadsheets{basic}],
-        }, page_uri_re => qr{/user/testuser/dataset/\d+},
-    });
+        },
+    }, "add new dataset");
+
+    my $new_uri = $mech->uri;
+    my $page_re = qr{/user/testuser/page/(\d+)};
+    like $new_uri, $page_re,
+        qq{sent to default page generated for this dataset};
+    my ($page_id) = ($new_uri =~ $page_re);
+    my $ds_id = t::DB::get_schema()->resultset('Page')->find({id => $page_id})
+        ->dataset_id;
+    my $dataset_uri = "/user/testuser/dataset/$ds_id";
 
     # fixme: PUT dataset/list
     # $mech->put($dataset_list_uri);
@@ -449,6 +458,10 @@ subtest 'DatasetColumns' => sub {
         },
     }, 'Can upload a dataset', );
 
+    my ($page_id) = ($mech->uri =~ m{/user/testuser/page/(\d+)});
+    my $ds_id = t::DB::get_schema()->resultset('Page')->find({id => $page_id})
+        ->dataset_id;
+    $mech->get("/user/testuser/dataset/$ds_id");
 
     # GET datasetcolumn/list
     my $dscol_list_uri = get_link_like_ok("dataset column list",
