@@ -148,7 +148,7 @@ test 'page' => sub {
         my $new_url = $self->mech->res->headers->header('Location');
         $self->_GET_json($new_url);
         my $expected = {
-            %$new_page, permission => 'private', columns => [], nbr_columns => 0,
+            %$new_page, permission => 'private', nbr_columns => 0,
             nbr_rows => 0+$private->{obj}->dataset->nbr_rows,
             dataset_id => 0+$private->{obj}->dataset->id,
             id => 0+($new_url =~ s{.+/}{}r),
@@ -159,7 +159,7 @@ test 'page' => sub {
 
         my $update = { %$expected };
         $update->{title} = "Brand New Title";
-        delete @{ $update }{qw(nbr_columns nbr_rows columns)};
+        delete @{ $update }{qw(nbr_columns nbr_rows)};
         $self->_PUT_json($new_url, $update);
         ok($self->mech->success, 'successfully PUTed update');
         $self->_GET_json($new_url);
