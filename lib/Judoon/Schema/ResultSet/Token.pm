@@ -26,7 +26,7 @@ Find a token with a given value
 
 Find all tokens with a C<password_reset> action.
 
-=head2 access()
+=head2 access_token()
 
 Find all tokens with an C<access> action.
 

@@ -59,3 +59,30 @@ sub index :Chained('base') PathPart('') Args(0) {
 
 __PACKAGE__->meta->make_immutable;
 1;
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::Search - search our site via ElasticSearch
+
+=head1 DESCRIPTION
+
+Search our site and display the results.
+
+=head1 Actions
+
+=head2 base
+
+This does most of the heavy lifting. Performs the search and formats
+the results so that they're suitable for display.
+
+=head2 index
+
+Sets the template.
+
+=cut

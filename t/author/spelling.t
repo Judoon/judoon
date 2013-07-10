@@ -82,3 +82,4 @@ Adaptor
 cellmigration
 AngularJS
 utf
+ElasticSearch
