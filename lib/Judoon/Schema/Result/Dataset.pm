@@ -2,7 +2,7 @@ package Judoon::Schema::Result::Dataset;
 
 =pod
 
-=for stopwords datastore shortnames tablename
+=for stopwords datastore shortnames tablename longname longnames de
 
 =encoding utf8
 
@@ -16,6 +16,7 @@ use Judoon::Schema::Candy;
 use Moo;
 
 
+use Clone qw(clone);
 use Data::UUID;
 use DateTime;
 use Judoon::Error::Devel::Arguments;
@@ -23,6 +24,7 @@ use Judoon::Error::Devel::Impossible;
 use Judoon::Tmpl;
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
+use Text::Unidecode;
 
 
 table 'datasets';
@@ -158,7 +160,7 @@ sub import_from_spreadsheet {
         got      => q{->isa('} . ref($spreadsheet) . q{')},
     }) unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
-    my $table_name = $self->_store_data($spreadsheet);
+    my ($table_name, $fields) = $self->_store_data($spreadsheet);
 
     $self->name($spreadsheet->name);
     $self->tablename($table_name);
@@ -169,9 +171,9 @@ sub import_from_spreadsheet {
     $self->update;
 
     my $sort = 1;
-    for my $field (@{ $spreadsheet->fields }) {
+    for my $field (@$fields) {
         $self->create_related('ds_columns', {
-            name => $field->{name}, shortname => $field->{shortname},
+            name => $field->{longname}, shortname => $field->{shortname},
             sort => $sort++, data_type => $field->{type},
         });
     }
@@ -384,7 +386,13 @@ sub _store_data {
 
     my $schema     = $self->schema_name;
     my $table_name = $self->_gen_table_name( $spreadsheet->name );
-    my @fields     = @{ $spreadsheet->fields };
+
+    my @fields       = @{ clone $spreadsheet->fields };
+    my @unique_names = $self->_unique_names(map {$_->{name}} @fields);
+    for (my $i=0; $i<=$#fields; $i++) {
+        @{$fields[$i]}{qw(longname shortname)} = @{$unique_names[$i]};
+    }
+
     my $sql        = qq{CREATE TABLE "$schema"."$table_name" (\n}
         . join(",\n", map { qq|"$_->{shortname}" text| } @fields)
         . ')';
@@ -411,7 +419,7 @@ sub _store_data {
         },
     );
 
-    return $table_name;
+    return ($table_name, \@fields);
 }
 
 
@@ -499,6 +507,161 @@ has schema_name => (is => 'lazy',);
 sub _build_schema_name {
     my ($self) = @_;
     return $self->user->schema_name;
+}
+
+
+
+
+=head2 Unique name utilities
+
+We need to be able to generate unique names for our columns when
+importing a new dataset or creating new computed columns.  There are
+two types of names, longnames and shortnames.
+
+B<Longnames> are the user-friendly names given by the user in the
+source spreadsheet or when adding a new computed column.  Longnames
+correspond to the C<name> field of the DatasetColumn.  If a given
+longname is blank, it is replaced with the string 'C<(untitled
+column)>'.  Duplicate longnames are de-duplicated by appending strings
+of the format 'C<($number)> e.g. 'C<Foo (1)>', 'C<Foo (2)>', etc.
+
+B<Shortnames> are normalized versions of the longname, suitable for
+use as SQL column names. The shortname 'C<id>' is reserved for use by
+Judoon as a primary key column on datastore tables.  Duplicate
+shortnames have a string of the format 'C<_%02d>' appended. Shortnames
+are stored in the C<shortname> field of the DatasetColumn and are used
+as the corresponding column name in the datastore.
+
+For both types of names, if we fail to find a unique name after
+appending X unique numbers, we use L</Data::UUID> to generate a
+globally unique id, then append that.
+
+An sql-normalized version of the name, suitable for use as an SQL
+column name.  Must be unique to the entire dataset, so may have
+trailing integers appended.  In the pathological case where more than
+100 columns have the same name, we start appending UUIDs. Don't do that.
+If that doesn't work, then I guess this is the end.
+
+=head3 _seenlong / _build__seenlong
+
+Longnames we've seen already.
+
+=head3 _seenshort / _build__seenshort
+
+Shortnames we've seen already.  'id' is reserved.
+
+=head3 _unique_names( @names )
+
+Convenience method that calls C<_unique_longname()> and
+C<_unique_shortname()> for each entry in C<@names>.  Returns a list of
+C<[ $longname, $shortname ]> pairs.
+
+=head3 _unique_longname( $name )
+
+Generate a longname as described above.
+
+=head3 _unique_shortname( $name )
+
+Generate a shortname as described above.
+
+=cut
+
+has _seenlong  => (is => 'lazy');
+sub _build__seenlong {
+    my ($self) = @_;
+    my @cols = $self->ds_columns_ordered->hri->all;
+    return {map {$_->{name} => 1} @cols};
+}
+
+has _seenshort => (is => 'lazy');
+sub _build__seenshort {
+    my ($self) = @_;
+    my @cols = $self->ds_columns_ordered->hri->all;
+    return {id => 1, map {$_->{shortname} => 1} @cols};
+}
+
+sub _unique_names {
+    my ($self, @names) = @_;
+
+    my @uniques;
+    for my $name (@names) {
+        push @uniques, [
+            $self->_unique_longname($name),
+            $self->_unique_shortname($name),
+        ];
+    }
+
+    return @uniques;
+}
+
+# generate a unique column title
+sub _unique_longname {
+    my ($self, $header) = @_;
+
+    $header = '(untitled column)' if (!defined($header) || $header eq '');
+
+    return $header if (not $self->_seenlong->{$header}++);
+
+    for my $i (1..999) {
+        my $new_header = $header . " ($i)";
+        return $new_header if (not $self->_seenlong->{$new_header}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $header . " ($uuid)";
+        return $uuid_name if(not $self->_seenlong->{$uuid_name}++);
+    }
+
+    Judoon::Error::Devel::Impossible->throw({                        # uncoverable statement
+        message => "couldn't generate a unique column name: "        # uncoverable statement
+            . p(%{ {header => $header, seen => $self->_seenlong} }), # uncoverable statement
+    });                                                              # uncoverable statement
+}
+
+# generate a unique sql-valid name for a column based off its text
+# name.
+sub _unique_shortname {
+    my ($self, $name) = @_;
+
+    $name = 'untitled' if (!defined($name) || $name eq '');
+
+    $name = unidecode($name);
+
+    # stolen from SQL::Translator::Utils::normalize_name
+    # The name can only begin with a-zA-Z_; if there's anything
+    # else, prefix with _
+    $name =~ s/^([^a-zA-Z_])/_$1/;
+
+    # anything other than a-zA-Z0-9_ in the non-first position
+    # needs to be turned into _
+    $name =~ tr/[a-zA-Z0-9_]/_/c;
+
+    # All duplicated _ need to be squashed into one.
+    $name =~ tr/_/_/s;
+
+    # Trim a trailing _
+    $name =~ s/_$//;
+
+    $name = lc $name;
+
+    return $name if (!$self->_seenshort->{$name}++);
+
+    for my $suffix (map {sprintf '%02d', $_} 1..99) {
+        my $new_colname = $name . '_' . $suffix;
+        return $new_colname if (!$self->_seenshort->{$new_colname}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $name . '_' . $uuid;
+        return $uuid_name if(!$self->_seenshort->{$uuid_name}++);
+    }
+
+    Judoon::Error::Devel::Impossible->throw({                     # uncoverable statement
+        message => "couldn't generate a unique sql column name: " # uncoverable statement
+            . p(%{ {name => $name, seen => $self->_seenshort} }), # uncoverable statement
+    });                                                           # uncoverable statement
 }
 
 

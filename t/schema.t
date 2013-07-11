@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use lib q{t/lib};
 
@@ -212,6 +213,31 @@ subtest 'Result::Dataset' => sub {
     is_deeply [map {$_->shortname} @repeat_dscols],
         ['repeat', map {"repeat_0$_"} 1..9],
             'duplicate shortnames correctly assigned';
+    $repeat_ds->delete;
+
+    # weird characters in column names
+    for my $enc (qw(utf8 cp1252)) {
+        my $encoded_ds = $user->import_data_by_filename("$DATA_DIR/encoding-${enc}.csv");
+        my @encoded_dscols = $encoded_ds->ds_columns_ordered->all;
+        is_deeply [map {$_->name} @encoded_dscols],
+            ['ÜñîçøðÆ'], "${enc}-encoded names correctly decoded";
+        is_deeply [map {$_->shortname} @encoded_dscols],
+            ['unicodae'], "${enc}-encoded shortnames correctly filtered";
+        $encoded_ds->delete;
+    }
+
+    # blank column titles
+    my $blank_ds = $user->import_data_by_filename("$DATA_DIR/blank_header.csv");
+    my @blank_dscols = $blank_ds->ds_columns_ordered->all;
+    is_deeply [map {$_->name} @blank_dscols],
+        ['First Column', '(untitled column)', 'Third Column',
+         '(untitled column) (1)',],
+             'blank names correctly assigned';
+    is_deeply [map {$_->shortname} @blank_dscols],
+        [q{first_column}, q{untitled}, q{third_column}, q{untitled_01},],
+        'blank shortnames correctly assigned';
+    $blank_ds->delete;
+
 };
 
 subtest 'Result::DatasetColumn' => sub {

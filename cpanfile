@@ -24,6 +24,7 @@ requires 'Catalyst::Runtime' => '5.90042';
 requires 'Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::RoleApplicator';
+requires 'Clone';
 requires 'Config::General' => '2.51';
 requires 'Data::Entropy::Algorithms';
 requires 'Data::UUID';

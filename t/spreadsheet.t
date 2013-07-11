@@ -62,8 +62,6 @@ subtest 'encoding' => sub {
                 '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_utf8->fields }], ['ÜñîçøðÆ'],
                 '  ...title is correct';
-            is_deeply [map {$_->{shortname}} @{ $js_utf8->fields }],
-                ['unicodae'], '  ...shortname is correct';
             is_deeply $js_utf8->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
                     '  ...data is correct';
@@ -77,8 +75,6 @@ subtest 'encoding' => sub {
                 '  ...name is correct';
             is_deeply [map {$_->{name}} @{ $js_cp1252->fields }], ['ÜñîçøðÆ'],
                 '  ...title is correct';
-            is_deeply [map {$_->{shortname}} @{ $js_cp1252->fields }],
-                ['unicodae'], '  ...shortname is correct';
             is_deeply $js_cp1252->data,
                 [['Ellipsis…'],['‘Single Quotes’'],['“Double quotes”'],],
                     '  ...data is correct';
@@ -95,13 +91,9 @@ subtest troublesome => sub {
                 filename => "${TEST_DATA_DIR}/blank_header.${ext}",
             });
             is_deeply [map {$_->{name}} @{ $js_blank->fields }],
-                [q{First Column}, q{(untitled column)}, q{Third Column},
-                 q{(untitled column) (1)},],
+                [q{First Column}, q{}, q{Third Column},
+                 q{},],
                 '  ...blank titles are correct';
-            is_deeply [map {$_->{shortname}} @{ $js_blank->fields }],
-                [q{first_column}, q{untitled}, q{third_column},
-                 q{untitled_01},],
-                '  ...blank sqlnames are correct';
 
             my $blank_data = $js_blank->data;
             is $blank_data->[3][0], '', 'first column space is blank';
