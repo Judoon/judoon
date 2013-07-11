@@ -22,3 +22,24 @@ around create_resource => sub {
 
 1;
 __END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::API::Resource::PageColumns - An set of PageColumns
+
+=head1 DESCRIPTION
+
+See L</Web::Machine::Resource>.
+
+=head1 METHODS
+
+=head2 create_resource
+
+Translate the C<template> parameter into a L<Judoon::Tmpl> object
+suitable for insertion into the database.
+
+=cut
