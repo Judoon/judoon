@@ -346,6 +346,19 @@ sub _build_schema_name {
 }
 
 
+=head2 datastore_name()
+
+Convenience method for getting fully-qualified datastore
+name ($schema_name.$table_name).
+
+=cut
+
+sub datastore_name {
+    my ($self) = @_;
+    return $self->schema_name . '.' . $self->tablename;
+}
+
+
 =head2 data() / _build_data()
 
 Attribute for getting at the data stored in the Datastore.
@@ -360,7 +373,7 @@ sub _build_data {
         $self->ds_columns_ordered->all;
     my $select = join ', ', @columns;
 
-    my $table = $self->schema_name . '.' . $self->tablename;
+    my $table = $self->datastore_name;
     return $self->result_source->storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
@@ -457,18 +470,12 @@ sub _store_data {
         . ')';
 
     # create table
-    my $dbic_storage = $self->result_source->storage;
-    $dbic_storage->dbh_do(
-        sub {
-            my ($storage, $dbh) = @_;
-            $dbh->do($sql);
-        },
-    );
+    $self->_run_sql($sql);
 
     # populate table
     my $field_list = join ', ', map {$_->{shortname}} @fields;
     my $join_list  = join ', ', (('?') x @fields);
-    $dbic_storage->dbh_do(
+    $self->result_source->storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
             my $sth_insert = $dbh->prepare_cached(
@@ -490,15 +497,7 @@ Delete the datastore table from the user's schema.
 
 sub _delete_datastore {
     my ($self) = @_;
-
-    my $dbic_storage = $self->result_source->storage;
-    $dbic_storage->dbh_do(
-        sub {
-            my ($storage, $dbh) = @_;
-            my ($schema_name, $table_name) = ($self->schema_name, $self->tablename);
-            $dbh->do(qq{DROP TABLE $schema_name.$table_name});
-        },
-    );
+    $self->_run_sql('DROP TABLE ' . $self->datastore_name);
     return;
 }
 
@@ -552,6 +551,24 @@ sub _table_exists {
             return @$ary;
         },
     );
+}
+
+
+=head2 _run_sql
+
+Convenience method for running sql directly.
+
+=cut
+
+sub _run_sql {
+    my ($self, $sql) = @_;
+    $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            $dbh->do($sql);
+        },
+    );
+    return;
 }
 
 
