@@ -198,6 +198,31 @@ sub import_from_spreadsheet {
 }
 
 
+=head2 new_computed_column( $name, $transform )
+
+Add a new column to the Dataset, derived by applying a transform (in
+the form of a C<Judoon::Transform>) to an existing column.
+
+=cut
+
+sub new_computed_column {
+    my ($self, $name, $transform) = @_;
+
+    my $computed_ds = $self->new_related('ds_columns', {}); #computed => 1,});
+
+    my ($longname, $shortname) = @{ ($self->_unique_names($name))[0] };
+    $computed_ds->name($longname);
+    $computed_ds->shortname($shortname);
+
+    $computed_ds->data_type($transform->result_data_type());
+    #$computed_ds->accession_type($transform->result_accession_type());
+    $computed_ds->insert();
+
+    $self->_deploy_computed_column($computed_ds, $transform);
+    return;
+}
+
+
 =head2 create_basic_page()
 
 Turn a dataset into a simple page with a one-to-one mapping between
@@ -498,6 +523,55 @@ Delete the datastore table from the user's schema.
 sub _delete_datastore {
     my ($self) = @_;
     $self->_run_sql('DROP TABLE ' . $self->datastore_name);
+    return;
+}
+
+
+=head2 _deploy_computed_column( $ds_col, $transform )
+
+Add the computed column to the datastore and fill in its data by
+applying the C<Judoon::Transform> to the source field.
+
+=cut
+
+sub _deploy_computed_column {
+    my ($self, $ds_col, $transform) = @_;
+
+    my $alter_stmt = 'ALTER TABLE ' . $self->datastore_name
+        . ' ADD COLUMN ' . $ds_col->shortname . ' '
+            . $transform->result_data_type;
+    $self->_run_sql($alter_stmt);
+
+    my @short_headers = $self->short_headers;
+    my $data = $self->data;
+
+    my $col_idx = 0;
+    for my $sname (@short_headers) {
+        last if ($sname eq $transform->input_field);
+        $col_idx++
+    }
+
+    my @col_data = map {$_->[$col_idx]} @$data;
+    my $transform_data = $transform->apply_batch(\@col_data);
+    my $id_data = $self->id_data;
+    my @virtual_col;
+    for (my $i=0; $i<=$#col_data; $i++) {
+        push @virtual_col, [$id_data->[$i][0], $transform_data->[$i]];
+    }
+
+    my $dstore_name  = $self->datastore_name;
+    my $ds_col_sname = $ds_col->shortname;
+    my $value_list   = join(', ',
+        map {q{('} . $_->[1] . q{', } . $_->[0] . ')'} @virtual_col
+    );
+    my $update_stmt = 'UPDATE ' . $dstore_name . ' AS src SET '
+        . $ds_col_sname . " = v.computed_value\n   FROM (VALUES "
+        . $value_list . ") AS v (computed_value, id) \n   WHERE src.id=v.id";
+    $self->_run_sql($update_stmt);
+
+    # UPDATE moo SET (lc_column) = v.computed_value
+    #   FROM (VALUES ("grr", 1), ("meow", "2"), ("quack", "3")) AS v (computed_value, id)
+    #   WHERE moo.id=v.id;
     return;
 }
 
