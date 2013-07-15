@@ -126,7 +126,7 @@ sub dscol_base : Chained('dataset_id') PathPart('column') CaptureArgs(0) {
 sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
-        $c, 'Judoon::API::Resource::DatasetColumn', {
+        $c, 'Judoon::API::Resource::DatasetColumns', {
             set      => $c->stash->{dscol_rs},
             writable => !!$c->stash->{authd_user},
         }
