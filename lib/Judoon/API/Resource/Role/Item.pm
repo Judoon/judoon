@@ -92,7 +92,6 @@ Turn JSON into objects and vice-versa.
 sub to_json { $_[0]->encode_json($_[0]->render_item(($_[0]->item))) }
 sub from_json {
     my ($self) = @_;
-    $self->request->env->{'psgix.input.buffered'} = 1;
     my $content = $self->request->content;
     $self->update_resource(
         $self->decode_json( $content )

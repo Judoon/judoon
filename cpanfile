@@ -2,7 +2,7 @@ requires 'Archive::Builder';
 requires 'Archive::Extract';
 requires 'Authen::Passphrase::BlowfishCrypt';
 requires 'autodie';
-requires 'Catalyst::Action::FromPSGI' => '0.001003';
+requires 'Catalyst::Action::FromPSGI' => '0.001004';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Action::REST';
 requires 'Catalyst::Authentication::Store::DBIx::Class';

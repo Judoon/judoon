@@ -108,7 +108,6 @@ sub to_json {
 
 sub from_json {
     my ($self) = @_;
-    $self->request->env->{'psgix.input.buffered'} = 1;
     my $content = $self->request->content;
     my $obj = $self->create_resource(
         $self->decode_json( $content )
