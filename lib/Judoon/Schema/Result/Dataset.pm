@@ -372,6 +372,28 @@ sub _build_data {
 }
 
 
+=head2 id_data() / _build_id_data()
+
+Attribute for storing the id column data in the datastore.
+
+=cut
+
+has id_data => (is => 'lazy',);
+sub _build_id_data {
+    my ($self) = @_;
+
+    my $table = $self->schema_name . '.' . $self->tablename;
+    return $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth = $dbh->prepare("SELECT id FROM $table");
+            $sth->execute;
+            return $sth->fetchall_arrayref();
+        },
+    );
+}
+
+
 =head2 sample_data() / _build_sample_data()
 
 Attribute for storing sample data i.e. the first non-blank entry for
@@ -430,6 +452,7 @@ sub _store_data {
     }
 
     my $sql        = qq{CREATE TABLE "$schema"."$table_name" (\n}
+        . qq|"id" serial,\n|
         . join(",\n", map { qq|"$_->{shortname}" text| } @fields)
         . ')';
 

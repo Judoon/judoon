@@ -137,6 +137,8 @@ subtest 'Result::Dataset' => sub {
     is_deeply $mutable_ds->data_table, [["Name", "Age", "Gender"], @$xls_ds_data],
         'Data table is as expected';
     is $mutable_ds->as_raw, "Name\tAge\tGender\nVa Bene\t14\tfemale\nChloe\t2\tfemale\nGrover\t8\tmale\nChewie\t5\tmale\nGoochie\t1\tfemale\n", 'Got as Raw';
+    is_deeply $mutable_ds->id_data, [map {[$_]} 1..5],
+        'Id data is as expected';
 
     ok my $excel = $mutable_ds->as_excel, 'can get excel object';
     open my $XLS, '<', \$excel;
@@ -237,6 +239,13 @@ subtest 'Result::Dataset' => sub {
         [q{first_column}, q{untitled}, q{third_column}, q{untitled_01},],
         'blank shortnames correctly assigned';
     $blank_ds->delete;
+
+    # id column title reserved for use
+    my $id_ds = $user->import_data_by_filename("$DATA_DIR/id_column.csv");
+    my @id_cols = $id_ds->ds_columns_ordered->all;
+    is_deeply [map {$_->shortname} @id_cols],
+        [qw(id_01 id_02 id_03 _id)], 'reserved name "id" not used';
+    is_deeply $id_ds->id_data, [[1],[2],[3]], 'id col has correct data';
 
 };
 
