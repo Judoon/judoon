@@ -105,6 +105,22 @@ __PACKAGE__->register_timestamps;
 
 =head1 METHODS
 
+=head2 TO_JSON()
+
+Return a data structure that represents this DatasetColumn suitable
+for serialization.
+
+=cut
+
+sub TO_JSON {
+    my ($self) = @_;
+
+    my $json = $self->next::method();
+    $json->{description} = delete $json->{notes};
+    return $json;
+}
+
+
 =head2 delete()
 
 Delete datastore table after deleting object
@@ -222,6 +238,36 @@ EOS
 }
 
 
+=head2 long_headers
+
+Return list of the human-readable C<DatasetColumn> names.
+
+=cut
+
+sub long_headers {
+    my ($self) = @_;
+    return map {$_->name} $self->ds_columns_ordered->all;
+}
+
+
+=head2 short_headers
+
+Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
+
+=cut
+
+sub short_headers {
+    my ($self) = @_;
+    return map {$_->shortname} $self->ds_columns_ordered->all;
+}
+
+
+
+=head1 VIEW METHODS
+
+The following methods return a representation of the C<Dataset> in
+different formats.
+
 =head2 data_table( $args )
 
 Returns an arrayref of arrayref of the dataset's data with the header
@@ -279,47 +325,30 @@ sub as_excel {
 }
 
 
-=head2 long_headers
-
-Return list of the human-readable C<DatasetColumn> names.
-
-=cut
-
-sub long_headers {
-    my ($self) = @_;
-    return map {$_->name} $self->ds_columns_ordered->all;
-}
-
-
-=head2 short_headers
-
-Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
-
-=cut
-
-sub short_headers {
-    my ($self) = @_;
-    return map {$_->shortname} $self->ds_columns_ordered->all;
-}
-
-
-sub TO_JSON {
-    my ($self) = @_;
-
-    my $json = $self->next::method();
-    $json->{description} = delete $json->{notes};
-    return $json;
-}
-
 
 =head1 DATASTORE
 
 The following methods create and retrieve the actual dataset data,
 which is stored in a different schema and table.
 
+=head2 schema_name() / _build_schema_name()
+
+Return schema name, which changes based on database engine.  For
+SQLite, the schema name is always 'data'.  For Pg, it's based on the
+name of the user.
+
+=cut
+
+has schema_name => (is => 'lazy',);
+sub _build_schema_name {
+    my ($self) = @_;
+    return $self->user->schema_name;
+}
+
+
 =head2 data() / _build_data()
 
-Accessor for getting at the data stored in the Datastore.
+Attribute for getting at the data stored in the Datastore.
 
 =cut
 
@@ -342,6 +371,13 @@ sub _build_data {
     );
 }
 
+
+=head2 sample_data() / _build_sample_data()
+
+Attribute for storing sample data i.e. the first non-blank entry for
+each column in the datastore.
+
+=cut
 
 has sample_data => (is => 'lazy',);
 sub _build_sample_data {
@@ -425,6 +461,7 @@ sub _store_data {
 
 =head2 _delete_datastore()
 
+Delete the datastore table from the user's schema.
 
 =cut
 
@@ -493,22 +530,6 @@ sub _table_exists {
         },
     );
 }
-
-
-=head2 schema_name() / _build_schema_name()
-
-Return schema name, which changes based on database engine.  For
-SQLite, the schema name is always 'data'.  For Pg, it's based on the
-name of the user.
-
-=cut
-
-has schema_name => (is => 'lazy',);
-sub _build_schema_name {
-    my ($self) = @_;
-    return $self->user->schema_name;
-}
-
 
 
 
