@@ -219,7 +219,7 @@ sub new_computed_column {
     $computed_ds->insert();
 
     $self->_deploy_computed_column($computed_ds, $transform);
-    return;
+    return $computed_ds;
 }
 
 
