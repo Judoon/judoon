@@ -18,8 +18,7 @@ sub create_resource {
     $self->set->result_source->schema->txn_do(
         sub {
             $new_col = $self->set->first->dataset->new_computed_column(
-                {name => $data->{name}},
-                $module->new( $data ),
+                $data->{name}, $module->new( $data ),
             );
         }
     );
