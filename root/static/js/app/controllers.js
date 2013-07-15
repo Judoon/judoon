@@ -171,3 +171,72 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
 
 }]);
 
+
+judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'DatasetColumn', '$window', function ($scope, $routeParams, DatasetColumn, $window) {
+
+    $scope.userName  = $routeParams.userName;
+    $scope.datasetId = $routeParams.datasetId;
+    DatasetColumn.query({},{dataset_id: $scope.datasetId}, function (columns) {
+        $scope.dsColumnsOriginal = angular.copy(columns);
+        $scope.dsColumns = columns;
+    });
+
+
+    $scope.transformTypes = [
+        {
+            name: 'Lookup',
+            transforms: [
+                {
+                    name: 'ViaUniprot',
+                    module: 'Accession::ViaUniprot',
+                    inputs:  ['FlyBase','UniGene', 'UniProtKB ID', 'UniProtKB AC'],
+                    outputs: ['GeneID', 'UniProtKB ID','UniProtKB AC'],
+                }
+            ],
+            constraint: function(column) {
+                return column.accession_type != null;
+            }
+        },
+        {
+            name: 'Text',
+            transforms: [
+                {name: 'LowerCase', module: 'String::LowerCase'},
+                {name: 'UpperCase', module: 'String::UpperCase'}
+            ],
+            constraint: function(column) {
+                return column.data_type === 'text';
+            }
+        }
+    ];
+
+
+
+    $scope.submitNewColumn = function() {
+        var data = {
+            name:          $scope.newColumnName,
+            module:        $scope.transform.module,
+            input_field:   $scope.sourceColumn.shortname,
+            input_format:  $scope.inputType,
+            output_format: $scope.outputType,
+            dataset_id:    $scope.datasetId
+        };
+
+        DatasetColumn.save({}, data);
+        $window.location.reload();
+    };
+
+    $scope.$watch('transform', function() {
+        $scope.filteredColumns = [];
+
+        if (!$scope.transformType) {
+            return;
+        }
+
+        angular.forEach($scope.dsColumns, function(value, key) {
+            if ($scope.transformType.constraint(value)) {
+                $scope.filteredColumns.push(value);
+            }
+        });
+    });
+
+}]);

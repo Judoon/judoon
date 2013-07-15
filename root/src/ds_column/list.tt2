@@ -1,5 +1,15 @@
+[% extra_js = BLOCK %]
+    <script src="/static/js/vendor/angular/angular.js"></script>
+    <script src="/static/js/vendor/angular/angular-resource.js"></script>
+
+    <script src="/static/js/app/app.js"></script>
+    <script src="/static/js/app/services.js"></script>
+    <script src="/static/js/app/controllers.js"></script>
+    <script src="/static/js/app/directives.js"></script>
+[% END %]
 [% WRAPPER components/wrapper.tt2
   title = "View columns in &quot;$dataset.object.name&quot;"
+  extra_javascript = extra_js
 %]
 
 [%- WRAPPER 'components/breadcrumbs.tt2' -%]
@@ -82,5 +92,10 @@
   <div class="form-actions">
     <a class="btn" href="[% c.uri_for_action('/private/dataset/object', c.req.captures) %]"><i class="icon arrow-right"></i>Return to dataset</a>
   </div>
+</form>
+
+<div ng-app="judoon">
+  <div ng-view></div>
+</div>
 
 [% END %]
