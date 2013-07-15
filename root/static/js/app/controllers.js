@@ -189,7 +189,7 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'DatasetCo
                 {
                     name: 'ViaUniprot',
                     module: 'Accession::ViaUniprot',
-                    inputs:  ['FlyBase','UniGene', 'UniProtKB ID', 'UniProtKB AC'],
+                    inputs:  ['FlyBase','UniGene', 'UniProtKB AC/ID'],
                     outputs: ['GeneID', 'UniProtKB ID','UniProtKB AC'],
                 }
             ],
