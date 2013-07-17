@@ -396,17 +396,7 @@ sub _build_data {
 
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
         $self->ds_columns_ordered->all;
-    my $select = join ', ', @columns;
-
-    my $table = $self->datastore_name;
-    return $self->result_source->storage->dbh_do(
-        sub {
-            my ($storage, $dbh) = @_;
-            my $sth = $dbh->prepare("SELECT $select FROM $table");
-            $sth->execute;
-            return $sth->fetchall_arrayref();
-        },
-    );
+    return $self->column_data(@columns);
 }
 
 
@@ -419,16 +409,7 @@ Attribute for storing the id column data in the datastore.
 has id_data => (is => 'lazy',);
 sub _build_id_data {
     my ($self) = @_;
-
-    my $table = $self->schema_name . '.' . $self->tablename;
-    return $self->result_source->storage->dbh_do(
-        sub {
-            my ($storage, $dbh) = @_;
-            my $sth = $dbh->prepare("SELECT id FROM $table");
-            $sth->execute;
-            return $sth->fetchall_arrayref();
-        },
-    );
+    return $self->column_data('id');
 }
 
 
@@ -460,6 +441,27 @@ sub _build_sample_data {
     return \%sample_data;
 }
 
+
+=head2 column_data(@columns)
+
+Fetch arrayref of arrayrefs of column data for each entry in
+C<@column>. Entries in C<@column> must be a valid C<shortname>.
+
+=cut
+
+sub column_data {
+    my ($self, @columns) = @_;
+    my $select = join ', ', @columns;
+    my $table = $self->datastore_name;
+    return $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            my $sth = $dbh->prepare("SELECT $select FROM $table");
+            $sth->execute;
+            return $sth->fetchall_arrayref();
+        },
+    );
+}
 
 
 =head2 _store_data( $spreadsheet )

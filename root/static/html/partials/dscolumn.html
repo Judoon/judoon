@@ -31,18 +31,41 @@
             </select>
           </div>
 
-          <div ng-show="sourceColumn && transform.inputs">
-            <h5>Source Type:</h5>
-            <select name="input" ng-model="inputType" ng-options="input for input in transform.inputs">
-            </select>
-          </div>
+          <div ng-show="transform">
+          <div ng-switch on="transform.type">
 
-          <div ng-show="sourceColumn && transform.outputs">
-            <h5>Produce:</h5>
-            <select name="produce" ng-model="outputType" ng-options="output for output in transform.outputs">
-            </select>
-          </div>
+            <div ng-switch-when="join">
+              <div>
+                <h5>Join Dataset:</h5>
+                <select name="jds" ng-model="$parent.joinDataset" ng-options="ds.name for ds in myDatasets"></select>
+              </div>
 
+              <div ng-show="$parent.joinDataset">
+                <h5>Join Column:</h5>
+                <select name="jcol" ng-model="$parent.joinColumn" ng-options="jcol.name for jcol in joinDataset.columns"></select>
+              </div>
+
+              <div ng-show="$parent.joinColumn">
+                <h5>Output Column:</h5>
+                <select name="ocol"  ng-model="$parent.outputColumn" ng-options="ocol.name for ocol in joinDataset.columns"></select>
+              </div>
+            </div>
+
+            <div ng-switch-default>
+              <div ng-show="sourceColumn && transform.inputs">
+                <h5>Source Type:</h5>
+                <select name="input" ng-model="inputType" ng-options="input for input in transform.inputs">
+                </select>
+              </div>
+
+              <div ng-show="sourceColumn && transform.outputs">
+                <h5>Produce:</h5>
+                <select name="produce" ng-model="outputType" ng-options="output for output in transform.outputs">
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
 
         <div class="span4">

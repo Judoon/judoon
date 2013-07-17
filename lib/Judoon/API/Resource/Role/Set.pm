@@ -32,6 +32,7 @@ provide.
 use Moo::Role;
 
 use Safe::Isa;
+use Try::Tiny;
 
 requires 'decode_json';
 requires 'encode_json';
@@ -109,10 +110,22 @@ sub to_json {
 sub from_json {
     my ($self) = @_;
     my $content = $self->request->content;
-    my $obj = $self->create_resource(
-        $self->decode_json( $content )
-    );
+    my $obj;
+    my $ret = try {
+        $obj = $self->create_resource(
+            $self->decode_json( $content )
+        );
+    }
+    catch {
+        my $e = $_;
+        if ( $e->$_does('HTTP::Throwable') ) {
+            return \ $e->status_code;
+        }
+        die $e;
+    };
     $self->_set_obj($obj);
+
+    return $ret;
 }
 
 

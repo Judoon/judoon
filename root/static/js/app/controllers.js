@@ -172,7 +172,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
 }]);
 
 
-judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'DatasetColumn', '$window', function ($scope, $routeParams, DatasetColumn, $window) {
+judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', '$window', function ($scope, $routeParams, Dataset, DatasetColumn, $window) {
 
     $scope.userName  = $routeParams.userName;
     $scope.datasetId = $routeParams.datasetId;
@@ -181,10 +181,23 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'DatasetCo
         $scope.dsColumns = columns;
     });
 
-
     $scope.transformTypes = [
         {
+            name: 'Join Table',
+            id:   'join',
+            transforms: [
+                {
+                    name:   'JoinTable',
+                    type:   'join',
+                    module: 'Accession::JoinTable'
+                }
+
+            ],
+            constraint: function() { return 1; }
+        },
+        {
             name: 'Lookup',
+            type: 'lookup',
             transforms: [
                 {
                     name: 'ViaUniprot',
@@ -199,6 +212,7 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'DatasetCo
         },
         {
             name: 'Text',
+            type: 'text',
             transforms: [
                 {name: 'LowerCase', module: 'String::LowerCase'},
                 {name: 'UpperCase', module: 'String::UpperCase'}
@@ -209,17 +223,44 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'DatasetCo
         }
     ];
 
+    Dataset.query({}, function (datasets) {
+        $scope.myDatasets = datasets;
+        angular.forEach(datasets, function(value, key) {
+            if (value.id == $scope.datasetId) {
+                $scope.myDatasets.splice(key, 1);
+                return;
+            }
 
+            DatasetColumn.query({}, {dataset_id: value.id}, function (columns) {
+                value.columns = columns;
+            });
+        });
+    });
 
     $scope.submitNewColumn = function() {
-        var data = {
-            name:          $scope.newColumnName,
-            module:        $scope.transform.module,
-            input_field:   $scope.sourceColumn.shortname,
-            input_format:  $scope.inputType,
-            output_format: $scope.outputType,
-            dataset_id:    $scope.datasetId
-        };
+        var data;
+
+        if ($scope.transform.type === 'join') {
+            data = {
+                name:         $scope.newColumnName,
+                module:       $scope.transform.module,
+                dataset_id:   $scope.datasetId,
+                input_field:  $scope.sourceColumn.shortname,
+                join_dataset: $scope.joinDataset.id,
+                join_column:  $scope.joinColumn.shortname,
+                to_column:    $scope.outputColumn.shortname
+            };
+        }
+        else {
+            data = {
+                name:          $scope.newColumnName,
+                module:        $scope.transform.module,
+                dataset_id:    $scope.datasetId,
+                input_field:   $scope.sourceColumn.shortname,
+                input_format:  $scope.inputType,
+                output_format: $scope.outputType,
+            };
+        }
 
         DatasetColumn.save({}, data);
         $window.location.reload();
