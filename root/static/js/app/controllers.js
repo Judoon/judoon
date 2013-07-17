@@ -172,7 +172,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
 }]);
 
 
-judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', '$window', function ($scope, $routeParams, Dataset, DatasetColumn, $window) {
+judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Transform', '$window', function ($scope, $routeParams, Dataset, DatasetColumn, Transform, $window) {
 
     $scope.userName  = $routeParams.userName;
     $scope.datasetId = $routeParams.datasetId;
@@ -181,47 +181,39 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
         $scope.dsColumns = columns;
     });
 
-    $scope.transformTypes = [
-        {
+    Transform.query({}, function(transformTypes) {
+        $scope.transformTypes = transformTypes;
+        $scope.transformTypes.unshift({
             name: 'Join Table',
             id:   'join',
             transforms: [
                 {
-                    name:   'JoinTable',
-                    type:   'join',
-                    module: 'Accession::JoinTable'
+                    name:    'JoinTable',
+                    id:      'join',
+                    accepts: 'any',
+                    module:  'Accession::JoinTable'
                 }
 
             ],
             constraint: function() { return 1; }
-        },
-        {
-            name: 'Lookup',
-            type: 'lookup',
-            transforms: [
-                {
-                    name: 'ViaUniprot',
-                    module: 'Accession::ViaUniprot',
-                    inputs:  ['FlyBase','UniGene', 'UniProtKB AC/ID'],
-                    outputs: ['GeneID', 'UniProtKB ID','UniProtKB AC'],
-                }
-            ],
-            constraint: function(column) {
-                return column.accession_type != null;
-            }
-        },
-        {
-            name: 'Text',
-            type: 'text',
-            transforms: [
-                {name: 'LowerCase', module: 'String::LowerCase'},
-                {name: 'UpperCase', module: 'String::UpperCase'}
-            ],
-            constraint: function(column) {
-                return column.data_type === 'text';
-            }
+        });
+    });
+
+    $scope.$watch('transformType', function() {
+        if (
+            (!$scope.transformType)
+              ||
+            ($scope.transformType.id === 'join')
+              ||
+            ($scope.transformType.transforms)
+        ) {
+            return;
         }
-    ];
+
+        Transform.query({}, {id: $scope.transformType.id}, function(transforms) {
+            $scope.transformType.transforms = transforms;
+        });
+    });
 
     Dataset.query({}, function (datasets) {
         $scope.myDatasets = datasets;
@@ -240,7 +232,7 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
     $scope.submitNewColumn = function() {
         var data;
 
-        if ($scope.transform.type === 'join') {
+        if ($scope.transform.id === 'join') {
             data = {
                 name:         $scope.newColumnName,
                 module:       $scope.transform.module,
@@ -274,9 +266,16 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
         }
 
         angular.forEach($scope.dsColumns, function(value, key) {
-            if ($scope.transformType.constraint(value)) {
-                $scope.filteredColumns.push(value);
+            var accepts = $scope.transform.accepts;
+
+            if ((accepts === 'text') && (value.data_type !== 'text')) {
+                return;
             }
+            if ((accepts === 'accession') && (!value.accession_type)) {
+                return;
+            }
+
+            $scope.filteredColumns.push(value);
         });
     });
 

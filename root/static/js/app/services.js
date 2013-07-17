@@ -49,3 +49,11 @@ judoonSrv.factory('PageColumn', ['$resource', '$http', function($resource, $http
 
     return PageCol;
 }]);
+
+
+judoonSrv.factory('Transform', ['$resource', function($resource) {
+    return $resource(
+        '/api/transform/:transformType/:transform',
+        {transformType: '@id'}
+    );
+}]);
