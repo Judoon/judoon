@@ -54,13 +54,13 @@
             <div ng-switch-default>
               <div ng-show="sourceColumn && transform.inputs">
                 <h5>Source Type:</h5>
-                <select name="input" ng-model="inputType" ng-options="input for input in transform.inputs">
+                <select name="input" ng-model="$parent.inputType" ng-options="input for input in transform.inputs">
                 </select>
               </div>
 
               <div ng-show="sourceColumn && transform.outputs">
                 <h5>Produce:</h5>
-                <select name="produce" ng-model="outputType" ng-options="output for output in transform.outputs">
+                <select name="produce" ng-model="$parent.outputType" ng-options="output for output in transform.outputs">
                 </select>
               </div>
             </div>
