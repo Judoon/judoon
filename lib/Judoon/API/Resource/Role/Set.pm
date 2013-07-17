@@ -118,7 +118,7 @@ sub from_json {
     }
     catch {
         my $e = $_;
-        if ( $e->$_does('HTTP::Throwable') ) {
+        if ( $e->$_DOES('HTTP::Throwable') ) {
             return \ $e->status_code;
         }
         die $e;
