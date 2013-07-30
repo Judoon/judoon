@@ -7,11 +7,14 @@ judoonCtrl.controller(
     ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn', 'DatasetPage',
      function ($scope, $routeParams, $http, Dataset, DatasetColumn, DatasetPage) {
 
+         // *** View property defaults
          $scope.hideProperties = false;
          $scope.hideData       = true;
          $scope.hideColumns    = true;
          $scope.hidePages      = true;
 
+
+         // *** Alerts ***
          $scope.alerts = [];
          $scope.addAlert = function(type, msg) {
              $scope.alerts.push({type: type, msg: msg});
@@ -19,11 +22,9 @@ judoonCtrl.controller(
          $scope.closeAlert = function(index) {
              $scope.alerts.splice(index, 1);
          };
-         $scope.permissions = [
-             {label: 'No', value: 'private'},
-             {label: 'Yes', value: 'public'},
-         ];
 
+
+         // *** Dataset ***
          $scope.userName  = $routeParams.userName;
          $scope.datasetId = $routeParams.datasetId;
          Dataset.get({id: $scope.datasetId}, function (dataset) {
@@ -31,17 +32,10 @@ judoonCtrl.controller(
              $scope.dataset = dataset;
          });
 
-         DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
-             $scope.dataset.columns = columns;
-             $scope.dsColumnsLoaded = 1;
-         });
-
-         DatasetPage.query({}, {dataset_id: $scope.datasetId}, function (pages) {
-             $scope.dataset.pages = pages;
-         });
-
-
-         $scope.newPage = {};
+         $scope.permissions = [
+             {label: 'No', value: 'private'},
+             {label: 'Yes', value: 'public'}
+         ];
 
          $scope.saveDataset = function() {
              Dataset.update(
@@ -60,6 +54,23 @@ judoonCtrl.controller(
          $scope.resetDataset = function() {
              $scope.dataset = angular.copy($scope.datasetOriginal);
          };
+
+
+         // *** Dataset Columns ***
+         DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
+             $scope.dataset.columns = columns;
+             $scope.dsColumnsLoaded = 1;
+         });
+
+
+         // *** Pages ***
+         DatasetPage.query({}, {dataset_id: $scope.datasetId}, function (pages) {
+             $scope.dataset.pages = pages;
+         });
+
+         $scope.newPage = {};
+
+
 
          $scope.getServerData = function ( sSource, aoData, fnCallback ) {
              $.ajax( {
