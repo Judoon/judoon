@@ -7,8 +7,6 @@
 
   <style type="text/css">
     h4 { padding-bottom: 5px; border-bottom: 1px lightgray solid; }
-    #outer { width: 99%; }
-    #inner { overflow-x: scroll; }
 
     .outer-hscroll { width: 99%; }
     .inner-hscroll { overflow-x: scroll; }
@@ -21,6 +19,8 @@
     }
     #ds_columns th, #ds_columns td { border-top: none; }
     #ds_columns th { white-space: nowrap; }
+
+    .add-panel { border: 1px lightgray solid; border-radius: 3px; padding: 5px; margin-top: 5px; }
   </style>
 
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
@@ -108,7 +108,7 @@
         <tr class="even">
           <th class="header">Sample Data</th>
           <td class="sample_data" ng-repeat="column in dataset.columns">
-            {{column.samples.join(', ')}}
+            {{column.samples.join(', ')}}&nbsp;
           </td>
         </tr>
 
@@ -137,7 +137,9 @@
     </table>
     </div></div>
 
-    <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
+    <div style="padding: 1em;">
+      <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
+    </div>
   </div>
 
 
@@ -155,7 +157,7 @@
     </ul>
 
     <div class="row-fluid">
-      <div class="span7" style="border: 1px lightgray solid; border-radius: 3px; padding: 5px;">
+      <div class="add-panel span7">
         <h5 style="margin: 0 5px 0; padding-top: 5px;" class="help-inline">Create New Page:</h5>
         <label class="radio inline">
           <input type="radio" ng-model="newPage.type" value="blank">

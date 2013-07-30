@@ -1,78 +1,94 @@
-  <form ng-controller="DatasetColumnCtrl">
+  <form class="add-panel" ng-controller="DatasetColumnCtrl" ng-submit="submitNewColumn()">
     <fieldset>
-      <h5>Add new computed column</h5>
 
-      <div class="row-fluid">
+      <div class="row-fluid" style="margin-top: 5px; margin-bottom: 10px;">
         <div class="span12">
-          <label class="control-label">New Column Name:
-            <input type="text" ng-model="newColumnName" required>
-          </label>
+          <h5 style="margin: 0 5px 0 0;" class="help-inline">Add new computed column:</h5>
+          <input style="margin-bottom: 0;" type="text" ng-model="newColumnName" required placeholder="New column name">
         </div>
       </div>
 
       <div class="row-fluid">
 
-        <div class="span4">
+        <div class="span3">
+          <h5>Transform</h5>
+
           <div>
-            <h5>Transform Type:</h5>
+            <h6>Transform Type:</h6>
             <select name="type" ng-model="transformType" ng-options="type.name for type in transformTypes">
             </select>
           </div>
 
           <div ng-show="transformType">
-            <h5>Transform:</h5>
+            <h6>Transform:</h6>
             <select name="transform" ng-model="transform" ng-options="act.name for act in transformType.transforms">
             </select>
           </div>
+        </div>
+
+        <div class="span1"></div>
+
+        <div class="span3">
+          <h5>Source</h5>
 
           <div ng-show="transform">
-            <h5>Source Column:</h5>
+            <h6>Source Column:</h6>
             <select name="source" ng-model="sourceColumn" ng-options="column.name for column in filteredColumns">
             </select>
-          </div>
 
-          <div ng-show="transform">
-          <div ng-switch on="transform.id">
-
-            <div ng-switch-when="join">
-              <div>
-                <h5>Join Dataset:</h5>
+            <div ng-switch on="transform.id">
+              <div ng-switch-when="join">
+                <h6>Join Dataset:</h6>
                 <select name="jds" ng-model="$parent.joinDataset" ng-options="ds.name for ds in myDatasets"></select>
+
+                <div ng-show="$parent.joinDataset">
+                  <h6>Join Column:</h6>
+                  <select name="jcol" ng-model="$parent.joinColumn" ng-options="jcol.name for jcol in joinDataset.columns"></select>
+                </div>
               </div>
 
-              <div ng-show="$parent.joinDataset">
-                <h5>Join Column:</h5>
-                <select name="jcol" ng-model="$parent.joinColumn" ng-options="jcol.name for jcol in joinDataset.columns"></select>
-              </div>
-
-              <div ng-show="$parent.joinColumn">
-                <h5>Output Column:</h5>
-                <select name="ocol"  ng-model="$parent.outputColumn" ng-options="ocol.name for ocol in joinDataset.columns"></select>
+              <div ng-switch-default>
+                <div ng-show="sourceColumn && transform.inputs">
+                  <h6>Source Type:</h6>
+                  <select name="input" ng-model="$parent.inputType" ng-options="input for input in transform.inputs">
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div ng-switch-default>
-              <div ng-show="sourceColumn && transform.inputs">
-                <h5>Source Type:</h5>
-                <select name="input" ng-model="$parent.inputType" ng-options="input for input in transform.inputs">
-                </select>
-              </div>
+          </div>
+        </div>
 
+        <div class="span1"></div>
+
+        <div class="span3">
+          <h5>Output</h5>
+
+          <div ng-switch on="transform.id">
+
+            <div ng-switch-when="join">
+              <div ng-show="$parent.joinColumn">
+                <h6>Output Column:</h6>
+                <select name="ocol"  ng-model="$parent.outputColumn" ng-options="ocol.name for ocol in joinDataset.columns"></select>
+              </div>
+            </div>
+            <div ng-switch-default>
               <div ng-show="sourceColumn && transform.outputs">
-                <h5>Produce:</h5>
+                <h6>Produce:</h6>
                 <select name="produce" ng-model="$parent.outputType" ng-options="output for output in transform.outputs">
                 </select>
               </div>
             </div>
           </div>
         </div>
+
+      </div>
+
+      <div class="row-fluid">
+        <div class="span2 offset8">
+          <button type="submit" class="btn btn-primary">Add column</button>
         </div>
-
       </div>
 
-      <div class="form-actions">
-        <button ng-click="submitNewColumn()" class="btn btn-primary">Add column</button>
-      </div>
-      
     </fieldset>
   </form>
