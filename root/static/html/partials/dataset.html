@@ -76,13 +76,12 @@
   <div collapse="hideData">
     <div class="outer-hscroll"><div class="inner-hscroll">
 
-    <table judoon-data-smable id="data_table" class="table table-striped table-condensed table-bordered">
-      <thead>
-        <th ng-repeat="column in dataset.columns">{{ column.name }}</th>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
+    <judoon-data-table
+       jdt-dataset-id="datasetId"
+       jdt-columns="dataset.columns"
+       jdt-header-key="name"
+       jdt-fetch-fn="getServerData">
+    </judoon-data-table>
 
     </div></div>
   </div>

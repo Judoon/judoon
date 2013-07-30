@@ -2,8 +2,32 @@
 
 var judoonDir = angular.module('judoon.directives', []);
 
+
+/**  Judoon Data Table
+
+ This directive binds our data api to a jQuery DataTables datatable.
+
+**/
+
 judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
+    var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">'
+        + '<thead>'
+        + '<th ng-repeat="column in columns">{{ column[headerKey] }}</th>'
+        + '</thead>'
+        + '<tbody></tbody>'
+        + '</table>';
+
+
     return {
+        restrict: 'E',
+        replace: true,
+        template: dataTableTemplate,
+        scope: {
+            datasetId     : '=jdtDatasetId',
+            columns       : '=jdtColumns',
+            headerKey     : '@jdtHeaderKey',
+            dataFetchFn   : '=jdtFetchFn'
+        },
         link: function(scope, element, attrs) {
 
             var dataTable;
@@ -13,7 +37,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 "bProcessing"     : true,
                 "sPaginationType" : "bootstrap",
                 "bDeferRender"    : true,
-                "fnServerData"    : scope.getServerData
+                "fnServerData"    : scope.dataFetchFn
             };
 
             function rebuildTable() {
@@ -23,70 +47,35 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
 
                 var tableOptions = angular.copy(defaultOptions);
                 tableOptions["aoColumns"] = [];
-                angular.forEach(scope.pageColumns, function (value, key) {
-                    tableOptions["aoColumns"][key] = value.title;
+                angular.forEach(scope.columns, function (value, key) {
+                    tableOptions["aoColumns"][key] = value[scope.headerKey];
                 } );
 
                 dataTable = element.dataTable(tableOptions);
             }
 
-
-            var unbindDsIdWatch = scope.$watch('pageLoaded', function() {
-                if (!scope.pageLoaded) {
+            // datasetId may not be available at link time
+            var unbindDsIdWatch = scope.$watch('datasetId', function() {
+                if (!scope.datasetId) {
                     return;
                 }
 
                 // this won't change over life of the directive
-                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.page.dataset_id;
+                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.datasetId;
+
+                // just in case this fired after the columns watch
+                if (scope.columns && scope.columns.length) {
+                    $timeout(function() { rebuildTable(); }, 0, false);
+                }
+
                 unbindDsIdWatch();
             });
 
-            scope.$watch('pageColumns', function() {
-                if (!scope.pageColumnsLoaded || !scope.pageLoaded) {
+            // columns may not be available at link time
+            scope.$watch('columns', function() {
+                if (!scope.datasetId || !scope.columns || !scope.columns.length) {
                     return; // too soon.
                 }
-
-                // run rebuild table after digest
-                $timeout(function() { rebuildTable(); }, 0, false);
-            }, true);
-        }
-    };
-}]);
-
-judoonDir.directive('judoonDataSmable', ['$timeout', function($timeout) {
-    return {
-        link: function(scope, element, attrs) {
-
-            var dataTable;
-            var defaultOptions = {
-                "bAutoWidth"      : false,
-                "bServerSide"     : true,
-                "bProcessing"     : true,
-                "sPaginationType" : "bootstrap",
-                "bDeferRender"    : true,
-                "fnServerData"    : scope.getServerData
-            };
-
-            function rebuildTable() {
-                if (dataTable) {
-                    dataTable.fnDestroy();
-                }
-
-                var tableOptions = angular.copy(defaultOptions);
-                tableOptions["aoColumns"] = [];
-                angular.forEach(scope.dataset.columns, function (value, key) {
-                    tableOptions["aoColumns"][key] = value.title;
-                } );
-
-                dataTable = element.dataTable(tableOptions);
-            }
-
-            scope.$watch('dataset.columns', function() {
-                if (!scope.dsColumnsLoaded) {
-                    return; // too soon.
-                }
-
-                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.datasetId;
 
                 // run rebuild table after digest
                 $timeout(function() { rebuildTable(); }, 0, false);
@@ -114,7 +103,7 @@ judoonDir.directive('judoonCkeditor', [function() {
                         { name: 'editing',   items: ['Find','Replace','-','SelectAll','-','Scayt'] },
                         { name: 'links',     items: ['Link','Unlink','Anchor'] },
                         { name: 'insert',    items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
-                        { name: 'groups',    items: ["NumberedList", "BulletedList", "DefinitionList", "Outdent", "Indent", "Blockquote", ] },
+                        { name: 'groups',    items: ["NumberedList", "BulletedList", "DefinitionList", "Outdent", "Indent", "Blockquote"] },
                         '/',
                         { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat"] },
                         { name: 'paragraph',  items: ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock" ] },
