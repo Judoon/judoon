@@ -23,7 +23,7 @@
     #ds_columns th { white-space: nowrap; }
   </style>
 
-
+  <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
   <!-- ******************** PROPERTIES ******************** -->
   <h4 ng-click="hideProperties = !hideProperties">
@@ -32,13 +32,13 @@
     Properties
   </h4>
   <div collapse="hideProperties">
-  <form class="form-horizontal">
+  <form class="form-horizontal" ng-submit="saveDataset()">
     <fieldset>
 
       <div class="control-group">
         <label class="control-label">Name</label>
         <div class="controls">
-          <input type="text" ng-model="dataset.name" class="span6" />
+          <input type="text" ng-model="dataset.name" required class="span6" />
         </div>
       </div>
 
@@ -52,13 +52,20 @@
       <div class="control-group">
         <label class="control-label">Public</label>
         <div class="controls">
-          <select class="span2" ng-model="dataset.permission" ng-select="permission for permission in permissions">
+          <select class="span2" ng-model="dataset.permission" ng-options="permission.value as permission.label for permission in permissions">
           </select>
         </div>
       </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="button" ng-click="resetDataset()" class="btn">Cancel</button>
+      </div>
+
     </fieldset>
   </form>
   </div>
+
 
   <!-- ******************** DATA ******************** -->
   <h4 ng-click="hideData = !hideData">

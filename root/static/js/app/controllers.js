@@ -12,8 +12,17 @@ judoonCtrl.controller(
          $scope.hideColumns    = true;
          $scope.hidePages      = true;
 
-
-         $scope.permissions = ['private','public'];
+         $scope.alerts = [];
+         $scope.addAlert = function(type, msg) {
+             $scope.alerts.push({type: type, msg: msg});
+         };
+         $scope.closeAlert = function(index) {
+             $scope.alerts.splice(index, 1);
+         };
+         $scope.permissions = [
+             {label: 'No', value: 'private'},
+             {label: 'Yes', value: 'public'},
+         ];
 
          $scope.userName  = $routeParams.userName;
          $scope.datasetId = $routeParams.datasetId;
@@ -33,6 +42,24 @@ judoonCtrl.controller(
 
 
          $scope.newPage = {};
+
+         $scope.saveDataset = function() {
+             Dataset.update(
+                 {}, {
+                     id:         $scope.datasetId,
+                     name:       $scope.dataset.name,
+                     notes:      $scope.dataset.notes,
+                     permission: $scope.dataset.permission
+                 },
+                 function() { $scope.addAlert('success', 'Dataset updated!'); },
+                 function() { $scope.addAlert('error', 'Something went wrong!'); }
+             );
+             $scope.datasetOriginal = $scope.dataset;
+         };
+
+         $scope.resetDataset = function() {
+             $scope.dataset = angular.copy($scope.datasetOriginal);
+         };
 
          $scope.getServerData = function ( sSource, aoData, fnCallback ) {
              $.ajax( {
