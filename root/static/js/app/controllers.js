@@ -178,7 +178,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
 
     $scope.removeColumn = function() {
         if (!$scope.deleteColumn) {
-            return false;
+            return;
         }
 
         var confirmed = confirm("Are you sure you want to delete this column?");
@@ -198,6 +198,8 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
                 }
             );
         }
+
+        return;
     };
 
     $scope.firstColumn = function() {
@@ -352,7 +354,7 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
                 dataset_id:    $scope.datasetId,
                 input_field:   $scope.sourceColumn.shortname,
                 input_format:  $scope.inputType,
-                output_format: $scope.outputType,
+                output_format: $scope.outputType
             };
         }
 
