@@ -68,8 +68,10 @@ judoonCtrl.controller(
              $scope.dataset.pages = pages;
          });
 
-         $scope.newPage = {};
-
+         $scope.newPage = {type: 'blank'};
+         $scope.createPage = function() {
+             DatasetPage.create({}, $scope.newPage);
+         };
 
 
          $scope.getServerData = function ( sSource, aoData, fnCallback ) {
