@@ -157,6 +157,8 @@
 
     <div class="row-fluid">
       <div class="add-panel span7">
+        <form ng-submit="createPage()" class="form-horizontal">
+          <fieldset>
         <h5 style="margin: 0 5px 0; padding-top: 5px;" class="help-inline">Create New Page:</h5>
         <label class="radio inline">
           <input type="radio" ng-model="newPage.type" value="blank">
@@ -170,19 +172,29 @@
           <input type="radio" ng-model="newPage.type" value="template">
           From Template
         </label>
-        <div ng-switch on="newPage.type" style="padding-top: 5px; padding-bottom: 5px;">
+
+        <div ng-switch on="newPage.type" style="padding-top: 5px; padding-bottom: 5px; margin-left: 3em; border-bottom: thin #ddd solid;">
           <div ng-switch-when="clone">
             <span class="help-inline">Use existing page's layout:</span>
             <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
             </select>
+            <span class="help-block">
+              Create a new page that mimics the layout of an exsiting
+              page.
+            </span>
           </div>
           <div ng-switch-when="template">
             <span class="help-inline">Template file to create with:</span>
             <input type="file" id="clone_template">
+            <span class="help-block">Create a new page from a provided template.</span>
           </div>
-          <div ng-switch-default></div>
+          <div ng-switch-default>
+            <span class="help-block">Create a new page without columns.</span>
+          </div>
         </div>
-        <button class="btn" ng-click="createPage()">Create</button>
+        <button type="submit" class="btn">Create</button>
+        </fieldset>
+        </form>
       </div>
     </div>
   </div>
