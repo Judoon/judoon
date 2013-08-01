@@ -21,6 +21,9 @@
     #ds_columns th { white-space: nowrap; }
 
     .add-panel { border: 1px lightgray solid; border-radius: 3px; padding: 5px; margin-top: 5px; }
+    .add-panel form { margin-bottom: 5px; }
+    .add-panel .form-actions { padding-top: 5px; padding-bottom: 5px; margin-bottom: 5px; }
+    .add-panel-banner { font-weight: bold; }
   </style>
 
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
@@ -159,44 +162,62 @@
       <div class="add-panel span7">
         <form ng-submit="createPage()" class="form-horizontal">
           <fieldset>
-        <h5 style="margin: 0 5px 0; padding-top: 5px;" class="help-inline">Create New Page:</h5>
-        <label class="radio inline">
-          <input type="radio" ng-model="newPage.type" value="blank">
-          Blank Page
-        </label>
-        <label class="radio inline">
-          <input type="radio" ng-model="newPage.type" value="clone">
-          Clone existing page
-        </label>
-        <label class="radio inline">
-          <input type="radio" ng-model="newPage.type" value="template">
-          From Template
-        </label>
 
-        <div ng-switch on="newPage.type" style="padding-top: 5px; padding-bottom: 5px; margin-left: 3em; border-bottom: thin #ddd solid;">
-          <div ng-switch-when="clone">
-            <span class="help-inline">Use existing page's layout:</span>
-            <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
-            </select>
-            <span class="help-block">
-              Create a new page that mimics the layout of an exsiting
-              page.
-            </span>
-          </div>
-          <div ng-switch-when="template">
-            <span class="help-inline">Template file to create with:</span>
-            <input type="file" id="clone_template">
-            <span class="help-block">Create a new page from a provided template.</span>
-          </div>
-          <div ng-switch-default>
-            <span class="help-block">Create a new page without columns.</span>
-          </div>
-        </div>
-        <button type="submit" class="btn">Create</button>
-        </fieldset>
+            <div class="control-group">
+              <label class="control-label add-panel-banner">Create New Page:</label>
+              <div class="controls">
+                <label class="radio inline">
+                  <input type="radio" ng-model="newPage.type" value="blank">
+                  Blank Page
+                </label>
+                <label class="radio inline">
+                  <input type="radio" ng-model="newPage.type" value="clone">
+                  Clone existing page
+                </label>
+                <label class="radio inline">
+                  <input type="radio" ng-model="newPage.type" value="template">
+                  From template
+                </label>
+
+                <div ng-switch on="newPage.type">
+                  <span ng-switch-when="clone" class="help-block">
+                    Create a new page that mimics the layout of an
+                    exsiting page.
+                  </span>
+                  <span ng-switch-when="template" class="help-block">
+                    Create a new page from a provided template.
+                  </span>
+                  <span ng-switch-when="blank" class="help-block">
+                    Create a new page without columns.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div ng-switch on="newPage.type">
+              <div ng-switch-when="clone" class="control-group">
+                <label class="control-label">Page to clone:</label>
+                <div class="controls">
+                  <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
+                  </select>
+                </div>
+              </div>
+              <div ng-switch-when="template" class="control-group">
+                <label class="control-label">Template file:</label>
+                <div class="controls">
+                  <input type="file">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+          </fieldset>
         </form>
       </div>
     </div>
+
   </div>
 
 </div>
