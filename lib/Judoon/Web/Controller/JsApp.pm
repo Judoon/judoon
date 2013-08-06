@@ -5,7 +5,10 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
 
-sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {}
+sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'jsapp/jsapp.tt2';
+}
 
 sub page_id : Chained('base') PathPart('page') CaptureArgs(1) {
     my ($self, $c, $page_id) = @_;
@@ -28,12 +31,6 @@ sub page_id : Chained('base') PathPart('page') CaptureArgs(1) {
     $c->stash->{page}{object} = $page;
 }
 
-sub page_view : Chained('page_id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'jsapp/page.tt2';
-}
-
-
 
 1;
 __END__
@@ -55,7 +52,7 @@ As a result, it doesn't do much except basic access control.
 
 =head2 base
 
-Base action, currently does nothing.
+Sets the template, AngularJS takes care of the rest.
 
 =head2 page_id
 
