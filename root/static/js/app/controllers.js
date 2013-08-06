@@ -2,17 +2,21 @@
 
 var judoonCtrl = angular.module('judoon.controllers', []);
 
-judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', function ($scope, $routeParams, Page, PageColumn) {
+judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', 'Dataset', function ($scope, $routeParams, Page, PageColumn, Dataset) {
 
     // Attributes
     $scope.editmode = 0;
 
+    $scope.userName = $routeParams.userName;
     $scope.pageId = $routeParams.pageId;
     $scope.pageLoaded = 0;
     Page.get({id: $scope.pageId}, function (page) {
         $scope.pageOriginal = angular.copy(page);
         $scope.page = page;
         $scope.pageLoaded = 1;
+        Dataset.get({id: page.dataset_id}, function (ds) {
+            $scope.dataset = ds;
+        });
     });
 
     $scope.$watch('page', function () {

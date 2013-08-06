@@ -1,4 +1,13 @@
 <div ng-controller="PageCtrl">
+
+
+  <ul class="breadcrumb">
+    <li><a href="/user/{{userName}}" target="_self">Overview</a> <span class="divider">/</span></li>
+    <li><a href="/user/{{userName}}/datasource/{{page.dataset_id}}" target="_self">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
+    <li>Page: {{page.title}}</li>
+  </ul>
+
+
   <div class="navbar">
     <div class="navbar-inner">
       <ul class="nav">
