@@ -8,6 +8,13 @@ judoonSrv.factory('Dataset', ['$resource', function($resource) {
     });
 }]);
 
+judoonSrv.factory('DatasetPage', ['$resource', function($resource) {
+    return $resource(
+        '/api/dataset/:datasetId/page/:pageId',
+        {datasetId: '@dataset_id', pageId: '@page_id'}
+    );
+}]);
+
 judoonSrv.factory('DatasetColumn', ['$resource', '$http', function($resource, $http) {
     var DatasetCol = $resource(
         '/api/dataset/:datasetId/column/:colId',

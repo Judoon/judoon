@@ -8,6 +8,10 @@ var judoonApp = angular.module(
 judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
     $locationProvider.html5Mode(true);
     $routeProvider
+        .when('/user/:userName/datasource/:datasetId', {
+            templateUrl: '/static/html/partials/dataset.html',
+            controller: 'DatasetCtrl'
+        })
         .when('/user/:userName/page/:pageId', {
             templateUrl: '/static/html/partials/page.html',
             controller: 'PageCtrl'

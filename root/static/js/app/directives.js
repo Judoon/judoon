@@ -53,6 +53,48 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
     };
 }]);
 
+judoonDir.directive('judoonDataSmable', ['$timeout', function($timeout) {
+    return {
+        link: function(scope, element, attrs) {
+
+            var dataTable;
+            var defaultOptions = {
+                "bAutoWidth"      : false,
+                "bServerSide"     : true,
+                "bProcessing"     : true,
+                "sPaginationType" : "bootstrap",
+                "bDeferRender"    : true,
+                "fnServerData"    : scope.getServerData
+            };
+
+            function rebuildTable() {
+                if (dataTable) {
+                    dataTable.fnDestroy();
+                }
+
+                var tableOptions = angular.copy(defaultOptions);
+                tableOptions["aoColumns"] = [];
+                angular.forEach(scope.dataset.columns, function (value, key) {
+                    tableOptions["aoColumns"][key] = value.title;
+                } );
+
+                dataTable = element.dataTable(tableOptions);
+            }
+
+            scope.$watch('dataset.columns', function() {
+                if (!scope.dsColumnsLoaded) {
+                    return; // too soon.
+                }
+
+                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.datasetId;
+
+                // run rebuild table after digest
+                $timeout(function() { rebuildTable(); }, 0, false);
+            }, true);
+        }
+    };
+}]);
+
 
 judoonDir.directive('judoonCkeditor', [function() {
     return {

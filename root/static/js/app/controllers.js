@@ -2,6 +2,66 @@
 
 var judoonCtrl = angular.module('judoon.controllers', []);
 
+judoonCtrl.controller(
+    'DatasetCtrl',
+    ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn', 'DatasetPage',
+     function ($scope, $routeParams, $http, Dataset, DatasetColumn, DatasetPage) {
+
+         $scope.hideProperties = false;
+         $scope.hideData       = true;
+         $scope.hideColumns    = true;
+         $scope.hidePages      = true;
+
+
+         $scope.permissions = ['private','public'];
+
+         $scope.userName  = $routeParams.userName;
+         $scope.datasetId = $routeParams.datasetId;
+         Dataset.get({id: $scope.datasetId}, function (dataset) {
+             $scope.datasetOriginal = angular.copy(dataset);
+             $scope.dataset = dataset;
+         });
+
+         DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
+             $scope.dataset.columns = columns;
+             $scope.dsColumnsLoaded = 1;
+         });
+
+         DatasetPage.query({}, {dataset_id: $scope.datasetId}, function (pages) {
+             $scope.dataset.pages = pages;
+         });
+
+
+         $scope.newPage = {};
+
+         $scope.getServerData = function ( sSource, aoData, fnCallback ) {
+             $.ajax( {
+                 "dataType" : "json",
+                 "type"     : "GET",
+                 "url"      : sSource,
+                 "data"     : aoData,
+                 "success": [
+                     function(data) {
+                         var new_data = [];
+                         for (var i = 0; i < data.tmplData.length; i++) {
+                             new_data[i] = [];
+                             for (var j = 0; j < $scope.dataset.columns.length; j++) {
+                                 new_data[i][j] = data.tmplData[i][$scope.dataset.columns[j].shortname];
+                             }
+                         }
+                         data.aaData = new_data;
+                     },
+                     fnCallback
+                 ],
+             } );
+         };
+
+     }
+    ]
+);
+
+
+
 judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', 'Dataset', function ($scope, $routeParams, Page, PageColumn, Dataset) {
 
     // Attributes

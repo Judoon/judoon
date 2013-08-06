@@ -146,6 +146,16 @@ sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
 }
 
 
+sub ds_page : Chained('dataset_id') PathPart('page') Args(0) ActionClass('FromPSGI') {
+    my ($self, $c) = @_;
+    return $self->wm(
+        $c, 'Judoon::API::Resource::Pages', {
+            set      => $c->stash->{dataset_object}->pages_ordered,
+            writable => !!$c->stash->{authd_user},
+        }
+    );
+}
+
 =head2 page_base / pages / page_id / page
 
 Authenticated users get full access to their pages and read access
