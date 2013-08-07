@@ -56,21 +56,23 @@ sub get_testuser { return \%testuser; }
 my %fixture_subs = (
     basic => sub {
         get_schema()->resultset('TtDscolumnDatatype')->populate([
-            ['id','data_type',],
-            [1,'text',],[2,'numeric',],[3,'datetime',],[4,'currency',],
-        ]);
-        get_schema()->resultset('TtAccessionType')->populate([
-            ['id','accession_type','accession_domain'],
-            [1,  'entrez_gene_id',     'biology',],
-            [2,  'entrez_gene_symbol', 'biology',],
-            [3,  'entrez_refseq_id',   'biology',],
-            [4,  'entrez_protein_id',  'biology',],
-            [5,  'entrez_unigene_id',  'biology',],
-            [6,  'pubmed_id',          'biology',],
-            [7,  'uniprot_acc',        'biology',],
-            [8,  'uniprot_id',         'biology',],
-            [9,  'flybase_id',         'biology',],
-            [10, 'wormbase_id',        'biology',],
+            ['id', 'data_type',                           ],
+            [1,    'CoreType_Text',                       ],
+            [2,    'CoreType_Numeric',                    ],
+            [3,    'CoreType_Datetime',                   ],
+            [4,    'Biology_Accession_Entrez_GeneId',     ],
+            [5,    'Biology_Accession_Entrez_GeneSymbol', ],
+            [6,    'Biology_Accession_Entrez_RefseqId',   ],
+            [7,    'Biology_Accession_Entrez_ProteinId',  ],
+            [8,    'Biology_Accession_Entrez_UnigeneId',  ],
+            [9,    'Biology_Accession_Pubmed_Pmid',       ],
+            [10,   'Biology_Accession_Uniprot_Acc',       ],
+            [11,   'Biology_Accession_Uniprot_Id',        ],
+            [12,   'Biology_Accession_Flybase_Id',        ],
+            [13,   'Biology_Accession_Wormbase_Id',       ],
+            [14,   'Biology_Accession_Cmkb_ComplexAcc',   ],
+            [15,   'Biology_Accession_Cmkb_FamilyAcc',    ],
+            [16,   'Biology_Accession_Cmkb_OrthologAcc',  ],
         ]);
 
 

@@ -288,16 +288,6 @@ subtest 'Result::DatasetColumn' => sub {
     ok exception { $ds_col3->data_type("moo"); },
         ' lookup_proxy dies on bad lookup';
 
-    # test accession_type lookup column
-    $ds_col3->discard_changes; # needed b/c fk is nullable
-    is $ds_col3->accession_type(), undef, 'accession_type not yet set';
-    ok !exception {
-        $ds_col3->accession_type('entrez_gene_id');
-    }, 'Can successfully set accession type';
-    $ds_col3->update;
-    $ds_col3->discard_changes;
-    is $ds_col3->accession_type(), 'entrez_gene_id', 'accession_type correctly set';
-
 
     # make sure we can import datasets w/ duplicate column names
     $user = ResultSet('User')->first;

@@ -157,7 +157,6 @@ has output_format => (is => 'ro', required => 1);
 
 
 sub result_data_type      { return 'text'; }
-sub result_accession_type { return undef;  }
 
 sub apply_batch {
     my ($self, $col_data) = @_;

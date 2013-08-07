@@ -4,7 +4,6 @@ use Moo::Role;
 
 
 requires 'result_data_type';
-requires 'result_accession_type';
 requires 'apply_batch';
 
 

@@ -215,7 +215,6 @@ sub new_computed_column {
     $computed_ds->shortname($shortname);
 
     $computed_ds->data_type($transform->result_data_type());
-    #$computed_ds->accession_type($transform->result_accession_type());
     $computed_ds->insert();
 
     $self->_deploy_computed_column($computed_ds, $transform);

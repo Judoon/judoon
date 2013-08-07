@@ -173,11 +173,11 @@ after object_GET => sub {
         $column->{js_template} = $tmpl->to_jstmpl;
     }
 
-    my @acc_columns          = grep {$_->accession_type} @ds_columns;
+    my @acc_columns          = grep {$_->data_type =~ m/Accession/} @ds_columns;
     $c->stash->{acc_columns} = \@acc_columns;
     my $sitelinker           = $c->model('SiteLinker');
     for my $acc_column (@acc_columns) {
-        my $sites = $sitelinker->mapping->{accession}{$acc_column->accession_type};
+        my $sites = $sitelinker->mapping->{accession}{$acc_column->data_type};
         my @links;
         for my $site (keys %$sites) {
             my $site_conf = $sitelinker->sites->{$site};
@@ -192,7 +192,7 @@ after object_GET => sub {
 
     $c->stash({
         column_acctype => $self->encode_json(
-            {map {$_->shortname => $_->accession_type} @acc_columns}
+            {map {$_->shortname => $_->data_type} @acc_columns}
         ),
         ds_column_json => $self->encode_json(
             [map {{name => $_->name, shortname => $_->shortname}} @ds_columns]

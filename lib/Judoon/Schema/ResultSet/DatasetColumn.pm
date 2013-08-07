@@ -38,14 +38,13 @@ sub for_dataset_id {
 
 =head2 with_lookups
 
-Prefetch the C<DatasetColumn>'s lookup fields. (Currently 'data_type'
-and 'accession_type').
+Prefetch the C<DatasetColumn>'s lookup fields. (Currently 'data_type').
 
 =cut
 
 sub with_lookups {
     my ($self) = @_;
-    return $self->search_rs({}, {prefetch => ['data_type_rel', 'accession_type_rel']},);
+    return $self->search_rs({}, {prefetch => ['data_type_rel']},);
 }
 
 1;

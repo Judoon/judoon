@@ -46,11 +46,6 @@ column data_type_id => {
     is_foreign_key => 1,
     is_nullable    => 0,
 };
-column accession_type_id => {
-    data_type      => "integer",
-    is_foreign_key => 1,
-    is_nullable    => 1,
-};
 
 
 unique_constraint dataset_id_shortname_unique => [qw(dataset_id shortname)];
@@ -64,14 +59,6 @@ belongs_to data_type_rel => "::TtDscolumnDatatype",
     { "foreign.id" => "self.data_type_id" },
     {
         lookup_proxy => 'data_type',
-        is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE",
-    };
-
-belongs_to accession_type_rel => "::TtAccessionType",
-    { "foreign.id" => "self.accession_type_id" },
-    {
-        join_type     => 'left',
-        lookup_proxy  => 'accession_type',
         is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE",
     };
 
@@ -104,7 +91,6 @@ sub TO_JSON {
     my ($self) = @_;
     my $json = $self->next::method();
     $json->{data_type} = $self->data_type;
-    $json->{accession_type} = $self->accession_type;
     return $json;
 }
 
