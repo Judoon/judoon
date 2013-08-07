@@ -98,6 +98,8 @@ requires 'Text::CSV';
 requires 'Text::Unidecode';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
+requires 'Type::Registry';
+requires 'Type::Tiny';
 requires 'URI';
 requires 'Web::Machine';
 
