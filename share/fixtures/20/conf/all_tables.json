@@ -1,0 +1,49 @@
+{
+   "sets" : [
+      {
+         "quantity" : "all",
+         "class" : "Role"
+      },
+      {
+         "quantity" : "all",
+         "class" : "UserRole"
+      },
+      {
+         "quantity" : "all",
+         "class" : "User"
+      },
+      {
+         "quantity" : "all",
+         "class" : "Dataset"
+      },
+      {
+         "quantity" : "all",
+         "class" : "Token"
+      },
+      {
+         "quantity" : "all",
+         "class" : "Page"
+      },
+      {
+         "quantity" : "all",
+         "class" : "TtDscolumnDatatype"
+      },
+      {
+         "quantity" : "all",
+         "class" : "PageColumn"
+      },
+      {
+         "quantity" : "all",
+         "class" : "DatasetColumn"
+      }
+   ],
+   "might_have" : {
+      "fetch" : 0
+   },
+   "belongs_to" : {
+      "fetch" : 0
+   },
+   "has_many" : {
+      "fetch" : 0
+   }
+}
