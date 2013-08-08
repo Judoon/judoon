@@ -55,4 +55,14 @@ Judoon::API::Resource::DatasetColumns - A set of DatasetColumns
 
 See L</Web::Machine::Resource>.
 
+=head1 METHODS
+
+=head2 create_resource
+
+Intercept parameters to make sure user has access to the joined table
+for a JoinTable transform.  Load and run transforms to create new
+computed column.
+
+=cut
+
 =cut
