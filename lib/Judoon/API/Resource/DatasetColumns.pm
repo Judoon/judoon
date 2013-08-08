@@ -45,6 +45,8 @@ __END__
 
 =pod
 
+=for stopwords JoinTable
+
 =encoding utf8
 
 =head1 NAME
@@ -62,7 +64,5 @@ See L</Web::Machine::Resource>.
 Intercept parameters to make sure user has access to the joined table
 for a JoinTable transform.  Load and run transforms to create new
 computed column.
-
-=cut
 
 =cut

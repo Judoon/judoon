@@ -146,6 +146,12 @@ sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
 }
 
 
+=head2 ds_page()
+
+Get the list of pages for the given dataset.
+
+=cut
+
 sub ds_page : Chained('dataset_id') PathPart('page') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
@@ -155,6 +161,7 @@ sub ds_page : Chained('dataset_id') PathPart('page') Args(0) ActionClass('FromPS
         }
     );
 }
+
 
 =head2 page_base / pages / page_id / page
 

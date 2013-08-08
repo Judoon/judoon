@@ -83,3 +83,4 @@ cellmigration
 AngularJS
 utf
 ElasticSearch
+InflateColumn
