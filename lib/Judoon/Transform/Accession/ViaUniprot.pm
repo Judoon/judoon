@@ -156,7 +156,7 @@ has input_format  => (is => 'ro');
 has output_format => (is => 'ro', required => 1);
 
 
-sub result_data_type      { return 'text'; }
+sub result_data_type      { return 'CoreType_Text'; }
 
 sub apply_batch {
     my ($self, $col_data) = @_;

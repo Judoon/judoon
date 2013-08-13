@@ -4,9 +4,9 @@ use Moo;
 
 extends 'Type::Tiny';
 
-has label  => (is => 'ro');
-has sample => (is => 'ro');
-
+has label   => (is => 'ro');
+has sample  => (is => 'ro');
+has pg_type => (is => 'ro');
 
 1;
 __END__
@@ -44,5 +44,9 @@ A nice human-readable name for this Type.
 =head2 sample
 
 An example of this particular Type.
+
+=head2 pg_type
+
+The PostgreSQL type that this type derives from.
 
 =cut

@@ -18,18 +18,20 @@ use Type::Tiny::Class;
 
 __PACKAGE__->meta->add_type(
     Judoon::Type->new(
-        name   => 'CoreType_Text',
-        parent => Str,
-        sample => 'some example text',
-        label  => 'Text',
+        name    => 'CoreType_Text',
+        parent  => Str,
+        sample  => 'some example text',
+        label   => 'Text',
+        pg_type => 'text',
     )
 );
 __PACKAGE__->meta->add_type(
     Judoon::Type->new(
-        name   => 'CoreType_Numeric',
-        parent => Num,
-        sample => 1234,
-        label  => 'Numeric',
+        name    => 'CoreType_Numeric',
+        parent  => Num,
+        sample  => 1234,
+        label   => 'Numeric',
+        pg_type => 'numeric',
     )
 );
 __PACKAGE__->meta->add_type(

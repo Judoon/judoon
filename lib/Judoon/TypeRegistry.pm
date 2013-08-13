@@ -1,10 +1,28 @@
 package Judoon::TypeRegistry;
 
 use Moo;
-use MooX::Types::MooseLike::Base qw(InstanceOf);
+use MooX::Types::MooseLike::Base qw(HashRef InstanceOf);
 
 use Type::Registry;
+use Safe::Isa;
 
+has pg_types => (
+    is  => 'lazy',
+    isa => HashRef,
+);
+sub _build_pg_types {
+    my ($self) = @_;
+
+    my %pg_types;
+    for my $typename ($self->all_types) {
+        next unless ($typename =~ m/CoreType/);
+        my $type = $self->registry->simple_lookup($typename);
+        next unless ($type->$_can('pg_type'));
+        $pg_types{$type->pg_type} = $type
+    }
+
+    return \%pg_types;
+}
 
 has registry => (
     is      => 'lazy',
@@ -14,6 +32,8 @@ has registry => (
 sub _build_registry {
     my ($self) = @_;
     my $reg = Type::Registry->for_me;
+    return $reg if (keys %$reg);
+
     $reg->add_types("Judoon::Types::Core");
     $reg->add_types("Judoon::Types::Biology::Accession");
     return $reg;

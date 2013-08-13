@@ -41,7 +41,7 @@
       <label class="control-label" for="ds_column.data_type">Data type:</label>
       <div class="controls">
         <select form="dscolumn_edit" name="ds_column.data_type" id="ds_column.data_type">
-          [% FOREACH data_type IN ['text', 'numeric'] %]
+          [% FOREACH data_type IN ['CoreType_Text', 'CoreType_Numeric'] %]
           <option value="[% data_type %]" [% IF data_type == ds_column.object.data_type %]selected[% END %]>[% data_type.ucfirst %]</option>
           [% END %]
         </select>

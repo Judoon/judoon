@@ -15,6 +15,7 @@ use Data::Printer;
 use DateTime;
 use Judoon::Spreadsheet;
 use Judoon::Tmpl;
+use Judoon::Types::Core qw(CoreType_Text);
 use Spreadsheet::ParseExcel;
 
 sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
@@ -256,22 +257,22 @@ subtest 'Result::DatasetColumn' => sub {
     my $dataset = $ds_column->dataset;
     my $new_ds_col = $dataset->create_related('ds_columns', {
         name => 'Test Column', sort => 99,
-        data_type_id => 1,
+        data_type => CoreType_Text,
     });
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
-        data_type_id => 1,
+        data_type => CoreType_Text,
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
-        name => q{}, sort => 98, data_type_id => 1,
+        name => q{}, sort => 98, data_type => CoreType_Text,
     }), 'can create column w/ empty name';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
-        name => q{#$*^(}, sort => 97, data_type_id => 1,
+        name => q{#$*^(}, sort => 97, data_type => CoreType_Text,
     }), 'can create column w/ non-ascii name';
 
     # mutating methods, create new dataset
@@ -280,13 +281,13 @@ subtest 'Result::DatasetColumn' => sub {
 
 
     # test data_type lookup column
-    is $ds_col3->data_type(), 'text', 'can proxy to lookup';
-    ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
-        ' lookup_proxy lives w/ good lookup';
-    is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
-    is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
-    ok exception { $ds_col3->data_type("moo"); },
-        ' lookup_proxy dies on bad lookup';
+    # is $ds_col3->data_type(), 'text', 'can proxy to lookup';
+    # ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
+    #     ' lookup_proxy lives w/ good lookup';
+    # is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
+    # is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
+    # ok exception { $ds_col3->data_type("moo"); },
+    #     ' lookup_proxy dies on bad lookup';
 
 
     # make sure we can import datasets w/ duplicate column names

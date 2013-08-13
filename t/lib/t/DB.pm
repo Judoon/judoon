@@ -56,27 +56,28 @@ sub get_testuser { return \%testuser; }
 my %fixture_subs = (
     basic => sub {
         get_schema()->resultset('TtDscolumnDatatype')->populate([
-            ['id', 'data_type',                           ],
-            [1,    'CoreType_Text',                       ],
-            [2,    'CoreType_Numeric',                    ],
-            [3,    'CoreType_Datetime',                   ],
-            [4,    'Biology_Accession_Entrez_GeneId',     ],
-            [5,    'Biology_Accession_Entrez_GeneSymbol', ],
-            [6,    'Biology_Accession_Entrez_RefseqId',   ],
-            [7,    'Biology_Accession_Entrez_ProteinId',  ],
-            [8,    'Biology_Accession_Entrez_UnigeneId',  ],
-            [9,    'Biology_Accession_Pubmed_Pmid',       ],
-            [10,   'Biology_Accession_Uniprot_Acc',       ],
-            [11,   'Biology_Accession_Uniprot_Id',        ],
-            [12,   'Biology_Accession_Flybase_Id',        ],
-            [13,   'Biology_Accession_Wormbase_Id',       ],
-            [14,   'Biology_Accession_Cmkb_ComplexAcc',   ],
-            [15,   'Biology_Accession_Cmkb_FamilyAcc',    ],
-            [16,   'Biology_Accession_Cmkb_OrthologAcc',  ],
+            ['data_type',                           ],
+            ['CoreType_Text',                       ],
+            ['CoreType_Numeric',                    ],
+            ['CoreType_Datetime',                   ],
+            ['Biology_Accession_Entrez_GeneId',     ],
+            ['Biology_Accession_Entrez_GeneSymbol', ],
+            ['Biology_Accession_Entrez_RefseqId',   ],
+            ['Biology_Accession_Entrez_ProteinId',  ],
+            ['Biology_Accession_Entrez_UnigeneId',  ],
+            ['Biology_Accession_Pubmed_Pmid',       ],
+            ['Biology_Accession_Uniprot_Acc',       ],
+            ['Biology_Accession_Uniprot_Id',        ],
+            ['Biology_Accession_Flybase_Id',        ],
+            ['Biology_Accession_Wormbase_Id',       ],
+            ['Biology_Accession_Cmkb_ComplexAcc',   ],
+            ['Biology_Accession_Cmkb_FamilyAcc',    ],
+            ['Biology_Accession_Cmkb_OrthologAcc',  ],
         ]);
 
 
         my $user_rs = get_schema()->resultset('User');
+        $DB::single = 1;
         my $user = $user_rs->find({username => get_testuser()->{username}})
             // $user_rs->create_user(get_testuser());
 

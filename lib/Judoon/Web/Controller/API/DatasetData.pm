@@ -69,7 +69,7 @@ sub object_GET {
     my $tbl_name     = $dataset->schema_name . '.' . $dataset->tablename;
     my $dbic_storage = $dataset->result_source->storage;
     my $params       = $c->req->params();
-    my @ds_cols      = $dataset->ds_columns_ordered->with_lookups->hri->all;
+    my @ds_cols      = $dataset->ds_columns_ordered->hri->all;
     my @fields       = map {$_->{shortname}} @ds_cols;
     my $total        = $dataset->nbr_rows;
 
@@ -98,9 +98,11 @@ sub object_GET {
                       :                                               'asc';
 
         my $field     = $fields[$colnum];
-        my $data_type = $ds_cols[$colnum]->{data_type_rel}{data_type};
-        my $sort_by   = $data_type eq 'text' ? $field
-                      :                        \"CAST($field AS $data_type)";
+        my $data_type = $ds_cols[$colnum]->{data_type};
+        my $type_obj  = $c->model('TypeRegistry')->simple_lookup($data_type);
+        my $pg_type   = $type_obj->pg_type;
+        my $sort_by   = $pg_type eq 'text' ? $field
+                      :                      \"CAST($field AS $pg_type)";
         push @order_by, {"-$direction" => $sort_by};
     }
 

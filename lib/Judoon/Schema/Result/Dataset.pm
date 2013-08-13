@@ -15,6 +15,7 @@ Judoon::Schema::Result::Dataset
 use Judoon::Schema::Candy;
 use Moo;
 
+use MooX::Types::MooseLike::Base qw(InstanceOf);
 
 use Clone qw(clone);
 use Data::UUID;
@@ -22,6 +23,7 @@ use DateTime;
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Impossible;
 use Judoon::Tmpl;
+use Judoon::TypeRegistry;
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
 use Text::Unidecode;
@@ -101,6 +103,21 @@ with qw(
 );
 __PACKAGE__->register_permissions;
 __PACKAGE__->register_timestamps;
+
+
+=head1 ATTRIBUTES
+
+=head2 type_registry
+
+An instance of L<Judoon::TypeRegistry>
+
+=cut
+
+has type_registry => (
+    is  => 'lazy',
+    isa => InstanceOf['Judoon::TypeRegistry']
+);
+sub _build_type_registry { Judoon::TypeRegistry->new; }
 
 
 =head1 METHODS
@@ -190,7 +207,8 @@ sub import_from_spreadsheet {
     for my $field (@$fields) {
         $self->create_related('ds_columns', {
             name => $field->{longname}, shortname => $field->{shortname},
-            sort => $sort++, data_type => $field->{type},
+            data_type => $self->type_registry->pg_types->{$field->{type}},
+            sort => $sort++,
         });
     }
 
