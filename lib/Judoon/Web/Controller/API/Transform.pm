@@ -136,3 +136,41 @@ sub transform_POST {
 
 __PACKAGE__->meta->make_immutable;
 1;
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Web::Controller::API::Transform - API for our Transform classes
+
+=head1 ACTIONS
+
+=head2 base
+
+Base action for common actions. Currently does nothing.
+
+=head2 index / index_GET
+
+Return a serialized list of transform types.
+
+=head2 type_id
+
+Lookup the transforms for a given type, returning 404 if not found.
+
+=head2 type / type_GET
+
+Return the serialized list of transforms.
+
+=head2 transform_id
+
+Lookup the given transform, returning 404 if not found.
+
+=head2 transform / transform_GET / transform_POST
+
+GET returns the serialized transform.  A POST request applies the
+transform to the supplied data.
+
+=cut
