@@ -115,23 +115,10 @@
         </tr>
 
         <tr class="odd">
-          <th class="header">Accession Type</th>
+          <th class="header">Data Type</th>
           <td class="metadata" ng-repeat="column in dataset.columns">
-            {{column.accession_type}}
-          </td>
-        </tr>
-
-        <tr class="even">
-          <th class="header">Column Type</th>
-          <td class="metadata" ng-repeat="column in dataset.columns">
-            {{column.data_type}}
-          </td>
-        </tr>
-
-        <tr class="odd">
-          <th class="header">Actions</th>
-          <td class="annotate center" ng-repeat="column in dataset.columns">
-            <button class="btn btn-mini">Annotate</button>
+            <select ng-model="column.data_type" ng-options="type.name as type.label group by type.library for type in data_types">
+            </select>
           </td>
         </tr>
 

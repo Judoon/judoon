@@ -64,3 +64,11 @@ judoonSrv.factory('Transform', ['$resource', function($resource) {
         {transformType: '@id'}
     );
 }]);
+
+
+judoonSrv.factory('DataType', ['$resource', function($resource) {
+    return $resource(
+        '/api/datatype/:typeId',
+        {typeId: '@id'}
+    );
+}]);

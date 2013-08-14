@@ -4,8 +4,8 @@ var judoonCtrl = angular.module('judoon.controllers', []);
 
 judoonCtrl.controller(
     'DatasetCtrl',
-    ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn', 'DatasetPage',
-     function ($scope, $routeParams, $http, Dataset, DatasetColumn, DatasetPage) {
+    ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn', 'DatasetPage', 'DataType',
+     function ($scope, $routeParams, $http, Dataset, DatasetColumn, DatasetPage, DataType) {
 
          // *** View property defaults
          $scope.hideProperties = false;
@@ -95,6 +95,12 @@ judoonCtrl.controller(
                  ],
              } );
          };
+
+
+         // *** DataTypes ***
+         DataType.query({}, {}, function (data_types) {
+             $scope.data_types = data_types;
+         });
 
      }
     ]
