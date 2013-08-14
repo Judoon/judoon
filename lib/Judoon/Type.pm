@@ -4,9 +4,21 @@ use Moo;
 
 extends 'Type::Tiny';
 
-has label   => (is => 'ro');
+has library => (is => 'ro');
 has sample  => (is => 'ro');
 has pg_type => (is => 'ro');
+
+sub TO_JSON {
+    my ($self) = @_;
+
+    return {
+        name    => $self->name,
+        label   => $self->display_name,
+        sample  => $self->sample,
+        library => $self->library,
+    };
+}
+
 
 1;
 __END__
@@ -25,10 +37,11 @@ Judoon::Type - Extension class for Type::Tiny
  use Types::Standard qw(Str);
 
  my $NUMISH = Judoon::Type->new(
-     name   => 'Numish',
-     parent => Str,
-     sample => '1 and a bit',
-     label  => 'A Number, but also something else?',
+     name         => 'Numish',
+     display_name => 'A Number, but also something else?',
+     parent       => Str,
+     sample       => '1 and a bit',
+     library      => 'Approximates',
  );
 
 =head1 DESCRIPTION
@@ -37,9 +50,9 @@ This lets us add extra information to our Type::Tiny-based types.
 
 =head1 ATTRIBUTES
 
-=head2 label
+=head2 library
 
-A nice human-readable name for this Type.
+The library this type is a member of.  Used for grouping.
 
 =head2 sample
 
@@ -48,5 +61,12 @@ An example of this particular Type.
 =head2 pg_type
 
 The PostgreSQL type that this type derives from.
+
+=head1 METHODS
+
+=head2 TO_JSON
+
+A data structure representing this type that is suitable for
+serialization.
 
 =cut

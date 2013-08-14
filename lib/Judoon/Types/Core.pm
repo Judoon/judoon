@@ -18,28 +18,30 @@ use Type::Tiny::Class;
 
 __PACKAGE__->meta->add_type(
     Judoon::Type->new(
-        name    => 'CoreType_Text',
-        parent  => Str,
-        sample  => 'some example text',
-        label   => 'Text',
-        pg_type => 'text',
+        name         => 'CoreType_Text',
+        display_name => 'Text',
+        parent       => Str,
+        sample       => 'some example text',
+        pg_type      => 'text',
+        library      => 'Basic',
     )
 );
 __PACKAGE__->meta->add_type(
     Judoon::Type->new(
-        name    => 'CoreType_Numeric',
-        parent  => Num,
-        sample  => 1234,
-        label   => 'Numeric',
-        pg_type => 'numeric',
+        name         => 'CoreType_Numeric',
+        display_name => 'Numeric',
+        parent       => Num,
+        sample       => 1234,
+        pg_type      => 'numeric',
+        library      => 'Basic',
     )
 );
-__PACKAGE__->meta->add_type(
-    Type::Tiny::Class->new(
-        name  => 'CoreType_Datetime',
-        class => 'DateTime',
-    )
-);
+# __PACKAGE__->meta->add_type(
+#     Type::Tiny::Class->new(
+#         name  => 'CoreType_Datetime',
+#         class => 'DateTime',
+#     )
+# );
 
 
 1;

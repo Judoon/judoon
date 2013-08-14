@@ -24,7 +24,9 @@ subtest 'Biology_Accession_Entrez_GeneId' => sub {
     ok !Biology_Accession_Entrez_GeneId->check("moo"), "'moo' isn't";
 
     is Biology_Accession_Entrez_GeneId->sample, '7094', 'got sample';
-    is Biology_Accession_Entrez_GeneId->label,  'Entrez Gene ID', 'got label';
+    is Biology_Accession_Entrez_GeneId->display_name, 'Entrez Gene ID', 'got display_name';
+    is Biology_Accession_Entrez_GeneId->parent->name, 'CoreType_Text', 'got parent';
+    is Biology_Accession_Entrez_GeneId->library, 'Biology::Accessions', 'got library';
 };
 
 
