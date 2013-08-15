@@ -173,7 +173,7 @@ after object_GET => sub {
         $column->{js_template} = $tmpl->to_jstmpl;
     }
 
-    my @acc_columns          = grep {$_->data_type =~ m/Accession/} @ds_columns;
+    my @acc_columns          = grep {$_->data_type->name =~ m/Accession/} @ds_columns;
     $c->stash->{acc_columns} = \@acc_columns;
     my $sitelinker           = $c->model('SiteLinker');
     for my $acc_column (@acc_columns) {
