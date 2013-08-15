@@ -133,7 +133,9 @@ Serialize this object into a JSON string.
 sub TO_JSON {
     my ($self) = @_;
     my $tmp = $self->next::method();
-    $tmp->{data_type} = $tmp->{data_type}->name;
+    $tmp->{data_type}   = $tmp->{data_type}->name;
+    my $shortname       = $tmp->{shortname};
+    $tmp->{sample_data} = $self->dataset->sample_data(3, $shortname)->{$shortname};
     return $tmp;
 }
 
