@@ -430,31 +430,43 @@ sub _build_id_data {
 }
 
 
-=head2 sample_data() / _build_sample_data()
+=head2 sample_data( $sample_count?, @columns? )
 
-Attribute for storing sample data i.e. the first non-blank entry for
-each column in the datastore.
+Method for retrieving sample data i.e. the first C<$sample_count>
+non-blank entries for each column in C<@columns>. C<$sample_count>
+defaults to 1. C<@columns> defaults to all columns in the dataset.
 
 =cut
 
-has sample_data => (is => 'lazy',);
-sub _build_sample_data {
-    my ($self) = @_;
+sub sample_data {
+    my ($self, $sample_count, @cols) = @_;
 
-    my @sample_data;
-    for my $idx (0..$self->nbr_columns-1) {
+    $sample_count ||= 1;
+
+    my $data;
+    if (@cols) {
+        $data = $self->column_data(@cols);
+    }
+    else {
+        @cols = map {$_->{shortname}} $self->ds_columns_ordered->hri->all;
+        $data = $self->data;
+    }
+
+    my @sample_data = map {[]} @cols;
+    for my $idx (0..$#cols) {
+        my $samples_found = 0;
       ROW_SEARCH:
-        for my $row (@{$self->data}) {
+        for my $row (@$data) {
+            last ROW_SEARCH if ($samples_found >= $sample_count);
             if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
-                push @sample_data, $row->[$idx];
-                last ROW_SEARCH;
+                push @{$sample_data[$idx]}, $row->[$idx];
+                $samples_found++;
             }
         }
     }
 
     my %sample_data;
-    @sample_data{map {$_->shortname} $self->ds_columns_ordered->all}
-        = @sample_data;
+    @sample_data{@cols} = @sample_data;
     return \%sample_data;
 }
 
