@@ -60,7 +60,21 @@ judoonCtrl.controller(
          DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
              $scope.dataset.columns = columns;
              $scope.dsColumnsLoaded = 1;
+             $scope.dsColumnsOriginal = angular.copy(columns);
          });
+
+         $scope.saveColumns = function() {
+             angular.forEach($scope.dataset.columns, function (value, key) {
+                 if (!angular.equals($scope.dsColumnsOriginal[key], value)) {
+                     DatasetColumn.update({
+                         dataset_id:  value.dataset_id,
+                         id:          value.id,
+                         data_type:   value.data_type
+                     });
+                     $scope.dsColumnsOriginal[key] = angular.copy(value);
+                 }
+             } );
+         };
 
 
          // *** Pages ***

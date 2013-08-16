@@ -96,7 +96,10 @@
     <i ng-show="!hideColumns" class="icon icon-chevron-down"></i>
     Columns
   </h4>
+
   <div collapse="hideColumns">
+
+    <form ng-submit="saveColumns()">
     <div class="outer-hscroll well"><div class="inner-hscroll">
     <table id="ds_columns" class="table table-striped table-bordered">
       <tbody>
@@ -126,9 +129,13 @@
     </table>
     </div></div>
 
+    <button type="submit" class="btn btn-primary">Update columns</button>
+    </form>
+
     <div style="padding: 1em;">
       <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
     </div>
+
   </div>
 
 
