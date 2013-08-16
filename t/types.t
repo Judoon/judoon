@@ -27,6 +27,7 @@ subtest 'Biology_Accession_Entrez_GeneId' => sub {
     is Biology_Accession_Entrez_GeneId->display_name, 'Entrez Gene ID', 'got display_name';
     is Biology_Accession_Entrez_GeneId->parent->name, 'CoreType_Text', 'got parent';
     is Biology_Accession_Entrez_GeneId->library, 'Biology::Accessions', 'got library';
+    is Biology_Accession_Entrez_GeneId->pg_type, 'text', 'got pg_type from parent';
 };
 
 

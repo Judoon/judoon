@@ -6,7 +6,11 @@ extends 'Type::Tiny';
 
 has library => (is => 'ro');
 has sample  => (is => 'ro');
-has pg_type => (is => 'ro');
+has pg_type => (is => 'lazy');
+sub _build_pg_type {
+    my ($self) = @_;
+    return $self->parent->pg_type;
+}
 
 sub TO_JSON {
     my ($self) = @_;
