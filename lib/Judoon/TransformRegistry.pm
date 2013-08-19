@@ -97,3 +97,19 @@ sub transform {
 
 1;
 __END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::TransformRegistry - Central data about our transforms
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 transform / transforms_for / type / type_list
+
+=cut

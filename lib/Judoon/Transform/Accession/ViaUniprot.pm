@@ -188,3 +188,29 @@ sub apply_batch {
 
 1;
 __END__
+
+=pod
+
+=encoding utf8
+
+=for stopwords Uniprot
+
+=head1 NAME
+
+Judoon::Transform::Accession::ViaUniprot - Lookup data from Uniprot
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 result_data_type
+
+C<CoreType_Text>
+
+=head2 apply_batch
+
+The subroutine that performs the transform.
+
+=head2 input_format / output_format
+
+=cut

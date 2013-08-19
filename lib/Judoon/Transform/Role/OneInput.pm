@@ -13,3 +13,19 @@ has input_field => (
 
 1;
 __END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Transform::Role::OneInput - For Transforms that accept one input
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head2 input_field
+
+=cut
