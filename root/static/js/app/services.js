@@ -33,10 +33,18 @@ judoonSrv.factory('DatasetColumn', ['$resource', '$http', function($resource, $h
     return DatasetCol;
 }]);
 
-judoonSrv.factory('Page', ['$resource', function($resource) {
-    return $resource('/api/page/:id', {id: '@id'}, {
+judoonSrv.factory('Page', ['$resource', '$http', function($resource, $http) {
+    var Page = $resource('/api/page/:id', {id: '@id'}, {
         update: {method: 'PUT'}
     });
+
+    Page.saveAndFetch = function(column, cb) {
+        this.save(column, function(data,  getResponseHeaders) {
+            $http.get(getResponseHeaders('Location')).success(cb);
+        });
+    };
+
+    return Page;
 }]);
 
 judoonSrv.factory('PageColumn', ['$resource', '$http', function($resource, $http) {

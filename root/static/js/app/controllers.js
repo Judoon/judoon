@@ -4,8 +4,8 @@ var judoonCtrl = angular.module('judoon.controllers', []);
 
 judoonCtrl.controller(
     'DatasetCtrl',
-    ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn', 'DatasetPage', 'DataType',
-     function ($scope, $routeParams, $http, Dataset, DatasetColumn, DatasetPage, DataType) {
+    ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn', 'Page', 'DatasetPage', 'DataType',
+     function ($scope, $routeParams, $http, Dataset, DatasetColumn, Page, DatasetPage, DataType) {
 
          // *** View property defaults
          $scope.hideProperties = false;
@@ -82,9 +82,13 @@ judoonCtrl.controller(
              $scope.dataset.pages = pages;
          });
 
-         $scope.newPage = {type: 'blank'};
+         Page.query({}, function (pages) { $scope.allPages = pages; });
+
+         $scope.newPage = {type: 'blank', dataset_id: $scope.datasetId};
          $scope.createPage = function() {
-             DatasetPage.create({}, $scope.newPage);
+             Page.saveAndFetch($scope.newPage, function(page) {
+                 $scope.dataset.pages.push(page);
+             });
          };
 
 
