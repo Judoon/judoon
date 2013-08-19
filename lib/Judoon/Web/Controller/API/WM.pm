@@ -157,7 +157,7 @@ sub ds_page : Chained('dataset_id') PathPart('page') Args(0) ActionClass('FromPS
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
             set      => $c->stash->{dataset_object}->pages_ordered,
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
