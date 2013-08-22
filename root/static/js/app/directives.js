@@ -215,11 +215,42 @@ judoonDir.directive(
 
 judoonDir.directive(
     'judoonLinkWidget',
-    [function() {
+    ['$modal', function($modal) {
+        function link(scope, elem, attrs) {
+
+            function openLinkBuilder(widget) {
+                var modalInstance = $modal.open({
+                    resolve: {
+                        activeWidget: function() { return angular.copy(widget); },
+                        dataset: function() { return scope.dataset; }
+                    },
+                    templateUrl:  '/static/html/partials/widget-link-builder.html',
+                    controller: 'LinkBuilderCtrl'
+                });
+
+                modalInstance.result.then(
+                    function (newWidget) {
+                        console.log("got a new widget: " + newWidget);
+                    },
+                    function () {
+                        console.log("modal dismissed!");
+                    }
+                )
+            }
+
+            angular.element(elem.find('input')).on(
+                'click', function () {
+                    openLinkBuilder(scope.widget);
+                    scope.$apply();
+                }
+            );
+        }
+
         return {
             restrict: 'E',
             replace: false,
-            templateUrl: '/static/html/partials/widget-link.html'
+            templateUrl: '/static/html/partials/widget-link.html',
+            link: link
         };
     }]
 );
@@ -228,7 +259,7 @@ judoonDir.directive(
     'judoonFormattingWidget',
     ['$timeout', function($timeout) {
 
-        function link(scope, elem, attrs, controller) {
+        function link(scope, elem, attrs) {
 
             function toggleFormatting(format) {
                 var idx = scope.widget.formatting.indexOf(format);
@@ -263,6 +294,18 @@ judoonDir.directive(
             replace: false,
             templateUrl: '/static/html/partials/widget-formatting.html',
             link: link
+        };
+    }]
+);
+
+
+judoonDir.directive(
+    'judoonLinkBuilderWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-link-builder.html'
         };
     }]
 );

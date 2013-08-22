@@ -507,6 +507,32 @@ judoonCtrl.controller(
                 controller: 'ElementGuideCtrl'
             });
         };
+
+        $scope.previewUrl = function() {
+            return zipSegments(widget.url);
+        };
+
+        $scope.previewLabel = function() {
+            return zipSegments(widget.label);
+        };
+
+        function zipSegments(varstring) {
+            var maxlen = Math.max(
+                varstring.text_segments.length,
+                varstring.variable_segments.length
+            );
+
+            var retstring = '';
+            for (var i = 0; i < maxlen; i++) {
+                retstring += varstring.text_segments[i] || '';
+                retstring += getSampleData(varstring.variable_segments[i]);
+            }
+            return retstring;
+        }
+
+        function getSampleData(variable) {
+            return $scope.sample_data[variable] || '';
+        }
     }]
 );
 
@@ -514,5 +540,116 @@ judoonCtrl.controller(
     'ElementGuideCtrl',
     ['$scope', '$modalInstance', function ($scope, $modalInstance) {
         $scope.closeElementGuide = function() { $modalInstance.dismiss(); };
+    }]
+);
+
+judoonCtrl.controller(
+    'LinkBuilderCtrl',
+    ['$scope', '$modalInstance', 'activeWidget', 'dataset',
+     function ($scope, $modalInstance, activeWidget, dataset) {
+
+         $scope.dataset = dataset;
+         $scope.activeWidget = activeWidget;
+         $scope.acc_columns = [];
+         angular.forEach(dataset.columns, function(value, key) {
+             if (value.data_type.match(/accession/i)) {
+                 $scope.acc_columns.push(value);
+             }
+         });
+
+         $scope.linkset = {};
+
+         $scope.url = {
+             active: {
+                 'acc':    activeWidget.url.varstring_type === 'accession' ? true : false,
+                 'var':    activeWidget.url.varstring_type === 'variable'  ? true : false,
+                 'static': activeWidget.url.varstring_type === 'static'    ? true : false
+             },
+             accession: {
+                 site: activeWidget.url.accession,
+                 source: activeWidget.url.variable_segments[0] || ''
+             },
+             variable: {
+                 prefix:   activeWidget.url.text_segments[0]     || '',
+                 variable: activeWidget.url.variable_segments[0] || '',
+                 suffix:   activeWidget.url.text_segments[1]     || ''
+             },
+             'static': activeWidget.url.text_segments[0] || ''
+         };
+         
+
+         $scope.label = {
+             type:     activeWidget.label.varstring_type,
+             'static': activeWidget.label.text_segments[0] || '',
+             variable: {
+                 prefix:   activeWidget.label.text_segments[0] || '',
+                 variable: activeWidget.label.variable_segments[0] || '',
+                 suffix:   activeWidget.label.text_segments[1] || ''
+             }
+         };
+
+
+         $scope.labelPreview = '';
+         function updateLabelPreview() {
+             switch ($scope.label.type) {
+             case 'default':
+                 $scope.labelPreview = 'default label';
+                 break;
+             case 'url':
+                 $scope.labelPreview = $scope.urlPreview;
+                 break;
+             case 'variable':
+                 $scope.labelPreview = $scope.label.variable.prefix
+                     + getSampleData($scope.label.variable.variable)
+                     + $scope.label.variable.suffix;
+                 break;
+             case 'static':
+                 $scope.labelPreview =  $scope.label['static'];
+                 break;
+             }
+         }
+         $scope.$watch('label', function() { updateLabelPreview(); }, true);
+
+         $scope.urlPreview = '';
+         function updateUrlPreview() {
+             if ($scope.url.active['static']) {
+                 $scope.urlPreview = $scope.url['static'];
+             }
+             else if ($scope.url.active['acc']) {
+                 var accession_parts = getPartsForAccession($scope.url.accession.site);
+                 $scope.urlPreview = accession_parts.prefix
+                     + getSampleData($scope.url.variable.variable)
+                     + accession_parts.suffix;
+             }
+             else if ($scope.url.active['var']) {
+                 $scope.urlPreview = $scope.url.variable.prefix
+                     + getSampleData($scope.url.variable.variable)
+                     + $scope.url.variable.suffix;
+             }
+         }
+         $scope.$watch('url', function() {
+             updateUrlPreview();
+             updateLabelPreview();
+         }, true);
+
+
+         var fakeSampleData = {
+             protein_name: 'Actinin',
+             flybase_id:   'Fbgn00534',
+             unigene_id:   4567965,
+             gene_symbol:  'ACTN1'
+         };
+         function getSampleData(field) { return fakeSampleData[field]; }
+         function getPartsForAccession() { return {prefix: 'moo', suffix: 'boo'}; }
+
+         $scope.closeLinkBuilder = function() {
+             $modalInstance.dismiss('cancel');
+             return false;
+         };
+
+         $scope.saveWidget = function() {
+             $modalInstance.close($scope.activeWidget);
+             return false;
+         };
     }]
 );
