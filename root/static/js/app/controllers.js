@@ -126,7 +126,7 @@ judoonCtrl.controller(
 
 
 
-judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', 'Dataset', function ($scope, $routeParams, Page, PageColumn, Dataset) {
+judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', 'Dataset', 'DatasetColumn', function ($scope, $routeParams, Page, PageColumn, Dataset, DatasetColumn) {
 
     // Attributes
     $scope.editmode = 0;
@@ -140,6 +140,11 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
         $scope.pageLoaded = 1;
         Dataset.get({id: page.dataset_id}, function (ds) {
             $scope.dataset = ds;
+        });
+        DatasetColumn.query({}, {dataset_id: page.dataset_id}, function (columns) {
+            $scope.dataset.columns = columns;
+            $scope.dsColumnsLoaded = 1;
+            $scope.dsColumnsOriginal = angular.copy(columns);
         });
     });
 
@@ -410,3 +415,29 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
     });
 
 }]);
+
+
+judoonCtrl.controller(
+    'PageColumnTemplateCtrl',
+    ['$scope', function ($scope) {
+
+        function addNode(node) { $scope.page.widgets.push(node); }
+        $scope.addTextNode = function() {
+            addNode({type: 'text', value: '', formatting: []});
+        };
+
+        $scope.addDataNode = function() {
+            addNode({type: 'data', name: '', formatting: []});
+        };
+
+        $scope.addNewlineNode = function() {
+            addNode({type: 'newline'});
+        };
+
+        $scope.addLinkNode = function() {
+            addNode({type: 'url', text_segments: [], variable_segments: [], formatting: []});
+        };
+
+
+    }]
+);

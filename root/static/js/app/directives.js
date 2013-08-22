@@ -160,3 +160,91 @@ judoonDir.directive('contenteditable', [function() {
         }
     };
 }]);
+
+
+judoonDir.directive(
+    'judoonTemplateBuilder',
+    [function() {
+
+        function controller($scope) {
+
+            return {
+                // addTextNode:     addTextNode,
+                // addVariableNode: addVariableNode,
+                // addNewlineNode:  addNewlineNode
+            }
+        }
+
+        function link($scope, elements, attributes, controller) {
+
+        }
+
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/template-builder.html',
+            link: link,
+            controller: controller,
+        };
+    }]
+);
+
+
+judoonDir.directive(
+    'judoonWidgetFactory',
+    ['$compile', function($compile) {
+        return {
+            restrict: 'E',
+            replace: true,
+            template: '<div></div>',
+            link: function(scope, element, attrs) {
+                element.append('<judoon-'+scope.widget.type+'-widget widget="widget">');
+                $compile(element.contents())(scope);
+            }
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonTextWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-text.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonVariableWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-variable.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonNewlineWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-newline.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonLinkWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-link.html'
+        };
+    }]
+);
