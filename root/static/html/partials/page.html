@@ -121,10 +121,10 @@
             <div class="span4">
               <h6>Add Elements <small> - <a href="#element_guide" data-toggle="modal">What is this?</a></small></h6>
               <div class="btn-group">
-                <a class="btn" id="btn_add_text">Text</a>
-                <a class="btn" id="btn_add_data">Data</a>
-                <a class="btn" id="btn_add_link">Link</a>
-                <a class="btn" id="btn_add_newline">Newline</a>
+                <a class="btn" ng-click="addTextNode()">Text</a>
+                <a class="btn" ng-click="addDataNode()">Data</a>
+                <a class="btn" ng-click="addLinkNode()">Link</a>
+                <a class="btn" ng-click="addNewlineNode()">Newline</a>
               </div>
             </div>
 
@@ -139,7 +139,7 @@
             <div class="span2">
               <h6>Actions</h6>
               <div class="btn-group">
-                <a class="btn" id="btn_backspace"><i class="icon-remove"></i> Delete</a>
+                <a class="btn" ng-click="removeNode()"><i class="icon-remove"></i> Delete</a>
               </div>
             </div>
 

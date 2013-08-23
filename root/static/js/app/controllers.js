@@ -428,46 +428,51 @@ judoonCtrl.controller(
             $scope.cursorWidget = $scope.currentColumn.widgets[ $scope.currentColumn.widgets.length - 1];
         });
 
+        /*
+         The cursor is positioned after $scope.cursorWidget in the
+         list of widgets. In order to position the cursor at the
+         beginning of the list, the column widgets are indexed using a
+         one-based indexing.  Index 0 is the beginning of the
+         list. Index 1 is the first widget in the list.
+         */
+        $scope.getCursorIndex = function() {
+            return !($scope.cursorWidget && $scope.currentColumn.widgets.length) ? 0
+                 : $scope.$parent.currentColumn.widgets.indexOf( $scope.cursorWidget ) + 1;
+        };
+
         $scope.cursorBack = function() {
-            if (!$scope.cursorWidget) {
-                return;
-            }
-
-            if (!$scope.currentColumn.widgets.length) {
-                return;
-            }
-
-            var index = $scope.$parent.currentColumn.widgets.indexOf( $scope.cursorWidget );
-            $scope.cursorWidget = index === 0 ? null : $scope.currentColumn.widgets[index - 1];
-
+            var cursorIdx = $scope.getCursorIndex();
+            $scope.cursorWidget = cursorIdx < 2 ? null
+                                : $scope.currentColumn.widgets[cursorIdx-2];
             return;
         };
 
         $scope.cursorForward = function() {
-            if (!$scope.currentColumn.widgets.length) {
+            var widgetCount = $scope.currentColumn.widgets.length;
+            if (!widgetCount) {
                 return;
             }
 
-            if (!$scope.cursorWidget) {
-                $scope.cursorWidget = $scope.currentColumn.widgets[0];
-            }
-            else {
-                var index = $scope.currentColumn.widgets.indexOf( $scope.cursorWidget );
-                if (index !== ($scope.currentColumn.widgets.length - 1)) {
-                    $scope.cursorWidget = $scope.currentColumn.widgets[index + 1];
-                }
+            var cursorIdx = $scope.getCursorIndex();
+            if (cursorIdx < widgetCount) {
+                $scope.cursorWidget = $scope.currentColumn.widgets[cursorIdx];
             }
 
             return;
         };
 
-        function addNode(node) { $scope.page.widgets.push(node); }
+        function addNode(node) {
+            var index = $scope.getCursorIndex();
+            $scope.currentColumn.widgets.splice(index, 0, node);
+            $scope.cursorWidget = $scope.currentColumn.widgets[index];
+            return;
+        }
         $scope.addTextNode = function() {
             addNode({type: 'text', value: '', formatting: []});
         };
 
         $scope.addDataNode = function() {
-            addNode({type: 'data', name: '', formatting: []});
+            addNode({type: 'variable', name: '', formatting: []});
         };
 
         $scope.addNewlineNode = function() {
@@ -475,7 +480,17 @@ judoonCtrl.controller(
         };
 
         $scope.addLinkNode = function() {
-            addNode({type: 'url', text_segments: [], variable_segments: [], formatting: []});
+            addNode({type: 'link', label: {}, url: {}, formatting: []});
+        };
+
+        $scope.removeNode = function() {
+            var index = $scope.getCursorIndex();
+            if (!index) {
+                return;
+            }
+            $scope.cursorBack();
+            $scope.currentColumn.widgets.splice(index-1, 1);
+            return;
         };
 
 
