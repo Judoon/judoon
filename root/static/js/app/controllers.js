@@ -494,5 +494,8 @@ judoonCtrl.controller(
         };
 
 
+        /* Modals */
+        $scope.openElementGuide  = function() { $scope.element_guide = true;  };
+        $scope.closeElementGuide = function() { $scope.element_guide = false; };
     }]
 );
