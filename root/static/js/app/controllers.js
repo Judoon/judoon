@@ -421,6 +421,46 @@ judoonCtrl.controller(
     'PageColumnTemplateCtrl',
     ['$scope', function ($scope) {
 
+        $scope.$watch('currentColumn', function() {
+            if (!$scope.currentColumn) {
+                return;
+            }
+            $scope.cursorWidget = $scope.currentColumn.widgets[ $scope.currentColumn.widgets.length - 1];
+        });
+
+        $scope.cursorBack = function() {
+            if (!$scope.cursorWidget) {
+                return;
+            }
+
+            if (!$scope.currentColumn.widgets.length) {
+                return;
+            }
+
+            var index = $scope.$parent.currentColumn.widgets.indexOf( $scope.cursorWidget );
+            $scope.cursorWidget = index === 0 ? null : $scope.currentColumn.widgets[index - 1];
+
+            return;
+        };
+
+        $scope.cursorForward = function() {
+            if (!$scope.currentColumn.widgets.length) {
+                return;
+            }
+
+            if (!$scope.cursorWidget) {
+                $scope.cursorWidget = $scope.currentColumn.widgets[0];
+            }
+            else {
+                var index = $scope.currentColumn.widgets.indexOf( $scope.cursorWidget );
+                if (index !== ($scope.currentColumn.widgets.length - 1)) {
+                    $scope.cursorWidget = $scope.currentColumn.widgets[index + 1];
+                }
+            }
+
+            return;
+        };
+
         function addNode(node) { $scope.page.widgets.push(node); }
         $scope.addTextNode = function() {
             addNode({type: 'text', value: '', formatting: []});

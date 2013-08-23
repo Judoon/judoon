@@ -163,34 +163,6 @@ judoonDir.directive('contenteditable', [function() {
 
 
 judoonDir.directive(
-    'judoonTemplateBuilder',
-    [function() {
-
-        function controller($scope) {
-
-            return {
-                // addTextNode:     addTextNode,
-                // addVariableNode: addVariableNode,
-                // addNewlineNode:  addNewlineNode
-            }
-        }
-
-        function link($scope, elements, attributes, controller) {
-
-        }
-
-        return {
-            restrict: 'E',
-            replace: false,
-            templateUrl: '/static/html/partials/template-builder.html',
-            link: link,
-            controller: controller,
-        };
-    }]
-);
-
-
-judoonDir.directive(
     'judoonWidgetFactory',
     ['$compile', function($compile) {
         return {
