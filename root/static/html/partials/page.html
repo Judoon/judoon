@@ -26,6 +26,10 @@
       vertical-align: bottom;
       padding: 0 0.4em;
     }
+
+    .boldit .widget-format-target { font-weight: bold; }
+    .italicit .widget-format-target { font-style: italic }
+
   </style>
 
 
@@ -139,7 +143,7 @@
             <div class="span2">
               <h6>Actions</h6>
               <div class="btn-group">
-                <a class="btn" ng-click="removeNode()"><i class="icon-remove"></i> Delete</a>
+                <a class="btn" ng-click="removeNodeAtCursor()"><i class="icon-remove"></i> Delete</a>
               </div>
             </div>
 

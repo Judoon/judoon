@@ -483,16 +483,22 @@ judoonCtrl.controller(
             addNode({type: 'link', label: {}, url: {}, formatting: []});
         };
 
-        $scope.removeNode = function() {
+        $scope.removeNodeAtCursor = function() {
             var index = $scope.getCursorIndex();
             if (!index) {
                 return;
             }
+
             $scope.cursorBack();
             $scope.currentColumn.widgets.splice(index-1, 1);
             return;
         };
 
+        $scope.removeNode = function(widget) {
+            var index = $scope.currentColumn.widgets.indexOf(widget);
+            $scope.currentColumn.widgets.splice(index, 1);
+            return;
+        };
 
         /* Modals */
         $scope.openElementGuide  = function() { $scope.element_guide = true;  };

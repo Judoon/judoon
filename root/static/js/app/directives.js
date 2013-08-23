@@ -168,7 +168,7 @@ judoonDir.directive(
         return {
             restrict: 'E',
             replace: true,
-            template: '<div class="widget-object widget-inline input-append dropdown"></div>',
+            template: '<div class="widget-object input-append dropdown"></div>',
             link: function(scope, element, attrs) {
                 element.append('<judoon-'+scope.widget.type+'-widget widget="widget">');
                 if (scope.widget.type !== 'newline') {
@@ -226,11 +226,43 @@ judoonDir.directive(
 
 judoonDir.directive(
     'judoonFormattingWidget',
-    [function() {
+    ['$timeout', function($timeout) {
+
+        function link(scope, elem, attrs, controller) {
+
+            function toggleFormatting(format) {
+                var idx = scope.widget.formatting.indexOf(format);
+                if (idx === -1) {
+                    scope.widget.formatting.push(format);
+                    elem.parent().addClass(format+'it');
+                }
+                else {
+                    scope.widget.formatting.splice(idx, 1);
+                    elem.parent().removeClass(format+'it');
+                }
+                return;
+            }
+            function toggleFormattingBold()   { toggleFormatting('bold');   }
+            function toggleFormattingItalic() { toggleFormatting('italic'); }
+
+            function deleteWidget() {
+                scope.$parent.removeNode(scope.widget);
+            }
+
+            var actions = elem.find('ul').find('a');
+            angular.element(actions[0]).on('click', toggleFormattingBold);
+            angular.element(actions[1]).on('click', toggleFormattingItalic);
+            angular.element(actions[2]).on('click', function(){
+                deleteWidget();
+                scope.$apply();
+            });
+        }
+
         return {
             restrict: 'E',
             replace: false,
-            templateUrl: '/static/html/partials/widget-formatting.html'
+            templateUrl: '/static/html/partials/widget-formatting.html',
+            link: link
         };
     }]
 );
