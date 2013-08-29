@@ -196,9 +196,12 @@ judoonDir.directive(
         return {
             restrict: 'E',
             replace: true,
-            template: '<div></div>',
+            template: '<div class="widget-object widget-inline input-append dropdown"></div>',
             link: function(scope, element, attrs) {
                 element.append('<judoon-'+scope.widget.type+'-widget widget="widget">');
+                if (scope.widget.type !== 'newline') {
+                    element.append('<judoon-formatting-widget>');
+                }
                 $compile(element.contents())(scope);
             }
         };
@@ -245,6 +248,17 @@ judoonDir.directive(
             restrict: 'E',
             replace: false,
             templateUrl: '/static/html/partials/widget-link.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonFormattingWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-formatting.html'
         };
     }]
 );
