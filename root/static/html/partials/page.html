@@ -152,22 +152,24 @@
             </div>
           </div>
 
-          <div modal="element_guide" close="closeElementGuide()">
-            <div class="modal-header">
-              <h3>How this works.</h3>
+          <script type="text/ng-template" id="elementGuide.html">
+            <div>
+              <div class="modal-header">
+                <h3>How this works.</h3>
+              </div>
+              <div class="modal-body">
+                <p>
+                  These buttons add elements to the canvas that let you control
+                  how your data is displayed.
+                </p>
+                <h5>Element Guide</h5>
+                <img src="/static/images/pagecolumn_components_labeled.png">
+              </div>
+              <div class="modal-footer">
+                <button class="btn" ng-click="closeElementGuide()">Close</button>
+              </div>
             </div>
-            <div class="modal-body">
-              <p>
-                These buttons add elements to the canvas that let you control
-                how your data is displayed.
-              </p>
-              <h5>Element Guide</h5>
-              <img src="/static/images/pagecolumn_components_labeled.png">
-            </div>
-            <div class="modal-footer">
-              <button class="btn" ng-click="closeElementGuide()">Close</button>
-            </div>
-          </div>
+          </script>
 
         </div>
       </div>

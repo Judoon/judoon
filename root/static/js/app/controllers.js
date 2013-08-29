@@ -419,7 +419,7 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
 
 judoonCtrl.controller(
     'PageColumnTemplateCtrl',
-    ['$scope', function ($scope) {
+    ['$scope', '$modal', function ($scope, $modal) {
 
         $scope.$watch('currentColumn', function() {
             if (!$scope.currentColumn) {
@@ -501,7 +501,18 @@ judoonCtrl.controller(
         };
 
         /* Modals */
-        $scope.openElementGuide  = function() { $scope.element_guide = true;  };
-        $scope.closeElementGuide = function() { $scope.element_guide = false; };
+        $scope.openElementGuide  = function() {
+            $modal.open({
+                templateUrl: 'elementGuide.html',
+                controller: 'ElementGuideCtrl'
+            });
+        };
+    }]
+);
+
+judoonCtrl.controller(
+    'ElementGuideCtrl',
+    ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+        $scope.closeElementGuide = function() { $modalInstance.dismiss(); };
     }]
 );

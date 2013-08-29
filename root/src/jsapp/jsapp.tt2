@@ -1,7 +1,7 @@
 [% extra_js = BLOCK %]
     <script src="/static/js/vendor/angular/angular.js"></script>
     <script src="/static/js/vendor/angular/angular-resource.js"></script>
-    <script src="/static/js/vendor/angular/ui-bootstrap-tpls-0.4.0.min.js"></script>
+    <script src="/static/js/vendor/angular/ui-bootstrap-tpls-0.6.0-SNAPSHOT.min.js"></script>
 
     <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
     <script src="/static/js/vendor/jquery.dataTables.js"></script>
