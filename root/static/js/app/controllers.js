@@ -277,6 +277,15 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
     };
 
 
+    $scope.updateColumn = function() {
+        PageColumn.update({
+            page_id:  $scope.currentColumn.page_id,
+            id:       $scope.currentColumn.id,
+            title:    $scope.currentColumn.title,
+            widgets:  $scope.currentColumn.widgets
+        });
+    };
+
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {
             "dataType": "json",
