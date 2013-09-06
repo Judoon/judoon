@@ -229,8 +229,10 @@ judoonDir.directive(
                 });
 
                 modalInstance.result.then(
-                    function (newWidget) {
-                        console.log("got a new widget: " + newWidget);
+                    function (linkProps) {
+                        widget.url   = linkProps.url;
+                        widget.label = linkProps.label;
+                        console.log("got a new widget: " + linkProps);
                     },
                     function () {
                         console.log("modal dismissed!");

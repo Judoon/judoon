@@ -577,8 +577,6 @@ judoonCtrl.controller(
              }
          });
 
-         $scope.linkset = {};
-
          $scope.url = {
              active: {
                  'acc':    activeWidget.url.varstring_type === 'accession' ? true : false,
@@ -586,7 +584,7 @@ judoonCtrl.controller(
                  'static': activeWidget.url.varstring_type === 'static'    ? true : false
              },
              accession: {
-                 site: activeWidget.url.accession,
+                 site:   activeWidget.url.accession,
                  source: activeWidget.url.variable_segments[0] || ''
              },
              variable: {
@@ -594,10 +592,9 @@ judoonCtrl.controller(
                  variable: activeWidget.url.variable_segments[0] || '',
                  suffix:   activeWidget.url.text_segments[1]     || ''
              },
-             'static': activeWidget.url.text_segments[0] || ''
+             'static': activeWidget.url.varstring_type === 'static' ? activeWidget.url.text_segments[0] : ''
          };
          
-
          $scope.label = {
              type:     activeWidget.label.varstring_type,
              'static': activeWidget.label.text_segments[0] || '',
@@ -607,6 +604,11 @@ judoonCtrl.controller(
                  suffix:   activeWidget.label.text_segments[1] || ''
              }
          };
+
+
+         $scope.$watch('url.accession.source', function() {
+             $scope.linkSite = getLinkableSites($scope.url.accession.source);
+         }, true);
 
 
          $scope.labelPreview = '';
@@ -636,7 +638,7 @@ judoonCtrl.controller(
                  $scope.urlPreview = $scope.url['static'];
              }
              else if ($scope.url.active['acc']) {
-                 var accession_parts = getPartsForAccession($scope.url.accession.site);
+                 var accession_parts = getUrlPartsForSite($scope.url.accession.site);
                  $scope.urlPreview = accession_parts.prefix
                      + getSampleData($scope.url.variable.variable)
                      + accession_parts.suffix;
@@ -659,8 +661,9 @@ judoonCtrl.controller(
              unigene_id:   4567965,
              gene_symbol:  'ACTN1'
          };
-         function getSampleData(field) { return fakeSampleData[field]; }
-         function getPartsForAccession() { return {prefix: 'moo', suffix: 'boo'}; }
+         function getSampleData(colname)    { return fakeSampleData[colname]; }
+         function getLinkableSites(colname) {}
+         function getUrlPartsForSite(site)  { return {prefix: 'moo', suffix: 'boo'}; }
 
          $scope.closeLinkBuilder = function() {
              $modalInstance.dismiss('cancel');
@@ -668,7 +671,63 @@ judoonCtrl.controller(
          };
 
          $scope.saveWidget = function() {
-             $modalInstance.close($scope.activeWidget);
+
+             var url;
+             if ($scope.url.active['static']) {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url['static']],
+                     variable_segments: [],
+                     varstring_type:    'static'
+                 };
+             }
+             else if ($scope.url.active['var']) {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url.variable.prefix, $scope.url.variable.suffix],
+                     variable_segments: [$scope.url.variable.variable],
+                     varstring_type:    'variable'
+                 };
+             }
+             else if ($scope.url.active['acc']) {
+                 var urlParts = getUrlPartsForSite($scope.url.accession.site, $scope.url.accession.accession);
+                 url = {
+                     accession:         $scope.url.accession.accession,
+                     text_segments:     [urlParts.prefix, urlParts.suffix],
+                     variable_segments: [$scope.url.accession.source],
+                     varstring_type:    'accession'
+                 };
+             }
+
+             var label;
+             if ($scope.label.type === 'default') {
+                 label = {
+                     text_segments:     [],
+                     variable_segments: [],
+                     varstring_type:    ''
+                 };
+             }
+             else if ($scope.label.type === 'static') {
+                 label = {
+                     text_segments:     [$scope.label['static']],
+                     variable_segments: [],
+                     varstring_type:    'static'
+                 };
+             }
+             else if ($scope.label.type === 'url') {
+                 label = angular.copy(url);
+                 label.varstring_type = label.variable_segments.length ? 'variable' : 'static';
+             }
+             else if ($scope.label.type === 'variable') {
+                 label = {
+                     text_segments:     [$scope.label.variable.prefix, $scope.label.variable.suffix],
+                     variable_segments: [$scope.label.variable.variable],
+                     varstring_type:    'variable'
+                 };
+             }
+             label.accession = '';
+
+             $modalInstance.close({url: url, label: label});
              return false;
          };
     }]
