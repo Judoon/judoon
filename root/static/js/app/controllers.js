@@ -126,7 +126,11 @@ judoonCtrl.controller(
 
 
 
-judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', 'Dataset', 'DatasetColumn', function ($scope, $routeParams, Page, PageColumn, Dataset, DatasetColumn) {
+judoonCtrl.controller(
+    'PageCtrl',
+    ['$scope', '$routeParams', '$http',
+     'Page', 'PageColumn', 'Dataset', 'DatasetColumn',
+     function ($scope, $routeParams, $http, Page, PageColumn, Dataset, DatasetColumn) {
 
     // Attributes
     $scope.editmode = 0;
@@ -285,6 +289,21 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
             widgets:  $scope.currentColumn.widgets
         });
     };
+
+
+    $scope.$watch('currentColumn.widgets', function() {
+        if (!$scope.currentColumn) {
+            return;
+        }
+        $http.post('/api/template', {widgets: $scope.currentColumn.widgets})
+            .success(function(data) {
+                $scope.currentColumn.template = data.template;
+            })
+            .error(function() {
+                $scope.alertError('Unable to translate template!');
+            });
+    }, true);
+
 
     $scope.alerts = [];
     $scope.alertSuccess = curryAlert('success');
