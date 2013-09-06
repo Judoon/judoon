@@ -50,6 +50,8 @@
     </div>
   </div>
 
+  <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+
   <div ng-show="editmode" class="editable_label" style="margin-bottom: -10px;">Page Title:</div>
   <h2 judoon-ckeditor ck-edit-type="inline" ng-class="{edit_outline: editmode}" ng-model="page.title" id="page_title" contenteditable="true" class="editable inline_editable"></h2>
 

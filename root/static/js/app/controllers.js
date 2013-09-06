@@ -286,6 +286,19 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
         });
     };
 
+    $scope.alerts = [];
+    $scope.alertSuccess = curryAlert('success');
+    $scope.alertError   = curryAlert('error');
+    $scope.alertWarning = curryAlert('warning');
+    $scope.alertInfo    = curryAlert('info');
+    function curryAlert(type) {
+        return function(msg) { $scope.alerts.push({type: type, msg: msg}); };
+    }
+    $scope.closeAlert = function(index) {
+        $scope.alerts.splice(index, 1);
+    };
+
+
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {
             "dataType": "json",
@@ -309,7 +322,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
                     data.aaData = new_data;
                 },
                 fnCallback
-            ],
+            ]
         } );
     };
 
