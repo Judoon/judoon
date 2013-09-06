@@ -221,7 +221,12 @@ judoonDir.directive(
             function openLinkBuilder(widget) {
                 var modalInstance = $modal.open({
                     resolve: {
-                        activeWidget: function() { return angular.copy(widget); },
+                        currentLink: function() {
+                            return {
+                                url:   angular.copy(widget.url),
+                                label: angular.copy(widget.label)
+                            };
+                        },
                         dataset: function() { return scope.dataset; }
                     },
                     templateUrl:  '/static/html/partials/widget-link-builder.html',

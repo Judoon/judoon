@@ -574,11 +574,10 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'LinkBuilderCtrl',
-    ['$scope', '$modalInstance', 'activeWidget', 'dataset',
-     function ($scope, $modalInstance, activeWidget, dataset) {
+    ['$scope', '$modalInstance', 'currentLink', 'dataset',
+     function ($scope, $modalInstance, currentLink, dataset) {
 
          $scope.dataset = dataset;
-         $scope.activeWidget = activeWidget;
          $scope.acc_columns = [];
          angular.forEach(dataset.columns, function(value, key) {
              if (value.data_type.match(/accession/i)) {
@@ -588,29 +587,29 @@ judoonCtrl.controller(
 
          $scope.url = {
              active: {
-                 'acc':    activeWidget.url.varstring_type === 'accession' ? true : false,
-                 'var':    activeWidget.url.varstring_type === 'variable'  ? true : false,
-                 'static': activeWidget.url.varstring_type === 'static'    ? true : false
+                 'acc':    currentLink.url.varstring_type === 'accession' ? true : false,
+                 'var':    currentLink.url.varstring_type === 'variable'  ? true : false,
+                 'static': currentLink.url.varstring_type === 'static'    ? true : false
              },
              accession: {
-                 site:   activeWidget.url.accession,
-                 source: activeWidget.url.variable_segments[0] || ''
+                 site:   currentLink.url.accession,
+                 source: currentLink.url.variable_segments[0] || ''
              },
              variable: {
-                 prefix:   activeWidget.url.text_segments[0]     || '',
-                 variable: activeWidget.url.variable_segments[0] || '',
-                 suffix:   activeWidget.url.text_segments[1]     || ''
+                 prefix:   currentLink.url.text_segments[0]     || '',
+                 variable: currentLink.url.variable_segments[0] || '',
+                 suffix:   currentLink.url.text_segments[1]     || ''
              },
-             'static': activeWidget.url.varstring_type === 'static' ? activeWidget.url.text_segments[0] : ''
+             'static': currentLink.url.varstring_type === 'static' ? currentLink.url.text_segments[0] : ''
          };
          
          $scope.label = {
-             type:     activeWidget.label.varstring_type,
-             'static': activeWidget.label.text_segments[0] || '',
+             type:     currentLink.label.varstring_type,
+             'static': currentLink.label.text_segments[0] || '',
              variable: {
-                 prefix:   activeWidget.label.text_segments[0] || '',
-                 variable: activeWidget.label.variable_segments[0] || '',
-                 suffix:   activeWidget.label.text_segments[1] || ''
+                 prefix:   currentLink.label.text_segments[0] || '',
+                 variable: currentLink.label.variable_segments[0] || '',
+                 suffix:   currentLink.label.text_segments[1] || ''
              }
          };
 
