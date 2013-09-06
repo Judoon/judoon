@@ -13,9 +13,14 @@ around update_resource => sub {
     my $self = shift;
     my $data = shift;
 
-    my $jstmpl = $data->{template};
-    my $tmpl   = Judoon::Tmpl->new_from_jstmpl($jstmpl);
-    $data->{template} = $tmpl;
+    if (my $jstmpl = delete $data->{template}) {
+        my $tmpl   = Judoon::Tmpl->new_from_jstmpl($jstmpl);
+        $data->{template} = $tmpl;
+    }
+    elsif (my $widgets = delete $data->{widgets}) {
+        my $tmpl = Judoon::Tmpl->new_from_data($widgets);
+        $data->{template} = $tmpl;
+    }
     return $self->$orig($data);
 };
 
