@@ -298,6 +298,8 @@ judoonCtrl.controller(
         };
     };
 
+    $scope.columnIsActive = function(column) { return $scope.editmode && angular.equals(column, $scope.currentColumn); };
+    $scope.columnIsDelete = function(column) { return $scope.editmode && angular.equals(column, $scope.deleteColumn);  };
 
     $scope.$watch('currentColumn.widgets', function() {
         if (!$scope.currentColumn) {
