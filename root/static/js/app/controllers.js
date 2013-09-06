@@ -480,7 +480,27 @@ judoonCtrl.controller(
         };
 
         $scope.addLinkNode = function() {
-            addNode({type: 'link', label: {}, url: {}, formatting: []});
+            addNode({
+                type: 'link',
+                formatting: [],
+                url: {
+                    type:              "varstring",
+                    varstring_type:    "variable",
+                    accession:         "",
+                    text_segments:     [],
+                    variable_segments: [],
+                    formatting:        []
+
+                },
+                label: {
+                    type:              "varstring",
+                    varstring_type:    "static",
+                    accession:         "",
+                    text_segments:     [],
+                    variable_segments: [],
+                    formatting:        []
+                }
+            });
         };
 
         $scope.removeNodeAtCursor = function() {
