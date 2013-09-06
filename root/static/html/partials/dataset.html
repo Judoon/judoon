@@ -168,18 +168,11 @@
                   <input type="radio" ng-model="newPage.type" value="clone">
                   Clone existing page
                 </label>
-                <label class="radio inline">
-                  <input type="radio" ng-model="newPage.type" value="template">
-                  From template
-                </label>
 
                 <div ng-switch on="newPage.type">
                   <span ng-switch-when="clone" class="help-block">
                     Create a new page that mimics the layout of an
                     exsiting page.
-                  </span>
-                  <span ng-switch-when="template" class="help-block">
-                    Create a new page from a provided template.
                   </span>
                   <span ng-switch-when="blank" class="help-block">
                     Create a new page without columns.
@@ -194,12 +187,6 @@
                 <div class="controls">
                   <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
                   </select>
-                </div>
-              </div>
-              <div ng-switch-when="template" class="control-group">
-                <label class="control-label">Template file:</label>
-                <div class="controls">
-                  <input type="file">
                 </div>
               </div>
             </div>
