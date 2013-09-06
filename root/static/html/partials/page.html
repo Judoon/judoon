@@ -27,9 +27,8 @@
       padding: 0 0.4em;
     }
 
-    .boldit .widget-format-target { font-weight: bold; }
+    .boldit   .widget-format-target { font-weight: bold; }
     .italicit .widget-format-target { font-style: italic }
-
   </style>
 
 
@@ -117,7 +116,7 @@
           <div id="column_canvas" class="well well-small" style="margin-bottom: 0;">
             <ul class="template_widget_list">
               <li class="list-top" ng-class="{cursor: !cursorWidget}" id="widget_list_top"><div></div></li>
-              <li ng-class="{cursor: cursorWidget==widget, newline: widget.type=='newline'}" ng-repeat="widget in currentColumn.widgets">
+              <li ng-class="{boldit: isBold(widget), italicit: isItalic(widget), cursor: cursorWidget==widget, newline: widget.type=='newline'}" ng-repeat="widget in currentColumn.widgets">
                 <judoon-widget-factory widget="widget">
               </li>
             </ul>

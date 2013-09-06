@@ -264,7 +264,7 @@ judoonDir.directive(
 
 judoonDir.directive(
     'judoonFormattingWidget',
-    ['$timeout', function($timeout) {
+    [function() {
 
         function link(scope, elem, attrs) {
 
@@ -272,11 +272,9 @@ judoonDir.directive(
                 var idx = scope.widget.formatting.indexOf(format);
                 if (idx === -1) {
                     scope.widget.formatting.push(format);
-                    elem.parent().addClass(format+'it');
                 }
                 else {
                     scope.widget.formatting.splice(idx, 1);
-                    elem.parent().removeClass(format+'it');
                 }
                 return;
             }
@@ -288,12 +286,9 @@ judoonDir.directive(
             }
 
             var actions = elem.find('ul').find('a');
-            angular.element(actions[0]).on('click', toggleFormattingBold);
-            angular.element(actions[1]).on('click', toggleFormattingItalic);
-            angular.element(actions[2]).on('click', function(){
-                deleteWidget();
-                scope.$apply();
-            });
+            angular.element(actions[0]).on('click', function() { toggleFormattingBold();   scope.$apply(); });
+            angular.element(actions[1]).on('click', function() { toggleFormattingItalic(); scope.$apply(); });
+            angular.element(actions[2]).on('click', function() { deleteWidget();           scope.$apply(); });
         }
 
         return {

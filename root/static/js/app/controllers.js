@@ -290,6 +290,14 @@ judoonCtrl.controller(
         });
     };
 
+    $scope.isBold   = curryFormatTest('bold');
+    $scope.isItalic = curryFormatTest('italic');
+    function curryFormatTest(format) {
+        return function(widget) {
+            return widget && widget.formatting && widget.formatting.some(function(e) { return e === format; });
+        };
+    };
+
 
     $scope.$watch('currentColumn.widgets', function() {
         if (!$scope.currentColumn) {
