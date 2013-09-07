@@ -113,7 +113,9 @@
         <tr class="even">
           <th class="header">Sample Data</th>
           <td class="sample_data" ng-repeat="column in dataset.columns">
-            {{column.sample_data.join(', ')}}&nbsp;
+            <ul class="unstyled">
+              <li ng-repeat="sample in column.sample_data">{{sample}}</li>
+            </ul>
           </td>
         </tr>
 
