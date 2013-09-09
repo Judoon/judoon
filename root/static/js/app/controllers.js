@@ -1,3 +1,7 @@
+/*jshint globalstrict: true */
+/*jshint jquery: true */
+/*global angular, Handlebars, window */
+
 'use strict';
 
 var judoonCtrl = angular.module('judoon.controllers', []);
@@ -230,7 +234,7 @@ judoonCtrl.controller(
             return;
         }
 
-        var confirmed = confirm("Are you sure you want to delete this column?");
+        var confirmed = window.confirm("Are you sure you want to delete this column?");
         if (confirmed) {
             PageColumn.delete(
                 {}, {page_id: $scope.pageId, id: $scope.deleteColumn.id},
@@ -310,7 +314,7 @@ judoonCtrl.controller(
         return function(widget) {
             return widget && widget.formatting && widget.formatting.some(function(e) { return e === format; });
         };
-    };
+    }
 
     $scope.columnIsActive = function(column) { return $scope.editmode && angular.equals(column, $scope.currentColumn); };
     $scope.columnIsDelete = function(column) { return $scope.editmode && angular.equals(column, $scope.deleteColumn);  };
@@ -405,10 +409,8 @@ judoonCtrl.controller(
 
     $scope.$watch('transformType', function() {
         if (
-            (!$scope.transformType)
-              ||
-            ($scope.transformType.id === 'join')
-              ||
+            (!$scope.transformType) ||
+            ($scope.transformType.id === 'join') ||
             ($scope.transformType.transforms)
         ) {
             return;
@@ -597,11 +599,11 @@ judoonCtrl.controller(
             });
         };
 
-        $scope.previewUrl = function() {
+        $scope.previewUrl = function(widget) {
             return zipSegments(widget.url);
         };
 
-        $scope.previewLabel = function() {
+        $scope.previewLabel = function(widget) {
             return zipSegments(widget.label);
         };
 
@@ -669,7 +671,7 @@ judoonCtrl.controller(
 
          $scope.$watch('url.accession.source', function() {
              $scope.linkSites = getLinkableSites(
-                 datatypeFor($scope.url.accession.source)
+                 getDataType($scope.url.accession.source)
              );
          }, true);
 
@@ -684,9 +686,9 @@ judoonCtrl.controller(
                  $scope.labelPreview = $scope.urlPreview;
                  break;
              case 'variable':
-                 $scope.labelPreview = $scope.label.variable.prefix
-                     + getSampleData($scope.label.variable.variable)
-                     + $scope.label.variable.suffix;
+                 $scope.labelPreview = $scope.label.variable.prefix +
+                     getSampleData($scope.label.variable.variable) +
+                     $scope.label.variable.suffix;
                  break;
              case 'static':
                  $scope.labelPreview =  $scope.label['static'];
@@ -700,16 +702,16 @@ judoonCtrl.controller(
              if ($scope.url.active['static']) {
                  $scope.urlPreview = $scope.url['static'];
              }
-             else if ($scope.url.active['acc']) {
+             else if ($scope.url.active.acc) {
                  var accession_parts = getUrlPartsForSite($scope.url.accession.site);
-                 $scope.urlPreview = accession_parts.prefix
-                     + getSampleData($scope.url.variable.variable)
-                     + accession_parts.suffix;
+                 $scope.urlPreview = accession_parts.prefix +
+                     getSampleData($scope.url.variable.variable) +
+                     accession_parts.suffix;
              }
              else if ($scope.url.active['var']) {
-                 $scope.urlPreview = $scope.url.variable.prefix
-                     + getSampleData($scope.url.variable.variable)
-                     + $scope.url.variable.suffix;
+                 $scope.urlPreview = $scope.url.variable.prefix +
+                     getSampleData($scope.url.variable.variable) +
+                     $scope.url.variable.suffix;
              }
          }
          $scope.$watch('url', function() {
@@ -719,7 +721,7 @@ judoonCtrl.controller(
 
 
          function getSampleData(colname) { return columns.dict[colname].sample_data[0]; }
-         function datatypeFor(colname)   { return columns.dict[colname].data_type; }
+         function getDataType(colname)   { return columns.dict[colname].data_type; }
 
          function getLinkableSites(accession) {
              return []; // siteLinker.accessions[accession];
@@ -755,8 +757,8 @@ judoonCtrl.controller(
                      varstring_type:    'variable'
                  };
              }
-             else if ($scope.url.active['acc']) {
-                 var urlParts = getUrlPartsForSite($scope.url.accession.site, datatypeFor($scope.url.accession.source));
+             else if ($scope.url.active.acc) {
+                 var urlParts = getUrlPartsForSite($scope.url.accession.site, getDataType($scope.url.accession.source));
                  url = {
                      accession:         $scope.url.accession.accession,
                      text_segments:     [urlParts.prefix, urlParts.suffix],

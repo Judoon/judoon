@@ -1,3 +1,6 @@
+/*jshint globalstrict: true */
+/*global angular, CKEDITOR */
+
 'use strict';
 
 var judoonDir = angular.module('judoon.directives', []);
@@ -10,13 +13,13 @@ var judoonDir = angular.module('judoon.directives', []);
 **/
 
 judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
-    var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">'
-        + '<thead>'
-        + '<th ng-class="{highlight: highlightActive({column: column}), \'highlight-danger\': highlightDelete({column: column})}"'
-             + ' ng-repeat="column in columns">{{ column[headerKey] }}</th>'
-        + '</thead>'
-        + '<tbody></tbody>'
-        + '</table>';
+    var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">' +
+        '<thead>' +
+        '<th ng-class="{highlight: highlightActive({column: column}), \'highlight-danger\': highlightDelete({column: column})}"' +
+           ' ng-repeat="column in columns">{{ column[headerKey] }}</th>' +
+        '</thead>' +
+        '<tbody></tbody>' +
+        '</table>';
 
 
     return {
@@ -49,9 +52,9 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
 
                 var tableOptions = angular.copy(defaultOptions);
-                tableOptions["aoColumns"] = [];
+                tableOptions.aoColumns = [];
                 angular.forEach(scope.columns, function (value, key) {
-                    tableOptions["aoColumns"][key] = value[scope.headerKey];
+                    tableOptions.aoColumns[key] = value[scope.headerKey];
                 } );
 
                 dataTable = element.dataTable(tableOptions);
@@ -64,7 +67,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
 
                 // this won't change over life of the directive
-                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.datasetId;
+                defaultOptions.sAjaxSource = "/api/datasetdata/" + scope.datasetId;
 
                 // just in case this fired after the columns watch
                 if (scope.columns && scope.columns.length) {
@@ -119,13 +122,14 @@ judoonDir.directive('judoonCkeditor', [function() {
             }
 
             scope.$watch('editmode', function() {
+                var ck;
                 if (scope.editmode == 1) {
                     elm.attr('contenteditable', 'true');
-                    var ck = CKEDITOR.inline(elm[0], ckConfig);
+                    ck = CKEDITOR.inline(elm[0], ckConfig);
                     elm.data('editor', ck);
                 }
                 else {
-                    var ck = elm.data('editor');
+                    ck = elm.data('editor');
                     if (ck) {
                         ck.destroy();
                     }
@@ -247,12 +251,8 @@ judoonDir.directive(
                     function (linkProps) {
                         widget.url   = linkProps.url;
                         widget.label = linkProps.label;
-                        console.log("got a new widget: " + linkProps);
-                    },
-                    function () {
-                        console.log("modal dismissed!");
                     }
-                )
+                );
             }
 
             angular.element(elem.find('input')).on(
