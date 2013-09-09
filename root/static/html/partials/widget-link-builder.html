@@ -43,7 +43,7 @@
                        <select ng-model="url.accession.source" ng-options="acc.shortname as acc.name for acc in columns.accessions"></select>
 
                        <p class="help-block">What site do you want to link to?</p>
-                       <select ng-model="url.accession.site" ng-options="link.value as link.text for link in linkSites.linkset"></select>
+                       <select ng-model="url.accession.site" ng-options="link.name as link.label for link in linkSites"></select>
                     </accordion-group>
                   </div>
 

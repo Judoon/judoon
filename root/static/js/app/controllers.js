@@ -167,7 +167,7 @@ judoonCtrl.controller(
             $http.get('/api/sitelinker/accession')
                 .success(function(data) {
                     angular.forEach(data, function(value) {
-                        $scope.siteLinker[value.accession] = value;
+                        $scope.siteLinker[value.name] = value;
                     });
                 });
         });
@@ -703,10 +703,18 @@ judoonCtrl.controller(
                  $scope.urlPreview = $scope.url['static'];
              }
              else if ($scope.url.active.acc) {
-                 var accession_parts = getUrlPartsForSite($scope.url.accession.site);
-                 $scope.urlPreview = accession_parts.prefix +
-                     getSampleData($scope.url.variable.variable) +
-                     accession_parts.suffix;
+                 if (!$scope.url.accession.site) {
+                     $scope.urlPreview = '';
+                 }
+                 else {
+                     var accession_parts = getUrlPartsForSite(
+                         $scope.url.accession.site,
+                         getDataType($scope.url.accession.source)
+                     );
+                     $scope.urlPreview = accession_parts.prefix +
+                         getSampleData($scope.url.accession.source) +
+                         accession_parts.suffix;
+                 }
              }
              else if ($scope.url.active['var']) {
                  $scope.urlPreview = $scope.url.variable.prefix +
@@ -724,12 +732,16 @@ judoonCtrl.controller(
          function getDataType(colname)   { return columns.dict[colname].data_type; }
 
          function getLinkableSites(accession) {
-             return []; // siteLinker.accessions[accession];
-             // return sitesForAccession(data_type);
+             return siteLinker[accession].sites;
          }
          function getUrlPartsForSite(site, accession)  {
-             return siteLinker.accessions[accession].sites[site];
-             //return {prefix: 'moo', suffix: 'boo'};
+             var parts;
+             angular.forEach(siteLinker[accession].sites, function(value) {
+                 if (value.name === site) {
+                     parts = value.mapping;
+                 }
+             });
+             return parts;
          }
 
 
