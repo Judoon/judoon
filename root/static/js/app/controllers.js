@@ -145,6 +145,7 @@ judoonCtrl.controller(
         Dataset.get({id: page.dataset_id}, function (ds) {
             $scope.dataset = ds;
         });
+
         DatasetColumn.query({}, {dataset_id: page.dataset_id}, function (columns) {
             $scope.dataset.columns = columns;
             $scope.dsColumnsLoaded = 1;
@@ -157,9 +158,6 @@ judoonCtrl.controller(
     }, true);
 
 
-    $scope.newColumnName;
-    $scope.currentColumn;
-    $scope.deleteColumn;
     PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
         $scope.pageColumnsOriginal = angular.copy(columns);
         $scope.pageColumns = columns;
@@ -181,7 +179,7 @@ judoonCtrl.controller(
             title:      $scope.page.title,
             preamble:   $scope.page.preamble,
             postamble:  $scope.page.postamble,
-            dataset_id: $scope.page.dataset_id,
+            dataset_id: $scope.page.dataset_id
         });
 
         angular.forEach($scope.pageColumns, function (value, key) {
@@ -358,7 +356,11 @@ judoonCtrl.controller(
 }]);
 
 
-judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Transform', '$window', function ($scope, $routeParams, Dataset, DatasetColumn, Transform, $window) {
+judoonCtrl.controller(
+    'DatasetColumnCtrl',
+    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn',
+     'Transform', '$window',
+     function ($scope, $routeParams, Dataset, DatasetColumn, Transform, $window) {
 
     $scope.userName  = $routeParams.userName;
     $scope.datasetId = $routeParams.datasetId;
