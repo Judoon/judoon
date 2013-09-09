@@ -230,7 +230,14 @@ judoonDir.directive(
                                 label: angular.copy(widget.label)
                             };
                         },
-                        dataset: function() { return scope.dataset; }
+                        columns: function() {
+                            return {
+                                all:        scope.dataset.columns,
+                                accessions: scope.ds_columns.accessions,
+                                dict:       scope.ds_columns.dict
+                            };
+                        },
+                        siteLinker: function() { return scope.siteLinker; }
                     },
                     templateUrl:  '/static/html/partials/widget-link-builder.html',
                     controller: 'LinkBuilderCtrl'

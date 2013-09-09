@@ -150,6 +150,22 @@ judoonCtrl.controller(
             $scope.dataset.columns = columns;
             $scope.dsColumnsLoaded = 1;
             $scope.dsColumnsOriginal = angular.copy(columns);
+
+            $scope.ds_columns = {accessions: [], dict: {}};
+            angular.forEach(columns, function(value, key) {
+                $scope.ds_columns.dict[value.shortname] = value;
+                if (value.data_type.match(/accession/i)) {
+                    $scope.ds_columns.accessions.push(value);
+                }
+            });
+
+            $scope.siteLinker = {};
+            $http.get('/api/sitelinker/accession')
+                .success(function(data) {
+                    angular.forEach(data, function(value) {
+                        $scope.siteLinker[value.accession] = value;
+                    });
+                });
         });
     });
 
@@ -603,8 +619,8 @@ judoonCtrl.controller(
             return retstring;
         }
 
-        function getSampleData(variable) {
-            return $scope.sample_data[variable] || '';
+        function getSampleData(colname) {
+            return $scope.ds_columns.dict[colname].sample_data[0] || '';
         }
     }]
 );
@@ -618,17 +634,10 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'LinkBuilderCtrl',
-    ['$scope', '$modalInstance', 'currentLink', 'dataset',
-     function ($scope, $modalInstance, currentLink, dataset) {
+    ['$scope', '$modalInstance', 'currentLink', 'columns', 'siteLinker',
+     function ($scope, $modalInstance, currentLink, columns, siteLinker) {
 
-         $scope.dataset = dataset;
-         $scope.acc_columns = [];
-         angular.forEach(dataset.columns, function(value, key) {
-             if (value.data_type.match(/accession/i)) {
-                 $scope.acc_columns.push(value);
-             }
-         });
-
+         $scope.columns = columns;
          $scope.url = {
              active: {
                  'acc':    currentLink.url.varstring_type === 'accession' ? true : false,
@@ -659,7 +668,9 @@ judoonCtrl.controller(
 
 
          $scope.$watch('url.accession.source', function() {
-             $scope.linkSite = getLinkableSites($scope.url.accession.source);
+             $scope.linkSites = getLinkableSites(
+                 datatypeFor($scope.url.accession.source)
+             );
          }, true);
 
 
@@ -707,15 +718,18 @@ judoonCtrl.controller(
          }, true);
 
 
-         var fakeSampleData = {
-             protein_name: 'Actinin',
-             flybase_id:   'Fbgn00534',
-             unigene_id:   4567965,
-             gene_symbol:  'ACTN1'
-         };
-         function getSampleData(colname)    { return fakeSampleData[colname]; }
-         function getLinkableSites(colname) {}
-         function getUrlPartsForSite(site)  { return {prefix: 'moo', suffix: 'boo'}; }
+         function getSampleData(colname) { return columns.dict[colname].sample_data[0]; }
+         function datatypeFor(colname)   { return columns.dict[colname].data_type; }
+
+         function getLinkableSites(accession) {
+             return []; // siteLinker.accessions[accession];
+             // return sitesForAccession(data_type);
+         }
+         function getUrlPartsForSite(site, accession)  {
+             return siteLinker.accessions[accession].sites[site];
+             //return {prefix: 'moo', suffix: 'boo'};
+         }
+
 
          $scope.closeLinkBuilder = function() {
              $modalInstance.dismiss('cancel');
@@ -742,7 +756,7 @@ judoonCtrl.controller(
                  };
              }
              else if ($scope.url.active['acc']) {
-                 var urlParts = getUrlPartsForSite($scope.url.accession.site, $scope.url.accession.accession);
+                 var urlParts = getUrlPartsForSite($scope.url.accession.site, datatypeFor($scope.url.accession.source));
                  url = {
                      accession:         $scope.url.accession.accession,
                      text_segments:     [urlParts.prefix, urlParts.suffix],

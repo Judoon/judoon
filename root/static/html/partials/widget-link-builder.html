@@ -35,15 +35,15 @@
               <div class="span11">
                 <accordion close-others="1">
 
-                  <div ng-show="acc_columns.length">
+                  <div ng-show="columns.accessions.length">
                     <accordion-group is-open="url.active.acc">
                        <accordion-heading>Link to another site using an accession in your dataset:</accordion-heading>
 
                        <p class="help-block">Which column should the link be based off of?</p>
-                       <select ng-model="url.accession.source" ng-options="acc.shortname as acc.name for acc in acc_columns"></select>
+                       <select ng-model="url.accession.source" ng-options="acc.shortname as acc.name for acc in columns.accessions"></select>
 
                        <p class="help-block">What site do you want to link to?</p>
-                       <select ng-model="url.accession.site" ng-options="link.value as link.text for link in linkSite.linkset"></select>
+                       <select ng-model="url.accession.site" ng-options="link.value as link.text for link in linkSites.linkset"></select>
                     </accordion-group>
                   </div>
 
@@ -51,7 +51,7 @@
                     <accordion-heading>Construct your own url from a dataset column:</accordion-heading>
 
                     <label>URL prefix: <input type="text" class="input-large" ng-model="url.variable.prefix" placeholder="usually http://..."></label>
-                    <select ng-model="url.variable.variable" ng-options="col.shortname as col.name for col in dataset.columns"></select>
+                    <select ng-model="url.variable.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
                     <label>URL suffix: <input type="text" class="input-large" ng-model="url.variable.suffix" placeholder="ex.: /index.html"></label>
                   </accordion-group>
 
@@ -86,7 +86,7 @@
 
                 <label class="radio"><input type="radio" ng-model="label.type" value="variable">Use column data:</label>
                 <label><input type="text" class="input-large" ng-model="label.variable.prefix" placeholder="Label prefix (optional)"></label>
-                <select ng-model="label.variable.variable" ng-options="col.shortname as col.name for col in dataset.columns"></select>
+                <select ng-model="label.variable.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
                 <label><input type="text" class="input-large" ng-model="label.variable.suffix" placeholder="Label suffix (optional)"></label>
               </div>
             </div>
