@@ -2,7 +2,7 @@ package Judoon::Schema::Result::Dataset;
 
 =pod
 
-=for stopwords datastore shortnames tablename
+=for stopwords datastore shortnames tablename longname longnames de
 
 =encoding utf8
 
@@ -15,14 +15,18 @@ Judoon::Schema::Result::Dataset
 use Judoon::Schema::Candy;
 use Moo;
 
+use MooX::Types::MooseLike::Base qw(InstanceOf);
 
+use Clone qw(clone);
 use Data::UUID;
 use DateTime;
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Impossible;
 use Judoon::Tmpl;
+use Judoon::TypeRegistry;
 use List::AllUtils qw(each_arrayref);
 use Spreadsheet::WriteExcel ();
+use Text::Unidecode;
 
 
 table 'datasets';
@@ -101,7 +105,38 @@ __PACKAGE__->register_permissions;
 __PACKAGE__->register_timestamps;
 
 
+=head1 ATTRIBUTES
+
+=head2 type_registry
+
+An instance of L<Judoon::TypeRegistry>
+
+=cut
+
+has type_registry => (
+    is  => 'lazy',
+    isa => InstanceOf['Judoon::TypeRegistry']
+);
+sub _build_type_registry { Judoon::TypeRegistry->new; }
+
+
 =head1 METHODS
+
+=head2 TO_JSON()
+
+Return a data structure that represents this DatasetColumn suitable
+for serialization.
+
+=cut
+
+sub TO_JSON {
+    my ($self) = @_;
+
+    my $json = $self->next::method();
+    $json->{description} = delete $json->{notes};
+    return $json;
+}
+
 
 =head2 delete()
 
@@ -158,7 +193,7 @@ sub import_from_spreadsheet {
         got      => q{->isa('} . ref($spreadsheet) . q{')},
     }) unless (ref $spreadsheet eq 'Judoon::Spreadsheet');
 
-    my $table_name = $self->_store_data($spreadsheet);
+    my ($table_name, $fields) = $self->_store_data($spreadsheet);
 
     $self->name($spreadsheet->name);
     $self->tablename($table_name);
@@ -169,14 +204,39 @@ sub import_from_spreadsheet {
     $self->update;
 
     my $sort = 1;
-    for my $field (@{ $spreadsheet->fields }) {
+    for my $field (@$fields) {
         $self->create_related('ds_columns', {
-            name => $field->{name}, shortname => $field->{shortname},
-            sort => $sort++, data_type => $field->{type},
+            name => $field->{longname}, shortname => $field->{shortname},
+            data_type => $self->type_registry->pg_types->{$field->{type}},
+            sort => $sort++,
         });
     }
 
     return $self;
+}
+
+
+=head2 new_computed_column( $name, $transform )
+
+Add a new column to the Dataset, derived by applying a transform (in
+the form of a C<Judoon::Transform>) to an existing column.
+
+=cut
+
+sub new_computed_column {
+    my ($self, $name, $transform) = @_;
+
+    my $computed_ds = $self->new_related('ds_columns', {}); #computed => 1,});
+
+    my ($longname, $shortname) = @{ ($self->_unique_names($name))[0] };
+    $computed_ds->name($longname);
+    $computed_ds->shortname($shortname);
+
+    $computed_ds->data_type($transform->result_data_type());
+    $computed_ds->insert();
+
+    $self->_deploy_computed_column($computed_ds, $transform);
+    return $computed_ds;
 }
 
 
@@ -219,6 +279,36 @@ EOS
     return $page;
 }
 
+
+=head2 long_headers
+
+Return list of the human-readable C<DatasetColumn> names.
+
+=cut
+
+sub long_headers {
+    my ($self) = @_;
+    return map {$_->name} $self->ds_columns_ordered->all;
+}
+
+
+=head2 short_headers
+
+Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
+
+=cut
+
+sub short_headers {
+    my ($self) = @_;
+    return map {$_->shortname} $self->ds_columns_ordered->all;
+}
+
+
+
+=head1 VIEW METHODS
+
+The following methods return a representation of the C<Dataset> in
+different formats.
 
 =head2 data_table( $args )
 
@@ -277,47 +367,43 @@ sub as_excel {
 }
 
 
-=head2 long_headers
-
-Return list of the human-readable C<DatasetColumn> names.
-
-=cut
-
-sub long_headers {
-    my ($self) = @_;
-    return map {$_->name} $self->ds_columns_ordered->all;
-}
-
-
-=head2 short_headers
-
-Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
-
-=cut
-
-sub short_headers {
-    my ($self) = @_;
-    return map {$_->shortname} $self->ds_columns_ordered->all;
-}
-
-
-sub TO_JSON {
-    my ($self) = @_;
-
-    my $json = $self->next::method();
-    $json->{description} = delete $json->{notes};
-    return $json;
-}
-
 
 =head1 DATASTORE
 
 The following methods create and retrieve the actual dataset data,
 which is stored in a different schema and table.
 
+=head2 schema_name() / _build_schema_name()
+
+Return schema name, which changes based on database engine.  For
+SQLite, the schema name is always 'data'.  For Pg, it's based on the
+name of the user.
+
+=cut
+
+has schema_name => (is => 'lazy',);
+sub _build_schema_name {
+    my ($self) = @_;
+    return $self->user->schema_name;
+}
+
+
+=head2 datastore_name()
+
+Convenience method for getting fully-qualified datastore
+name ($schema_name.$table_name).
+
+=cut
+
+sub datastore_name {
+    my ($self) = @_;
+    return $self->schema_name . '.' . $self->tablename;
+}
+
+
 =head2 data() / _build_data()
 
-Accessor for getting at the data stored in the Datastore.
+Attribute for getting at the data stored in the Datastore.
 
 =cut
 
@@ -327,9 +413,75 @@ sub _build_data {
 
     my @columns = map {$_->shortname} sort {$a->sort <=> $b->sort}
         $self->ds_columns_ordered->all;
-    my $select = join ', ', @columns;
+    return $self->column_data(@columns);
+}
 
-    my $table = $self->schema_name . '.' . $self->tablename;
+
+=head2 id_data() / _build_id_data()
+
+Attribute for storing the id column data in the datastore.
+
+=cut
+
+has id_data => (is => 'lazy',);
+sub _build_id_data {
+    my ($self) = @_;
+    return $self->column_data('id');
+}
+
+
+=head2 sample_data( $sample_count?, @columns? )
+
+Method for retrieving sample data i.e. the first C<$sample_count>
+non-blank entries for each column in C<@columns>. C<$sample_count>
+defaults to 1. C<@columns> defaults to all columns in the dataset.
+
+=cut
+
+sub sample_data {
+    my ($self, $sample_count, @cols) = @_;
+
+    $sample_count ||= 1;
+
+    my $data;
+    if (@cols) {
+        $data = $self->column_data(@cols);
+    }
+    else {
+        @cols = map {$_->{shortname}} $self->ds_columns_ordered->hri->all;
+        $data = $self->data;
+    }
+
+    my @sample_data = map {[]} @cols;
+    for my $idx (0..$#cols) {
+        my $samples_found = 0;
+      ROW_SEARCH:
+        for my $row (@$data) {
+            last ROW_SEARCH if ($samples_found >= $sample_count);
+            if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
+                push @{$sample_data[$idx]}, $row->[$idx];
+                $samples_found++;
+            }
+        }
+    }
+
+    my %sample_data;
+    @sample_data{@cols} = @sample_data;
+    return \%sample_data;
+}
+
+
+=head2 column_data(@columns)
+
+Fetch arrayref of arrayrefs of column data for each entry in
+C<@column>. Entries in C<@column> must be a valid C<shortname>.
+
+=cut
+
+sub column_data {
+    my ($self, @columns) = @_;
+    my $select = join ', ', @columns;
+    my $table = $self->datastore_name;
     return $self->result_source->storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
@@ -339,29 +491,6 @@ sub _build_data {
         },
     );
 }
-
-
-has sample_data => (is => 'lazy',);
-sub _build_sample_data {
-    my ($self) = @_;
-
-    my @sample_data;
-    for my $idx (0..$self->nbr_columns-1) {
-      ROW_SEARCH:
-        for my $row (@{$self->data}) {
-            if (defined($row->[$idx]) && $row->[$idx] =~ m/\S/) {
-                push @sample_data, $row->[$idx];
-                last ROW_SEARCH;
-            }
-        }
-    }
-
-    my %sample_data;
-    @sample_data{map {$_->shortname} $self->ds_columns_ordered->all}
-        = @sample_data;
-    return \%sample_data;
-}
-
 
 
 =head2 _store_data( $spreadsheet )
@@ -384,24 +513,25 @@ sub _store_data {
 
     my $schema     = $self->schema_name;
     my $table_name = $self->_gen_table_name( $spreadsheet->name );
-    my @fields     = @{ $spreadsheet->fields };
+
+    my @fields       = @{ clone $spreadsheet->fields };
+    my @unique_names = $self->_unique_names(map {$_->{name}} @fields);
+    for (my $i=0; $i<=$#fields; $i++) {
+        @{$fields[$i]}{qw(longname shortname)} = @{$unique_names[$i]};
+    }
+
     my $sql        = qq{CREATE TABLE "$schema"."$table_name" (\n}
+        . qq|"id" serial,\n|
         . join(",\n", map { qq|"$_->{shortname}" text| } @fields)
         . ')';
 
     # create table
-    my $dbic_storage = $self->result_source->storage;
-    $dbic_storage->dbh_do(
-        sub {
-            my ($storage, $dbh) = @_;
-            $dbh->do($sql);
-        },
-    );
+    $self->_run_sql($sql);
 
     # populate table
     my $field_list = join ', ', map {$_->{shortname}} @fields;
     my $join_list  = join ', ', (('?') x @fields);
-    $dbic_storage->dbh_do(
+    $self->result_source->storage->dbh_do(
         sub {
             my ($storage, $dbh) = @_;
             my $sth_insert = $dbh->prepare_cached(
@@ -411,26 +541,68 @@ sub _store_data {
         },
     );
 
-    return $table_name;
+    return ($table_name, \@fields);
 }
 
 
 =head2 _delete_datastore()
 
+Delete the datastore table from the user's schema.
 
 =cut
 
 sub _delete_datastore {
     my ($self) = @_;
+    $self->_run_sql('DROP TABLE ' . $self->datastore_name);
+    return;
+}
 
-    my $dbic_storage = $self->result_source->storage;
-    $dbic_storage->dbh_do(
-        sub {
-            my ($storage, $dbh) = @_;
-            my ($schema_name, $table_name) = ($self->schema_name, $self->tablename);
-            $dbh->do(qq{DROP TABLE $schema_name.$table_name});
-        },
+
+=head2 _deploy_computed_column( $ds_col, $transform )
+
+Add the computed column to the datastore and fill in its data by
+applying the C<Judoon::Transform> to the source field.
+
+=cut
+
+sub _deploy_computed_column {
+    my ($self, $ds_col, $transform) = @_;
+
+    my $alter_stmt = 'ALTER TABLE ' . $self->datastore_name
+        . ' ADD COLUMN ' . $ds_col->shortname . ' '
+            . $transform->result_data_type;
+    $self->_run_sql($alter_stmt);
+
+    my @short_headers = $self->short_headers;
+    my $data = $self->data;
+
+    my $col_idx = 0;
+    for my $sname (@short_headers) {
+        last if ($sname eq $transform->input_field);
+        $col_idx++
+    }
+
+    my @col_data = map {$_->[$col_idx]} @$data;
+    my $transform_data = $transform->apply_batch(\@col_data);
+    my $id_data = $self->id_data;
+    my @virtual_col;
+    for (my $i=0; $i<=$#col_data; $i++) {
+        push @virtual_col, [$id_data->[$i][0], $transform_data->[$i]];
+    }
+
+    my $dstore_name  = $self->datastore_name;
+    my $ds_col_sname = $ds_col->shortname;
+    my $value_list   = join(', ',
+        map {q{('} . $_->[1] . q{', } . $_->[0] . ')'} @virtual_col
     );
+    my $update_stmt = 'UPDATE ' . $dstore_name . ' AS src SET '
+        . $ds_col_sname . " = v.computed_value\n   FROM (VALUES "
+        . $value_list . ") AS v (computed_value, id) \n   WHERE src.id=v.id";
+    $self->_run_sql($update_stmt);
+
+    # UPDATE moo SET (lc_column) = v.computed_value
+    #   FROM (VALUES ("grr", 1), ("meow", "2"), ("quack", "3")) AS v (computed_value, id)
+    #   WHERE moo.id=v.id;
     return;
 }
 
@@ -487,18 +659,175 @@ sub _table_exists {
 }
 
 
-=head2 schema_name() / _build_schema_name()
+=head2 _run_sql
 
-Return schema name, which changes based on database engine.  For
-SQLite, the schema name is always 'data'.  For Pg, it's based on the
-name of the user.
+Convenience method for running sql directly.
 
 =cut
 
-has schema_name => (is => 'lazy',);
-sub _build_schema_name {
+sub _run_sql {
+    my ($self, $sql) = @_;
+    $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh) = @_;
+            $dbh->do($sql);
+        },
+    );
+    return;
+}
+
+
+
+=head2 Unique name utilities
+
+We need to be able to generate unique names for our columns when
+importing a new dataset or creating new computed columns.  There are
+two types of names, longnames and shortnames.
+
+B<Longnames> are the user-friendly names given by the user in the
+source spreadsheet or when adding a new computed column.  Longnames
+correspond to the C<name> field of the DatasetColumn.  If a given
+longname is blank, it is replaced with the string 'C<(untitled
+column)>'.  Duplicate longnames are de-duplicated by appending strings
+of the format 'C<($number)> e.g. 'C<Foo (1)>', 'C<Foo (2)>', etc.
+
+B<Shortnames> are normalized versions of the longname, suitable for
+use as SQL column names. The shortname 'C<id>' is reserved for use by
+Judoon as a primary key column on datastore tables.  Duplicate
+shortnames have a string of the format 'C<_%02d>' appended. Shortnames
+are stored in the C<shortname> field of the DatasetColumn and are used
+as the corresponding column name in the datastore.
+
+For both types of names, if we fail to find a unique name after
+appending X unique numbers, we use L</Data::UUID> to generate a
+globally unique id, then append that.
+
+An sql-normalized version of the name, suitable for use as an SQL
+column name.  Must be unique to the entire dataset, so may have
+trailing integers appended.  In the pathological case where more than
+100 columns have the same name, we start appending UUIDs. Don't do that.
+If that doesn't work, then I guess this is the end.
+
+=head3 _seenlong / _build__seenlong
+
+Longnames we've seen already.
+
+=head3 _seenshort / _build__seenshort
+
+Shortnames we've seen already.  'id' is reserved.
+
+=head3 _unique_names( @names )
+
+Convenience method that calls C<_unique_longname()> and
+C<_unique_shortname()> for each entry in C<@names>.  Returns a list of
+C<[ $longname, $shortname ]> pairs.
+
+=head3 _unique_longname( $name )
+
+Generate a longname as described above.
+
+=head3 _unique_shortname( $name )
+
+Generate a shortname as described above.
+
+=cut
+
+has _seenlong  => (is => 'lazy');
+sub _build__seenlong {
     my ($self) = @_;
-    return $self->user->schema_name;
+    my @cols = $self->ds_columns_ordered->hri->all;
+    return {map {$_->{name} => 1} @cols};
+}
+
+has _seenshort => (is => 'lazy');
+sub _build__seenshort {
+    my ($self) = @_;
+    my @cols = $self->ds_columns_ordered->hri->all;
+    return {id => 1, map {$_->{shortname} => 1} @cols};
+}
+
+sub _unique_names {
+    my ($self, @names) = @_;
+
+    my @uniques;
+    for my $name (@names) {
+        push @uniques, [
+            $self->_unique_longname($name),
+            $self->_unique_shortname($name),
+        ];
+    }
+
+    return @uniques;
+}
+
+# generate a unique column title
+sub _unique_longname {
+    my ($self, $header) = @_;
+
+    $header = '(untitled column)' if (!defined($header) || $header eq '');
+
+    return $header if (not $self->_seenlong->{$header}++);
+
+    for my $i (1..999) {
+        my $new_header = $header . " ($i)";
+        return $new_header if (not $self->_seenlong->{$new_header}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $header . " ($uuid)";
+        return $uuid_name if(not $self->_seenlong->{$uuid_name}++);
+    }
+
+    Judoon::Error::Devel::Impossible->throw({                        # uncoverable statement
+        message => "couldn't generate a unique column name: "        # uncoverable statement
+            . p(%{ {header => $header, seen => $self->_seenlong} }), # uncoverable statement
+    });                                                              # uncoverable statement
+}
+
+# generate a unique sql-valid name for a column based off its text
+# name.
+sub _unique_shortname {
+    my ($self, $name) = @_;
+
+    $name = 'untitled' if (!defined($name) || $name eq '');
+
+    $name = unidecode($name);
+
+    # stolen from SQL::Translator::Utils::normalize_name
+    # The name can only begin with a-zA-Z_; if there's anything
+    # else, prefix with _
+    $name =~ s/^([^a-zA-Z_])/_$1/;
+
+    # anything other than a-zA-Z0-9_ in the non-first position
+    # needs to be turned into _
+    $name =~ tr/[a-zA-Z0-9_]/_/c;
+
+    # All duplicated _ need to be squashed into one.
+    $name =~ tr/_/_/s;
+
+    # Trim a trailing _
+    $name =~ s/_$//;
+
+    $name = lc $name;
+
+    return $name if (!$self->_seenshort->{$name}++);
+
+    for my $suffix (map {sprintf '%02d', $_} 1..99) {
+        my $new_colname = $name . '_' . $suffix;
+        return $new_colname if (!$self->_seenshort->{$new_colname}++);
+    }
+
+    for my $i (0..10) {
+        my $uuid = Data::UUID->new->create_str();
+        my $uuid_name = $name . '_' . $uuid;
+        return $uuid_name if(!$self->_seenshort->{$uuid_name}++);
+    }
+
+    Judoon::Error::Devel::Impossible->throw({                     # uncoverable statement
+        message => "couldn't generate a unique sql column name: " # uncoverable statement
+            . p(%{ {name => $name, seen => $self->_seenshort} }), # uncoverable statement
+    });                                                           # uncoverable statement
 }
 
 

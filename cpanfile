@@ -24,6 +24,7 @@ requires 'Catalyst::Runtime' => '5.90042';
 requires 'Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack';
 requires 'Catalyst::View::TT';
 requires 'CatalystX::RoleApplicator';
+requires 'Clone';
 requires 'Config::General' => '2.51';
 requires 'Data::Entropy::Algorithms';
 requires 'Data::UUID';
@@ -97,6 +98,8 @@ requires 'Text::CSV';
 requires 'Text::Unidecode';
 requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
+requires 'Type::Registry';
+requires 'Type::Tiny';
 requires 'URI';
 requires 'Web::Machine';
 

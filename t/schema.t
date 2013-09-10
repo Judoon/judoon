@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use lib q{t/lib};
 
@@ -14,6 +15,7 @@ use Data::Printer;
 use DateTime;
 use Judoon::Spreadsheet;
 use Judoon::Tmpl;
+use Judoon::Types::Core qw(CoreType_Text);
 use Spreadsheet::ParseExcel;
 
 sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
@@ -136,6 +138,8 @@ subtest 'Result::Dataset' => sub {
     is_deeply $mutable_ds->data_table, [["Name", "Age", "Gender"], @$xls_ds_data],
         'Data table is as expected';
     is $mutable_ds->as_raw, "Name\tAge\tGender\nVa Bene\t14\tfemale\nChloe\t2\tfemale\nGrover\t8\tmale\nChewie\t5\tmale\nGoochie\t1\tfemale\n", 'Got as Raw';
+    is_deeply $mutable_ds->id_data, [map {[$_]} 1..5],
+        'Id data is as expected';
 
     ok my $excel = $mutable_ds->as_excel, 'can get excel object';
     open my $XLS, '<', \$excel;
@@ -212,6 +216,38 @@ subtest 'Result::Dataset' => sub {
     is_deeply [map {$_->shortname} @repeat_dscols],
         ['repeat', map {"repeat_0$_"} 1..9],
             'duplicate shortnames correctly assigned';
+    $repeat_ds->delete;
+
+    # weird characters in column names
+    for my $enc (qw(utf8 cp1252)) {
+        my $encoded_ds = $user->import_data_by_filename("$DATA_DIR/encoding-${enc}.csv");
+        my @encoded_dscols = $encoded_ds->ds_columns_ordered->all;
+        is_deeply [map {$_->name} @encoded_dscols],
+            ['ÜñîçøðÆ'], "${enc}-encoded names correctly decoded";
+        is_deeply [map {$_->shortname} @encoded_dscols],
+            ['unicodae'], "${enc}-encoded shortnames correctly filtered";
+        $encoded_ds->delete;
+    }
+
+    # blank column titles
+    my $blank_ds = $user->import_data_by_filename("$DATA_DIR/blank_header.csv");
+    my @blank_dscols = $blank_ds->ds_columns_ordered->all;
+    is_deeply [map {$_->name} @blank_dscols],
+        ['First Column', '(untitled column)', 'Third Column',
+         '(untitled column) (1)',],
+             'blank names correctly assigned';
+    is_deeply [map {$_->shortname} @blank_dscols],
+        [q{first_column}, q{untitled}, q{third_column}, q{untitled_01},],
+        'blank shortnames correctly assigned';
+    $blank_ds->delete;
+
+    # id column title reserved for use
+    my $id_ds = $user->import_data_by_filename("$DATA_DIR/id_column.csv");
+    my @id_cols = $id_ds->ds_columns_ordered->all;
+    is_deeply [map {$_->shortname} @id_cols],
+        [qw(id_01 id_02 id_03 _id)], 'reserved name "id" not used';
+    is_deeply $id_ds->id_data, [[1],[2],[3]], 'id col has correct data';
+
 };
 
 subtest 'Result::DatasetColumn' => sub {
@@ -221,22 +257,22 @@ subtest 'Result::DatasetColumn' => sub {
     my $dataset = $ds_column->dataset;
     my $new_ds_col = $dataset->create_related('ds_columns', {
         name => 'Test Column', sort => 99,
-        data_type_id => 1,
+        data_type => CoreType_Text,
     });
 
     my $new_ds_col2 = $dataset->create_related('ds_columns', {
         name => 'Test Column 2', shortname => 'moo', sort => 99,
-        data_type_id => 1,
+        data_type => CoreType_Text,
     });
     is $new_ds_col2->shortname, 'moo',
         "auto shortname doesn't overwrite provided shortname";
 
     ok my $ds_col3 = $dataset->create_related('ds_columns', {
-        name => q{}, sort => 98, data_type_id => 1,
+        name => q{}, sort => 98, data_type => CoreType_Text,
     }), 'can create column w/ empty name';
 
     ok my $ds_col4 = $dataset->create_related('ds_columns', {
-        name => q{#$*^(}, sort => 97, data_type_id => 1,
+        name => q{#$*^(}, sort => 97, data_type => CoreType_Text,
     }), 'can create column w/ non-ascii name';
 
     # mutating methods, create new dataset
@@ -245,23 +281,13 @@ subtest 'Result::DatasetColumn' => sub {
 
 
     # test data_type lookup column
-    is $ds_col3->data_type(), 'text', 'can proxy to lookup';
-    ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
-        ' lookup_proxy lives w/ good lookup';
-    is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
-    is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
-    ok exception { $ds_col3->data_type("moo"); },
-        ' lookup_proxy dies on bad lookup';
-
-    # test accession_type lookup column
-    $ds_col3->discard_changes; # needed b/c fk is nullable
-    is $ds_col3->accession_type(), undef, 'accession_type not yet set';
-    ok !exception {
-        $ds_col3->accession_type('entrez_gene_id');
-    }, 'Can successfully set accession type';
-    $ds_col3->update;
-    $ds_col3->discard_changes;
-    is $ds_col3->accession_type(), 'entrez_gene_id', 'accession_type correctly set';
+    # is $ds_col3->data_type(), 'text', 'can proxy to lookup';
+    # ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
+    #     ' lookup_proxy lives w/ good lookup';
+    # is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
+    # is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
+    # ok exception { $ds_col3->data_type("moo"); },
+    #     ' lookup_proxy dies on bad lookup';
 
 
     # make sure we can import datasets w/ duplicate column names

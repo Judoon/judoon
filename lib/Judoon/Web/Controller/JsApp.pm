@@ -5,11 +5,34 @@ use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
 
-sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {}
+sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    $c->stash->{template} = 'jsapp/jsapp.tt2';
+}
 
-sub page_id : Chained('base') PathPart('page') CaptureArgs(1) {
+sub dataset_view : Chained('base') PathPart('datasource') Args(1) {
+    my ($self, $c, $ds_id) = @_;
+
+    my $dataset = $c->stash->{user}{object}->datasets_rs->find({id => $ds_id});
+    if (not $dataset) {
+        $c->forward('/default');
+        $c->detach();
+    }
+
+    if (not $c->stash->{user}{is_owner}) {
+        $self->go_here(
+            $c, '/private/dataset/object',
+            [$c->stash->{user}{id}, $ds_id],
+        );
+        $c->detach();
+    }
+
+    $c->stash->{dataset}{object} = $dataset;
+}
+
+
+sub page_view : Chained('base') PathPart('page') Args(1) {
     my ($self, $c, $page_id) = @_;
-
 
     my $page = $c->stash->{user}{object}->my_pages->find({id => $page_id});
     if (not $page) {
@@ -27,12 +50,6 @@ sub page_id : Chained('base') PathPart('page') CaptureArgs(1) {
 
     $c->stash->{page}{object} = $page;
 }
-
-sub page_view : Chained('page_id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'jsapp/page.tt2';
-}
-
 
 
 1;
@@ -55,15 +72,17 @@ As a result, it doesn't do much except basic access control.
 
 =head2 base
 
-Base action, currently does nothing.
+Sets the template, AngularJS takes care of the rest.
 
-=head2 page_id
+=head2 dataset_view
 
-Extract the L<Judoon::Schema::Result::Page> id, checks to make sure
+Extract the L<Judoon::Schema::Result::Dataset> id, checks to make sure
 requesting user has valid permissions to access it.
 
 =head2 page_view
 
-Sets the template, AngularJS takes care of the rest.
+Extract the L<Judoon::Schema::Result::Page> id, checks to make sure
+requesting user has valid permissions to access it.
+
 
 =cut

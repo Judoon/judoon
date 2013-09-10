@@ -490,11 +490,10 @@ subtest 'DatasetColumns' => sub {
 
     # PUT    datasetcolumn/object
     puts_ok('dataset_column', $dscol_uri, 'dscolumn_edit', {
-        'ds_column.data_type'      => 'numeric',
-        'ds_column.accession_type' => '',
+        'ds_column.data_type' => 'CoreType_Numeric',
     });
     $mech->content_like(
-        qr{value="numeric" selected}, 'can update dataset column'
+        qr{value="CoreType_Numeric" selected}, 'can update dataset column'
     );
 
     # DELETE datasetcolumn/object

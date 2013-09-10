@@ -39,6 +39,7 @@ use Moo;
 use Archive::Builder;
 use File::Temp qw(tempfile);
 use Judoon::Error::Devel::Foreign;
+use Judoon::TypeRegistry;
 use Path::Class qw(dir);
 use Template;
 
@@ -55,6 +56,9 @@ which a standalone version should be built. This attribute is required.
 has 'page' => (is => 'ro', required => 1,);
 
 =head2 archive
+
+An instance of L</Archive::Builder> that contains the bundled archive
+contents.
 
 =cut
 
@@ -99,6 +103,10 @@ The L<Template::Toolkit> object.
 The name of the archive, which will be the subdirectory it unpacks
 to. Default: C<judoon>.
 
+=head3 type_registry
+
+An instance of L<Judoon::TypeRegistry> for looking up type properties.
+
 =cut
 
 has standalone_index => (is => 'lazy',);
@@ -121,6 +129,9 @@ sub _build_tt { return Template->new; }
 has archive_name => (is => 'lazy',);
 sub _build_archive_name { return 'judoon'; }
 
+
+has type_registry => (is => 'lazy',);
+sub _build_type_registry { Judoon::TypeRegistry->new }
 
 sub _build_archive {
     my ($self) = @_;
@@ -167,8 +178,8 @@ sub _build_archive {
     # add datatypes
     $archive_section->new_file(
         $self->standalone_types, 'string',
-        join("\t", map {$_->{data_type_rel}{data_type}}
-                 $dataset->ds_columns_ordered->with_lookups->hri->all)
+        join("\t", map {$self->type_registry->simple_lookup($_->{data_type})->pg_type}
+                 $dataset->ds_columns_ordered->hri->all)
     );
 
     Judoon::Error::Devel::Foreign->throw({

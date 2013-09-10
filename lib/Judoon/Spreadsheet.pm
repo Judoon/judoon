@@ -32,14 +32,12 @@ use Moo;
 use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef FileHandle);
 
 use Data::Printer;
-use Data::UUID;
 use Encode qw(decode);
 use Encode::Guess;
 use Excel::Reader::XLSX;
 use IO::File ();
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Foreign;
-use Judoon::Error::Devel::Impossible;
 use Judoon::Error::Input::File;
 use Judoon::Error::Input::Filename;
 use Judoon::Error::Spreadsheet;
@@ -50,7 +48,6 @@ use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
 use Text::CSV;
-use Text::Unidecode;
 
 
 =head1 METHODS
@@ -145,11 +142,8 @@ sub BUILD {
     $self->{nbr_rows}    = scalar @$data;
     $self->{nbr_columns} = scalar @{ $data->[0] };
 
-    my ($colidx, @fields, %sql_seen, %header_seen) = (1);
+    my ($colidx, @fields) = (1);
     for my $header (@$headers) {
-        my $shortname = $self->_unique_sqlname(\%sql_seen, $header);
-        $header = $self->_unique_header(\%header_seen, $header);
-
         my $parser_type = $self->$type_meth( $colidx );
         my %heuristic_types;
         for my $row (@$data) {
@@ -166,8 +160,9 @@ sub BUILD {
 
         my $data_type = $heuristic_type eq 'integer' ? 'numeric'
                       :                                $heuristic_type;
+        $header //= q{};
         push @fields, {
-            name => $header,    shortname   => $shortname,
+            name => $header,
             type => $data_type, parser_type => $parser_type,
             heuristic_type => $heuristic_type,
         };
@@ -339,20 +334,13 @@ of the worksheet.  For text files, it defaults to 'IO'.
 =head2 fields
 
 An arrayref of hashrefs of metadata about the columns.  Keys are:
-C<name>, C<shortname>, C<type>, C<excel_type>, C<heuristic_type>.
+C<name>, C<type>, C<excel_type>, C<heuristic_type>.
 
 =over
 
 =item name
 
 The actual text of the column, assumed to be the header value.
-
-=item shortname
-
-An sql-normalized version of the name, suitable for use as an SQL
-column name.  Must be unique to the entire dataset, so may have
-trailing integers appended.  In the pathological case where more than
-100 columns have the same name, we start appending UUIDs. Don't do that.
 
 =item type / excel_type / heuristic_type
 
@@ -396,78 +384,6 @@ has data        => (is => 'ro', init_arg => undef, isa => ArrayRef[ArrayRef],);
 has nbr_rows    => (is => 'ro', init_arg => undef, isa => Int, );
 has nbr_columns => (is => 'ro', init_arg => undef, isa => Int, );
 
-
-# generate a unique sql-valid name for a column based off its text
-# name.
-sub _unique_sqlname {
-    my ($self, $seen, $name) = @_;
-
-    $name = 'untitled' if (!defined($name) || $name eq '');
-
-    $name = unidecode($name);
-
-    # stolen from SQL::Translator::Utils::normalize_name
-    # The name can only begin with a-zA-Z_; if there's anything
-    # else, prefix with _
-    $name =~ s/^([^a-zA-Z_])/_$1/;
-
-    # anything other than a-zA-Z0-9_ in the non-first position
-    # needs to be turned into _
-    $name =~ tr/[a-zA-Z0-9_]/_/c;
-
-    # All duplicated _ need to be squashed into one.
-    $name =~ tr/_/_/s;
-
-    # Trim a trailing _
-    $name =~ s/_$//;
-
-    $name = lc $name;
-
-    return $name if (!$seen->{$name}++);
-
-    for my $suffix (map {sprintf '%02d', $_} 1..99) {
-        my $new_colname = $name . '_' . $suffix;
-        return $new_colname if (!$seen->{$new_colname}++);
-    }
-
-    for my $i (0..10) {
-        my $uuid = Data::UUID->new->create_str();
-        my $uuid_name = $name . '_' . $uuid;
-        return $uuid_name if(!$seen->{$uuid_name}++);
-    }
-
-
-    Judoon::Error::Devel::Impossible->throw({                     # uncoverable statement
-        message => "couldn't generate a unique sql column name: " # uncoverable statement
-            . p(%{ {name => $name, seen => $seen} }),             # uncoverable statement
-    });                                                           # uncoverable statement
-}
-
-
-# generate a unique column title
-sub _unique_header {
-    my ($self, $seen, $header) = @_;
-
-    $header = '(untitled column)' if (!defined($header) || $header eq '');
-
-    return $header if (not $seen->{$header}++);
-
-    for my $i (1..999) {
-        my $new_header = $header . " ($i)";
-        return $new_header if (not $seen->{$new_header}++);
-    }
-
-    for my $i (0..10) {
-        my $uuid = Data::UUID->new->create_str();
-        my $uuid_name = $header . " ($uuid)";
-        return $uuid_name if(not $seen->{$uuid_name}++);
-    }
-
-    Judoon::Error::Devel::Impossible->throw({                 # uncoverable statement
-        message => "couldn't generate a unique column name: " # uncoverable statement
-            . p(%{ {header => $header, seen => $seen} }),     # uncoverable statement
-    });                                                       # uncoverable statement
-}
 
 
 1;

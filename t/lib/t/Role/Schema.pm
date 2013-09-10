@@ -104,23 +104,24 @@ sub _build_fixtures {
         basic => sub {
             my ($self) = @_;
             $self->schema()->resultset('TtDscolumnDatatype')->populate([
-                ['id','data_type',],
-                [1,'text',],[2,'numeric',],[3,'datetime',],[4,'currency',],
+                ['data_type',                           ],
+                ['CoreType_Text',                       ],
+                ['CoreType_Numeric',                    ],
+                ['CoreType_Datetime',                   ],
+                ['Biology_Accession_Entrez_GeneId',     ],
+                ['Biology_Accession_Entrez_GeneSymbol', ],
+                ['Biology_Accession_Entrez_RefseqId',   ],
+                ['Biology_Accession_Entrez_ProteinId',  ],
+                ['Biology_Accession_Entrez_UnigeneId',  ],
+                ['Biology_Accession_Pubmed_Pmid',       ],
+                ['Biology_Accession_Uniprot_Acc',       ],
+                ['Biology_Accession_Uniprot_Id',        ],
+                ['Biology_Accession_Flybase_Id',        ],
+                ['Biology_Accession_Wormbase_Id',       ],
+                ['Biology_Accession_Cmkb_ComplexAcc',   ],
+                ['Biology_Accession_Cmkb_FamilyAcc',    ],
+                ['Biology_Accession_Cmkb_OrthologAcc',  ],
             ]);
-            $self->schema()->resultset('TtAccessionType')->populate([
-                ['id','accession_type','accession_domain'],
-                [1,  'entrez_gene_id',     'biology',],
-                [2,  'entrez_gene_symbol', 'biology',],
-                [3,  'entrez_refseq_id',   'biology',],
-                [4,  'entrez_protein_id',  'biology',],
-                [5,  'entrez_unigene_id',  'biology',],
-                [6,  'pubmed_id',          'biology',],
-                [7,  'uniprot_acc',        'biology',],
-                [8,  'uniprot_id',         'biology',],
-                [9,  'flybase_id',         'biology',],
-                [10, 'wormbase_id',        'biology',],
-            ]);
-
 
             my $user_rs = $self->schema()->resultset('User');
             my $user = $user_rs->find({username => $self->testuser()->{username}})

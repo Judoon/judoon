@@ -15,10 +15,11 @@ place to set defaults.
 
 =cut
 
+use strict;
+use warnings;
 use 5.10.1;
 
-use Moo;
-extends 'DBIx::Class::Core';
+use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw{
    Helper::Row::Lookup

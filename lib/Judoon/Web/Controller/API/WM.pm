@@ -126,7 +126,7 @@ sub dscol_base : Chained('dataset_id') PathPart('column') CaptureArgs(0) {
 sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
-        $c, 'Judoon::API::Resource::DatasetColumn', {
+        $c, 'Judoon::API::Resource::DatasetColumns', {
             set      => $c->stash->{dscol_rs},
             writable => !!$c->stash->{authd_user},
         }
@@ -141,6 +141,23 @@ sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
         $c, 'Judoon::API::Resource::DatasetColumn', {
             item     => $item,
             writable => !!$c->stash->{authd_user},
+        }
+    );
+}
+
+
+=head2 ds_page()
+
+Get the list of pages for the given dataset.
+
+=cut
+
+sub ds_page : Chained('dataset_id') PathPart('page') Args(0) ActionClass('FromPSGI') {
+    my ($self, $c) = @_;
+    return $self->wm(
+        $c, 'Judoon::API::Resource::Pages', {
+            set      => $c->stash->{dataset_object}->pages_ordered,
+            writable => 0,
         }
     );
 }
