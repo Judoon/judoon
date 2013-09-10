@@ -561,11 +561,24 @@ judoonCtrl.controller(
                     text_segments:     [],
                     variable_segments: [],
                     formatting:        []
-
                 },
                 label: {
                     type:              "varstring",
                     varstring_type:    "static",
+                    accession:         "",
+                    text_segments:     [],
+                    variable_segments: [],
+                    formatting:        []
+                }
+            });
+        };
+
+        $scope.addImageNode = function() {
+            addNode({
+                type: 'image',
+                url: {
+                    type:              "varstring",
+                    varstring_type:    "variable",
                     accession:         "",
                     text_segments:     [],
                     variable_segments: [],
@@ -811,4 +824,72 @@ judoonCtrl.controller(
              return false;
          };
     }]
+);
+
+
+judoonCtrl.controller(
+    'ImageBuilderCtrl',
+    ['$scope', '$modalInstance', 'currentImage', 'columns',
+     function ($scope, $modalInstance, currentImage, columns) {
+
+         $scope.columns = columns;
+         $scope.url = {
+             type: currentImage.url === 'static' ? 'fixed' : 'fromdata'
+         };
+         if ($scope.url.type === 'fixed') {
+             $scope.url.fixed = currentImage.url.text_segments[0];
+         }
+         else {
+             $scope.url.fromdata = {
+                 prefix:     currentImage.url.text_segments[0] || '',
+                 datasource: currentImage.url.variable_segments[0] || '',
+                 suffix:     currentImage.url.text_segments[1] || ''
+             };
+         }
+
+         function updateSampleUrl() {
+             if ($scope.url.type === 'fixed') {
+                 $scope.sampleUrl = $scope.url.fixed;
+             }
+             else if ($scope.url.type === 'fromdata') {
+                 if (!$scope.url.fromdata.datasource) {
+                     $scope.sampleUrl = '';
+                 }
+                 else {
+                     $scope.sampleUrl = $scope.url.fromdata.prefix +
+                         columns.dict[$scope.url.fromdata.datasource].sample_data[0] +
+                         $scope.url.fromdata.suffix;
+                 }
+             }
+         }
+         $scope.$watch('url', function() { updateSampleUrl(); }, true);
+
+         $scope.closeImageBuilder = function() {
+             $modalInstance.dismiss('cancel');
+             return false;
+         };
+
+         $scope.saveWidget = function() {
+             var url;
+             if ($scope.url.type === 'fixed') {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url.fixed],
+                     variable_segments: [],
+                     varstring_type:    'static'
+                 };
+             }
+             else if ($scope.url.type === 'fromdata') {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url.fromdata.prefix, $scope.url.fromdata.suffix],
+                     variable_segments: [$scope.url.fromdata.datasource],
+                     varstring_type:    'variable'
+                 };
+             }
+
+             $modalInstance.close({url: url});
+             return false;
+         };
+     }]
 );

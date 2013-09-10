@@ -178,7 +178,7 @@ judoonDir.directive(
             template: '<div class="widget-object input-append dropdown"></div>',
             link: function(scope, element, attrs) {
                 element.append('<judoon-'+scope.widget.type+'-widget widget="widget">');
-                if (scope.widget.type !== 'newline') {
+                if (scope.widget.type !== 'newline' && scope.widget.type !== 'image') {
                     element.append('<judoon-formatting-widget>');
                 }
                 $compile(element.contents())(scope);
@@ -271,6 +271,56 @@ judoonDir.directive(
         };
     }]
 );
+
+judoonDir.directive(
+    'judoonImageWidget',
+    ['$modal', function($modal) {
+        function link(scope, elem, attrs) {
+
+            function openImageBuilder(widget) {
+                var modalInstance = $modal.open({
+                    resolve: {
+                        currentImage: function() {
+                            return {
+                                url:   angular.copy(widget.url),
+                            };
+                        },
+                        columns: function() {
+                            return {
+                                all:  scope.dataset.columns,
+                                dict: scope.ds_columns.dict
+                            };
+                        }
+                    },
+                    templateUrl:  '/static/html/partials/widget-image-builder.html',
+                    controller: 'ImageBuilderCtrl'
+                });
+
+                modalInstance.result.then(
+                    function (imageProps) {
+                        widget.url   = imageProps.url;
+                    }
+                );
+            }
+
+            angular.element(elem.find('input')).on(
+                'click', function () {
+                    openImageBuilder(scope.widget);
+                    scope.$apply();
+                }
+            );
+        }
+
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-image.html',
+            link: link
+        };
+    }]
+);
+
+
 
 judoonDir.directive(
     'judoonFormattingWidget',
