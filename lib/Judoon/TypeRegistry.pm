@@ -14,9 +14,8 @@ sub _build_pg_types {
     my ($self) = @_;
 
     my %pg_types;
-    for my $typename ($self->all_types) {
-        next unless ($typename =~ m/CoreType/);
-        my $type = $self->registry->simple_lookup($typename);
+    for my $type ($self->all_types) {
+        next unless ($type->name =~ m/CoreType/);
         next unless ($type->$_can('pg_type'));
         $pg_types{$type->pg_type} = $type
     }
@@ -40,9 +39,19 @@ sub _build_registry {
 }
 
 
-sub all_types {
+sub all_typenames {
     my ($self) = @_;
     return sort keys %{ $self->registry };
+}
+
+sub all_types {
+    my ($self) = @_;
+    return sort {$a->name cmp $b->name} values %{ $self->registry };
+}
+
+sub accessions {
+    my ($self) = @_;
+    return grep {$_->name =~ m/Accession/} $self->all_types;
 }
 
 

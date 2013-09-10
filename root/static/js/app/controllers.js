@@ -1,3 +1,7 @@
+/*jshint globalstrict: true */
+/*jshint jquery: true */
+/*global angular, Handlebars, window */
+
 'use strict';
 
 var judoonCtrl = angular.module('judoon.controllers', []);
@@ -126,7 +130,11 @@ judoonCtrl.controller(
 
 
 
-judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn', 'Dataset', function ($scope, $routeParams, Page, PageColumn, Dataset) {
+judoonCtrl.controller(
+    'PageCtrl',
+    ['$scope', '$routeParams', '$http',
+     'Page', 'PageColumn', 'Dataset', 'DatasetColumn',
+     function ($scope, $routeParams, $http, Page, PageColumn, Dataset, DatasetColumn) {
 
     // Attributes
     $scope.editmode = 0;
@@ -141,6 +149,28 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
         Dataset.get({id: page.dataset_id}, function (ds) {
             $scope.dataset = ds;
         });
+
+        DatasetColumn.query({}, {dataset_id: page.dataset_id}, function (columns) {
+            $scope.dataset.columns = columns;
+            $scope.dsColumnsLoaded = 1;
+            $scope.dsColumnsOriginal = angular.copy(columns);
+
+            $scope.ds_columns = {accessions: [], dict: {}};
+            angular.forEach(columns, function(value, key) {
+                $scope.ds_columns.dict[value.shortname] = value;
+                if (value.data_type.match(/accession/i)) {
+                    $scope.ds_columns.accessions.push(value);
+                }
+            });
+
+            $scope.siteLinker = {};
+            $http.get('/api/sitelinker/accession')
+                .success(function(data) {
+                    angular.forEach(data, function(value) {
+                        $scope.siteLinker[value.name] = value;
+                    });
+                });
+        });
     });
 
     $scope.$watch('page', function () {
@@ -148,9 +178,6 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
     }, true);
 
 
-    $scope.newColumnName;
-    $scope.currentColumn;
-    $scope.deleteColumn;
     PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
         $scope.pageColumnsOriginal = angular.copy(columns);
         $scope.pageColumns = columns;
@@ -172,7 +199,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
             title:      $scope.page.title,
             preamble:   $scope.page.preamble,
             postamble:  $scope.page.postamble,
-            dataset_id: $scope.page.dataset_id,
+            dataset_id: $scope.page.dataset_id
         });
 
         angular.forEach($scope.pageColumns, function (value, key) {
@@ -207,7 +234,7 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
             return;
         }
 
-        var confirmed = confirm("Are you sure you want to delete this column?");
+        var confirmed = window.confirm("Are you sure you want to delete this column?");
         if (confirmed) {
             PageColumn.delete(
                 {}, {page_id: $scope.pageId, id: $scope.deleteColumn.id},
@@ -272,6 +299,53 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
     };
 
 
+    $scope.updateColumn = function() {
+        PageColumn.update({
+            page_id:  $scope.currentColumn.page_id,
+            id:       $scope.currentColumn.id,
+            title:    $scope.currentColumn.title,
+            widgets:  $scope.currentColumn.widgets
+        });
+    };
+
+    $scope.isBold   = curryFormatTest('bold');
+    $scope.isItalic = curryFormatTest('italic');
+    function curryFormatTest(format) {
+        return function(widget) {
+            return widget && widget.formatting && widget.formatting.some(function(e) { return e === format; });
+        };
+    }
+
+    $scope.columnIsActive = function(column) { return $scope.editmode && angular.equals(column, $scope.currentColumn); };
+    $scope.columnIsDelete = function(column) { return $scope.editmode && angular.equals(column, $scope.deleteColumn);  };
+
+    $scope.$watch('currentColumn.widgets', function() {
+        if (!$scope.currentColumn) {
+            return;
+        }
+        $http.post('/api/template', {widgets: $scope.currentColumn.widgets})
+            .success(function(data) {
+                $scope.currentColumn.template = data.template;
+            })
+            .error(function() {
+                $scope.alertError('Unable to translate template!');
+            });
+    }, true);
+
+
+    $scope.alerts = [];
+    $scope.alertSuccess = curryAlert('success');
+    $scope.alertError   = curryAlert('error');
+    $scope.alertWarning = curryAlert('warning');
+    $scope.alertInfo    = curryAlert('info');
+    function curryAlert(type) {
+        return function(msg) { $scope.alerts.push({type: type, msg: msg}); };
+    }
+    $scope.closeAlert = function(index) {
+        $scope.alerts.splice(index, 1);
+    };
+
+
     $scope.getServerData = function ( sSource, aoData, fnCallback ) {
         $.ajax( {
             "dataType": "json",
@@ -295,14 +369,18 @@ judoonCtrl.controller('PageCtrl', ['$scope', '$routeParams', 'Page', 'PageColumn
                     data.aaData = new_data;
                 },
                 fnCallback
-            ],
+            ]
         } );
     };
 
 }]);
 
 
-judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Transform', '$window', function ($scope, $routeParams, Dataset, DatasetColumn, Transform, $window) {
+judoonCtrl.controller(
+    'DatasetColumnCtrl',
+    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn',
+     'Transform', '$window',
+     function ($scope, $routeParams, Dataset, DatasetColumn, Transform, $window) {
 
     $scope.userName  = $routeParams.userName;
     $scope.datasetId = $routeParams.datasetId;
@@ -331,10 +409,8 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
 
     $scope.$watch('transformType', function() {
         if (
-            (!$scope.transformType)
-              ||
-            ($scope.transformType.id === 'join')
-              ||
+            (!$scope.transformType) ||
+            ($scope.transformType.id === 'join') ||
             ($scope.transformType.transforms)
         ) {
             return;
@@ -346,13 +422,16 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
     });
 
     Dataset.query({}, function (datasets) {
+        var self_idx;
+        angular.forEach(datasets, function(value, key) {
+            if (value.id === $scope.dataset.id) {
+                self_idx = key;
+            }
+        });
+        datasets.splice(self_idx, 1);
+
         $scope.myDatasets = datasets;
         angular.forEach(datasets, function(value, key) {
-            if (value.id == $scope.datasetId) {
-                $scope.myDatasets.splice(key, 1);
-                return;
-            }
-
             DatasetColumn.query({}, {dataset_id: value.id}, function (columns) {
                 value.columns = columns;
             });
@@ -410,3 +489,410 @@ judoonCtrl.controller('DatasetColumnCtrl', ['$scope', '$routeParams', 'Dataset',
     });
 
 }]);
+
+
+judoonCtrl.controller(
+    'PageColumnTemplateCtrl',
+    ['$scope', '$modal', function ($scope, $modal) {
+
+        $scope.$watch('currentColumn', function() {
+            if (!$scope.currentColumn) {
+                return;
+            }
+            $scope.cursorWidget = $scope.currentColumn.widgets[ $scope.currentColumn.widgets.length - 1];
+        });
+
+        /*
+         The cursor is positioned after $scope.cursorWidget in the
+         list of widgets. In order to position the cursor at the
+         beginning of the list, the column widgets are indexed using a
+         one-based indexing.  Index 0 is the beginning of the
+         list. Index 1 is the first widget in the list.
+         */
+        $scope.getCursorIndex = function() {
+            return !($scope.cursorWidget && $scope.currentColumn.widgets.length) ? 0
+                 : $scope.$parent.currentColumn.widgets.indexOf( $scope.cursorWidget ) + 1;
+        };
+
+        $scope.cursorBack = function() {
+            var cursorIdx = $scope.getCursorIndex();
+            $scope.cursorWidget = cursorIdx < 2 ? null
+                                : $scope.currentColumn.widgets[cursorIdx-2];
+            return;
+        };
+
+        $scope.cursorForward = function() {
+            var widgetCount = $scope.currentColumn.widgets.length;
+            if (!widgetCount) {
+                return;
+            }
+
+            var cursorIdx = $scope.getCursorIndex();
+            if (cursorIdx < widgetCount) {
+                $scope.cursorWidget = $scope.currentColumn.widgets[cursorIdx];
+            }
+
+            return;
+        };
+
+        function addNode(node) {
+            var index = $scope.getCursorIndex();
+            $scope.currentColumn.widgets.splice(index, 0, node);
+            $scope.cursorWidget = $scope.currentColumn.widgets[index];
+            return;
+        }
+        $scope.addTextNode = function() {
+            addNode({type: 'text', value: '', formatting: []});
+        };
+
+        $scope.addDataNode = function() {
+            addNode({type: 'variable', name: '', formatting: []});
+        };
+
+        $scope.addNewlineNode = function() {
+            addNode({type: 'newline'});
+        };
+
+        $scope.addLinkNode = function() {
+            addNode({
+                type: 'link',
+                formatting: [],
+                url: {
+                    type:              "varstring",
+                    varstring_type:    "variable",
+                    accession:         "",
+                    text_segments:     [],
+                    variable_segments: [],
+                    formatting:        []
+                },
+                label: {
+                    type:              "varstring",
+                    varstring_type:    "static",
+                    accession:         "",
+                    text_segments:     [],
+                    variable_segments: [],
+                    formatting:        []
+                }
+            });
+        };
+
+        $scope.addImageNode = function() {
+            addNode({
+                type: 'image',
+                url: {
+                    type:              "varstring",
+                    varstring_type:    "variable",
+                    accession:         "",
+                    text_segments:     [],
+                    variable_segments: [],
+                    formatting:        []
+                }
+            });
+        };
+
+        $scope.removeNodeAtCursor = function() {
+            var index = $scope.getCursorIndex();
+            if (!index) {
+                return;
+            }
+
+            $scope.cursorBack();
+            $scope.currentColumn.widgets.splice(index-1, 1);
+            return;
+        };
+
+        $scope.removeNode = function(widget) {
+            var index = $scope.currentColumn.widgets.indexOf(widget);
+            $scope.currentColumn.widgets.splice(index, 1);
+            return;
+        };
+
+        /* Modals */
+        $scope.openElementGuide  = function() {
+            $modal.open({
+                templateUrl: 'elementGuide.html',
+                controller: 'ElementGuideCtrl'
+            });
+        };
+
+        $scope.previewUrl = function(widget) {
+            return zipSegments(widget.url);
+        };
+
+        $scope.previewLabel = function(widget) {
+            return zipSegments(widget.label);
+        };
+
+        function zipSegments(varstring) {
+            var maxlen = Math.max(
+                varstring.text_segments.length,
+                varstring.variable_segments.length
+            );
+
+            var retstring = '';
+            for (var i = 0; i < maxlen; i++) {
+                retstring += varstring.text_segments[i] || '';
+                retstring += getSampleData(varstring.variable_segments[i]);
+            }
+            return retstring;
+        }
+
+        function getSampleData(colname) {
+            return $scope.ds_columns.dict[colname].sample_data[0] || '';
+        }
+    }]
+);
+
+judoonCtrl.controller(
+    'ElementGuideCtrl',
+    ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+        $scope.closeElementGuide = function() { $modalInstance.dismiss(); };
+    }]
+);
+
+judoonCtrl.controller(
+    'LinkBuilderCtrl',
+    ['$scope', '$modalInstance', 'currentLink', 'columns', 'siteLinker',
+     function ($scope, $modalInstance, currentLink, columns, siteLinker) {
+
+         $scope.columns = columns;
+         $scope.url = {
+             active: {
+                 'acc':    currentLink.url.varstring_type === 'accession' ? true : false,
+                 'var':    currentLink.url.varstring_type === 'variable'  ? true : false,
+                 'static': currentLink.url.varstring_type === 'static'    ? true : false
+             },
+             accession: {
+                 site:   currentLink.url.accession,
+                 source: currentLink.url.variable_segments[0] || ''
+             },
+             variable: {
+                 prefix:   currentLink.url.text_segments[0]     || '',
+                 variable: currentLink.url.variable_segments[0] || '',
+                 suffix:   currentLink.url.text_segments[1]     || ''
+             },
+             'static': currentLink.url.varstring_type === 'static' ? currentLink.url.text_segments[0] : ''
+         };
+         
+         $scope.label = {
+             type:     currentLink.label.varstring_type,
+             'static': currentLink.label.text_segments[0] || '',
+             variable: {
+                 prefix:   currentLink.label.text_segments[0] || '',
+                 variable: currentLink.label.variable_segments[0] || '',
+                 suffix:   currentLink.label.text_segments[1] || ''
+             }
+         };
+
+
+         $scope.$watch('url.accession.source', function() {
+             $scope.linkSites = getLinkableSites(
+                 getDataType($scope.url.accession.source)
+             );
+         }, true);
+
+
+         $scope.labelPreview = '';
+         function updateLabelPreview() {
+             switch ($scope.label.type) {
+             case 'default':
+                 $scope.labelPreview = 'default label';
+                 break;
+             case 'url':
+                 $scope.labelPreview = $scope.urlPreview;
+                 break;
+             case 'variable':
+                 $scope.labelPreview = $scope.label.variable.prefix +
+                     getSampleData($scope.label.variable.variable) +
+                     $scope.label.variable.suffix;
+                 break;
+             case 'static':
+                 $scope.labelPreview =  $scope.label['static'];
+                 break;
+             }
+         }
+         $scope.$watch('label', function() { updateLabelPreview(); }, true);
+
+         $scope.urlPreview = '';
+         function updateUrlPreview() {
+             if ($scope.url.active['static']) {
+                 $scope.urlPreview = $scope.url['static'];
+             }
+             else if ($scope.url.active.acc) {
+                 if (!$scope.url.accession.site) {
+                     $scope.urlPreview = '';
+                 }
+                 else {
+                     var accession_parts = getUrlPartsForSite(
+                         $scope.url.accession.site,
+                         getDataType($scope.url.accession.source)
+                     );
+                     $scope.urlPreview = accession_parts.prefix +
+                         getSampleData($scope.url.accession.source) +
+                         accession_parts.suffix;
+                 }
+             }
+             else if ($scope.url.active['var']) {
+                 $scope.urlPreview = $scope.url.variable.prefix +
+                     getSampleData($scope.url.variable.variable) +
+                     $scope.url.variable.suffix;
+             }
+         }
+         $scope.$watch('url', function() {
+             updateUrlPreview();
+             updateLabelPreview();
+         }, true);
+
+
+         function getSampleData(colname) { return columns.dict[colname].sample_data[0]; }
+         function getDataType(colname)   { return columns.dict[colname].data_type; }
+
+         function getLinkableSites(accession) {
+             return siteLinker[accession].sites;
+         }
+         function getUrlPartsForSite(site, accession)  {
+             var parts;
+             angular.forEach(siteLinker[accession].sites, function(value) {
+                 if (value.name === site) {
+                     parts = value.mapping;
+                 }
+             });
+             return parts;
+         }
+
+
+         $scope.closeLinkBuilder = function() {
+             $modalInstance.dismiss('cancel');
+             return false;
+         };
+
+         $scope.saveWidget = function() {
+
+             var url;
+             if ($scope.url.active['static']) {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url['static']],
+                     variable_segments: [],
+                     varstring_type:    'static'
+                 };
+             }
+             else if ($scope.url.active['var']) {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url.variable.prefix, $scope.url.variable.suffix],
+                     variable_segments: [$scope.url.variable.variable],
+                     varstring_type:    'variable'
+                 };
+             }
+             else if ($scope.url.active.acc) {
+                 var urlParts = getUrlPartsForSite($scope.url.accession.site, getDataType($scope.url.accession.source));
+                 url = {
+                     accession:         $scope.url.accession.accession,
+                     text_segments:     [urlParts.prefix, urlParts.suffix],
+                     variable_segments: [$scope.url.accession.source],
+                     varstring_type:    'accession'
+                 };
+             }
+
+             var label;
+             if ($scope.label.type === 'default') {
+                 label = {
+                     text_segments:     [],
+                     variable_segments: [],
+                     varstring_type:    ''
+                 };
+             }
+             else if ($scope.label.type === 'static') {
+                 label = {
+                     text_segments:     [$scope.label['static']],
+                     variable_segments: [],
+                     varstring_type:    'static'
+                 };
+             }
+             else if ($scope.label.type === 'url') {
+                 label = angular.copy(url);
+                 label.varstring_type = label.variable_segments.length ? 'variable' : 'static';
+             }
+             else if ($scope.label.type === 'variable') {
+                 label = {
+                     text_segments:     [$scope.label.variable.prefix, $scope.label.variable.suffix],
+                     variable_segments: [$scope.label.variable.variable],
+                     varstring_type:    'variable'
+                 };
+             }
+             label.accession = '';
+
+             $modalInstance.close({url: url, label: label});
+             return false;
+         };
+    }]
+);
+
+
+judoonCtrl.controller(
+    'ImageBuilderCtrl',
+    ['$scope', '$modalInstance', 'currentImage', 'columns',
+     function ($scope, $modalInstance, currentImage, columns) {
+
+         $scope.columns = columns;
+         $scope.url = {
+             type: currentImage.url === 'static' ? 'fixed' : 'fromdata'
+         };
+         if ($scope.url.type === 'fixed') {
+             $scope.url.fixed = currentImage.url.text_segments[0];
+         }
+         else {
+             $scope.url.fromdata = {
+                 prefix:     currentImage.url.text_segments[0] || '',
+                 datasource: currentImage.url.variable_segments[0] || '',
+                 suffix:     currentImage.url.text_segments[1] || ''
+             };
+         }
+
+         function updateSampleUrl() {
+             if ($scope.url.type === 'fixed') {
+                 $scope.sampleUrl = $scope.url.fixed;
+             }
+             else if ($scope.url.type === 'fromdata') {
+                 if (!$scope.url.fromdata.datasource) {
+                     $scope.sampleUrl = '';
+                 }
+                 else {
+                     $scope.sampleUrl = $scope.url.fromdata.prefix +
+                         columns.dict[$scope.url.fromdata.datasource].sample_data[0] +
+                         $scope.url.fromdata.suffix;
+                 }
+             }
+         }
+         $scope.$watch('url', function() { updateSampleUrl(); }, true);
+
+         $scope.closeImageBuilder = function() {
+             $modalInstance.dismiss('cancel');
+             return false;
+         };
+
+         $scope.saveWidget = function() {
+             var url;
+             if ($scope.url.type === 'fixed') {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url.fixed],
+                     variable_segments: [],
+                     varstring_type:    'static'
+                 };
+             }
+             else if ($scope.url.type === 'fromdata') {
+                 url = {
+                     accession:         '',
+                     text_segments:     [$scope.url.fromdata.prefix, $scope.url.fromdata.suffix],
+                     variable_segments: [$scope.url.fromdata.datasource],
+                     varstring_type:    'variable'
+                 };
+             }
+
+             $modalInstance.close({url: url});
+             return false;
+         };
+     }]
+);

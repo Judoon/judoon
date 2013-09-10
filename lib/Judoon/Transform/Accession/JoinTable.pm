@@ -6,8 +6,6 @@ use MooX::Types::MooseLike::Base qw(Str InstanceOf);
 with 'Judoon::Transform::Role::Base',
      'Judoon::Transform::Role::OneInput';
 
-sub result_data_type      { return 'CoreType_Text'; }
-
 has join_dataset => (
     is       => 'ro',
     required => 1,
@@ -26,6 +24,13 @@ has to_column => (
     isa      => Str,
 );
 
+
+sub result_data_type {
+    my ($self) = @_;
+    return $self->join_dataset->ds_columns_rs->find({
+        shortname => $self->to_column
+    })->data_type;
+}
 
 sub apply_batch {
     my ($self, $col_data) = @_;

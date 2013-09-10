@@ -92,9 +92,9 @@ sub edit : Chained('id') PathPart('') Args(0) {
             ->ordered_with_pages_and_pagecols->hri->all;
 
         my @url_keys = (
-            [qw(edit_url        /private/dataset/object    )],
-            [qw(column_list_url /private/datasetcolumn/list)],
-            [qw(page_list_url   /private/page/list         )],
+            [qw(edit_url        /jsapp/dataset_view )],
+            [qw(column_list_url /jsapp/dataset_view )],
+            [qw(page_list_url   /private/page/list  )],
         );
 
         for my $dataset (@datasets) {

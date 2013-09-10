@@ -111,6 +111,7 @@ sub TO_JSON {
     my ($self) = @_;
     return {
         template => $self->template->to_jstmpl,
+        widgets  => $self->template->to_data,
         %{ $self->next::method },
     };
 }

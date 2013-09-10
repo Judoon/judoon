@@ -22,7 +22,7 @@ BEGIN {extends 'Catalyst::Controller'; }
 
 use Judoon::API::Machine;
 use Module::Load;
-
+use HTTP::Response;
 
 =head1 Methods
 

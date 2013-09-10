@@ -39,7 +39,7 @@ my @types = (
     ['Wormbase_Id',       qr/^\d+$/,      'WBGene00016197', 'WormBase ID',             ],
     ['Cmkb_OrthologAcc',  qr/^co\d{8}+$/, 'co00001234',     'CMKB Ortholog Accession', ],
     ['Cmkb_FamilyAcc',    qr/^cf\d{8}+$/, 'cf00001234',     'CMKB Family Accession',   ],
-    ['Cmkb_ComplexAcc',   qr/^cc\d{8}+$/, 'cc00001234',     'CMKB Comple Accession',   ],
+    ['Cmkb_ComplexAcc',   qr/^cc\d{8}+$/, 'cc00001234',     'CMKB Complex Accession',   ],
 );
 
 

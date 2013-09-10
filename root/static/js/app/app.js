@@ -1,3 +1,6 @@
+/*jshint globalstrict: true */
+/*global angular */
+
 'use strict';
 
 var judoonApp = angular.module(

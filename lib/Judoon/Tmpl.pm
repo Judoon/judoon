@@ -38,6 +38,7 @@ use Judoon::Error::Input;
 use Judoon::Tmpl::Node::Text;
 use Judoon::Tmpl::Node::Variable;
 use Judoon::Tmpl::Node::Link;
+use Judoon::Tmpl::Node::Image;
 use Judoon::Tmpl::Node::Newline;
 use Judoon::Tmpl::Node::VarString;
 use Params::Validate qw(:all);
@@ -320,7 +321,7 @@ sub _new_node {
 
     my %node_type_to_class = (
         text => 'Text', variable => 'Variable',
-        newline => 'Newline', link => 'Link',
+        newline => 'Newline', link => 'Link', image => 'Image',
         varstring => 'VarString',
     );
 
@@ -394,6 +395,14 @@ sub _get_nodes_from_tree {
                 label => { $class->_build_varstring($label_literal) },
             };
             push @nodelist, $link_node;
+        }
+        elsif ($element->tag eq 'img') { # add Image node
+            my $url_literal   = $element->attr('src');
+            my $image_node = {
+                type => 'image',
+                url  => { $class->_build_varstring($url_literal)   },
+            };
+            push @nodelist, $image_node;
         }
         elsif ($element->tag eq 'br') { # add Newline node
             push @nodelist, {type => 'newline'};

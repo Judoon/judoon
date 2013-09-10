@@ -1,3 +1,6 @@
+/*jshint globalstrict: true */
+/*global angular, CKEDITOR */
+
 'use strict';
 
 var judoonDir = angular.module('judoon.directives', []);
@@ -10,12 +13,13 @@ var judoonDir = angular.module('judoon.directives', []);
 **/
 
 judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
-    var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">'
-        + '<thead>'
-        + '<th ng-repeat="column in columns">{{ column[headerKey] }}</th>'
-        + '</thead>'
-        + '<tbody></tbody>'
-        + '</table>';
+    var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">' +
+        '<thead>' +
+        '<th ng-class="{highlight: highlightActive({column: column}), \'highlight-danger\': highlightDelete({column: column})}"' +
+           ' ng-repeat="column in columns">{{ column[headerKey] }}</th>' +
+        '</thead>' +
+        '<tbody></tbody>' +
+        '</table>';
 
 
     return {
@@ -23,10 +27,12 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
         replace: true,
         template: dataTableTemplate,
         scope: {
-            datasetId     : '=jdtDatasetId',
-            columns       : '=jdtColumns',
-            headerKey     : '@jdtHeaderKey',
-            dataFetchFn   : '=jdtFetchFn'
+            datasetId       : '=jdtDatasetId',
+            columns         : '=jdtColumns',
+            headerKey       : '@jdtHeaderKey',
+            dataFetchFn     : '=jdtFetchFn',
+            highlightActive : '&highlightActive',
+            highlightDelete : '&highlightDelete'
         },
         link: function(scope, element, attrs) {
 
@@ -46,9 +52,9 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
 
                 var tableOptions = angular.copy(defaultOptions);
-                tableOptions["aoColumns"] = [];
+                tableOptions.aoColumns = [];
                 angular.forEach(scope.columns, function (value, key) {
-                    tableOptions["aoColumns"][key] = value[scope.headerKey];
+                    tableOptions.aoColumns[key] = value[scope.headerKey];
                 } );
 
                 dataTable = element.dataTable(tableOptions);
@@ -61,7 +67,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
 
                 // this won't change over life of the directive
-                defaultOptions["sAjaxSource"] = "/api/datasetdata/" + scope.datasetId;
+                defaultOptions.sAjaxSource = "/api/datasetdata/" + scope.datasetId;
 
                 // just in case this fired after the columns watch
                 if (scope.columns && scope.columns.length) {
@@ -116,13 +122,14 @@ judoonDir.directive('judoonCkeditor', [function() {
             }
 
             scope.$watch('editmode', function() {
+                var ck;
                 if (scope.editmode == 1) {
                     elm.attr('contenteditable', 'true');
-                    var ck = CKEDITOR.inline(elm[0], ckConfig);
+                    ck = CKEDITOR.inline(elm[0], ckConfig);
                     elm.data('editor', ck);
                 }
                 else {
-                    var ck = elm.data('editor');
+                    ck = elm.data('editor');
                     if (ck) {
                         ck.destroy();
                     }
@@ -160,3 +167,207 @@ judoonDir.directive('contenteditable', [function() {
         }
     };
 }]);
+
+
+judoonDir.directive(
+    'judoonWidgetFactory',
+    ['$compile', function($compile) {
+        return {
+            restrict: 'E',
+            replace: true,
+            template: '<div class="widget-object input-append dropdown"></div>',
+            link: function(scope, element, attrs) {
+                element.append('<judoon-'+scope.widget.type+'-widget widget="widget">');
+                if (scope.widget.type !== 'newline' && scope.widget.type !== 'image') {
+                    element.append('<judoon-formatting-widget>');
+                }
+                $compile(element.contents())(scope);
+            }
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonTextWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-text.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonVariableWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-variable.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonNewlineWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-newline.html'
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonLinkWidget',
+    ['$modal', function($modal) {
+        function link(scope, elem, attrs) {
+
+            function openLinkBuilder(widget) {
+                var modalInstance = $modal.open({
+                    resolve: {
+                        currentLink: function() {
+                            return {
+                                url:   angular.copy(widget.url),
+                                label: angular.copy(widget.label)
+                            };
+                        },
+                        columns: function() {
+                            return {
+                                all:        scope.dataset.columns,
+                                accessions: scope.ds_columns.accessions,
+                                dict:       scope.ds_columns.dict
+                            };
+                        },
+                        siteLinker: function() { return scope.siteLinker; }
+                    },
+                    templateUrl:  '/static/html/partials/widget-link-builder.html',
+                    controller: 'LinkBuilderCtrl'
+                });
+
+                modalInstance.result.then(
+                    function (linkProps) {
+                        widget.url   = linkProps.url;
+                        widget.label = linkProps.label;
+                    }
+                );
+            }
+
+            angular.element(elem.find('input')).on(
+                'click', function () {
+                    openLinkBuilder(scope.widget);
+                    scope.$apply();
+                }
+            );
+        }
+
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-link.html',
+            link: link
+        };
+    }]
+);
+
+judoonDir.directive(
+    'judoonImageWidget',
+    ['$modal', function($modal) {
+        function link(scope, elem, attrs) {
+
+            function openImageBuilder(widget) {
+                var modalInstance = $modal.open({
+                    resolve: {
+                        currentImage: function() {
+                            return {
+                                url:   angular.copy(widget.url),
+                            };
+                        },
+                        columns: function() {
+                            return {
+                                all:  scope.dataset.columns,
+                                dict: scope.ds_columns.dict
+                            };
+                        }
+                    },
+                    templateUrl:  '/static/html/partials/widget-image-builder.html',
+                    controller: 'ImageBuilderCtrl'
+                });
+
+                modalInstance.result.then(
+                    function (imageProps) {
+                        widget.url   = imageProps.url;
+                    }
+                );
+            }
+
+            angular.element(elem.find('input')).on(
+                'click', function () {
+                    openImageBuilder(scope.widget);
+                    scope.$apply();
+                }
+            );
+        }
+
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-image.html',
+            link: link
+        };
+    }]
+);
+
+
+
+judoonDir.directive(
+    'judoonFormattingWidget',
+    [function() {
+
+        function link(scope, elem, attrs) {
+
+            function toggleFormatting(format) {
+                var idx = scope.widget.formatting.indexOf(format);
+                if (idx === -1) {
+                    scope.widget.formatting.push(format);
+                }
+                else {
+                    scope.widget.formatting.splice(idx, 1);
+                }
+                return;
+            }
+            function toggleFormattingBold()   { toggleFormatting('bold');   }
+            function toggleFormattingItalic() { toggleFormatting('italic'); }
+
+            function deleteWidget() {
+                scope.$parent.removeNode(scope.widget);
+            }
+
+            var actions = elem.find('ul').find('a');
+            angular.element(actions[0]).on('click', function() { toggleFormattingBold();   scope.$apply(); });
+            angular.element(actions[1]).on('click', function() { toggleFormattingItalic(); scope.$apply(); });
+            angular.element(actions[2]).on('click', function() { deleteWidget();           scope.$apply(); });
+        }
+
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-formatting.html',
+            link: link
+        };
+    }]
+);
+
+
+judoonDir.directive(
+    'judoonLinkBuilderWidget',
+    [function() {
+        return {
+            restrict: 'E',
+            replace: false,
+            templateUrl: '/static/html/partials/widget-link-builder.html'
+        };
+    }]
+);

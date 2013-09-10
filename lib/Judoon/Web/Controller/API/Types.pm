@@ -19,10 +19,7 @@ sub index : Chained('base') PathPart('') Args(0) ActionClass('REST') {}
 sub index_GET {
     my ($self, $c) = @_;
     my $typereg = $c->model('TypeRegistry');
-    $self->status_ok($c, entity => [
-        map {$typereg->simple_lookup($_)->TO_JSON}
-            sort $typereg->all_types
-    ]);
+    $self->status_ok($c, entity => [map {$_->TO_JSON} $typereg->all_types]);
 }
 
 
