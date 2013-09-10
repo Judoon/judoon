@@ -422,13 +422,16 @@ judoonCtrl.controller(
     });
 
     Dataset.query({}, function (datasets) {
+        var self_idx;
+        angular.forEach(datasets, function(value, key) {
+            if (value.id === $scope.dataset.id) {
+                self_idx = key;
+            }
+        });
+        datasets.splice(self_idx, 1);
+
         $scope.myDatasets = datasets;
         angular.forEach(datasets, function(value, key) {
-            if (value.id == $scope.datasetId) {
-                $scope.myDatasets.splice(key, 1);
-                return;
-            }
-
             DatasetColumn.query({}, {dataset_id: value.id}, function (columns) {
                 value.columns = columns;
             });
