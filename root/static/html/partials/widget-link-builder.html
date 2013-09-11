@@ -82,12 +82,12 @@
                 <label class="radio"><input type="radio" ng-model="label.type" value="url">Use the URL</label>
 
                 <label class="radio"><input type="radio" ng-model="label.type" value="static">Use the following label:</label>
-                <input type="text" class="input-large" ng-model="label.static">
+                <input type="text" class="input-large" ng-trim="false" ng-model="label.static">
 
                 <label class="radio"><input type="radio" ng-model="label.type" value="variable">Use column data:</label>
-                <label><input type="text" class="input-large" ng-model="label.variable.prefix" placeholder="Label prefix (optional)"></label>
+                <label><input type="text" class="input-large" ng-trim="false" ng-model="label.variable.prefix" placeholder="Label prefix (optional)"></label>
                 <select ng-model="label.variable.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
-                <label><input type="text" class="input-large" ng-model="label.variable.suffix" placeholder="Label suffix (optional)"></label>
+                <label><input type="text" class="input-large" ng-trim="false" ng-model="label.variable.suffix" placeholder="Label suffix (optional)"></label>
               </div>
             </div>
           </fieldset>
