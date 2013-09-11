@@ -199,7 +199,8 @@ judoonCtrl.controller(
             title:      $scope.page.title,
             preamble:   $scope.page.preamble,
             postamble:  $scope.page.postamble,
-            dataset_id: $scope.page.dataset_id
+            dataset_id: $scope.page.dataset_id,
+            permission: $scope.page.permission
         });
 
         angular.forEach($scope.pageColumns, function (value, key) {

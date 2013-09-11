@@ -51,6 +51,12 @@
 
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
+  <p ng-show="!editmode" class="muted">This page is <strong>{{page.permission}}</strong>.</p>
+  <div ng-show="editmode" class="btn-group">
+    <button type="button" class="btn btn-primary" ng-model="page.permission" btn-radio="'public'">Public</button>
+    <button type="button" class="btn btn-primary" ng-model="page.permission" btn-radio="'private'">Private</button>
+  </div>
+
   <div ng-show="editmode" class="editable_label" style="margin-bottom: -10px;">Page Title:</div>
   <h2 judoon-ckeditor ck-edit-type="inline" ng-class="{edit_outline: editmode}" ng-model="page.title" id="page_title" contenteditable="true" class="editable inline_editable"></h2>
 
