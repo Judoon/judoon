@@ -655,28 +655,37 @@ judoonCtrl.controller(
                  'var':    currentLink.url.varstring_type === 'variable'  ? true : false,
                  'static': currentLink.url.varstring_type === 'static'    ? true : false
              },
-             accession: {
-                 site:   currentLink.url.accession,
-                 source: currentLink.url.variable_segments[0] || ''
-             },
-             variable: {
-                 prefix:   currentLink.url.text_segments[0]     || '',
-                 variable: currentLink.url.variable_segments[0] || '',
-                 suffix:   currentLink.url.text_segments[1]     || ''
-             },
-             'static': currentLink.url.varstring_type === 'static' ? currentLink.url.text_segments[0] : ''
+             accession: { site: '', source: ''},
+             variable:  { prefix: '', variable: '', suffix: ''},
+             'static':  ''
+         };
+         if ($scope.url.active.acc) {
+             $scope.url.accession.site   = currentLink.url.accession;
+             $scope.url.accession.source = currentLink.url.variable_segments[0];
+         }
+         else if ($scope.url.active['var']) {
+             $scope.url.variable.prefix   = currentLink.url.text_segments[0];
+             $scope.url.variable.variable = currentLink.url.variable_segments[0];
+             $scope.url.variable.suffix   = currentLink.url.text_segments[1];
+         }
+         else {
+             $scope.url['static'] = currentLink.url.text_segments[0];
          };
          
+
          $scope.label = {
              type:     currentLink.label.varstring_type,
-             'static': currentLink.label.varstring_type !== 'static' ? ''
-                     : currentLink.label.text_segments[0] || getLabelDefault(),
-             variable: {
-                 prefix:   currentLink.label.text_segments[0] || '',
-                 variable: currentLink.label.variable_segments[0] || '',
-                 suffix:   currentLink.label.text_segments[1] || ''
-             }
+             'static': '',
+             variable:  { prefix: '', variable: '', suffix: ''}
          };
+         if ($scope.label.type === 'static') {
+             $scope.label['static'] = currentLink.label.text_segments[0] || getLabelDefault();
+         }
+         else {
+             $scope.label.variable.prefix   = currentLink.label.text_segments[0];
+             $scope.label.variable.variable = currentLink.label.variable_segments[0];
+             $scope.label.variable.suffix   = currentLink.label.text_segments[1];
+         }
 
          function getLabelDefault() {
              return $scope.url.active.acc && $scope.url.accession.site
