@@ -36,7 +36,7 @@
                 <accordion close-others="1">
 
                   <div ng-show="columns.accessions.length">
-                    <accordion-group is-open="url.active.acc">
+                    <accordion-group is-open="url.active.accession">
                        <accordion-heading>Link to another site using an accession in your dataset:</accordion-heading>
 
                        <p class="help-block">Which column should the link be based off of?</p>
@@ -47,18 +47,18 @@
                     </accordion-group>
                   </div>
 
-                  <accordion-group is-open="url.active.var">
+                  <accordion-group is-open="url.active.fromdata">
                     <accordion-heading>Construct your own url from a dataset column:</accordion-heading>
 
-                    <label>URL prefix: <input type="text" class="input-large" ng-model="url.variable.prefix" placeholder="usually http://..."></label>
-                    <select ng-model="url.variable.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
-                    <label>URL suffix: <input type="text" class="input-large" ng-model="url.variable.suffix" placeholder="ex.: /index.html"></label>
+                    <label>URL prefix: <input type="text" class="input-large" ng-model="url.fromdata.prefix" placeholder="usually http://..."></label>
+                    <select ng-model="url.fromdata.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
+                    <label>URL suffix: <input type="text" class="input-large" ng-model="url.fromdata.suffix" placeholder="ex.: /index.html"></label>
                   </accordion-group>
 
-                  <accordion-group is-open="url.active.static">
+                  <accordion-group is-open="url.active.fixed">
                     <accordion-heading>Use the following URL:</accordion-heading>
 
-                    <input type="text" ng-model="url.static" class="input-large" placeholder="Type URL here...">
+                    <input type="text" ng-model="url.fixed" class="input-large" placeholder="Type URL here...">
                   </accordion-group>
 
                 </accordion>
@@ -82,12 +82,12 @@
                 <label class="radio"><input type="radio" ng-model="label.type" value="url">Use the URL</label>
 
                 <label class="radio"><input type="radio" ng-model="label.type" value="static">Use the following label:</label>
-                <input type="text" class="input-large" ng-trim="false" ng-model="label.static">
+                <input type="text" class="input-large" ng-trim="false" ng-model="label.fixed">
 
                 <label class="radio"><input type="radio" ng-model="label.type" value="variable">Use column data:</label>
-                <label><input type="text" class="input-large" ng-trim="false" ng-model="label.variable.prefix" placeholder="Label prefix (optional)"></label>
-                <select ng-model="label.variable.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
-                <label><input type="text" class="input-large" ng-trim="false" ng-model="label.variable.suffix" placeholder="Label suffix (optional)"></label>
+                <label><input type="text" class="input-large" ng-trim="false" ng-model="label.fromdata.prefix" placeholder="Label prefix (optional)"></label>
+                <select ng-model="label.fromdata.variable" ng-options="col.shortname as col.name for col in columns.all"></select>
+                <label><input type="text" class="input-large" ng-trim="false" ng-model="label.fromdata.suffix" placeholder="Label suffix (optional)"></label>
               </div>
             </div>
           </fieldset>

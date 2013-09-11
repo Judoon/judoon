@@ -651,44 +651,44 @@ judoonCtrl.controller(
          $scope.columns = columns;
          $scope.url = {
              active: {
-                 'acc':    currentLink.url.varstring_type === 'accession' ? true : false,
-                 'var':    currentLink.url.varstring_type === 'variable'  ? true : false,
-                 'static': currentLink.url.varstring_type === 'static'    ? true : false
+                 accession : currentLink.url.varstring_type === 'accession' ? true : false,
+                 fromdata  : currentLink.url.varstring_type === 'variable'  ? true : false,
+                 fixed     : currentLink.url.varstring_type === 'static'    ? true : false
              },
              accession: { site: '', source: ''},
-             variable:  { prefix: '', variable: '', suffix: ''},
-             'static':  ''
+             fromdata:  { prefix: '', variable: '', suffix: ''},
+             fixed:     ''
          };
-         if ($scope.url.active.acc) {
+         if ($scope.url.active.accession) {
              $scope.url.accession.site   = currentLink.url.accession;
              $scope.url.accession.source = currentLink.url.variable_segments[0];
          }
-         else if ($scope.url.active['var']) {
-             $scope.url.variable.prefix   = currentLink.url.text_segments[0];
-             $scope.url.variable.variable = currentLink.url.variable_segments[0];
-             $scope.url.variable.suffix   = currentLink.url.text_segments[1];
+         else if ($scope.url.active.fromdata) {
+             $scope.url.fromdata.prefix   = currentLink.url.text_segments[0];
+             $scope.url.fromdata.variable = currentLink.url.variable_segments[0];
+             $scope.url.fromdata.suffix   = currentLink.url.text_segments[1];
          }
          else {
-             $scope.url['static'] = currentLink.url.text_segments[0];
+             $scope.url.fixed = currentLink.url.text_segments[0];
          };
          
 
          $scope.label = {
-             type:     currentLink.label.varstring_type,
-             'static': '',
-             variable:  { prefix: '', variable: '', suffix: ''}
+             type     : currentLink.label.varstring_type,
+             fixed    : '',
+             fromdata : { prefix: '', variable: '', suffix: ''}
          };
          if ($scope.label.type === 'static') {
-             $scope.label['static'] = currentLink.label.text_segments[0] || getLabelDefault();
+             $scope.label.fixed = currentLink.label.text_segments[0] || getLabelDefault();
          }
          else {
-             $scope.label.variable.prefix   = currentLink.label.text_segments[0];
-             $scope.label.variable.variable = currentLink.label.variable_segments[0];
-             $scope.label.variable.suffix   = currentLink.label.text_segments[1];
+             $scope.label.fromdata.prefix   = currentLink.label.text_segments[0];
+             $scope.label.fromdata.variable = currentLink.label.variable_segments[0];
+             $scope.label.fromdata.suffix   = currentLink.label.text_segments[1];
          }
 
          function getLabelDefault() {
-             return $scope.url.active.acc && $scope.url.accession.site
+             return $scope.url.active.accession && $scope.url.accession.site
                  ? getCurrentSite().label : 'Link';
          }
 
@@ -708,12 +708,12 @@ judoonCtrl.controller(
                  $scope.labelPreview = $scope.urlPreview;
                  break;
              case 'variable':
-                 $scope.labelPreview = $scope.label.variable.prefix +
-                     getSampleData($scope.label.variable.variable) +
-                     $scope.label.variable.suffix;
+                 $scope.labelPreview = $scope.label.fromdata.prefix +
+                     getSampleData($scope.label.fromdata.variable) +
+                     $scope.label.fromdata.suffix;
                  break;
              case 'static':
-                 $scope.labelPreview =  $scope.label['static'];
+                 $scope.labelPreview =  $scope.label.fixed;
                  break;
              }
          }
@@ -721,10 +721,10 @@ judoonCtrl.controller(
 
          $scope.urlPreview = '';
          function updateUrlPreview() {
-             if ($scope.url.active['static']) {
-                 $scope.urlPreview = $scope.url['static'];
+             if ($scope.url.active.fixed) {
+                 $scope.urlPreview = $scope.url.fixed;
              }
-             else if ($scope.url.active.acc) {
+             else if ($scope.url.active.accession) {
                  if (!$scope.url.accession.site) {
                      $scope.urlPreview = '';
                  }
@@ -735,10 +735,10 @@ judoonCtrl.controller(
                          accession_parts.suffix;
                  }
              }
-             else if ($scope.url.active['var']) {
-                 $scope.urlPreview = $scope.url.variable.prefix +
-                     getSampleData($scope.url.variable.variable) +
-                     $scope.url.variable.suffix;
+             else if ($scope.url.active.fromdata) {
+                 $scope.urlPreview = $scope.url.fromdata.prefix +
+                     getSampleData($scope.url.fromdata.variable) +
+                     $scope.url.fromdata.suffix;
              }
          }
          $scope.$watch('url', function() {
@@ -776,23 +776,23 @@ judoonCtrl.controller(
          $scope.saveWidget = function() {
 
              var url;
-             if ($scope.url.active['static']) {
+             if ($scope.url.active.fixed) {
                  url = {
                      accession:         '',
-                     text_segments:     [$scope.url['static']],
+                     text_segments:     [$scope.url.fixed],
                      variable_segments: [],
                      varstring_type:    'static'
                  };
              }
-             else if ($scope.url.active['var']) {
+             else if ($scope.url.active.fromdata) {
                  url = {
                      accession:         '',
-                     text_segments:     [$scope.url.variable.prefix, $scope.url.variable.suffix],
-                     variable_segments: [$scope.url.variable.variable],
+                     text_segments:     [$scope.url.fromdata.prefix, $scope.url.fromdata.suffix],
+                     variable_segments: [$scope.url.fromdata.variable],
                      varstring_type:    'variable'
                  };
              }
-             else if ($scope.url.active.acc) {
+             else if ($scope.url.active.accession) {
                  var urlParts = getUrlPartsForCurrentSite();
                  url = {
                      accession:         $scope.url.accession.site,
@@ -812,7 +812,7 @@ judoonCtrl.controller(
              }
              else if ($scope.label.type === 'static') {
                  label = {
-                     text_segments:     [$scope.label['static']],
+                     text_segments:     [$scope.label.fixed],
                      variable_segments: [],
                      varstring_type:    'static'
                  };
@@ -823,8 +823,8 @@ judoonCtrl.controller(
              }
              else if ($scope.label.type === 'variable') {
                  label = {
-                     text_segments:     [$scope.label.variable.prefix, $scope.label.variable.suffix],
-                     variable_segments: [$scope.label.variable.variable],
+                     text_segments:     [$scope.label.fromdata.prefix, $scope.label.fromdata.suffix],
+                     variable_segments: [$scope.label.fromdata.variable],
                      varstring_type:    'variable'
                  };
              }
