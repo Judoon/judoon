@@ -14,10 +14,10 @@ var judoonDir = angular.module('judoon.directives', []);
 
 judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
     var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">' +
-        '<thead>' +
+        '<thead><tr>' +
         '<th ng-class="{highlight: highlightActive({column: column}), \'highlight-danger\': highlightDelete({column: column})}"' +
            ' ng-repeat="column in columns">{{ column[headerKey] }}</th>' +
-        '</thead>' +
+        '</tr></thead>' +
         '<tbody></tbody>' +
         '</table>';
 
