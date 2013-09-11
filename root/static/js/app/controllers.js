@@ -669,7 +669,8 @@ judoonCtrl.controller(
          
          $scope.label = {
              type:     currentLink.label.varstring_type,
-             'static': currentLink.label.text_segments[0] || '',
+             'static': currentLink.label.varstring_type !== 'static' ? ''
+                     : currentLink.label.text_segments[0] || getLabelDefault(),
              variable: {
                  prefix:   currentLink.label.text_segments[0] || '',
                  variable: currentLink.label.variable_segments[0] || '',
@@ -677,11 +678,14 @@ judoonCtrl.controller(
              }
          };
 
+         function getLabelDefault() {
+             return $scope.url.active.acc && $scope.url.accession.site
+                 ? getCurrentSite().label : 'Link';
+         }
+
 
          $scope.$watch('url.accession.source', function() {
-             $scope.linkSites = getLinkableSites(
-                 getDataType($scope.url.accession.source)
-             );
+             $scope.linkSites = getLinkableSites();
          }, true);
 
 
@@ -689,7 +693,7 @@ judoonCtrl.controller(
          function updateLabelPreview() {
              switch ($scope.label.type) {
              case 'default':
-                 $scope.labelPreview = 'default label';
+                 $scope.labelPreview = getLabelDefault();
                  break;
              case 'url':
                  $scope.labelPreview = $scope.urlPreview;
@@ -716,10 +720,7 @@ judoonCtrl.controller(
                      $scope.urlPreview = '';
                  }
                  else {
-                     var accession_parts = getUrlPartsForSite(
-                         $scope.url.accession.site,
-                         getDataType($scope.url.accession.source)
-                     );
+                     var accession_parts = getUrlPartsForCurrentSite()
                      $scope.urlPreview = accession_parts.prefix +
                          getSampleData($scope.url.accession.source) +
                          accession_parts.suffix;
@@ -740,17 +741,21 @@ judoonCtrl.controller(
          function getSampleData(colname) { return columns.dict[colname].sample_data[0]; }
          function getDataType(colname)   { return columns.dict[colname].data_type; }
 
-         function getLinkableSites(accession) {
-             return siteLinker[accession].sites;
+
+         function getLinkableSites() {
+             return siteLinker[getDataType($scope.url.accession.source)].sites;
          }
-         function getUrlPartsForSite(site, accession)  {
-             var parts;
-             angular.forEach(siteLinker[accession].sites, function(value) {
-                 if (value.name === site) {
-                     parts = value.mapping;
+         function getCurrentSite() {
+             var site;
+             angular.forEach(getLinkableSites(), function(value) {
+                 if (value.name === $scope.url.accession.site) {
+                     site = value;
                  }
              });
-             return parts;
+             return site;
+         }
+         function getUrlPartsForCurrentSite()  {
+             return getCurrentSite().mapping;
          }
 
 
@@ -779,9 +784,9 @@ judoonCtrl.controller(
                  };
              }
              else if ($scope.url.active.acc) {
-                 var urlParts = getUrlPartsForSite($scope.url.accession.site, getDataType($scope.url.accession.source));
+                 var urlParts = getUrlPartsForCurrentSite();
                  url = {
-                     accession:         $scope.url.accession.accession,
+                     accession:         $scope.url.accession.site,
                      text_segments:     [urlParts.prefix, urlParts.suffix],
                      variable_segments: [$scope.url.accession.source],
                      varstring_type:    'accession'
@@ -791,9 +796,9 @@ judoonCtrl.controller(
              var label;
              if ($scope.label.type === 'default') {
                  label = {
-                     text_segments:     [],
+                     text_segments:     [getLabelDefault()],
                      variable_segments: [],
-                     varstring_type:    ''
+                     varstring_type:    'static'
                  };
              }
              else if ($scope.label.type === 'static') {
