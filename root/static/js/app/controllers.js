@@ -207,7 +207,8 @@ judoonCtrl.controller(
                 page_id:  value.page_id,
                 id:       value.id,
                 title:    value.title,
-                template: value.template
+                widgets:  value.widgets,
+                sort:     key+1
             });
         } );
 
