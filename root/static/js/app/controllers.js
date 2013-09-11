@@ -300,15 +300,6 @@ judoonCtrl.controller(
     };
 
 
-    $scope.updateColumn = function() {
-        PageColumn.update({
-            page_id:  $scope.currentColumn.page_id,
-            id:       $scope.currentColumn.id,
-            title:    $scope.currentColumn.title,
-            widgets:  $scope.currentColumn.widgets
-        });
-    };
-
     $scope.isBold   = curryFormatTest('bold');
     $scope.isItalic = curryFormatTest('italic');
     function curryFormatTest(format) {
