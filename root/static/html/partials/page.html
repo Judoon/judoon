@@ -34,8 +34,8 @@
 
   <ul class="breadcrumb">
     <li><a href="/user/{{userName}}" target="_self">Overview</a> <span class="divider">/</span></li>
-    <li><a href="/user/{{userName}}/datasource/{{page.dataset_id}}" target="_self">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
-    <li>Page: {{page.title}}</li>
+    <li><a href="/user/{{userName}}/datasource/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
+    <li>Page: <span ng-bind-html="page.title"></span></li>
   </ul>
 
 

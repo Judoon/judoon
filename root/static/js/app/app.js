@@ -5,7 +5,8 @@
 
 var judoonApp = angular.module(
     'judoon',
-    ['ui.bootstrap','judoon.services','judoon.controllers','judoon.directives']
+    ['ngSanitize', 'ui.bootstrap',
+     'judoon.services', 'judoon.controllers', 'judoon.directives']
 );
 
 judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {

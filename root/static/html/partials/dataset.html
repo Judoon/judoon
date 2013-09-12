@@ -150,7 +150,7 @@
   <div collapse="hidePages">
     <ul>
       <li ng-repeat="page in dataset.pages">
-        <a href="/user/{{userName}}/page/{{page.id}}" target="_self">{{page.title}}</a>
+        <a href="/user/{{userName}}/page/{{page.id}}" ng-bind-html="page.title"></a>
       </li>
     </ul>
 

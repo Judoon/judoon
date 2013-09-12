@@ -75,7 +75,7 @@
             <td>[% loop.count %]<a name="page_[%- page_obj.id -%]"></a></td>
             <td>
               <p style="display: inline-block;">
-                <a href="[% page_obj.jsapp_url %]">[%- page_obj.title | html -%]</a>
+                <a href="[% page_obj.jsapp_url %]">[%- page_obj.title -%]</a>
                 - [%- page_obj.nbr_columns -%] columns, [%- page_obj.nbr_rows -%] rows
               </p>
               <div class="btn-toolbar pull-right">
