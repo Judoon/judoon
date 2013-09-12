@@ -5,15 +5,14 @@
 
   <h2>Datasets</h2>
   <ul class="nav nav-tabs">
-    <!-- <li class="nav-header">Datasets</li> -->
     [% FOREACH dataset_obj IN dataset.list %]
-    <li class="[% loop.first ? 'active' : '' %]"><a href="#tab[% loop.count %]" data-toggle="tab">[%- dataset_obj.name | truncate(TAB_TITLE_MAXLEN) | html -%]</a></li>
+    <li><a href="#dataset[% dataset_obj.id %]" data-toggle="tab">[%- dataset_obj.name | truncate(TAB_TITLE_MAXLEN) | html -%]</a></li>
     [% END %]
   </ul>
 
   <div class="tab-content">
     [% FOREACH dataset_obj IN dataset.list %]
-    <div class="tab-pane [% loop.first ? 'active' : '' %]" id="tab[% loop.count %]">
+    <div class="tab-pane" id="dataset[% dataset_obj.id %]">
 
       <h3>[%- dataset_obj.name | html -%]</h3>
 

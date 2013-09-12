@@ -2,6 +2,19 @@
 [% INCLUDE 'components/forms/upload_dataset_js.tt2' %]
 <script>
   $(document).ready(function() {
+      if (window.location.hash === '') {
+        $('ul.nav-tabs li:first a').tab('show');
+      }
+      else {
+        $('a[href="' + window.location.hash + '"]').tab('show');
+      }
+
+      $('a[data-toggle="tab"]').on('shown', function(e) {
+        return window.location.hash = $(e.target).attr('href').substr(1);
+      });
+  });
+
+  $(document).ready(function() {
       $('.action_edit_dataset').tooltip({title: "Update the name, permissions, or other properties of this dataset.", container: "body"});
       $('.action_annotate_cols').tooltip({title: "Mark columns as having a specific data type or role", container: "body"});
       $('.action_custom_page').tooltip({title: "Create a custom view of your dataset", container: "body"});
