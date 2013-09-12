@@ -1,37 +1,5 @@
 <div>
 
-  <style type="text/css">
-    ul.template_widget_list {
-      list-style-type: none;
-      margin-left: 5px;
-    }
-    ul.template_widget_list li {
-      display: inline-block;
-      float: left;
-      margin-right: 3px;
-      margin-left: 3px;
-    }
-    ul.template_widget_list li.list-top {
-      margin-right: 0px;
-      margin-left: 0px;
-    }
-    ul.template_widget_list li.newline + li {
-      clear: left;
-    }
-
-    .cursor:after {
-      content: "";
-      border: 1px #999 solid;
-      color: transparent;
-      vertical-align: bottom;
-      padding: 0 0.4em;
-    }
-
-    .boldit   .widget-format-target { font-weight: bold; }
-    .italicit .widget-format-target { font-style: italic }
-  </style>
-
-
   <ul class="breadcrumb">
     <li><a ng-href="/user/{{userName}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
     <li><a ng-href="/user/{{userName}}/datasource/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
@@ -119,7 +87,7 @@
         <label class="control-label" for="page.layout">Layout: </label>
 
         <div class="controls" ng-controller="PageColumnTemplateCtrl">
-          <div id="column_canvas" class="well well-small" style="margin-bottom: 0;">
+          <div id="column_canvas" class="well well-small">
             <ul class="template_widget_list">
               <li class="list-top" ng-class="{cursor: !cursorWidget}" id="widget_list_top"><div></div></li>
               <li ng-class="{boldit: isBold(widget), italicit: isItalic(widget), cursor: cursorWidget==widget, newline: widget.type=='newline'}" ng-repeat="widget in currentColumn.widgets">

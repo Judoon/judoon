@@ -5,27 +5,6 @@
     <li>Dataset: {{dataset.name}}</li>
   </ul>
 
-  <style type="text/css">
-    h4 { padding-bottom: 5px; border-bottom: 1px lightgray solid; }
-
-    .outer-hscroll {}
-    .inner-hscroll { overflow-x: scroll; }
-
-    fieldset { min-width: auto; }
-
-    #ds_columns td {
-      vertical-align: top;
-      text-align: center;
-    }
-    #ds_columns th, #ds_columns td { border-top: none; }
-    #ds_columns th { white-space: nowrap; }
-
-    .add-panel { border: 1px lightgray solid; border-radius: 3px; padding: 5px; margin-top: 5px; }
-    .add-panel form { margin-bottom: 5px; }
-    .add-panel .form-actions { padding-top: 5px; padding-bottom: 5px; margin-bottom: 5px; }
-    .add-panel-banner { font-weight: bold; }
-  </style>
-
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
   <!-- ******************** PROPERTIES ******************** -->
