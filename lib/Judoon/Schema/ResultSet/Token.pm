@@ -38,7 +38,7 @@ Find all tokens that have not yet expired.
 
 sub find_by_value  { shift->find({value => shift}); }
 sub password_reset { shift->search({action => 'password_reset'}); }
-sub access_token   { shift->search({action => 'access_token'}); }
+sub access_token   { shift->search({action => 'access'}); }
 sub unexpired      {
     my ($self) = @_;
     my $dtf = $self->result_source->schema->storage->datetime_parser;
