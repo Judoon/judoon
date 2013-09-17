@@ -113,9 +113,18 @@
     <button type="submit" class="btn btn-primary">Update columns</button>
     </form>
 
-    <div style="padding: 1em;">
-      <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
-    </div>
+  </div>
+
+  <!-- ******************** NEW COLUMNS ******************** -->
+  <h4 ng-click="hideAddColumn = !hideAddColumn">
+    <i ng-show="hideAddColumn" class="icon icon-chevron-right"></i>
+    <i ng-show="!hideAddColumn" class="icon icon-chevron-down"></i>
+    Add New Column
+  </h4>
+
+  <div collapse="hideAddColumn">
+
+    <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
 
   </div>
 

@@ -17,6 +17,7 @@ judoonCtrl.controller(
          $scope.hideProperties = false;
          $scope.hideData       = true;
          $scope.hideColumns    = true;
+         $scope.hideAddColumn  = true;
          $scope.hidePages      = true;
 
 
