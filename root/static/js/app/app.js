@@ -20,9 +20,5 @@ judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvi
             templateUrl: '/static/html/partials/page.html',
             controller: 'PageCtrl'
         })
-        .when('/user/:userName/dataset/:datasetId/column', {
-            templateUrl: '/static/html/partials/dscolumn.html',
-            controller: 'DatasetColumnCtrl'
-        })
         .otherwise({redirectTo: '/'});
 }]);
