@@ -13,13 +13,6 @@ judoonCtrl.controller(
      function ($scope, $routeParams, $http, Dataset, DatasetColumn,
                Page, DatasetPage, DataType) {
 
-         // *** View property defaults
-         $scope.hideProperties = false;
-         $scope.hideData       = true;
-         $scope.hideColumns    = true;
-         $scope.hideAddColumn  = true;
-         $scope.hidePages      = true;
-
 
          // *** Alerts ***
          $scope.alerts = [];
