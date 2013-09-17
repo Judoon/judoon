@@ -7,15 +7,10 @@
   </ul>
 
 
-  <div class="navbar">
-    <div class="navbar-inner">
-      <ul class="nav">
-        <li ng-class="{active: !editmode}"><a ng-click="editmode = 0" id="preview_mode" href="#">Preview</a></li>
-        <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
-        <li><a ng-class="{'save-disabled': !pageDirty, 'save-ready': pageDirty}" ng-click="updatePage()" href="#">Save</a></li>
-      </ul>
-    </div>
-  </div>
+  <ul class="nav nav-tabs">
+    <li ng-class="{active: !editmode}"><a ng-click="editmode = 0" id="preview_mode" href="#">Preview</a></li>
+    <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
+  </ul>
 
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
