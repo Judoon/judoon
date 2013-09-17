@@ -36,6 +36,16 @@ judoonCtrl.controller(
          Dataset.get({id: $scope.datasetId}, function (dataset) {
              $scope.datasetOriginal = angular.copy(dataset);
              $scope.dataset = dataset;
+
+             DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
+                 $scope.dataset.columns = columns;
+                 $scope.dsColumnsLoaded = 1;
+                 $scope.dsColumnsOriginal = angular.copy(columns);
+             });
+
+             DatasetPage.query({}, {dataset_id: $scope.datasetId}, function (pages) {
+                 $scope.dataset.pages = pages;
+             });
          });
 
          $scope.permissions = [
@@ -63,12 +73,6 @@ judoonCtrl.controller(
 
 
          // *** Dataset Columns ***
-         DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
-             $scope.dataset.columns = columns;
-             $scope.dsColumnsLoaded = 1;
-             $scope.dsColumnsOriginal = angular.copy(columns);
-         });
-
          $scope.saveColumns = function() {
              angular.forEach($scope.dataset.columns, function (value, key) {
                  if (!angular.equals($scope.dsColumnsOriginal[key], value)) {
@@ -84,10 +88,6 @@ judoonCtrl.controller(
 
 
          // *** Pages ***
-         DatasetPage.query({}, {dataset_id: $scope.datasetId}, function (pages) {
-             $scope.dataset.pages = pages;
-         });
-
          Page.query({}, function (pages) { $scope.allPages = pages; });
 
          $scope.newPage = {type: 'blank', dataset_id: $scope.datasetId};
