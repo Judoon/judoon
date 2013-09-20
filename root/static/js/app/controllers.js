@@ -151,14 +151,16 @@ judoonCtrl.controller(
                  return;
              }
 
-             if (!$scope.currentLookup.inputColumns) {
-                 $scope.currentLookup.inputColumns = Lookup.query({}, {
+             if (!$scope.currentLookup.inputColumnsCanon) {
+                 $scope.currentLookup.inputColumnsCanon = Lookup.query({}, {
                      group_id: $scope.currentLookup.group_id,
                      id:       $scope.currentLookup.id,
                      io:       'input'
                  });
              }
          });
+
+         $scope.$watch('currentLookup.inputColumnsCanon', function () { filterInputColumns(); }, true);
 
          $scope.$watch('thatJoinColumn', function vivifyOutputs() {
              $scope.thatSelectColumn = null;
@@ -178,8 +180,33 @@ judoonCtrl.controller(
          });
 
 
-         // $scope.$watch('restrictByType', function () {
-         // });
+         $scope.restrictByType = false;
+         $scope.$watch('restrictByType', function () { filterInputColumns(); });
+         function filterInputColumns() {
+             if (!$scope.currentLookup) {
+                 return;
+             }
+
+             $scope.currentLookup.inputColumns = [];
+
+             if ($scope.restrictByType) {
+                 if (!$scope.thisJoinColumn) {
+                     return;
+                 }
+                 angular.forEach($scope.currentLookup.inputColumnsCanon, function(value) {
+                     if (value.type === $scope.thisJoinColumn.data_type) {
+                         $scope.currentLookup.inputColumns.push(
+                             angular.copy(value)
+                         );
+                     }
+                 });
+             }
+             else {
+                 $scope.currentLookup.inputColumns = angular.copy(
+                     $scope.currentLookup.inputColumnsCanon
+                 );
+             }
+         }
 
 
          $scope.submitNewColumn = function() {
