@@ -228,89 +228,9 @@ judoonCtrl.controller(
              // $window.location.reload();
          };
 
-         // BUSTED BELOW THIS!
-
-         $scope.lookupTypesFlat = [
-             {
-                 name:           'Simpson2008',
-                 inputColumns:   [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
-                 outputColumns:  [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
-                 group:          'My Datasets'
-             },
-             {
-                 name:           'Montell 2007',
-                 inputColumns:   [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
-                 outputColumns:  [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
-                 group:          'My Datasets'
-             },
-             {
-                 name:          'Entrez Gene',
-                 inputColumns:  [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
-                 outputColumns: [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
-                 group:         'External Database'
-             },
-             {
-                 name:          'Uniprot',
-                 inputColumns:  [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
-                 outputColumns: [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
-                 group:         'External Database'
-             }
-         ];
-
-
-
-         $scope.submitNewColumn = function() {
-             var data;
-
-             if ($scope.transform.id === 'join') {
-                 data = {
-                     name:         $scope.newColumnName,
-                     module:       $scope.transform.module,
-                     dataset_id:   $scope.datasetId,
-                     input_field:  $scope.sourceColumn.shortname,
-                     join_dataset: $scope.joinDataset.id,
-                     join_column:  $scope.joinColumn.shortname,
-                     to_column:    $scope.outputColumn.shortname
-                 };
-             }
-             else {
-                 data = {
-                     name:          $scope.newColumnName,
-                     module:        $scope.transform.module,
-                     dataset_id:    $scope.datasetId,
-                     input_field:   $scope.sourceColumn.shortname,
-                     input_format:  $scope.inputType,
-                     output_format: $scope.outputType
-                 };
-             }
-
-             DatasetColumn.save({}, data);
-             $window.location.reload();
-         };
-
-         $scope.$watch('transform', function() {
-             $scope.filteredColumns = [];
-
-             if (!$scope.transformType) {
-                 return;
-             }
-
-             angular.forEach($scope.dsColumns, function(value, key) {
-                 var accepts = $scope.transform.accepts;
-
-                 if ((accepts === 'text') && (value.data_type !== 'text')) {
-                     return;
-                 }
-                 if ((accepts === 'accession') && (!value.accession_type)) {
-                     return;
-                 }
-
-                 $scope.filteredColumns.push(value);
-             });
-         });
-
-
-     }]);
+     }
+    ]
+);
 
 
 
