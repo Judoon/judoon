@@ -128,10 +128,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'DatasetColumnCtrl',
-    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn',
-     'Transform', 'Lookup', '$window',
-     function ($scope, $routeParams, Dataset, DatasetColumn, Transform,
-               Lookup, $window) {
+    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Lookup', '$window',
+     function ($scope, $routeParams, Dataset, DatasetColumn, Lookup, $window) {
 
          Lookup.query({}, function (lookups) {
              var self_idx;

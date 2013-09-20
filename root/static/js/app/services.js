@@ -69,25 +69,10 @@ judoonSrv.factory('PageColumn', ['$resource', '$http', function($resource, $http
 }]);
 
 
-judoonSrv.factory('Transform', ['$resource', function($resource) {
-    return $resource(
-        '/api/transform/:transformType/:transform',
-        {transformType: '@id'}
-    );
-}]);
-
-
 judoonSrv.factory('DataType', ['$resource', function($resource) {
     return $resource(
         '/api/datatype/:typeId',
         {typeId: '@id'}
-    );
-}]);
-
-judoonSrv.factory('Transform', ['$resource', function($resource) {
-    return $resource(
-        '/api/transform/:transformType/:transform',
-        {transformType: '@id'}
     );
 }]);
 
@@ -103,10 +88,6 @@ judoonSrv.factory('Lookup', ['$resource', function($resource) {
             sub_io:   '@sub_io'
         }
     );
-
-    Lookup.getInputs = function () {
-        this.input_columns = this.$get({},{io: 'input'});
-    };
 
     return Lookup;
 }]);
