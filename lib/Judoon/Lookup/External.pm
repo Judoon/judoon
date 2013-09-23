@@ -17,9 +17,10 @@ use MooX::Types::MooseLike::Base qw(ArrayRef HashRef);
 use Moo;
 
 with 'Judoon::Lookup::Role::Base';
-with 'Judoon::Lookup::Role::Group::External';
 
-has '+dataset' => (isa => HashRef); #InstanceOf('Judoon::Schema::Result::ExternalDataset'));
+has '+dataset'     => (isa => HashRef); #InstanceOf('Judoon::Schema::Result::ExternalDataset'));
+has '+group_id'    => (is => 'ro', default => 'external');
+has '+group_label' => (is => 'ro', default => 'External Database');
 
 my %columns_for = (
     uniprot => [

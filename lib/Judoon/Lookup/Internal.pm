@@ -18,10 +18,12 @@ use MooX::Types::MooseLike::Base qw(ArrayRef InstanceOf);
 use Moo;
 
 with 'Judoon::Lookup::Role::Base';
-with 'Judoon::Lookup::Role::Group::Internal';
 
 
-has '+dataset' => (isa => InstanceOf('Judoon::Schema::Result::Dataset'));
+has '+dataset'     => (isa => InstanceOf('Judoon::Schema::Result::Dataset'));
+has '+group_id'    => (is => 'ro', default => 'internal');
+has '+group_label' => (is => 'ro', default => 'My Datasets');
+
 
 has columns => (is => 'lazy', isa => ArrayRef[],);
 sub _build_columns {
