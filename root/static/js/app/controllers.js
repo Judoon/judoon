@@ -129,126 +129,108 @@ judoonCtrl.controller(
 judoonCtrl.controller(
     'DatasetColumnCtrl',
     ['$scope', '$routeParams', 'Dataset', 'DatasetColumn',
-     'Transform', '$window',
+     'Transform', 'Lookup', '$window',
      function ($scope, $routeParams, Dataset, DatasetColumn, Transform,
-               $window) {
+               Lookup, $window) {
 
-         $scope.lookupTypes = [
-             {
-                 name:    'My Datasets',
-                 value:   'jointable',
-                 sources: [
-                     {
-                         name:           'Simpson2008',
-                         inputColumns:   [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
-                         outputColumns:  [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
-                     },
-                     {
-                         name:           'Montell 2007',
-                         inputColumns:   [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
-                         outputColumns:  [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}]
-                     },
-                 ]
-             },
-             {
-                 name:    'External Database',
-                 value:   'lookup',
-                 sources: [
-                     {
-                         name:          'Entrez Gene',
-                         inputColumns:  [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
-                         outputColumns: [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
-                     },
-                     {
-                         name:          'Uniprot',
-                         inputColumns:  [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
-                         outputColumns: [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
-                     },
-                 ],
-             },
-         ];
+         Lookup.query({}, function (lookups) {
+             var self_idx;
+             angular.forEach(lookups, function (value, key) {
+                 if ((value.type === 'internal') && (value.id === $scope.datasetId)) {
+                     self_idx = key;
+                 }
+             });
 
+             lookups.splice(self_idx,1);
+             $scope.lookups = lookups;
+         });
+
+         $scope.$watch('currentLookup', function vivfyInputs() {
+             $scope.thatJoinColumn = null;
+             if (!$scope.currentLookup) {
+                 return;
+             }
+
+             if (!$scope.currentLookup.inputColumns) {
+                 $scope.currentLookup.inputColumns = Lookup.query({}, {
+                     group_id: $scope.currentLookup.group_id,
+                     id:       $scope.currentLookup.id,
+                     io:       'input'
+                 });
+             }
+         });
+
+         $scope.$watch('thatJoinColumn', function vivifyOutputs() {
+             $scope.thatSelectColumn = null;
+             if (!$scope.thatJoinColumn) {
+                 return;
+             }
+
+             if (!$scope.thatJoinColumn.outputColumns) {
+                 $scope.thatJoinColumn.outputColumns = Lookup.query({}, {
+                     group_id: $scope.currentLookup.group_id,
+                     id:       $scope.currentLookup.id,
+                     io:       'input',
+                     input_id: $scope.thatJoinColumn.id,
+                     sub_io:   'output'
+                 });
+             }
+         });
+
+
+         // $scope.$watch('restrictByType', function () {
+         // });
+
+
+         $scope.submitNewColumn = function() {
+             var data = {
+                 dataset_id:        $scope.datasetId,
+                 new_col_name:      $scope.newColumnName,
+                 this_table_id:     $scope.datasetId,
+                 that_table_id:     $scope.currentLookup.full_id,
+                 this_joincol_id:   $scope.thisJoinColumn.shortname,
+                 that_joincol_id:   $scope.thatJoinColumn.id,
+                 that_selectcol_id: $scope.thatSelectColumn.id
+             };
+
+             DatasetColumn.save(
+                 {}, data,
+                 function() { $scope.addAlert('success', 'yay'     ); },
+                 function() { $scope.addAlert('error', 'aww, shit.'); }
+             );
+             // $window.location.reload();
+         };
+
+         // BUSTED BELOW THIS!
 
          $scope.lookupTypesFlat = [
              {
                  name:           'Simpson2008',
                  inputColumns:   [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
                  outputColumns:  [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
-                 group:          'My Datasets',
+                 group:          'My Datasets'
              },
              {
                  name:           'Montell 2007',
                  inputColumns:   [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
                  outputColumns:  [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
-                 group:          'My Datasets',
+                 group:          'My Datasets'
              },
              {
                  name:          'Entrez Gene',
                  inputColumns:  [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
                  outputColumns: [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
-                 group:         'External Database',
+                 group:         'External Database'
              },
              {
                  name:          'Uniprot',
                  inputColumns:  [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
                  outputColumns: [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
-                 group:         'External Database',
-             },
+                 group:         'External Database'
+             }
          ];
 
 
-
-
-/*
-         Transform.query({}, function(transformTypes) {
-             $scope.transformTypes = transformTypes;
-             $scope.transformTypes.unshift({
-                 name: 'Join Table',
-                 id:   'join',
-                 transforms: [
-                     {
-                         name:    'JoinTable',
-                         id:      'join',
-                         accepts: 'any',
-                         module:  'Accession::JoinTable'
-                     }
-
-                 ],
-                 constraint: function() { return 1; }
-             });
-         });
-
-
-         $scope.$watch('transformType', function() {
-             if (
-                 (!$scope.transformType) ||
-                     ($scope.transformType.id === 'join') ||
-                     ($scope.transformType.transforms)
-             ) {
-                 return;
-             }
-
-             Transform.query({}, {id: $scope.transformType.id}, function(transforms) {
-                 $scope.transformType.transforms = transforms;
-             });
-         });
-
-         Dataset.query({}, function (datasets) {
-             var self_idx;
-             angular.forEach(datasets, function(value, key) {
-                 if (value.id === $scope.dataset.id) {
-                     self_idx = key;
-                 }
-             });
-             datasets.splice(self_idx, 1);
-
-             $scope.myDatasets = datasets;
-             angular.forEach(datasets, function(value, key) {
-                 DatasetColumn.query({}, {dataset_id: value.id}, function (columns) {
-                     value.columns = columns;
-                 });
-             });
-         });
 
          $scope.submitNewColumn = function() {
              var data;
@@ -299,7 +281,6 @@ judoonCtrl.controller(
                  $scope.filteredColumns.push(value);
              });
          });
-*/
 
 
      }]);

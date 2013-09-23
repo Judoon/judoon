@@ -1,37 +1,52 @@
 package Judoon::API::Resource::DatasetColumns;
 
+
+use HTTP::Throwable::Factory qw(http_throw);
+use Judoon::LookupRegistry;
+
 use Moo;
 
 extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
 
-use HTTP::Throwable::Factory qw(http_throw);
-use Module::Load;
-
 sub create_resource {
     my ($self, $data) = @_;
 
-    if ($data->{module} eq 'Accession::JoinTable') {
-        my $owner = $self->set->first->dataset->user;
-        if (my $ds = $owner->datasets_rs->find($data->{join_dataset})) {
-            $data->{join_dataset} = $ds;
-        }
-        else {
-            http_throw(Forbidden => {
-                message => "You don't have permission to access the joined dataset",
-            });
-        }
-    }
+    my $dataset = $self->set->first->dataset;
+    my $owner   = $dataset->user;
+    my $schema  = $dataset->result_source->schema;
 
-    my $module = "Judoon::Transform::".$data->{module};
-    load $module;
+    # if ($data->{module} eq 'Accession::JoinTable') {
+    #     my $owner = $dataset->user;
+    #     if (my $ds = $owner->datasets_rs->find($data->{join_dataset})) {
+    #         $data->{join_dataset} = $ds;
+    #     }
+    #     else {
+    #         http_throw(Forbidden => {
+    #             message => "You don't have permission to access the joined dataset",
+    #         });
+    #     }
+    # }
+
+    my $registry = Judoon::LookupRegistry->new({
+        schema => $schema, user => $owner,
+    });
+
+    my $full_id = $data->{that_table_id} // '';
+    my $lookup = $registry->find_by_full_id($full_id);
+    if (not $lookup) {
+        warn "Lookup failure! for  $full_id";
+        http_throw(Forbidden => {
+            message => "No such lookup: $full_id",
+        });
+    }
 
     my $new_col;
     $self->set->result_source->schema->txn_do(
         sub {
-            $new_col = $self->set->first->dataset->new_computed_column(
-                $data->{name}, $module->new( $data ),
+            $new_col = $dataset->new_computed_column(
+                $data->{new_col_name}, $lookup->build_actor( $data ),
             );
         }
     );

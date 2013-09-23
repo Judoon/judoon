@@ -32,7 +32,7 @@
             </div>
             <div class="span3">
               <span class="help-block">Which dataset?</span>
-              <select ng-model="lookupSource2" ng-options="source.name group by source.group for source in lookupTypesFlat"></select>
+              <select ng-model="currentLookup" ng-options="source.name group by source.group_label for source in lookups"></select>
             </div>
           </div>
 
@@ -41,19 +41,37 @@
           <div class="row-fluid">
             <div class="span3">
               <span class="help-block">This column in {{$parent.dataset.name}}</span>
-              <select ng-model="thisColumn" ng-options="column.name for column in $parent.dataset.columns"></select>
             </div>
             <div class="span3">
-              <span class="help-block">...should equal this column in {{lookupSource2.name}}</span>
-              <select ng-model="thatColumn" ng-options="column.name for column in lookupSource2.inputColumns"></select>
+              <span class="help-block">...should equal this column in {{currentLookup.name}}</span>
             </div>
             <div class="span3">
-              <span class="help-block">Take data from this column in {{lookupSource2.name}}</span>
-              <select ng-model="outputColumn" ng-options="column.name for column in lookupSource2.outputColumns"></select>
+              <span class="help-block">Take data from this column in {{currentLookup.name}}</span>
             </div>
             <div class="span3">
               <span class="help-block">...and put it into a new column named:</span>
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div class="span3">
+              <select ng-model="thisJoinColumn" ng-options="column.name for column in $parent.dataset.columns"></select>
+            </div>
+            <div class="span3">
+              <select ng-model="thatJoinColumn" ng-options="column.label for column in currentLookup.inputColumns"></select>
+            </div>
+            <div class="span3">
+              <select ng-model="thatSelectColumn" ng-options="column.label for column in thatJoinColumn.outputColumns"></select>
+            </div>
+            <div class="span3">
               <input type="text" ng-model="newColumnName" required placeholder="New column name">
+            </div>
+          </div>
+
+          <div class="row-fluid">
+            <div class="span3"></div>
+            <div class="span3">
+              <label class="checkbox"><input type="checkbox" ng-model="restrictByType"> Restrict by type</label>
             </div>
           </div>
 
