@@ -36,7 +36,6 @@ sub create_resource {
     my $full_id = $data->{that_table_id} // '';
     my $lookup = $registry->find_by_full_id($full_id);
     if (not $lookup) {
-        warn "Lookup failure! for  $full_id";
         http_throw(Forbidden => {
             message => "No such lookup: $full_id",
         });
