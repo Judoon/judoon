@@ -134,7 +134,7 @@ judoonCtrl.controller(
          Lookup.query({}, function (lookups) {
              var self_idx;
              angular.forEach(lookups, function (value, key) {
-                 if ((value.type === 'internal') && (value.id === $scope.datasetId)) {
+                 if ((value.group_id === 'internal') && (value.id+"" === $scope.datasetId)) {
                      self_idx = key;
                  }
              });
@@ -220,10 +220,9 @@ judoonCtrl.controller(
 
              DatasetColumn.save(
                  {}, data,
-                 function() { $scope.addAlert('success', 'yay'     ); },
-                 function() { $scope.addAlert('error', 'aww, shit.'); }
+                 function() { $scope.addAlert('success', 'Column added!'); },
+                 function() { $scope.addAlert('error', 'Something went wrong!'); }
              );
-             // $window.location.reload();
          };
 
      }
