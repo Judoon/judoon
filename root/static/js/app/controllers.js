@@ -140,13 +140,73 @@ judoonCtrl.controller(
      function ($scope, $routeParams, Dataset, DatasetColumn, Transform,
                $window) {
 
-         $scope.userName  = $routeParams.userName;
-         $scope.datasetId = $routeParams.datasetId;
-         DatasetColumn.query({},{dataset_id: $scope.datasetId}, function (columns) {
-             $scope.dsColumnsOriginal = angular.copy(columns);
-             $scope.dsColumns = columns;
-         });
+         $scope.lookupTypes = [
+             {
+                 name:    'My Datasets',
+                 value:   'jointable',
+                 sources: [
+                     {
+                         name:           'Simpson2008',
+                         inputColumns:   [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
+                         outputColumns:  [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
+                     },
+                     {
+                         name:           'Montell 2007',
+                         inputColumns:   [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
+                         outputColumns:  [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}]
+                     },
+                 ]
+             },
+             {
+                 name:    'External Database',
+                 value:   'lookup',
+                 sources: [
+                     {
+                         name:          'Entrez Gene',
+                         inputColumns:  [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
+                         outputColumns: [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
+                     },
+                     {
+                         name:          'Uniprot',
+                         inputColumns:  [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
+                         outputColumns: [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
+                     },
+                 ],
+             },
+         ];
 
+
+         $scope.lookupTypesFlat = [
+             {
+                 name:           'Simpson2008',
+                 inputColumns:   [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
+                 outputColumns:  [{name: 'Gene Id'},{name: 'Gene Symbol'},{name: 'Wound Image'}],
+                 group:          'My Datasets',
+             },
+             {
+                 name:           'Montell 2007',
+                 inputColumns:   [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
+                 outputColumns:  [{name: 'Gene Id'},{name: 'Flybase Id'},{name: 'Fold Change'}],
+                 group:          'My Datasets',
+             },
+             {
+                 name:          'Entrez Gene',
+                 inputColumns:  [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
+                 outputColumns: [{name: 'Gene Id'}, {name: 'Gene Description'}, {name: 'Homolgene Id'}],
+                 group:         'External Database',
+             },
+             {
+                 name:          'Uniprot',
+                 inputColumns:  [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
+                 outputColumns: [{name: 'Uniprot ID'}, {name: 'Uniprot ACC'}, {name: 'Entrez Gene ID'}],
+                 group:         'External Database',
+             },
+         ];
+
+
+
+
+/*
          Transform.query({}, function(transformTypes) {
              $scope.transformTypes = transformTypes;
              $scope.transformTypes.unshift({
@@ -164,6 +224,7 @@ judoonCtrl.controller(
                  constraint: function() { return 1; }
              });
          });
+
 
          $scope.$watch('transformType', function() {
              if (
@@ -245,6 +306,8 @@ judoonCtrl.controller(
                  $scope.filteredColumns.push(value);
              });
          });
+*/
+
 
      }]);
 
