@@ -1,6 +1,18 @@
 package Judoon::Lookup::External;
 
-use MooX::Types::MooseLike::Base qw(Str ArrayRef InstanceOf HashRef);
+=pod
+
+=for stopwords
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Lookup::External - Lookup data from a non-Judoon source
+
+=cut
+
+use MooX::Types::MooseLike::Base qw(ArrayRef HashRef);
 
 use Moo;
 
@@ -8,10 +20,6 @@ with 'Judoon::Lookup::Role::Base';
 with 'Judoon::Lookup::Role::Group::External';
 
 has '+dataset' => (isa => HashRef); #InstanceOf('Judoon::Schema::Result::ExternalDataset'));
-
-sub id   { return $_[0]->dataset->{id}; }
-sub name { return $_[0]->dataset->{name}; }
-
 
 my %columns_for = (
     uniprot => [
@@ -48,6 +56,19 @@ sub _build_column_dict {
 }
 
 
+
+has actionroles => (is => 'lazy', isa => HashRef,);
+sub _build_actionroles {
+    return {
+        'uniprot' => 'Judoon::Lookup::Role::Action::Uniprot',
+    };
+}
+
+
+sub id   { return $_[0]->dataset->{id}; }
+sub name { return $_[0]->dataset->{name}; }
+
+
 sub input_columns {
     my ($self) = @_;
     return [grep {$self->column_dict->{$_->{id}}->{dir} ne 'to'} @{$_[0]->columns}];
@@ -69,13 +90,6 @@ sub output_columns_for {
     return [grep {$self->column_dict->{$_->{id}}->{dir} eq $dir} @{$_[0]->columns}];
 }
 
-
-has actionroles => (is => 'lazy', isa => HashRef,);
-sub _build_actionroles {
-    return {
-        'uniprot' => 'Judoon::Lookup::Role::Action::Uniprot',
-    };
-}
 
 sub build_actor {
     my ($self, $args) = @_;
