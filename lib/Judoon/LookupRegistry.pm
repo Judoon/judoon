@@ -162,18 +162,12 @@ C<::Dataset> and constructs an object from that.
 
 sub new_internal_from_obj {
     my ($self, $dataset) = @_;
-    return $self->new_internal({
-        dataset    => $dataset,
-        that_table => $dataset->id
-    });
+    return $self->new_internal({dataset => $dataset});
 }
 sub new_internal_from_id {
     my ($self, $id) = @_;
     my $dataset = $self->schema->resultset('Dataset')->find({id => $id});
-    return $self->new_internal({
-        dataset    => $dataset,
-        that_table => $id,
-    });
+    return $self->new_internal({dataset => $dataset});
 }
 sub new_internal {
     my ($self, $attrs) = @_;
@@ -199,10 +193,7 @@ hash and constructs an object from that.
 
 sub new_external_from_obj {
     my ($self, $dataset) = @_;
-    return $self->new_external({
-        dataset    => $dataset,
-        that_table => $dataset->{id},
-    });
+    return $self->new_external({dataset => $dataset});
 }
 sub new_external_from_id {
     my ($self, $id) = @_;
@@ -215,10 +206,7 @@ sub new_external_from_id {
             last;
         }
     }
-    return $self->new_external({
-        dataset    => $dataset,
-        that_table => $id,
-    });
+    return $self->new_external({dataset => $dataset});
 }
 sub new_external {
     my ($self, $attrs) = @_;
