@@ -71,7 +71,7 @@ requires 'MIME::Base64';
 requires 'Module::Load';
 requires 'Module::Pluggable';
 requires 'Module::Versions';
-requires 'Moo';
+requires 'Moo' => '1.001000';
 requires 'MooX::Types::MooseLike';
 requires 'Moose';
 requires 'MooseX::MarkAsMethods';
