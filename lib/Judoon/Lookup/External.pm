@@ -98,9 +98,7 @@ sub build_actor {
         'Judoon::Lookup::ExternalActor',
         $self->actionroles->{ $self->id },
         'Judoon::Lookup::Role::Actor',
-    )->new({
-        %$args, schema => $self->schema, that_table_id => $self->id,
-    });
+    )->new($args);
 }
 
 

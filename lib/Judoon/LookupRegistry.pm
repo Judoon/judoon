@@ -37,10 +37,6 @@ use Moo;
 
 =head1 ATTRIBUTES
 
-=head2 schema
-
-A L<Judoon::Schema> instance.  Used to get Internal datasets.
-
 =head2 user
 
 A L<Judoon::Schema::Result::User> instance.  Internal datasets must
@@ -53,12 +49,6 @@ hashref with C<id> and C<name> keys.  Will eventually be replaced by
 an actual table in the L<Judoon::Schema> database.
 
 =cut
-
-has schema => (
-    is       => 'ro',
-    isa      => InstanceOf['Judoon::Schema'],
-    required => 1,
-);
 
 has user => (
     is       => 'ro',
@@ -166,12 +156,12 @@ sub new_internal_from_obj {
 }
 sub new_internal_from_id {
     my ($self, $id) = @_;
-    my $dataset = $self->schema->resultset('Dataset')->find({id => $id});
+    my $dataset = $self->user->datasets_rs->find({id => $id});
     return $self->new_internal({dataset => $dataset});
 }
 sub new_internal {
     my ($self, $attrs) = @_;
-    return Judoon::Lookup::Internal->new({schema => $self->schema, %$attrs});
+    return Judoon::Lookup::Internal->new({user => $self->user, %$attrs});
 }
 
 
@@ -210,7 +200,7 @@ sub new_external_from_id {
 }
 sub new_external {
     my ($self, $attrs) = @_;
-    return Judoon::Lookup::External->new({schema => $self->schema, %$attrs});
+    return Judoon::Lookup::External->new({user => $self->user, %$attrs});
 }
 
 

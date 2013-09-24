@@ -48,8 +48,9 @@ sub output_columns_for { return $_[0]->columns; }
 
 sub build_actor {
     my ($self, $args) = @_;
+    my $join_dataset = $self->user->datasets_rs->find({id => $self->id});
     return Judoon::Lookup::InternalActor->new({
-        %$args, schema => $self->schema, that_table_id => $self->id,
+        %$args, join_dataset => $join_dataset,
     });
 }
 

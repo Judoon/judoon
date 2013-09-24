@@ -7,16 +7,10 @@ use Moo;
 with 'Judoon::Lookup::Role::Actor';
 
 has join_dataset => (
-    is  => 'lazy',
-    isa => InstanceOf['Judoon::Schema::Result::Dataset'],
+    is       => 'ro',
+    isa      => InstanceOf['Judoon::Schema::Result::Dataset'],
+    required => 1,
 );
-sub _build_join_dataset {
-    my ($self) = @_;
-
-    return $self->schema->resultset('Dataset')->find({
-        id => $self->that_table_id,
-    });
-}
 
 
 sub result_data_type {

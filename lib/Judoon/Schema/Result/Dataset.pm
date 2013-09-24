@@ -24,7 +24,7 @@ use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Impossible;
 use Judoon::Tmpl;
 use Judoon::TypeRegistry;
-use List::AllUtils qw(each_arrayref);
+use List::MoreUtils qw();
 use Spreadsheet::WriteExcel ();
 use Text::Unidecode;
 
@@ -578,7 +578,6 @@ sub _deploy_computed_column {
     my $lookup_data = $lookup_actor->lookup(\@col_data);
     my $id_data     = $self->id_data;
 
-    use List::MoreUtils qw();
     my @virtual_col
         = List::MoreUtils::pairwise {no warnings q(once); [$a->[0], $b]}
            @$id_data, @$lookup_data;

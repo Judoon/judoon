@@ -9,14 +9,12 @@ __PACKAGE__->config( class => 'Judoon::LookupRegistry' );
 
 sub prepare_arguments {
     my ($self, $c) = @_;
-    return {
-        schema => $c->model('User')->schema,
-        user   => $c->user->get_object,
-    };
+    return {user => $c->user->get_object};
 }
 
 __PACKAGE__->meta->make_immutable;
 1;
+
 __END__
 
 =pod

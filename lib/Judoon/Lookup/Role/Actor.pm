@@ -22,18 +22,6 @@ use Moo::Role;
 
 =head1 REQUIRED ATTRIBUTES
 
-=head2 schema
-
-An instance of L<Judoon::Schema>
-
-=head2 this_table_id
-
-The id of the table to which the new column is being added.
-
-=head2 that_table_id
-
-The id of the table from which the new data is being fetched.
-
 =head2 this_joincol_id
 
 The id of the column in C<this_table> that is being joined on.
@@ -48,9 +36,6 @@ The id of the column in C<that_table> which contains the deisred data.
 
 =cut
 
-has schema            => (is => 'ro', required => 1,);
-has this_table_id     => (is => 'ro', required => 1,);
-has that_table_id     => (is => 'ro', required => 1,);
 has this_joincol_id   => (is => 'ro', required => 1,);
 has that_joincol_id   => (is => 'ro', required => 1,);
 has that_selectcol_id => (is => 'ro', required => 1,);

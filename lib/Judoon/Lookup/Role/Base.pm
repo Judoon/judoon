@@ -19,16 +19,16 @@ the actual lookup.
 
 =cut
 
-use MooX::Types::MooseLike::Base qw(Str);
+use MooX::Types::MooseLike::Base qw(Str InstanceOf);
 
 use Moo::Role;
 
 
 =head1 REQUIRED ATTRIBUTES
 
-=head2 schema
+=head2 user
 
-An instance of L<Judoon::Schema>.
+An instance of L<Judoon::Schema::Result::User>.
 
 =head2 dataset
 
@@ -44,7 +44,11 @@ A freely formatted string representing the Lookup group name.
 
 =cut
 
-has schema      => (is => 'ro', required => 1,);
+has user => (
+    is       => 'ro',
+    isa      => InstanceOf['Judoon::Schema::Result::User'],
+    required => 1,
+);
 has dataset     => (is => 'ro', required => 1,);
 has group_id    => (is => 'ro', isa => Str, required => 1,);
 has group_label => (is => 'ro', isa => Str, required => 1,);
