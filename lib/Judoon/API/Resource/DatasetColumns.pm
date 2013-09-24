@@ -15,34 +15,25 @@ sub create_resource {
 
     my $dataset = $self->set->first->dataset;
     my $owner   = $dataset->user;
-    my $schema  = $dataset->result_source->schema;
 
-    # if ($data->{module} eq 'Accession::JoinTable') {
-    #     my $owner = $dataset->user;
-    #     if (my $ds = $owner->datasets_rs->find($data->{join_dataset})) {
-    #         $data->{join_dataset} = $ds;
-    #     }
-    #     else {
-    #         http_throw(Forbidden => {
-    #             message => "You don't have permission to access the joined dataset",
-    #         });
-    #     }
-    # }
-
-    my $registry = Judoon::LookupRegistry->new({
-        schema => $schema, user => $owner,
-    });
-
-    my $full_id = $data->{that_table_id} // '';
-    my $lookup = $registry->find_by_full_id($full_id);
+    my $registry = Judoon::LookupRegistry->new({user => $owner,});
+    my $full_id  = $data->{that_table_id} // '';
+    my $lookup   = $registry->find_by_full_id($full_id);
     if (not $lookup) {
         http_throw(Forbidden => {
             message => "No such lookup: $full_id",
         });
     }
+    elsif ($lookup->group_id eq 'internal') {
+        if (!$owner->datasets_rs->find({id => $lookup->id})) {
+            http_throw(Forbidden => {
+                message => "You don't have permission to access the joined dataset",
+            });
+        }
+    }
 
     my $new_col;
-    $self->set->result_source->schema->txn_do(
+    $dataset->result_source->schema->txn_do(
         sub {
             $new_col = $dataset->new_computed_column(
                 $data->{new_col_name}, $lookup->build_actor( $data ),
@@ -76,7 +67,7 @@ See L</Web::Machine::Resource>.
 =head2 create_resource
 
 Intercept parameters to make sure user has access to the joined table
-for a JoinTable transform.  Load and run transforms to create new
+for an internal lookup.  Load and run lookup to create new
 computed column.
 
 =cut
