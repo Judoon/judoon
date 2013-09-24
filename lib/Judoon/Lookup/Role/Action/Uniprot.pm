@@ -2,7 +2,6 @@ package Judoon::Lookup::Role::Action::Uniprot;
 
 use Judoon::Types::Biology::Accession qw(:all);
 use Type::Utils qw(declare as union);
-use MooX::Types::MooseLike::Base qw(ArrayRef);
 
 use Moo::Role;
 

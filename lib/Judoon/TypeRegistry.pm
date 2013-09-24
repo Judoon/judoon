@@ -1,10 +1,10 @@
 package Judoon::TypeRegistry;
 
-use Moo;
 use MooX::Types::MooseLike::Base qw(HashRef InstanceOf);
-
-use Type::Registry;
 use Safe::Isa;
+use Type::Registry;
+
+use Moo;
 
 has pg_to_judoon => (
     is  => 'lazy',

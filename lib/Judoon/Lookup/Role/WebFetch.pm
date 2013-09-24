@@ -1,7 +1,7 @@
 package Judoon::Lookup::Role::WebFetch;
 
 use LWP::UserAgent;
-use MooX::Types::MooseLike::Base qw(Str ArrayRef InstanceOf HashRef);
+use MooX::Types::MooseLike::Base qw(Str InstanceOf);
 
 use Moo::Role;
 
