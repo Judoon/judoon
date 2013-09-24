@@ -1,36 +1,10 @@
 <div>
 
   <style type="text/css">
-    ul.template_widget_list {
-      list-style-type: none;
-      margin-left: 5px;
+    #page_actions .affix {
+       top:   160px;
     }
-    ul.template_widget_list li {
-      display: inline-block;
-      float: left;
-      margin-right: 3px;
-      margin-left: 3px;
-    }
-    ul.template_widget_list li.list-top {
-      margin-right: 0px;
-      margin-left: 0px;
-    }
-    ul.template_widget_list li.newline + li {
-      clear: left;
-    }
-
-    .cursor:after {
-      content: "";
-      border: 1px #999 solid;
-      color: transparent;
-      vertical-align: bottom;
-      padding: 0 0.4em;
-    }
-
-    .boldit   .widget-format-target { font-weight: bold; }
-    .italicit .widget-format-target { font-style: italic }
   </style>
-
 
   <ul class="breadcrumb">
     <li><a ng-href="/user/{{userName}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
@@ -39,22 +13,28 @@
   </ul>
 
 
-  <div class="navbar">
-    <div class="navbar-inner">
-      <ul class="nav">
-        <li ng-class="{active: !editmode}"><a ng-click="editmode = 0" id="preview_mode" href="#">Preview</a></li>
-        <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
-        <li><a ng-class="{'save-disabled': !pageDirty, 'save-ready': pageDirty}" ng-click="updatePage()" href="#">Save</a></li>
-      </ul>
-    </div>
-  </div>
+  <ul class="nav nav-tabs">
+    <li ng-class="{active: !editmode}"><a ng-click="editmode = 0" id="preview_mode" href="#">Preview</a></li>
+    <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
+  </ul>
 
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
   <p ng-show="!editmode" class="muted">This page is <strong>{{page.permission}}</strong>.</p>
-  <div ng-show="editmode" class="btn-group">
-    <button type="button" class="btn btn-primary" ng-model="page.permission" btn-radio="'public'">Public</button>
-    <button type="button" class="btn btn-primary" ng-model="page.permission" btn-radio="'private'">Private</button>
+  <div id="page_actions" ng-show="editmode">
+    <div class="row-fluid">
+      <div class="span2">
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" ng-model="page.permission" btn-radio="'public'">Public</button>
+          <button type="button" class="btn btn-primary" ng-model="page.permission" btn-radio="'private'">Private</button>
+        </div>
+      </div>
+      <div class="span2 offset8">
+        <div class="btn-group affix">
+          <button class="btn btn-danger" ng-disabled="!pageDirty" ng-click="updatePage()">Save</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div ng-show="editmode" class="editable_label" style="margin-bottom: -10px;">Page Title:</div>
@@ -119,7 +99,7 @@
         <label class="control-label" for="page.layout">Layout: </label>
 
         <div class="controls" ng-controller="PageColumnTemplateCtrl">
-          <div id="column_canvas" class="well well-small" style="margin-bottom: 0;">
+          <div id="column_canvas" class="well well-small">
             <ul class="template_widget_list">
               <li class="list-top" ng-class="{cursor: !cursorWidget}" id="widget_list_top"><div></div></li>
               <li ng-class="{boldit: isBold(widget), italicit: isItalic(widget), cursor: cursorWidget==widget, newline: widget.type=='newline'}" ng-repeat="widget in currentColumn.widgets">

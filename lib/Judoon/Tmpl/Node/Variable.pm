@@ -28,7 +28,7 @@ our $AUTHORITY = '';
 
 =head2 name
 
-The name of the variable.  Must correspond to a shortname in the
+The name of the variable.  Must correspond to a C<shortname> in the
 L<Judoon::Schema::Result::DatasetColumn> table.
 
 =cut

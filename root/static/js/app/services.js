@@ -69,17 +69,25 @@ judoonSrv.factory('PageColumn', ['$resource', '$http', function($resource, $http
 }]);
 
 
-judoonSrv.factory('Transform', ['$resource', function($resource) {
-    return $resource(
-        '/api/transform/:transformType/:transform',
-        {transformType: '@id'}
-    );
-}]);
-
-
 judoonSrv.factory('DataType', ['$resource', function($resource) {
     return $resource(
         '/api/datatype/:typeId',
         {typeId: '@id'}
     );
+}]);
+
+
+judoonSrv.factory('Lookup', ['$resource', function($resource) {
+    var Lookup = $resource(
+        '/api/lookup/:group_id/:id/:io/:input_id/:sub_io',
+        {
+            group_id: '@group_id',
+            id:       '@id',
+            io:       '@io',
+            input_id: '@input_id',
+            sub_io:   '@sub_io'
+        }
+    );
+
+    return Lookup;
 }]);

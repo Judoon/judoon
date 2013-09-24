@@ -5,202 +5,169 @@
     <li>Dataset: {{dataset.name}}</li>
   </ul>
 
-  <style type="text/css">
-    h4 { padding-bottom: 5px; border-bottom: 1px lightgray solid; }
-
-    .outer-hscroll {}
-    .inner-hscroll { overflow-x: scroll; }
-
-    fieldset { min-width: auto; }
-
-    #ds_columns td {
-      vertical-align: top;
-      text-align: center;
-    }
-    #ds_columns th, #ds_columns td { border-top: none; }
-    #ds_columns th { white-space: nowrap; }
-
-    .add-panel { border: 1px lightgray solid; border-radius: 3px; padding: 5px; margin-top: 5px; }
-    .add-panel form { margin-bottom: 5px; }
-    .add-panel .form-actions { padding-top: 5px; padding-bottom: 5px; margin-bottom: 5px; }
-    .add-panel-banner { font-weight: bold; }
-  </style>
-
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
-  <!-- ******************** PROPERTIES ******************** -->
-  <h4 ng-click="hideProperties = !hideProperties">
-    <i ng-show="hideProperties" class="icon icon-chevron-right"></i>
-    <i ng-show="!hideProperties" class="icon icon-chevron-down"></i>
-    Properties
-  </h4>
-  <div collapse="hideProperties">
-  <form class="form-horizontal" ng-submit="saveDataset()">
-    <fieldset>
 
-      <div class="control-group">
-        <label class="control-label">Name</label>
-        <div class="controls">
-          <input type="text" ng-model="dataset.name" required class="span6" />
+  <tabset>
+
+    <!-- ******************** PROPERTIES ******************** -->
+    <tab heading="Properties">
+
+      <form class="form-horizontal" ng-submit="saveDataset()">
+        <fieldset>
+
+          <div class="control-group">
+            <label class="control-label">Name</label>
+            <div class="controls">
+              <input type="text" ng-model="dataset.name" required class="span6" />
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Notes</label>
+            <div class="controls">
+              <textarea class="span6" ng-model="dataset.notes"></textarea>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label">Public</label>
+            <div class="controls">
+              <select class="span2" ng-model="dataset.permission" ng-options="permission.value as permission.label for permission in permissions">
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <button type="button" ng-click="resetDataset()" class="btn">Cancel</button>
+          </div>
+
+        </fieldset>
+      </form>
+    </tab>
+
+
+    <!-- ******************** DATA ******************** -->
+    <tab heading="Data">
+      <div class="outer-hscroll"><div class="inner-hscroll">
+
+          <judoon-data-table
+             jdt-dataset-id="datasetId"
+             jdt-columns="dataset.columns"
+             jdt-header-key="name"
+             jdt-fetch-fn="getServerData">
+          </judoon-data-table>
+
+      </div></div>
+    </tab>
+
+
+    <!-- ******************** COLUMNS ******************** -->
+    <tab heading="Data Columns">
+      <form ng-submit="saveColumns()">
+
+        <div class="outer-hscroll"><div class="inner-hscroll">
+            <table id="ds_columns" class="table table-striped table-bordered">
+              <tbody>
+                <tr class="odd">
+                  <th class="header">Column</th>
+                  <td class="name" ng-repeat="column in dataset.columns">
+                    <span class="label">{{column.name}}</span>
+                  </td>
+                </tr>
+
+                <tr class="even">
+                  <th class="header">Sample Data</th>
+                  <td class="sample_data" ng-repeat="column in dataset.columns">
+                    <ul class="unstyled">
+                      <li ng-repeat="sample in column.sample_data">{{sample}}</li>
+                    </ul>
+                  </td>
+                </tr>
+
+                <tr class="odd">
+                  <th class="header">Data Type</th>
+                  <td class="metadata" ng-repeat="column in dataset.columns">
+                    <select ng-model="column.data_type" ng-options="type.name as type.label group by type.library for type in data_types">
+                    </select>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+        </div></div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Update columns</button>
         </div>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">Notes</label>
-        <div class="controls">
-          <textarea class="span6" ng-model="dataset.notes"></textarea>
-        </div>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">Public</label>
-        <div class="controls">
-          <select class="span2" ng-model="dataset.permission" ng-options="permission.value as permission.label for permission in permissions">
-          </select>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save changes</button>
-        <button type="button" ng-click="resetDataset()" class="btn">Cancel</button>
-      </div>
-
-    </fieldset>
-  </form>
-  </div>
+      </form>
+    </tab>
 
 
-  <!-- ******************** DATA ******************** -->
-  <h4 ng-click="hideData = !hideData">
-    <i ng-show="hideData" class="icon icon-chevron-right"></i>
-    <i ng-show="!hideData" class="icon icon-chevron-down"></i>
-    Original Data
-  </h4>
-  <div collapse="hideData">
-    <div class="outer-hscroll well"><div class="inner-hscroll">
-
-    <judoon-data-table
-       jdt-dataset-id="datasetId"
-       jdt-columns="dataset.columns"
-       jdt-header-key="name"
-       jdt-fetch-fn="getServerData">
-    </judoon-data-table>
-
-    </div></div>
-  </div>
-
-
-  <!-- ******************** COLUMNS ******************** -->
-  <h4 ng-click="hideColumns = !hideColumns">
-    <i ng-show="hideColumns" class="icon icon-chevron-right"></i>
-    <i ng-show="!hideColumns" class="icon icon-chevron-down"></i>
-    Columns
-  </h4>
-
-  <div collapse="hideColumns">
-
-    <form ng-submit="saveColumns()">
-    <div class="outer-hscroll well"><div class="inner-hscroll">
-    <table id="ds_columns" class="table table-striped table-bordered">
-      <tbody>
-        <tr class="odd">
-          <th class="header">Column</th>
-          <td class="name" ng-repeat="column in dataset.columns">
-            <span class="label">{{column.name}}</span>
-          </td>
-        </tr>
-
-        <tr class="even">
-          <th class="header">Sample Data</th>
-          <td class="sample_data" ng-repeat="column in dataset.columns">
-            <ul class="unstyled">
-              <li ng-repeat="sample in column.sample_data">{{sample}}</li>
-            </ul>
-          </td>
-        </tr>
-
-        <tr class="odd">
-          <th class="header">Data Type</th>
-          <td class="metadata" ng-repeat="column in dataset.columns">
-            <select ng-model="column.data_type" ng-options="type.name as type.label group by type.library for type in data_types">
-            </select>
-          </td>
-        </tr>
-
-      </tbody>
-    </table>
-    </div></div>
-
-    <button type="submit" class="btn btn-primary">Update columns</button>
-    </form>
-
-    <div style="padding: 1em;">
+    <!-- ******************** NEW COLUMNS ******************** -->
+    <tab heading="Add Column">
       <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
-    </div>
-
-  </div>
+    </tab>
 
 
-  <!-- ******************** PAGES ******************** -->
-  <h4 ng-click="hidePages = !hidePages">
-    <i ng-show="hidePages" class="icon icon-chevron-right"></i>
-    <i ng-show="!hidePages" class="icon icon-chevron-down"></i>
-    Presentations
-  </h4>
-  <div collapse="hidePages">
-    <ul>
-      <li ng-repeat="page in dataset.pages">
-        <a href="/user/{{userName}}/page/{{page.id}}" ng-bind-html="page.title"></a>
-      </li>
-    </ul>
+    <!-- ******************** PRESENTATIONS ******************** -->
+    <tab heading="Presentations">
 
-    <div class="row-fluid">
-      <div class="add-panel span7">
-        <form ng-submit="createPage()" class="form-horizontal">
-          <fieldset>
+      <ul>
+        <li ng-repeat="page in dataset.pages">
+          <a href="/user/{{userName}}/page/{{page.id}}" ng-bind-html="page.title"></a>
+        </li>
+      </ul>
 
-            <div class="control-group">
-              <label class="control-label add-panel-banner">Create New Page:</label>
-              <div class="controls">
-                <label class="radio inline">
-                  <input type="radio" ng-model="newPage.type" value="blank">
-                  Blank Page
-                </label>
-                <label class="radio inline">
-                  <input type="radio" ng-model="newPage.type" value="clone">
-                  Clone existing page
-                </label>
+      <div class="row-fluid">
+        <div class="add-panel span7">
+          <form ng-submit="createPage()" class="form-horizontal">
+            <fieldset>
 
-                <div ng-switch on="newPage.type">
-                  <span ng-switch-when="clone" class="help-block">
-                    Create a new page that mimics the layout of an
-                    exsiting page.
-                  </span>
-                  <span ng-switch-when="blank" class="help-block">
-                    Create a new page without columns.
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div ng-switch on="newPage.type">
-              <div ng-switch-when="clone" class="control-group">
-                <label class="control-label">Page to clone:</label>
+              <div class="control-group">
+                <label class="control-label add-panel-banner">Create New Page:</label>
                 <div class="controls">
-                  <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
-                  </select>
+                  <label class="radio inline">
+                    <input type="radio" ng-model="newPage.type" value="blank">
+                    Blank Page
+                  </label>
+                  <label class="radio inline">
+                    <input type="radio" ng-model="newPage.type" value="clone">
+                    Clone existing page
+                  </label>
+
+                  <div ng-switch on="newPage.type">
+                    <span ng-switch-when="clone" class="help-block">
+                      Create a new page that mimics the layout of an
+                      exsiting page.
+                    </span>
+                    <span ng-switch-when="blank" class="help-block">
+                      Create a new page without columns.
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">Create</button>
-            </div>
-          </fieldset>
-        </form>
+              <div ng-switch on="newPage.type">
+                <div ng-switch-when="clone" class="control-group">
+                  <label class="control-label">Page to clone:</label>
+                  <div class="controls">
+                    <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </fieldset>
+          </form>
+        </div>
       </div>
-    </div>
+    </tab>
 
-  </div>
+  </tabset>
 
 </div>

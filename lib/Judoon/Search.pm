@@ -24,6 +24,6 @@ Judoon::Search - interface to our ElasticSearch search engine
 
 =head1 DESCRIPTION
 
-See L</Elastic::Model>.  Default namespace is 'judoon'.
+See L</Elastic::Model>.  Default namespace is 'C<judoon>'.
 
 =cut

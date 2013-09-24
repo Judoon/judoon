@@ -29,8 +29,8 @@ my @types = (
     # type                constraint      sample            display_name
     ['Entrez_GeneId',     qr/^\d+$/,      '7094',           'Entrez Gene ID',          ],
     ['Entrez_GeneSymbol', qr/^\w+$/,      'TLN1',           'Entrez Gene Symbol',      ],
-    ['Entrez_RefseqId',   qr/^\d+$/,      'NM_006289',      'RefSeq ID',               ],
-    ['Entrez_ProteinId',  qr/^\d+$/,      'NP_006280',      'Entrez Protein ID',       ],
+    ['Entrez_RefseqId',   qr/^NM_\d+$/,   'NM_006289',      'RefSeq ID',               ],
+    ['Entrez_ProteinId',  qr/^NP_\d+$/,   'NP_006280',      'Entrez Protein ID',       ],
     ['Entrez_UnigeneId',  qr/^\d+$/,      '686173',         'Entrez Unigene ID',       ],
     ['Pubmed_Pmid',       qr/^\d+$/,      '22270917',       'PubMed ID',               ],
     ['Uniprot_Acc',       qr/^\w+$/,      'Q9Y490',         'Uniprot ACC',             ],

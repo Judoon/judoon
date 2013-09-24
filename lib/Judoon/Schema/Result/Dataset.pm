@@ -24,7 +24,7 @@ use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Impossible;
 use Judoon::Tmpl;
 use Judoon::TypeRegistry;
-use List::AllUtils qw(each_arrayref);
+use List::MoreUtils qw();
 use Spreadsheet::WriteExcel ();
 use Text::Unidecode;
 
@@ -207,7 +207,7 @@ sub import_from_spreadsheet {
     for my $field (@$fields) {
         $self->create_related('ds_columns', {
             name => $field->{longname}, shortname => $field->{shortname},
-            data_type => $self->type_registry->pg_types->{$field->{type}},
+            data_type => $self->type_registry->pg_to_judoon->{$field->{type}},
             sort => $sort++,
         });
     }
@@ -216,15 +216,15 @@ sub import_from_spreadsheet {
 }
 
 
-=head2 new_computed_column( $name, $transform )
+=head2 new_computed_column( $name, $lookup_actor )
 
-Add a new column to the Dataset, derived by applying a transform (in
-the form of a C<Judoon::Transform>) to an existing column.
+Add a new column to the Dataset, derived by applying a lookup (in
+the form of a C<Judoon::Lookup::*Actor>) to an existing column.
 
 =cut
 
 sub new_computed_column {
-    my ($self, $name, $transform) = @_;
+    my ($self, $name, $lookup_actor) = @_;
 
     my $computed_ds = $self->new_related('ds_columns', {}); #computed => 1,});
 
@@ -232,10 +232,10 @@ sub new_computed_column {
     $computed_ds->name($longname);
     $computed_ds->shortname($shortname);
 
-    $computed_ds->data_type($transform->result_data_type());
+    $computed_ds->data_type($lookup_actor->result_data_type());
     $computed_ds->insert();
 
-    $self->_deploy_computed_column($computed_ds, $transform);
+    $self->_deploy_computed_column($computed_ds, $lookup_actor);
     return $computed_ds;
 }
 
@@ -558,37 +558,29 @@ sub _delete_datastore {
 }
 
 
-=head2 _deploy_computed_column( $ds_col, $transform )
+=head2 _deploy_computed_column( $ds_col, $lookup_actor )
 
 Add the computed column to the datastore and fill in its data by
-applying the C<Judoon::Transform> to the source field.
+applying the C<Judoon::Lookup::*Actor> to the source field.
 
 =cut
 
 sub _deploy_computed_column {
-    my ($self, $ds_col, $transform) = @_;
+    my ($self, $ds_col, $lookup_actor) = @_;
 
     my $alter_stmt = 'ALTER TABLE ' . $self->datastore_name
         . ' ADD COLUMN ' . $ds_col->shortname . ' '
-            . $transform->result_data_type;
+            . $lookup_actor->result_data_type->pg_type;
     $self->_run_sql($alter_stmt);
 
-    my @short_headers = $self->short_headers;
-    my $data = $self->data;
+    my @col_data = map {$_->[0]}
+        @{ $self->column_data($lookup_actor->this_joincol_id) };
+    my $lookup_data = $lookup_actor->lookup(\@col_data);
+    my $id_data     = $self->id_data;
 
-    my $col_idx = 0;
-    for my $sname (@short_headers) {
-        last if ($sname eq $transform->input_field);
-        $col_idx++
-    }
-
-    my @col_data = map {$_->[$col_idx]} @$data;
-    my $transform_data = $transform->apply_batch(\@col_data);
-    my $id_data = $self->id_data;
-    my @virtual_col;
-    for (my $i=0; $i<=$#col_data; $i++) {
-        push @virtual_col, [$id_data->[$i][0], $transform_data->[$i]];
-    }
+    my @virtual_col
+        = List::MoreUtils::pairwise {no warnings q(once); [$a->[0], $b]}
+           @$id_data, @$lookup_data;
 
     my $dstore_name  = $self->datastore_name;
     my $ds_col_sname = $ds_col->shortname;
