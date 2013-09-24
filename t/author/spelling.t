@@ -84,3 +84,6 @@ AngularJS
 utf
 ElasticSearch
 InflateColumn
+Uniprot
+DBIC
+serializable

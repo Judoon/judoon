@@ -140,7 +140,7 @@ sub change_password {
 
 =head2 import_data( $filehandle, $filetype )
 
-C<import_data()> takes in a filehandle and filetype and attempts to
+C<import_data()> takes in a filehandle and file type and attempts to
 turn it into a L<Judoon::Spreadsheet>.  A new C<Dataset> is created
 from the C<Spreadsheet> and inserted into the database.
 
