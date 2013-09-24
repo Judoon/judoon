@@ -77,7 +77,7 @@ Judoon::TypeRegistry - Registry of Judoon::Types
 
 =head1 DESCRIPTION
 
-Fetch Judoon::Types by name.
+Fetch L<Judoon::Type>s by name.
 
 =head1 ATTRIBUTES
 
@@ -85,14 +85,27 @@ Fetch Judoon::Types by name.
 
 A L</Type::Registry> object loaded with our types.
 
+=head2 pg_to_judoon
+
+A hashref that maps PostgreSQL data types to the closest Judoon core
+type.
+
 =head1 METHODS
 
 =head2 simple_lookup
 
-Delegated method from L</Type::Registry>
+Delegated method from L</Type::Registry>.
 
 =head2 all_types
 
-Get a list of all types stored in the registry.
+Get a list of all type objects stored in the registry.
+
+=head2 all_typenames
+
+Get a list of all type names stored in the registry.
+
+=head2 accessions
+
+Get a list of all type objects that are accessions.
 
 =cut
