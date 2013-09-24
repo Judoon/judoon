@@ -1,10 +1,34 @@
 package Judoon::Lookup::Role::Action::Uniprot;
 
+=pod
+
+=for stopwords
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Lookup::Role::Action::Uniprot - Lookup data via Uniprot web API
+
+=head1 DESCRIPTION
+
+This is our base class for internal database lookup actors.  Lookup
+actors are the objects in charge of actually taking a list of data and
+translating that into new data via lookups in another data
+source. Objects of this class are expected to fetch their data from a
+another Judoon dataset.
+
+These objects are constructed by the C<build_actor()> method of a
+L<Judoon::Lookup::Internal> object.
+
+=cut
+
 use Judoon::Types::Biology::Accession qw(:all);
 use Type::Utils qw(declare as union);
 
 use Moo::Role;
 
+# for ->agent attribute
 with 'Judoon::Lookup::Role::WebFetch';
 
 
@@ -25,6 +49,8 @@ my @ids = (
     ['WormBase',          'WORMBASE_ID',    'both', Biology_Accession_Wormbase_Id,      ],
 );
 
+# maps of ids to descriptive structures
+# %input_keys is currently unused
 my (%input_keys, %output_keys);
 for my $id (@ids) {
 
@@ -39,6 +65,19 @@ for my $id (@ids) {
 
 }
 
+
+=head1 METHODS
+
+=head2 result_data_type
+
+The data type of the selected output type.
+
+=head2 lookup( \@col_data )
+
+Build a POST request suitable for submission to the Uniprot id-mapping
+web service.  For details see L<http://www.uniprot.org/faq/28>.
+
+=cut
 
 sub result_data_type {
     my ($self) = @_;

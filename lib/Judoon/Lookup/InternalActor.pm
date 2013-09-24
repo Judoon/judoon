@@ -45,3 +45,45 @@ sub lookup {
 
 1;
 __END__
+
+=pod
+
+=for stopwords
+
+=encoding utf8
+
+=head1 NAME
+
+Judoon::Lookup::InternalActor - Base class of Judoon dataset lookups
+
+=head1 DESCRIPTION
+
+This is our base class for internal database lookup actors.  Lookup
+actors are the objects in charge of actually taking a list of data and
+translating that into new data via lookups in another data
+source. Objects of this class are expected to fetch their data from a
+another Judoon dataset.
+
+These objects are constructed by the C<build_actor()> method of a
+L<Judoon::Lookup::Internal> object.
+
+=head1 REQUIRED ATTRIBUTES
+
+=head2 join_dataset
+
+An instance of L<Judoon::Schema::Result::Dataset> that new new data
+will be retrieved from.
+
+=head1 METHODS
+
+=head2 result_data_type
+
+The L<Judoon::Type> of the output data.
+
+=head2 lookup(\@col_data)
+
+For each entry in C<@col_data>, find a matching entry in
+C<join_dataset>.C<that_joincol_id>, and return the related data in
+C<join_dataset>.C<that_selectcol_id>.
+
+=cut

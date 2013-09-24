@@ -85,10 +85,10 @@ identified by C<$input_col_id> is used in the join condition.
 =head2 build_actor( \%attrs )
 
 Construct and return a C<Judoon::Lookup::*Actor> of the same type as
-the lookup, with the relavant Action roles added.  C<InternalActor>s
+the lookup, with the relevant Action roles added.  C<InternalActor>s
 do not need any additional roles, but C<ExternalActor>s will need a
 C<Judoon::Lookup::Role::Action::*> role applied to them that specifies
-how extactly to lookup the given data.
+how exactly to lookup the given data.
 
 =cut
 
@@ -108,7 +108,7 @@ requires 'build_actor';
 
 =head2 TO_JSON
 
-A serializable represention of the C<Lookup>.
+A serializable representation of the C<Lookup>.
 
  Examples:
  Key         | External          | Internal

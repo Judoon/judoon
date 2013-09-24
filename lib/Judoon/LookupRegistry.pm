@@ -2,8 +2,6 @@ package Judoon::LookupRegistry;
 
 =pod
 
-=for stopwords
-
 =encoding utf8
 
 =head1 NAME
@@ -71,7 +69,7 @@ sub _build_external_db {
 Returns a list of all available L<Judoon::Lookup::Internal>s for
 L</user>.
 
-=head1 externals
+=head2 externals
 
 Returns a list of all available L<Judoon::Lookup::External>s.
 

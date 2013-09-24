@@ -87,3 +87,4 @@ InflateColumn
 Uniprot
 DBIC
 serializable
+sitelinker

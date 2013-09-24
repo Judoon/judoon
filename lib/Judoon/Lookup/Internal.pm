@@ -20,6 +20,27 @@ use Moo;
 with 'Judoon::Lookup::Role::Base';
 
 
+=head1 ATTRIBUTES
+
+=head2 dataset
+
+An instance of L<Judoon::Schema::Result::Dataset>.
+
+=head2 group_id
+
+Group identifier: C<internal>
+
+=head2 group_label
+
+Group label: C<My Datasets>
+
+=head2 columns
+
+A list of simple hashrefs with metadata about the columns of the
+dataset.
+
+=cut
+
 has '+dataset'     => (isa => InstanceOf('Judoon::Schema::Result::Dataset'));
 has '+group_id'    => (is => 'ro', default => 'internal');
 has '+group_label' => (is => 'ro', default => 'My Datasets');
@@ -37,14 +58,42 @@ sub _build_columns {
 }
 
 
+=head1 METHODS
+
+=head2 id
+
+The id of the dataset.
+
+=head2 name
+
+The name of the dataset.
+
+=cut
+
 sub id { return $_[0]->dataset->id; }
 sub name { return $_[0]->dataset->name; }
+
+
+=head2 input_columns / output_columns / input_columns_for / output_columns_for
+
+For Internal Lookups, these methods all return the same thing: the
+list of columns in the L</columns> attribute.
+
+=cut
 
 sub input_columns  { return $_[0]->columns; }
 sub output_columns { return $_[0]->columns; }
 
 sub input_columns_for  { return $_[0]->columns; }
 sub output_columns_for { return $_[0]->columns; }
+
+
+=head2 build_actor
+
+Builds an instance of L<Judoon::Lookup::InternalActor> capable of
+performing the requested lookup.
+
+=cut
 
 sub build_actor {
     my ($self, $args) = @_;
