@@ -223,6 +223,7 @@ judoonCtrl.controller(
                  function() { $scope.addAlert('success', 'Column added!'); },
                  function() { $scope.addAlert('error', 'Something went wrong!'); }
              );
+             $window.location.reload();
          };
 
      }
