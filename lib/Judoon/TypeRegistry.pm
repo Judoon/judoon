@@ -6,11 +6,11 @@ use MooX::Types::MooseLike::Base qw(HashRef InstanceOf);
 use Type::Registry;
 use Safe::Isa;
 
-has pg_types => (
+has pg_to_judoon => (
     is  => 'lazy',
     isa => HashRef,
 );
-sub _build_pg_types {
+sub _build_pg_to_judoon {
     my ($self) = @_;
 
     my %pg_types;

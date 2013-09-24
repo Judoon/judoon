@@ -207,7 +207,7 @@ sub import_from_spreadsheet {
     for my $field (@$fields) {
         $self->create_related('ds_columns', {
             name => $field->{longname}, shortname => $field->{shortname},
-            data_type => $self->type_registry->pg_types->{$field->{type}},
+            data_type => $self->type_registry->pg_to_judoon->{$field->{type}},
             sort => $sort++,
         });
     }
