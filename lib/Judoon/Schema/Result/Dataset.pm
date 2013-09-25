@@ -252,7 +252,7 @@ sub create_basic_page {
 
     my $DEFAULT_PREAMBLE = <<'EOS';
 <p>This is a standard table.</p>
-<p>Edit this by logging into your account and selecting 'edit page'.</p>
+<p>Edit this by logging into your account and selecting 'edit view'.</p>
 EOS
     my $DEFAULT_POSTAMBLE = <<'EOS';
 Created with Judoon on 

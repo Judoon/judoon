@@ -23,9 +23,9 @@
             [% IF welcome_message %]
             [% welcome_spiel = BLOCK %]
             <p>
-              <strong>Your dataset has been imported.</strong> Here is the page
+              <strong>Your dataset has been imported.</strong> Here is the view
               we've created for you.  Click <strong>Edit</strong> above to make
-              changes, or <strong>Share</strong> to make the page public.
+              changes, or <strong>Share</strong> to make the view public.
             </p>
             [% END %]
             [%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]

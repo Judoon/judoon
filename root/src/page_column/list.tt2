@@ -54,7 +54,7 @@
 
 [% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "View Page for &quot;$dataset.object.name&quot;"
+  title = "View for &quot;$dataset.object.name&quot;"
   extra_javascript = extra_js
 %]
 
@@ -65,10 +65,10 @@
 [%- INCLUDE 'components/identification.tt2' -%]
 
 <ul class="nav nav-pills">
-  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your view</a></li>
 </ul>
 
-<h3>Page Columns</h3>
+<h3>View Columns</h3>
 
 <form name="add_page_column_form" id="add_page_column_form" action="[% c.uri_for_action('/private/pagecolumn/list', c.req.captures) %]" method="post" class="form-inline" style="margin-top: 10px;">
   <div class="input-append">

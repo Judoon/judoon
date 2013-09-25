@@ -1,6 +1,6 @@
 [% extra_js = BLOCK %][% INCLUDE 'components/page/display_js.tt2' %][% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "View Page for &quot;$dataset.object.name&quot;"
+  title = "View for &quot;$dataset.object.name&quot;"
   extra_javascript = extra_js
 %]
 

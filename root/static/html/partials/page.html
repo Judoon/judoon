@@ -9,7 +9,7 @@
   <ul class="breadcrumb">
     <li><a ng-href="/user/{{userName}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
     <li><a ng-href="/user/{{userName}}/datasource/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
-    <li>Page: <span ng-bind-html="page.title"></span></li>
+    <li>View: <span ng-bind-html="page.title"></span></li>
   </ul>
 
 
@@ -20,7 +20,7 @@
 
   <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 
-  <p ng-show="!editmode" class="muted">This page is <strong>{{page.permission}}</strong>.</p>
+  <p ng-show="!editmode" class="muted">This view is <strong>{{page.permission}}</strong>.</p>
   <div id="page_actions" ng-show="editmode">
     <div class="row-fluid">
       <div class="span2">
@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <div ng-show="editmode" class="editable_label" style="margin-bottom: -10px;">Page Title:</div>
+  <div ng-show="editmode" class="editable_label" style="margin-bottom: -10px;">View Title:</div>
   <h2 judoon-ckeditor ck-edit-type="inline" ng-class="{edit_outline: editmode}" ng-model="page.title" id="page_title" contenteditable="true" class="editable inline_editable"></h2>
 
   <div ng-show="editmode" class="editable_label">Preamble:</div>

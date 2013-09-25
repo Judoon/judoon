@@ -1,19 +1,19 @@
 [%- WRAPPER components/wrapper.tt2
-  title = 'Public Pages'
-  description = 'See a list of publicly available pages'
+  title = 'Public Views'
+  description = 'See a list of publicly available views'
 -%]
 
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
 <section id="pages">
-  <h4>Publicly Available Pages</h4>
+  <h4>Publicly Available Views</h4>
   [% IF page.list.size %]
   <table class="table table-striped table-condensed" id="page_list">
     <thead>
       <tr>
         <th></th>
-        <th>Page</th>
+        <th>View</th>
         <th>Columns / Rows</th>
         <th>About</th>
         <th>Owner</th>
@@ -32,7 +32,7 @@
     </tbody>
   </table>
   [%- ELSE -%]
-  <p>Sorry, no pages are available at this time.</p>
+  <p>Sorry, no views are available at this time.</p>
   [%- END -%]
 </section>
 

@@ -111,8 +111,8 @@
     </tab>
 
 
-    <!-- ******************** PRESENTATIONS ******************** -->
-    <tab heading="Presentations">
+    <!-- ******************** VIEWS ******************** -->
+    <tab heading="Views">
 
       <ul>
         <li ng-repeat="page in dataset.pages">
@@ -126,24 +126,24 @@
             <fieldset>
 
               <div class="control-group">
-                <label class="control-label add-panel-banner">Create New Page:</label>
+                <label class="control-label add-panel-banner">Create New View:</label>
                 <div class="controls">
                   <label class="radio inline">
                     <input type="radio" ng-model="newPage.type" value="blank">
-                    Blank Page
+                    Blank view
                   </label>
                   <label class="radio inline">
                     <input type="radio" ng-model="newPage.type" value="clone">
-                    Clone existing page
+                    Clone existing view
                   </label>
 
                   <div ng-switch on="newPage.type">
                     <span ng-switch-when="clone" class="help-block">
-                      Create a new page that mimics the layout of an
-                      exsiting page.
+                      Create a new view that mimics the layout of an
+                      exsiting view.
                     </span>
                     <span ng-switch-when="blank" class="help-block">
-                      Create a new page without columns.
+                      Create a new view without columns.
                     </span>
                   </div>
                 </div>
@@ -151,7 +151,7 @@
 
               <div ng-switch on="newPage.type">
                 <div ng-switch-when="clone" class="control-group">
-                  <label class="control-label">Page to clone:</label>
+                  <label class="control-label">View to clone:</label>
                   <div class="controls">
                     <select ng-model="newPage.clone_from" ng-options="allPage.id as allPage.title for allPage in allPages">
                     </select>

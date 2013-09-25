@@ -1,5 +1,5 @@
 [% WRAPPER components/wrapper.tt2
-  title = "View Page for &quot;$dataset.object.name&quot;"
+  title = "View for &quot;$dataset.object.name&quot;"
 %]
 
 [%- WRAPPER 'components/breadcrumbs.tt2' -%]
@@ -9,7 +9,7 @@
 [%- INCLUDE 'components/identification.tt2' -%]
 
 <ul class="nav nav-pills">
-  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your page</a></li>
+  <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'},) %]">Preview your view</a></li>
   <li class="active"><a href="[% c.uri_for_action('/private/page/object', c.req.captures, {view => 'template'},) %]">Save as template</a></li>
 </ul>
 
@@ -17,7 +17,7 @@
   <div class="span6">
 <form name="page_edit" id="page_edit" action="[% c.uri_for_action('/private/page/object', c.req.captures) %]" method="post" enctype="multipart/form-data" class="form-horizontal">
   <fieldset style="min-width: 0px;">
-    <legend>Page Layout</legend>
+    <legend>View Layout</legend>
 
 
     <div class="control-group">
@@ -67,9 +67,9 @@
 
 <section id="actions">
   <h4>Actions</h4>
-  [% INCLUDE 'components/action_button.tt2' label="Preview Page" url=c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'}, ) -%]
+  [% INCLUDE 'components/action_button.tt2' label="Preview View" url=c.uri_for_action('/private/page/object', c.req.captures, {view => 'preview'}, ) -%]
   [% INCLUDE 'components/action_button.tt2' label=" Add or Edit Columns" url=c.uri_for_action('/private/pagecolumn/list', c.req.captures) -%]
-  [% INCLUDE 'components/forms/action_form.tt2' label="Delete Page" url=c.uri_for_action('/private/page/object', c.req.captures), method="DELETE" form_name="delete_page" -%]
+  [% INCLUDE 'components/forms/action_form.tt2' label="Delete View" url=c.uri_for_action('/private/page/object', c.req.captures), method="DELETE" form_name="delete_page" -%]
 </section>
 
 

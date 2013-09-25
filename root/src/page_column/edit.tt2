@@ -23,7 +23,7 @@
 
 [% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "Add column to page for &quot;$dataset.object.name&quot;"
+  title = "Add column to view for &quot;$dataset.object.name&quot;"
   extra_javascript = extra_js
 %]
 
@@ -54,7 +54,7 @@
 
 <form id="pagecol_form" name="pagecol_form" action="[% c.uri_for_action('/private/pagecolumn/object', c.req.captures) %]" method="post" class="form-horizontal">
   <fieldset>
-    <legend>Page Column</legend>
+    <legend>View Column</legend>
 
     <div class="control-group">
       <label class="control-label" for="page_column.title">Column Title:</label>

@@ -27,7 +27,7 @@ sub create_resource {
     if ($type eq 'clone') {
         my $clone_id = $data->{clone_from} or die 'Bad request?';
         my $existing_page = $user->my_pages->find({id => $clone_id})
-            or die q{That page doesn't exist!};
+            or die q{That view doesn't exist!};
 
         $new_page = $dataset->new_related('pages',{})
             ->clone_from_existing($existing_page);
