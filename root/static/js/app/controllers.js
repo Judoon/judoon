@@ -665,8 +665,8 @@ judoonCtrl.controller(
          }
          else {
              $scope.url.fixed = currentLink.url.text_segments[0];
-         };
-         
+         }
+
 
          $scope.label = {
              type     : currentLink.label.varstring_type,
@@ -683,8 +683,8 @@ judoonCtrl.controller(
          }
 
          function getLabelDefault() {
-             return $scope.url.active.accession && $scope.url.accession.site
-                 ? getCurrentSite().label : 'Link';
+             return $scope.url.active.accession && $scope.url.accession.site ?
+                 getCurrentSite().label : 'Link';
          }
 
 
@@ -724,7 +724,7 @@ judoonCtrl.controller(
                      $scope.urlPreview = '';
                  }
                  else {
-                     var accession_parts = getUrlPartsForCurrentSite()
+                     var accession_parts = getUrlPartsForCurrentSite();
                      $scope.urlPreview = accession_parts.prefix +
                          getSampleData($scope.url.accession.source) +
                          accession_parts.suffix;
