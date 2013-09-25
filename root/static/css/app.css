@@ -1,4 +1,6 @@
 
+/* === View page styles === */
+
 /*
  Handy colors:
  #006d4c - brand color
@@ -103,7 +105,10 @@ ul.template_widget_list li.newline + li {
 .italicit .widget-format-target { font-style: italic }
 
 
-/* Dataset page styles */
+#page_actions .affix { top:   160px; }
+
+
+/* === Dataset page styles === */
 
 .outer-hscroll {}
 .inner-hscroll { overflow-x: scroll; }
@@ -129,3 +134,6 @@ fieldset { min-width: auto; }
     margin-bottom: 5px;
 }
 .add-panel-banner { font-weight: bold; }
+
+#computed_columns h5 { margin-bottom: 0px; }
+ 
