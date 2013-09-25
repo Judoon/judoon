@@ -105,11 +105,6 @@ ul.template_widget_list li.newline + li {
 
 /* Dataset page styles */
 
-h4 {
-    padding-bottom: 5px;
-    border-bottom: 1px lightgray solid;
-}
-
 .outer-hscroll {}
 .inner-hscroll { overflow-x: scroll; }
 
