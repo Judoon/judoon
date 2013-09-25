@@ -26,7 +26,7 @@
         <td><a href="[%- c.uri_for_action('/private/page/object', [page_owner.username, page_dataset.id, page_obj.id]) -%]">[%- page_obj.title -%]</a></td>
         <td>[%- page_obj.nbr_columns -%] / [%- page_obj.nbr_rows -%]</td>
         <td>[%- '-' -%]</td>
-        <td>[%- page_owner.username -%]</td>
+        <td>[%- page_owner.name -%]</td>
       </tr>
       [%- END -%]
     </tbody>

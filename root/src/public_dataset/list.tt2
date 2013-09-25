@@ -26,7 +26,7 @@
         <td><a href="[%- c.uri_for_action('/private/dataset/object', [dataset_owner.username, dataset_obj.id]) -%]">[%- dataset_obj.name -%]</a></td>
         <td>[%- dataset_obj.nbr_columns -%] / [%- dataset_obj.nbr_rows -%]</td>
         <td>[%- '-' -%]</td>
-        <td>[%- dataset_owner.username -%]</td>
+        <td>[%- dataset_owner.name -%]</td>
       </tr>
       [%- END -%]
     </tbody>
