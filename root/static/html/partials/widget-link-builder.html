@@ -39,7 +39,7 @@
                     <accordion-group is-open="url.active.accession">
                        <accordion-heading>Link to another site using an accession in your dataset:</accordion-heading>
 
-                       <p class="help-block">Which column should the link be based off of?</p>
+                       <p class="help-block">Which data column should the link be based off of?</p>
                        <select ng-model="url.accession.source" ng-options="acc.shortname as acc.name for acc in columns.accessions"></select>
 
                        <p class="help-block">What site do you want to link to?</p>
@@ -48,7 +48,7 @@
                   </div>
 
                   <accordion-group is-open="url.active.fromdata">
-                    <accordion-heading>Construct your own url from a dataset column:</accordion-heading>
+                    <accordion-heading>Construct your own url from a data column:</accordion-heading>
 
                     <label>URL prefix: <input type="text" class="input-large" ng-model="url.fromdata.prefix" placeholder="usually http://..."></label>
                     <select ng-model="url.fromdata.variable" ng-options="col.shortname as col.name for col in columns.all"></select>

@@ -43,9 +43,9 @@
     <div class="row-fluid">
       <div class="span3">
         <form ng-submit="addColumn()" class="column_list">
-          <h6>Add a new column</h6>
+          <h6>Add a new view column</h6>
           <div class="input-append">
-            <input type="text" placeholder="Column name" required ng-model="newColumnName">
+            <input type="text" placeholder="View column name" required ng-model="newColumnName">
             <button type="submit" class="btn">Add</button>
           </div>
         </form>
@@ -55,7 +55,7 @@
 
       <div class="span3">
         <form class="column_list">
-          <h6>Update an existing column</h6>
+          <h6>Update an existing view column</h6>
           <div class="input-append">
             <select ng-model="currentColumn" ng-options="c.title for c in pageColumns">
               <option value=""></option>
@@ -68,7 +68,7 @@
 
       <div class="span3">
         <form class="column_list">
-          <h6 class="text-warning">Delete a column</h6>
+          <h6 class="text-warning">Delete a view column</h6>
           <div class="input-append">
             <select ng-model="deleteColumn" ng-options="c.title for c in pageColumns">
               <option value=""></option>
@@ -165,7 +165,7 @@
       </div>
     </form>
 
-    <p ng-show="!currentColumn" class="text-center muted">No column selected.</p>
+    <p ng-show="!currentColumn" class="text-center muted">No view column selected.</p>
   </div>
 
     <judoon-data-table
