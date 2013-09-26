@@ -3,8 +3,9 @@ package Judoon::Lookup::InternalActor;
 use MooX::Types::MooseLike::Base qw(InstanceOf);
 
 use Moo;
-
 with 'Judoon::Lookup::Role::Actor';
+use namespace::clean;
+
 
 has join_dataset => (
     is       => 'ro',

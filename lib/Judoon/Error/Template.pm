@@ -1,8 +1,11 @@
 package Judoon::Error::Template;
 
-use Moo;
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef Str);
+
+use Moo;
 extends 'Judoon::Error';
+use namespace::clean;
+
 
 has templates     => (is => 'ro', isa => ArrayRef[HashRef],);
 has valid_columns => (is => 'ro', isa => ArrayRef[Str],);

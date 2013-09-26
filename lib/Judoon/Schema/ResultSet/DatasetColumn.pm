@@ -11,6 +11,8 @@ Judoon::Schema::ResultSet::DatasetColumn
 =cut
 
 use Moo;
+use namespace::clean;
+
 extends 'Judoon::Schema::ResultSet';
 
 __PACKAGE__->load_components('+DBIx::Class::Helper::ResultSet::Lookup');

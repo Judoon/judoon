@@ -34,14 +34,15 @@ installation as easy as possible for non-technical users.
 =cut
 
 
-use Moo;
-
 use Archive::Builder;
 use File::Temp qw(tempfile);
 use Judoon::Error::Devel::Foreign;
 use Judoon::TypeRegistry;
 use Path::Class qw(dir);
 use Template;
+
+use Moo;
+use namespace::clean;
 
 
 =head1 ATTRIBUTES

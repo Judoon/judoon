@@ -11,7 +11,9 @@ Judoon::Schema::Result::Role
 =cut
 
 use Judoon::Schema::Candy;
+
 use Moo;
+use namespace::clean;
 
 
 table "roles";

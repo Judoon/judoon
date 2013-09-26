@@ -1,8 +1,9 @@
 package Judoon::Role::JsonEncoder;
 
+use JSON::MaybeXS qw(JSON);
+
 use Moo::Role;
 
-use JSON::MaybeXS qw(JSON);
 
 has _json_encoder => (
    is => 'ro',

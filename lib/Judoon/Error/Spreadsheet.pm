@@ -1,8 +1,11 @@
 package Judoon::Error::Spreadsheet;
 
-use Moo;
 use MooX::Types::MooseLike::Base qw(Str);
+
+use Moo;
 extends 'Judoon::Error';
+use namespace::clean;
+
 
 has filetype => (is => 'ro', isa => Str,);
 

@@ -1,9 +1,11 @@
 package Judoon::Error::Spreadsheet::Type;
 
+use MooX::Types::MooseLike::Base qw(ArrayRef);
+
 use Moo;
 extends 'Judoon::Error::Spreadsheet';
+use namespace::clean;
 
-use MooX::Types::MooseLike::Base qw(ArrayRef);
 
 has 'supported' => (
     is      => 'ro',

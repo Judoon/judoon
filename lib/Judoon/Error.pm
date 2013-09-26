@@ -16,6 +16,7 @@ Judoon::Error - base class for our exception hierarchy
 
 use Moo;
 extends 'Throwable::Error';
+use namespace::clean;
 
 1;
 __END__

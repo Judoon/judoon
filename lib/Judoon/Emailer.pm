@@ -25,11 +25,12 @@ processing it to set a VERP from on the envelope.
 
 =cut
 
-use Moo;
-use MooX::Types::MooseLike::Base qw(Str RegexpRef);
-
 use Email::Address;
 use Email::Sender::Simple;
+use MooX::Types::MooseLike::Base qw(Str RegexpRef);
+
+use Moo;
+use namespace::clean;
 
 
 =head1 ATTRIBUTES

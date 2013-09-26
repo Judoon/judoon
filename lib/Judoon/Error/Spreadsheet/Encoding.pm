@@ -1,8 +1,10 @@
 package Judoon::Error::Spreadsheet::Encoding;
 
-use Moo;
 use MooX::Types::MooseLike::Base qw(Str);
+
+use Moo;
 extends 'Judoon::Error::Spreadsheet';
+use namespace::clean;
 
 has encoding => (is => 'ro', isa => Str);
 

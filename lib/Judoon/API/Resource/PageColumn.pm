@@ -1,12 +1,14 @@
 package Judoon::API::Resource::PageColumn;
 
+use Judoon::Tmpl;
+
 use Moo;
+use namespace::clean;
 
 extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
-use Judoon::Tmpl;
 
 around update_resource => sub {
     my $orig = shift;

@@ -11,6 +11,8 @@ Judoon::Schema::ResultSet::PageColumn
 =cut
 
 use Moo;
+use namespace::clean;
+
 extends 'Judoon::Schema::ResultSet';
 
 

@@ -16,8 +16,9 @@ use Judoon::Lookup::InternalActor;
 use MooX::Types::MooseLike::Base qw(ArrayRef InstanceOf);
 
 use Moo;
-
 with 'Judoon::Lookup::Role::Base';
+use namespace::clean;
+
 
 
 =head1 ATTRIBUTES

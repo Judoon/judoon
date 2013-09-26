@@ -26,11 +26,13 @@ accessions to websites and vice-versa.
 
 =cut
 
-use Moo;
-use MooX::Types::MooseLike::Base qw(HashRef ArrayRef);
-
 use Clone qw(clone);
 use List::AllUtils qw(zip);
+use MooX::Types::MooseLike::Base qw(HashRef ArrayRef);
+
+use Moo;
+use namespace::clean;
+
 
 =head1 ATTRIBUTES
 

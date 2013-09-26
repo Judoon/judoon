@@ -5,10 +5,12 @@ use HTTP::Throwable::Factory qw(http_throw);
 use Judoon::LookupRegistry;
 
 use Moo;
+use namespace::clean;
 
 extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
+
 
 sub create_resource {
     my ($self, $data) = @_;

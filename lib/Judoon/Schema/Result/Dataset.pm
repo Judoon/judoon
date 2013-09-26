@@ -12,21 +12,21 @@ Judoon::Schema::Result::Dataset
 
 =cut
 
-use Judoon::Schema::Candy;
-use Moo;
-
-use MooX::Types::MooseLike::Base qw(InstanceOf);
-
 use Clone qw(clone);
 use Data::UUID;
 use DateTime;
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Impossible;
+use Judoon::Schema::Candy;
 use Judoon::Tmpl;
 use Judoon::TypeRegistry;
 use List::MoreUtils qw();
+use MooX::Types::MooseLike::Base qw(InstanceOf);
 use Spreadsheet::WriteExcel ();
 use Text::Unidecode;
+
+use Moo;
+use namespace::clean;
 
 
 table 'datasets';

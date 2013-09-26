@@ -83,6 +83,7 @@ requires 'MooseX::Types::Common';
 requires 'MooseX::Types::DateTime';
 requires 'MooseX::Types::URI';
 requires 'namespace::autoclean';
+requires 'namespace::clean';
 requires 'Params::Validate';
 requires 'Path::Class';
 requires 'Plack::Middleware::Debug';

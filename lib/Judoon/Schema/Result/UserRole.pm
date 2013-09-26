@@ -11,7 +11,10 @@ Judoon::Schema::Result::UserRole
 =cut
 
 use Judoon::Schema::Candy;
+
 use Moo;
+use namespace::clean;
+
 
 table 'user_roles';
 

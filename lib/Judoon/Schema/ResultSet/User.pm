@@ -10,11 +10,13 @@ Judoon::Schema::ResultSet::User
 
 =cut
 
+use Judoon::Error::Input;
+
 use Moo;
+use namespace::clean;
+
 extends 'Judoon::Schema::ResultSet';
 
-
-use Judoon::Error::Input;
 
 use constant MIN_PASSWORD_LENGTH => 8;
 use constant USERNAME_MAXLEN => 40;

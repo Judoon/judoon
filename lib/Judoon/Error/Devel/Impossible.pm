@@ -10,6 +10,7 @@ Judoon::Error::Devel::Impossible - errors that should never happen
 
 use Moo;
 extends 'Judoon::Error::Devel';
+use namespace::clean;
 
 1;
 __END__

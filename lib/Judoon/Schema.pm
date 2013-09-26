@@ -13,6 +13,8 @@ Judoon::Schema
 use 5.10.1;
 
 use Moo;
+use namespace::clean;
+
 extends 'DBIx::Class::Schema::Config';
 
 

@@ -12,14 +12,15 @@ Judoon::Schema::Result::User
 
 =cut
 
-use Judoon::Schema::Candy;
-use Moo;
-
-
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Input;
 use Judoon::Error::Input::Filename;
+use Judoon::Schema::Candy;
 use Judoon::Spreadsheet;
+
+use Moo;
+use namespace::clean;
+
 
 use constant SCHEMA_PREFIX => 'user_';
 

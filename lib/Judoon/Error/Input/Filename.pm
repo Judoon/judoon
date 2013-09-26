@@ -2,8 +2,11 @@ package Judoon::Error::Input::Filename;
 
 use Moo;
 extends 'Judoon::Error::Input';
+use namespace::clean;
+
 
 has filename => (is => 'ro',);
+
 
 1;
 __END__

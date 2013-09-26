@@ -2,6 +2,7 @@ package Judoon::Error::Input::File;
 
 use Moo;
 extends 'Judoon::Error::Input';
+use namespace::clean;
 
 1;
 __END__

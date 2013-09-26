@@ -25,10 +25,6 @@ C<Judoon::Tmpl> is an object that represents a template.
 
 =cut
 
-use Moo;
-use MooX::Types::MooseLike::Base qw(ArrayRef ConsumerOf RegexpRef InstanceOf);
-use feature ':5.10';
-
 use Data::Visitor::Callback;
 use HTML::TreeBuilder;
 use JSON::MaybeXS;
@@ -41,8 +37,12 @@ use Judoon::Tmpl::Node::Link;
 use Judoon::Tmpl::Node::Image;
 use Judoon::Tmpl::Node::Newline;
 use Judoon::Tmpl::Node::VarString;
+use MooX::Types::MooseLike::Base qw(ArrayRef ConsumerOf RegexpRef InstanceOf);
 use Params::Validate qw(:all);
 
+use Moo;
+use feature ':5.10';
+use namespace::clean;
 
 
 =head1 Attributes

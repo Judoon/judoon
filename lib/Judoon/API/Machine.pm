@@ -1,8 +1,8 @@
 package Judoon::API::Machine;
 
 use Moo;
-
 extends 'Web::Machine';
+use namespace::clean;
 
 
 1;

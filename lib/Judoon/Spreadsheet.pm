@@ -28,9 +28,6 @@ getting at the name, columns, and data of that spreadsheet.
 =cut
 
 
-use Moo;
-use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef FileHandle);
-
 use Data::Printer;
 use Encode qw(decode);
 use Encode::Guess;
@@ -44,10 +41,14 @@ use Judoon::Error::Spreadsheet;
 use Judoon::Error::Spreadsheet::Encoding;
 use Judoon::Error::Spreadsheet::Type;
 use List::Util ();
+use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef FileHandle);
 use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
 use Text::CSV;
+
+use Moo;
+use namespace::clean;
 
 
 =head1 METHODS

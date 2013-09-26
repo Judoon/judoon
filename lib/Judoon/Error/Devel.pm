@@ -10,6 +10,8 @@ Judoon::Error::Devel - base error for developer errors
 
 use Moo;
 extends 'Judoon::Error';
+use namespace::clean;
+
 
 1;
 __END__

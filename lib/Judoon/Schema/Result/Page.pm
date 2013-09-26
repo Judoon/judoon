@@ -10,14 +10,15 @@ Judoon::Schema::Result::Page
 
 =cut
 
-use Judoon::Schema::Candy;
-use Moo;
-with 'Judoon::Role::JsonEncoder';
-
-
 use Judoon::Error::Devel::Foreign;
 use Judoon::Error::Template;
+use Judoon::Schema::Candy;
 use Template;
+
+use Moo;
+use namespace::clean;
+
+with 'Judoon::Role::JsonEncoder';
 
 
 table 'pages';

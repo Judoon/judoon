@@ -12,12 +12,13 @@ Judoon::Schema::Result::Token - unique action tokens
 
 =cut
 
-use Judoon::Schema::Candy;
-use Moo;
-
 use Data::Entropy::Algorithms qw/rand_bits/;
 use DateTime;
+use Judoon::Schema::Candy;
 use MIME::Base64 qw/encode_base64url/;
+
+use Moo;
+use namespace::clean;
 
 
 table 'tokens';

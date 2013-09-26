@@ -10,11 +10,13 @@ Judoon::Schema::ResultSet::Page
 
 =cut
 
+use Scalar::Util qw(blessed);
+
 use Moo;
+use namespace::clean;
+
 extends 'Judoon::Schema::ResultSet';
 with 'Judoon::Schema::Role::ResultSet::HasPermissions';
-
-use Scalar::Util qw(blessed);
 
 
 =head1 METHODS

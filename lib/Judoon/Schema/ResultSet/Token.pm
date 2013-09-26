@@ -10,10 +10,12 @@ Judoon::Schema::ResultSet::Token
 
 =cut
 
-use Moo;
-extends 'Judoon::Schema::ResultSet';
-
 use DateTime;
+
+use Moo;
+use namespace::clean;
+
+extends 'Judoon::Schema::ResultSet';
 
 
 =head1 METHODS

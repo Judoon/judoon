@@ -10,11 +10,12 @@ Judoon::Schema::Result::DatasetColumn
 
 =cut
 
-use Judoon::Schema::Candy;
-use Moo;
-
 use MooX::Types::MooseLike::Base qw(InstanceOf);
+use Judoon::Schema::Candy;
 use Judoon::TypeRegistry;
+
+use Moo;
+use namespace::clean;
 
 
 table 'dataset_columns';

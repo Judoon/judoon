@@ -5,6 +5,8 @@ use Safe::Isa;
 use Type::Registry;
 
 use Moo;
+use namespace::clean;
+
 
 has pg_to_judoon => (
     is  => 'lazy',

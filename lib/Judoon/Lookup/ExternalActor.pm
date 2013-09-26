@@ -1,7 +1,7 @@
 package Judoon::Lookup::ExternalActor;
 
 use Moo;
-
+use namespace::clean;
 
 1;
 __END__

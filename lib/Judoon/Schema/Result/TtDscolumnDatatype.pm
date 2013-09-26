@@ -11,7 +11,10 @@ Judoon::Schema::Result::TtDscolumnDatatype
 =cut
 
 use Judoon::Schema::Candy;
+
 use Moo;
+use namespace::clean;
+
 
 table 'tt_dscolumn_datatypes';
 

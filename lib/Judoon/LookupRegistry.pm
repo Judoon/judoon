@@ -33,6 +33,7 @@ use Judoon::Lookup::External;
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef InstanceOf);
 
 use Moo;
+use namespace::clean;
 
 
 =head1 ATTRIBUTES

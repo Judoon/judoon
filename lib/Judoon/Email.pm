@@ -25,10 +25,11 @@ the common configuration elements.
 
 =cut
 
-use Moo;
+use Email::MIME::Kit;
 use MooX::Types::MooseLike::Base qw(Str);
 
-use Email::MIME::Kit;
+use Moo;
+use namespace::clean;
 
 
 =head1 ATTRIBUTES

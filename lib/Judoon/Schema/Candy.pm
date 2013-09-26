@@ -1,6 +1,8 @@
 package Judoon::Schema::Candy;
 
 use Moo;
+use namespace::clean;
+
 extends 'DBIx::Class::Candy';
 
 sub base { 'Judoon::Schema::Result' }

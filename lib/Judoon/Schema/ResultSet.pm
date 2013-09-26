@@ -18,6 +18,8 @@ place to set defaults.
 use 5.10.1;
 
 use Moo;
+use namespace::clean;
+
 extends 'DBIx::Class::ResultSet';
 
 __PACKAGE__->load_components(qw(

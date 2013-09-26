@@ -1,12 +1,14 @@
 package Judoon::API::Resource::Pages;
 
+use HTTP::Throwable::Factory qw(http_throw);
+
 use Moo;
+use namespace::clean;
 
 extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
 
-use HTTP::Throwable::Factory qw(http_throw);
 
 
 sub create_resource {

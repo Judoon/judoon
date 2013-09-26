@@ -29,10 +29,11 @@ provide.
 
 =cut
 
-use Moo::Role;
-
 use Safe::Isa;
 use Try::Tiny;
+
+use Moo::Role;
+
 
 requires 'decode_json';
 requires 'encode_json';

@@ -2,6 +2,8 @@ package Judoon::Error::Input;
 
 use Moo;
 extends 'Judoon::Error';
+use namespace::clean;
+
 
 has 'expected' => (is => 'ro',);
 has 'got'      => (is => 'ro',);

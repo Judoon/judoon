@@ -15,8 +15,8 @@ Judoon::Lookup::External - Lookup data from a non-Judoon source
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef);
 
 use Moo;
-
 with 'Judoon::Lookup::Role::Base';
+use namespace::clean;
 
 
 =head1 ATTRIBUTES

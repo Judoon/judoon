@@ -10,6 +10,7 @@ Judoon::Error::Archive - error for archives (zips, tarballs, etc.)
 
 use Moo;
 extends 'Judoon::Error';
+use namespace::clean;
 
 1;
 __END__

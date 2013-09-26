@@ -12,12 +12,14 @@ Judoon::Schema::ResultSet::Dataset
 
 =cut
 
+use Scalar::Util qw(blessed);
+
 use Moo;
+use namespace::clean;
+
 extends 'Judoon::Schema::ResultSet';
 with 'Judoon::Schema::Role::ResultSet::HasPermissions';
 
-
-use Scalar::Util qw(blessed);
 
 
 =head1 METHODS

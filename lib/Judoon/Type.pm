@@ -1,8 +1,8 @@
 package Judoon::Type;
 
 use Moo;
-
 extends 'Type::Tiny';
+use namespace::clean;
 
 has library => (is => 'ro');
 has sample  => (is => 'ro');

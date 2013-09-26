@@ -13,9 +13,10 @@ Judoon::Schema::Result::PageColumn
 =cut
 
 use Judoon::Schema::Candy;
-use Moo;
-
 use Judoon::Tmpl;
+
+use Moo;
+use namespace::clean;
 
 
 table 'page_columns';
