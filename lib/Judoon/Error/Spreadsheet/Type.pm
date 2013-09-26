@@ -16,6 +16,8 @@ __END__
 
 =pod
 
+=for stopwords filetype
+
 =encoding utf8
 
 =head1 NAME

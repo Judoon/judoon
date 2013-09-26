@@ -2,6 +2,8 @@ package Judoon::LookupRegistry;
 
 =pod
 
+=for stopwords uniprot
+
 =encoding utf8
 
 =head1 NAME
@@ -21,7 +23,7 @@ This module is a registry of LJudoon::Lookup> types and instances.  It
 is used to find and build L<Judoon::Lookup::Internal> and
 L<Judoon::Lookup::External> objects with a given id.  An example of an
 C<::Internal> id would be "internal_260". An example of an external id
-would be "uniprot".
+would be C<uniprot>.
 
 
 =cut

@@ -2,7 +2,7 @@ package Judoon::Lookup::External;
 
 =pod
 
-=for stopwords
+=for stopwords actionroles
 
 =encoding utf8
 
