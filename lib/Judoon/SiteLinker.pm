@@ -214,7 +214,7 @@ sub _build_accession_groups {
 
     my %groups;
     for my $accession (values %{$self->accessions}) {
-        push @{$groups{$accession->library}}, $accession;
+        push @{$groups{$accession->{library}}}, $accession;
     }
 
     return [ map {{group_label => $_, types => $groups{$_}}} keys %groups ];
