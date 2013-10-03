@@ -54,7 +54,41 @@ the stash.
 
 sub wm_base : Chained('/api/base') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
-    $c->stash->{authd_user} = $c->user->get_object if ($c->user);
+}
+
+
+=head2 user_base / users / user_id / user
+
+Information about Judoon users.
+
+=cut
+
+sub user_base : Chained('wm_base') PathPart('users') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    $c->stash->{user_rs} = $c->model('User::User');
+}
+sub users : Chained('user_base') PathPart('') Args(0) ActionClass('FromPSGI') {
+    my ($self, $c) = @_;
+    return $self->wm(
+        $c, 'Judoon::API::Resource::Users', {
+            set      => $c->model('User::User'),
+            writable => 0,
+        }
+    );
+}
+sub user_id : Chained('user_base') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $id) = @_;
+    $c->stash->{user_id}     = $id;
+    $c->stash->{user_object} = $c->stash->{user_rs}->find({username => $id});
+}
+sub user : Chained('user_id') PathPart('') Args(0) ActionClass('FromPSGI') {
+    my ($self, $c) = @_;
+    return $self->wm(
+        $c, 'Judoon::API::Resource::User', {
+            item     => $c->stash->{user_object},
+            writable => 0,
+        }
+    );
 }
 
 
