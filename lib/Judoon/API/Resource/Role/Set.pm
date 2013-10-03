@@ -74,7 +74,7 @@ has obj => (is => 'rw', writer => '_set_obj');
 
 =head2 allowed_methods
 
-Permitted HTTP verbs.  GET and HEAD are always available.  PUT and
+Permitted HTTP verbs.  GET and HEAD are always available.  POST and
 DELETE are available when the C<writable> attribute is set.
 
 =cut
@@ -82,7 +82,7 @@ DELETE are available when the C<writable> attribute is set.
 sub allowed_methods {
     return [
         qw(GET HEAD),
-        ( $_[0]->writable ) ? (qw(POST PUT DELETE)) : ()
+        ( $_[0]->writable ) ? (qw(POST DELETE)) : ()
     ];
 }
 
