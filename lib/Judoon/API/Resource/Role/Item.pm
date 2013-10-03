@@ -69,7 +69,7 @@ DELETE are available when the C<writable> attribute is set.
 sub allowed_methods {
    return [
       qw(GET HEAD),
-      ( $_[0]->writable || 1 ) ? (qw(PUT DELETE)) : ()
+      ( $_[0]->writable ) ? (qw(PUT DELETE)) : ()
    ];
 }
 
