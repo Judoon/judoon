@@ -107,6 +107,28 @@ has fixtures => (
 );
 sub _build_fixtures {
     return {
+        init  => sub {
+            my ($self) = @_;
+            $self->schema()->resultset('TtDscolumnDatatype')->populate([
+                ['data_type',                           ],
+                ['CoreType_Text',                       ],
+                ['CoreType_Numeric',                    ],
+                ['CoreType_Datetime',                   ],
+                ['Biology_Accession_Entrez_GeneId',     ],
+                ['Biology_Accession_Entrez_GeneSymbol', ],
+                ['Biology_Accession_Entrez_RefseqId',   ],
+                ['Biology_Accession_Entrez_ProteinId',  ],
+                ['Biology_Accession_Entrez_UnigeneId',  ],
+                ['Biology_Accession_Pubmed_Pmid',       ],
+                ['Biology_Accession_Uniprot_Acc',       ],
+                ['Biology_Accession_Uniprot_Id',        ],
+                ['Biology_Accession_Flybase_Id',        ],
+                ['Biology_Accession_Wormbase_Id',       ],
+                ['Biology_Accession_Cmkb_ComplexAcc',   ],
+                ['Biology_Accession_Cmkb_FamilyAcc',    ],
+                ['Biology_Accession_Cmkb_OrthologAcc',  ],
+            ]);
+        },
         basic => sub {
             my ($self) = @_;
             $self->schema()->resultset('TtDscolumnDatatype')->populate([
