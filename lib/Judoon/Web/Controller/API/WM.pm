@@ -99,32 +99,16 @@ to public datasets.
 
 =cut
 
-sub dataset_base : Chained('wm_base') PathPart('dataset') CaptureArgs(0) {
+sub dataset_base : Chained('wm_base') PathPart('datasets') CaptureArgs(0) {
     my ($self, $c) = @_;
-
-    my $set = $c->model('User::Dataset');
-    if (not $c->stash->{authd_user}) {
-        $set = $set->public();
-    }
-    elsif ($c->request->method eq 'GET') {
-        $set = $set->search_or([
-            $set->for_user($c->stash->{authd_user}),
-            $set->public
-        ]);
-    }
-    else {
-        $set = $set->for_user($c->stash->{authd_user});
-    }
-    $c->stash->{dataset_rs} = $set;
-
-    return;
+    $c->stash->{dataset_rs} = $c->model('User::Dataset')->public();
 }
 sub datasets : Chained('dataset_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Datasets', {
             set      => $c->stash->{dataset_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
@@ -139,7 +123,7 @@ sub dataset : Chained('dataset_id') PathPart('') Args(0) ActionClass('FromPSGI')
     return $self->wm(
         $c, 'Judoon::API::Resource::Dataset', {
             item     => $c->stash->{dataset_object},
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
@@ -152,7 +136,7 @@ restricted to the parent dataset's columns.
 
 =cut
 
-sub dscol_base : Chained('dataset_id') PathPart('column') CaptureArgs(0) {
+sub dscol_base : Chained('dataset_id') PathPart('columns') CaptureArgs(0) {
     my ($self, $c) = @_;
     my $ds = $c->stash->{dataset_object};
     $c->stash->{dscol_rs} = $ds ? $ds->ds_columns_ordered : undef;
@@ -162,19 +146,18 @@ sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') 
     return $self->wm(
         $c, 'Judoon::API::Resource::DatasetColumns', {
             set      => $c->stash->{dscol_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
 sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
     my $item = $c->stash->{dscol_rs}
-        ? $c->stash->{dscol_rs}->find($id)
-        : undef;
+        ? $c->stash->{dscol_rs}->find($id) : undef;
     return $self->wm(
         $c, 'Judoon::API::Resource::DatasetColumn', {
             item     => $item,
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
@@ -186,7 +169,7 @@ Get the list of pages for the given dataset.
 
 =cut
 
-sub ds_page : Chained('dataset_id') PathPart('page') Args(0) ActionClass('FromPSGI') {
+sub ds_page : Chained('dataset_id') PathPart('pages') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
@@ -204,35 +187,21 @@ to public pages.
 
 =cut
 
-sub page_base : Chained('wm_base') PathPart('page') CaptureArgs(0) {
+sub page_base : Chained('wm_base') PathPart('pages') CaptureArgs(0) {
     my ($self, $c) = @_;
-
-    my $set = $c->model('User::Page');
-    if (not $c->stash->{authd_user}) {
-        $set = $set->public();
-    }
-    elsif ($c->request->method eq 'GET') {
-        $set = $set->for_user($c->stash->{authd_user})->union($set->public);
-    }
-    else {
-        $set = $set->for_user($c->stash->{authd_user});
-    }
-    $c->stash->{page_rs} = $set;
-
-    return;
+    $c->stash->{page_rs} = $c->model('User::Page')->public();
 }
 sub pages : Chained('page_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
             set      => $c->stash->{page_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
 sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
-
     $c->stash->{page_id}     = $id;
     $c->stash->{page_object} = $c->stash->{page_rs}->find({id => $id});
 }
@@ -241,7 +210,7 @@ sub page : Chained('page_id') PathPart('') Args(0) ActionClass('FromPSGI') {
     return $self->wm(
         $c, 'Judoon::API::Resource::Page', {
             item     => $c->stash->{page_object},
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
@@ -254,30 +223,28 @@ restricted to the parent page's columns.
 
 =cut
 
-sub pagecol_base : Chained('page_id') PathPart('column') CaptureArgs(0) {
+sub pagecol_base : Chained('page_id') PathPart('columns') CaptureArgs(0) {
     my ($self, $c) = @_;
     my $page = $c->stash->{page_object};
     $c->stash->{pagecol_rs} = $page ? $page->page_columns_ordered : undef;
-    return;
 }
 sub pagecols : Chained('pagecol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::PageColumns', {
             set      => $c->stash->{pagecol_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }
 sub pagecol : Chained('pagecol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
     my $item = $c->stash->{pagecol_rs}
-        ? $c->stash->{pagecol_rs}->find({id => $id})
-        : undef;
+        ? $c->stash->{pagecol_rs}->find({id => $id}) : undef;
     return $self->wm(
         $c, 'Judoon::API::Resource::PageColumn', {
             item     => $item,
-            writable => !!$c->stash->{authd_user},
+            writable => 0,
         }
     );
 }

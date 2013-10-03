@@ -86,9 +86,12 @@ test 'Basic Tests' => sub {
         is $self->mech->uri, 'http://localhost/', '  ...redirects to root';
     }
 
+    # this should eventually go away, be replaced by /datasets/1/data
     $self->mech->get_ok('/api/datasetdata', 'get /api/datasetdata');
 };
 
+
+# READONLY ROUTES
 
 # A read-only route for getting information about all / other users
 test '/users' => sub {
@@ -116,6 +119,21 @@ test '/users' => sub {
     $self->add_route_readonly('/api/users/me', '*');
 
 };
+
+
+# readonly access to public datasets
+test '/datasets' => sub { fail('not done'); };
+test '/datasets/1/columns' => sub { fail('not done'); };
+test '/datasets/1/pages' => sub { fail('not done'); };
+test '/datasets/1/data' => sub { fail('not done'); };
+
+# readonly access to public pages
+test '/pages' => sub { fail('not done'); };
+test '/pages/1/columns' => sub { fail('not done'); };
+
+
+
+test '/user' => sub { fail('not done'); };
 
 
 # read-write the logged-in users dataset
@@ -222,9 +240,23 @@ test '/user/dataset' => sub {
 };
 
 
-# GET /api/user/datasets/$my_pub_ds/columns
-# POST /api/user/datasets/$my_pub_ds/columns
+test '/user/datasets/1/columns' => sub { fail('not done'); };
+test '/user/datasets/1/pages' => sub { fail('not done'); };
+test '/user/datasets/1/data' => sub { fail('not done'); };
+test '/user/pages' => sub { fail('not done'); };
+test '/user/pages/1/columns' => sub { fail('not done'); };
 
+
+
+
+test '/templates' => sub { fail('not done'); };
+test '/types' => sub { fail('not done'); };
+test '/sitelinker' => sub { fail('not done'); };
+test '/lookup' => sub { fail('not done'); };
+
+
+
+# report untested routes
 after teardown => sub {
     my ($self) = @_;
 
@@ -250,6 +282,7 @@ run_me();
 done_testing();
 
 
+# HELPER METHODS
 
 sub _build_routes { return []; }
 sub add_route {

@@ -128,7 +128,7 @@ sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') 
     return $self->wm(
         $c, 'Judoon::API::Resource::DatasetColumns', {
             set      => $c->stash->{dscol_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 1,
         }
     );
 }
@@ -140,7 +140,7 @@ sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
     return $self->wm(
         $c, 'Judoon::API::Resource::DatasetColumn', {
             item     => $item,
-            writable => !!$c->stash->{authd_user},
+            writable => 1,
         }
     );
 }
@@ -172,42 +172,32 @@ to public pages.
 
 sub page_base : Chained('user_base') PathPart('pages') CaptureArgs(0) {
     my ($self, $c) = @_;
-
-    my $set = $c->model('User::Page');
-    if (not $c->stash->{authd_user}) {
-        $set = $set->public();
-    }
-    elsif ($c->request->method eq 'GET') {
-        $set = $set->for_user($c->stash->{authd_user})->union($set->public);
-    }
-    else {
-        $set = $set->for_user($c->stash->{authd_user});
-    }
-    $c->stash->{page_rs} = $set;
-
-    return;
+    $c->stash->{page_rs} = $c->model('User::Page')
+        ->for_user($c->stash->{authd_user});
 }
 sub pages : Chained('page_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
             set      => $c->stash->{page_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 1,
         }
     );
 }
 sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
-
     $c->stash->{page_id}     = $id;
     $c->stash->{page_object} = $c->stash->{page_rs}->find({id => $id});
+    $c->stash->{page_forbidden} = !c->stash->{page_object}
+        && $c->model('User::Page')->find({id => $id});
 }
 sub page : Chained('page_id') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Page', {
-            item     => $c->stash->{page_object},
-            writable => !!$c->stash->{authd_user},
+            item      => $c->stash->{page_object},
+            writable  => 1,
+            forbidden => $c->stash->{page_forbidden},
         }
     );
 }
@@ -231,7 +221,7 @@ sub pagecols : Chained('pagecol_base') PathPart('') Args(0) ActionClass('FromPSG
     return $self->wm(
         $c, 'Judoon::API::Resource::PageColumns', {
             set      => $c->stash->{pagecol_rs},
-            writable => !!$c->stash->{authd_user},
+            writable => 1,
         }
     );
 }
@@ -243,7 +233,7 @@ sub pagecol : Chained('pagecol_base') PathPart('') Args(1) ActionClass('FromPSGI
     return $self->wm(
         $c, 'Judoon::API::Resource::PageColumn', {
             item     => $item,
-            writable => !!$c->stash->{authd_user},
+            writable => 1,
         }
     );
 }
