@@ -67,6 +67,12 @@ sub load_fixtures {
 
 sub reset_fixtures {
     my ($self) = @_;
+
+    for my $user ($self->schema->resultset('User')->all) {
+        $self->schema->storage->dbh->do(
+            'DROP SCHEMA ' . $user->schema_name . ' CASCADE'
+        );
+    }
     reset_schema();
     return;
 }
