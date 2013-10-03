@@ -193,7 +193,10 @@ sub _build_fixtures {
     };
 }
 
-
+sub add_fixture {
+    my ($self, $key, $code) = @_;
+    $self->fixtures->{$key} = $code;
+}
 
 
 1;
