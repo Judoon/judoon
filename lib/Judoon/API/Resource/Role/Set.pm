@@ -60,6 +60,15 @@ Indicates whether this resource can be modified.
 
 has writable => (is => 'ro',);
 
+=head2 is_authorized / forbidden
+
+Let external code decide when 401 or 403 should be returned.
+
+=cut
+
+has forbidden => (is => 'ro', default => 0);
+has is_authorized => (is => 'ro', default => 1);
+
 =head2 obj
 
 Stores a new object created by a POST action so that we can get its id
