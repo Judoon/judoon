@@ -153,6 +153,14 @@ Create a new resource as a member of C<set>.
 sub create_resource { $_[0]->set->create($_[1]) }
 
 
+=head2 delete_resource
+
+Delete all members of C<set>.
+
+=cut
+
+sub delete_resource { $_[0]->set->delete; }
+
 
 =head1 OUR METHODS
 
