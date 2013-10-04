@@ -316,9 +316,10 @@ Get the list of pages for the given dataset.
 
 sub ds_page : Chained('dataset_id') PathPart('pages') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
+    my $pages = $c->stash->{dataset_object}->pages_ordered;
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
-            set       => $c->stash->{dataset_object}->pages_ordered,
+            set       => $c->stash->{authd_owns} ? $pages : $pages->public,
             writable  => 0,
         }
     );
