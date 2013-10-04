@@ -375,7 +375,7 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
 
     my $is_public = !$c->stash->{page_object}->is_private;
     $c->stash->{authd_owns}      = $c->stash->{authd_user}
-        && $c->stash->{authd_user}->pages_rs->search({id => $id})->count;
+        && $c->stash->{authd_user}->my_pages->search({'pages.id' => $id})->count;
 
     #http_throw('NotFound')
     unless ($is_public || $c->stash->{authd_owns}) {
