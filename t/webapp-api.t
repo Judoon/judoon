@@ -286,10 +286,44 @@ test '/datasets' => sub {
     $self->add_route_not_found("/api/datasets/$my_priv_ds_id", 'you+noone', '*', {});
 };
 
-
 # mixed access to dataset properties
 test '/datasets/1/columns' => sub { fail('not done'); };
-test '/datasets/1/pages'   => sub { fail('not done'); };
+test '/datasets/1/pages' => sub {
+    my ($self) = @_;
+
+    my $my_datasets = $self->schema->resultset('User')
+        ->find({username => 'me'})->datasets_rs;
+
+    # I can see all my pages for my public dataset
+    my $my_pub_ds     = $my_datasets->public->first;
+    my $my_pub_ds_id  = $my_pub_ds->id;
+    my @my_pub_ds_pages = map {$_->TO_JSON} $my_pub_ds->pages_rs->all;
+    $self->add_route_test(
+        "/api/datasets/$my_pub_ds_id/pages", 'me', 'GET', {},
+        { want => \@my_pub_ds_pages },
+    );
+    $self->add_route_readonly("/api/datasets/$my_pub_ds_id/pages", 'me');
+
+    # I can see all my pages for my private dataset
+    my $my_priv_ds     = $my_datasets->private->first;
+    my $my_priv_ds_id  = $my_priv_ds->id;
+    my @my_priv_ds_pages = map {$_->TO_JSON} $my_priv_ds->pages_rs->all;
+    $self->add_route_test(
+        "/api/datasets/$my_priv_ds_id/pages", 'me', 'GET', {},
+        { want => \@my_priv_ds_pages },
+    );
+    $self->add_route_readonly("/api/datasets/$my_priv_ds_id/pages", 'me');
+
+    # other users can see public pages of public datasets, but nothing
+    # for private datasets
+    my @my_pub_ds_pub_pages = map {$_->TO_JSON} $my_pub_ds->pages_rs->public->all;
+    $self->add_route_test(
+        "/api/datasets/$my_pub_ds_id/pages", 'you+noone', 'GET', {},
+        { want => \@my_pub_ds_pub_pages, }
+    );
+    $self->add_route_bad_method("/api/datasets/$my_pub_ds_id/pages", 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found("/api/datasets/$my_priv_ds_id/pages", 'you+noone', '*', {});
+};
 test '/datasets/1/data'    => sub { fail('not done'); };
 
 # mixed access to page properties
@@ -369,6 +403,8 @@ test '/pages' => sub {
     $self->add_route_bad_method("/api/pages/$my_pub_page_id", 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found("/api/pages/$my_priv_page_id", 'you+noone', '*', {});
 };
+
+
 test '/pages/1/columns' => sub { fail('not done'); };
 
 
