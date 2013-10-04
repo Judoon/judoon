@@ -18,7 +18,7 @@ L</Web::Machine>-based REST API.
 use Moose;
 use namespace::autoclean;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN {extends 'Judoon::Web::Controller'; }
 
 use Judoon::API::Machine;
 use Module::Load;
@@ -149,7 +149,15 @@ themselves, their datasets, or their pages.
 
 sub authd_user_base : Chained('wm_base') PathPart('user') CaptureArgs(0) {
     my ($self, $c) = @_;
-    $c->stash->{authd_user} = $c->user->get_object if ($c->user);
+    if ($c->user) {
+        $c->stash->{authd_user} = $c->user->get_object;
+    }
+    else {
+        #http_throw(Unauthorized => {www_authenticate => "moo"});
+        $c->res->status(401);
+        $c->res->body('');
+        $c->detach;
+    }
 }
 sub authd_user : Chained('authd_user_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
@@ -211,12 +219,23 @@ user owns the requested resource id.
 
 =cut
 
-sub mixed_base : Chained('wm_base') PathPart('') CaptureArgs(0) {}
+sub mixed_base : Chained('wm_base') PathPart('') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->user) {
+        $c->stash->{authd_user} = $c->user->get_object;
+    }
+}
 
 sub dataset_base : Chained('mixed_base') PathPart('datasets') CaptureArgs(0) {}
 sub datasets : Chained('dataset_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
-    $self->go_here('/api/wm/public_datasets');
+    if ($c->req->method eq 'GET') {
+        $self->go_here($c, '/api/wm/public_datasets');
+    }
+    else {
+        $c->res->status(405);
+        $c->res->body('');
+    }
     $c->detach;
 }
 sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
@@ -226,15 +245,23 @@ sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     $c->stash->{dataset_object} = $c->model('User::Dataset')->find({id => $id});
 
     if (not $c->stash->{dataset_object}) {
-        http_throw('NotFound');
+        # http_throw('NotFound');
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
     }
 
     my $is_public = !$c->stash->{dataset_object}->is_private;
     $c->stash->{authd_owns} = $c->stash->{authd_user}
         && $c->stash->{authd_user}->datasets_rs->search({id => $id})->count;
 
-    http_throw('NotFound')
-        unless ($is_public || $c->stash->{authd_owns});
+    #http_throw('NotFound')
+    unless ($is_public || $c->stash->{authd_owns}) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
+
 }
 sub dataset : Chained('dataset_id') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
@@ -306,7 +333,10 @@ Get the data the given dataset.
 
 sub ds_data : Chained('dataset_id') PathPart('data') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
-    http_throw(NotImplemented => {message => 'Fitz is still working on this'});
+    #http_throw(NotImplemented => {message => 'Fitz is still working on this'});
+    $c->res->status(501);
+    $c->res->body('Fitz is still working on this');
+    $c->detach;
 }
 
 
@@ -319,9 +349,15 @@ to public pages.
 =cut
 
 sub page_base : Chained('mixed_base') PathPart('pages') CaptureArgs(0) {}
-sub pages : Chained('page_base') PathPart('') Args(0) ActionClass('FromPSGI') {
+sub pages : Chained('page_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
-    $self->go_here('/api/wm/public_pages');
+    if ($c->req->method eq 'GET') {
+        $self->go_here($c, '/api/wm/public_pages');
+    }
+    else {
+        $c->res->status(405);
+        $c->res->body('');
+    }
     $c->detach;
 }
 sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
@@ -331,15 +367,22 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     $c->stash->{page_object} = $c->model('User::Page')->find({id => $id});
 
     if (not $c->stash->{page_object}) {
-        http_throw('NotFound');
+        # http_throw('NotFound');
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
     }
 
     my $is_public = !$c->stash->{page_object}->is_private;
     $c->stash->{authd_owns}      = $c->stash->{authd_user}
         && $c->stash->{authd_user}->pages_rs->search({id => $id})->count;
 
-    http_throw('NotFound')
-        unless ($is_public || $c->stash->{authd_owns});
+    #http_throw('NotFound')
+    unless ($is_public || $c->stash->{authd_owns}) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
 }
 sub page : Chained('page_id') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;

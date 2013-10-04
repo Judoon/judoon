@@ -120,47 +120,87 @@ test '/users' => sub {
 
 };
 
+test '/public_datasets' => sub {
+    my ($self) = @_;
+    my @datasets = map {$_->TO_JSON} $self->schema->resultset('Dataset')->public->all;
+    $self->add_route_test(
+        '/api/public_datasets', '*', 'GET', {}, {want => \@datasets}
+    );
+    $self->add_route_readonly('/api/public_datasets', '*');
+};
 
-# readonly access to public datasets
-test '/datasets' => sub { fail('not done'); };
-test '/datasets/1/columns' => sub { fail('not done'); };
-test '/datasets/1/pages' => sub { fail('not done'); };
-test '/datasets/1/data' => sub { fail('not done'); };
-
-# readonly access to public pages
-test '/pages' => sub { fail('not done'); };
-test '/pages/1/columns' => sub { fail('not done'); };
-
+test '/public_pages' => sub {
+    my ($self) = @_;
+    my @pages = map {$_->TO_JSON} $self->schema->resultset('Page')->public->all;
+    $self->add_route_test(
+        '/api/public_pages', '*', 'GET', {}, {want => \@pages}
+    );
+    $self->add_route_readonly('/api/public_pages', '*');
+};
 
 
-test '/user' => sub { fail('not done'); };
-
-
-# read-write the logged-in users dataset
-test '/user/dataset' => sub {
+# Authd routes
+test '/user' => sub {
     my ($self) = @_;
 
+    my $user_rs = $self->schema->resultset('User');
+    my $me  = $user_rs->find({username => 'me'});
+    my $you = $user_rs->find({username => 'you'});
+
+    $self->add_route_test('/api/user', 'me', 'GET', {}, {want => $me->TO_JSON});
+    $self->add_route_test('/api/user', 'you', 'GET', {}, {want => $you->TO_JSON});
+    $self->add_route_readonly('/api/user', 'me+you');
+
+
     # I have full priviliges over my dataset
-    my $me = $self->schema->resultset('User')->find({username => 'me'});
     my $my_datasets = $me->datasets_rs;
-    my @all_my_ds = map {$_->TO_JSON} $my_datasets->all;
-    my $my_new_ds = {};
-    $self->add_route_test('/api/user/datasets', 'me', 'GET',    {}, {want => \@all_my_ds}, );
-    # fixme: implement these:
-    # $self->add_route_test('/api/user/datasets', 'me', 'POST',   {}, [\302, {want => $my_new_ds}],    );
-    $self->add_route_test('/api/user/datasets', 'me', 'PUT',    {}, \405, );
-    $self->add_route_test(
-        '/api/user/datasets', 'me', 'DELETE', {},
-        sub {
-            my ($self, $msg) = @_;
-            is_deeply [$my_datasets->all], [], "$msg: all datasets deleted";
-        },
-    );
+    my @all_my_ds   = map {$_->TO_JSON} $my_datasets->all;
+    my $my_new_ds   = {};
+    $self->add_route_test('/api/user/datasets', 'me', 'GET', {}, {want => \@all_my_ds});
+    fail("NOT IMPLEMENTED! me POST /api/user/datasets");
+    # $self->add_route_test('/api/user/datasets', 'me', 'POST', $my_new_ds, [\302, {want => $my_new_ds}]);
+    $self->add_route_bad_method('/api/user/datasets', 'me', 'PUT+DELETE', {});
 
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
+    # you have full privileges over your datasets
+    my $your_datasets = $you->datasets_rs;
+    my @all_your_ds   = map {$_->TO_JSON} $your_datasets->all;
+    my $your_new_ds   = {};
+    $self->add_route_test('/api/user/datasets', 'you', 'GET', {}, {want => \@all_your_ds});
+    fail("NOT IMPLEMENTED! you POST /api/user/datasets");
+    # $self->add_route_test('/api/user/datasets', 'you', 'POST', $your_new_ds, [\302, {want => $your_new_ds}]);
+    $self->add_route_bad_method('/api/user/datasets', 'you', 'PUT+DELETE', {});
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+    $self->add_route_needs_auth('/api/user', 'noone', '*', {});
+    $self->add_route_needs_auth('/api/user/datasets', 'noone', '*', {});
+    $self->add_route_needs_auth('/api/user/pages', 'noone', '*', {});
+
+};
+
+
+# read-write the logged-in users dataset
+test '/datasets' => sub {
+    my ($self) = @_;
+
+    # /api/datasets redirects to /public_datasets
+    my @all_datasets = map {$_->TO_JSON}
+        $self->schema->resultset('Dataset')->public->all;
+    $self->add_route_test(
+        '/api/datasets', '*', 'GET', {}, {want => \@all_datasets}
+    );
+    $self->add_route_readonly('/api/datasets', '*');
+
     my %valid_ds_fields = map {$_ => 1} qw(name notes permission);
+    my $user_rs = $self->schema->resultset('User');
+
+    # I have full priviliges over my dataset
+    my $me            = $user_rs->find({username => 'me'});
+    my $my_datasets   = $me->datasets_rs;
     my $my_pub_ds     = $my_datasets->public->first->TO_JSON;
     my $my_pub_ds_id  = $my_pub_ds->{id};
     my $my_pub_update = clone($my_pub_ds);
@@ -168,11 +208,18 @@ test '/user/dataset' => sub {
         grep {!$valid_ds_fields{$_}} keys %$my_pub_update
     };
     $my_pub_update->{notes} = "Moo moo quack quack";
-    $self->add_route_test("/api/user/datasets/$my_pub_ds_id", 'me', 'GET',    {}, {want => $my_pub_ds}, );
-    $self->add_route_test("/api/user/datasets/$my_pub_ds_id", 'me', 'POST',   {}, \405, );
-    $self->add_route_test("/api/user/datasets/$my_pub_ds_id", 'me', 'PUT',    $my_pub_update, \204, );
+    $self->add_route_test("/api/datasets/$my_pub_ds_id", 'me', 'GET', {}, {want => $my_pub_ds});
+    $self->add_route_bad_method("/api/datasets/$my_pub_ds_id", 'me', 'POST', {});
     $self->add_route_test(
-        "/api/user/datasets/$my_pub_ds_id", 'me', 'DELETE', {},
+        "/api/datasets/$my_pub_ds_id", 'me', 'PUT', $my_pub_update, \204,
+    );
+    $self->add_route_test(
+        "/api/datasets/$my_pub_ds_id", 'me', 'GET', {}, {want => {
+            %$my_pub_ds, description => $my_pub_update->{notes}
+        }}
+    );
+    $self->add_route_test(
+        "/api/datasets/$my_pub_ds_id", 'me', 'DELETE', {},
         sub {
             my ($self, $msg) = @_;
             ok !($my_datasets->find({id => $my_pub_ds_id})),
@@ -188,11 +235,16 @@ test '/user/dataset' => sub {
         grep {!$valid_ds_fields{$_}} keys %$my_priv_update
     };
     $my_priv_update->{notes} = "wumpa wumpa";
-    $self->add_route_test("/api/user/datasets/$my_priv_ds_id", 'me',  'GET',    {}, {want => $my_priv_ds},);
-    $self->add_route_test("/api/user/datasets/$my_priv_ds_id", 'me',  'POST',   {}, \405,);
-    $self->add_route_test("/api/user/datasets/$my_priv_ds_id", 'me',  'PUT',    $my_priv_update, \204, );
+    $self->add_route_test("/api/datasets/$my_priv_ds_id", 'me', 'GET', {}, {want => $my_priv_ds});
+    $self->add_route_bad_method("/api/datasets/$my_priv_ds_id", 'me', 'POST', {},);
+    $self->add_route_test("/api/datasets/$my_priv_ds_id", 'me', 'PUT', $my_priv_update, \204);
     $self->add_route_test(
-        "/api/user/datasets/$my_priv_ds_id", 'me',  'DELETE', {},
+        "/api/datasets/$my_priv_ds_id", 'me', 'GET', {}, {want => {
+            %$my_priv_ds, description => $my_priv_update->{notes}
+        }}
+    );
+    $self->add_route_test(
+        "/api/datasets/$my_priv_ds_id", 'me',  'DELETE', {},
         sub {
             my ($self, $msg) = @_;
             ok !($my_datasets->find({id => $my_priv_ds_id})),
@@ -204,55 +256,46 @@ test '/user/dataset' => sub {
     $self->load_fixtures('init','api');
 
     # other user can see own datasets, but not mine
-    my $you = $self->schema->resultset('User')->find({username => 'you'});
+    my $you           = $user_rs->find({username => 'you'});
     my $your_datasets = $you->datasets_rs;
-    my @all_your_ds = map {$_->TO_JSON} $your_datasets->all;
-    my $your_new_ds = ();
-    $self->add_route_test('/api/user/datasets', 'you', 'GET', {}, {want => \@all_your_ds},     );
-    # fixme: implement theses
-    # $self->add_route_test('/api/user/datasets', 'you', 'POST',   $your_new_ds, [\302, {want => $your_new_ds}],);
-    $self->add_route_test('/api/user/datasets', 'you', 'PUT', {}, \405, );
-    $self->add_route_test(
-        '/api/user/datasets', 'you', 'DELETE', {},
-        sub {
-            my ($self, $msg) = @_;
-            is_deeply [$your_datasets->all], [], "$msg: all your datasets deleted";
-        },
-    );
-
-    $self->reset_fixtures();
-    $self->load_fixtures('init','api');
+    my @all_your_ds   = map {$_->TO_JSON} $your_datasets->all;
+    my $your_new_ds   = ();
 
     # other user doesn't get to do anything with my datasets
-    $self->add_route_forbidden("/api/user/datasets/$my_pub_ds_id", 'you', 'GET+PUT+DELETE', {},);
-    $self->add_method_not_allowed("/api/user/datasets/$my_pub_ds_id",  'you', 'POST', {},);
-    $self->add_route_forbidden("/api/user/datasets/$my_priv_ds_id", 'you', 'GET+PUT+DELETE', {},);
-    $self->add_method_not_allowed("/api/user/datasets/$my_priv_ds_id",  'you', 'POST', {},);
-
-
-    # un-authd users can't do anything with /user/dataset
-    $self->add_route_needs_auth("/api/user/datasets", 'noone', 'GET+POST+DELETE', {}, );
-    $self->add_method_not_allowed("/api/user/datasets", 'noone', 'PUT', {}, );
-    $self->add_route_needs_auth("/api/user/datasets/$my_pub_ds_id", 'noone', 'GET+PUT+DELETE', {}, );
-    $self->add_method_not_allowed("/api/user/datasets/$my_pub_ds_id", 'noone', 'POST', {}, );
-    $self->add_route_needs_auth("/api/user/datasets/$my_priv_ds_id", 'noone', 'GET+PUT+DELETE', {}, );
-    $self->add_method_not_allowed("/api/user/datasets/$my_priv_ds_id", 'noone', 'POST', {}, );
+    $self->add_route_test("/api/datasets/$my_pub_ds_id", 'you+noone', 'GET', {}, {want => $my_pub_ds});
+    $self->add_route_bad_method("/api/datasets/$my_pub_ds_id", 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found("/api/datasets/$my_priv_ds_id", 'you+noone', '*', {});
+    #$self->add_route_bad_method("/api/datasets/$my_priv_ds_id", 'you+noone', 'POST+PUT+DELETE', {});
 };
 
 
-test '/user/datasets/1/columns' => sub { fail('not done'); };
-test '/user/datasets/1/pages' => sub { fail('not done'); };
-test '/user/datasets/1/data' => sub { fail('not done'); };
-test '/user/pages' => sub { fail('not done'); };
-test '/user/pages/1/columns' => sub { fail('not done'); };
+# mixed access to dataset properties
+test '/datasets/1/columns' => sub { fail('not done'); };
+test '/datasets/1/pages'   => sub { fail('not done'); };
+test '/datasets/1/data'    => sub { fail('not done'); };
+
+# mixed access to page properties
+test '/pages' => sub {
+    my ($self) = @_;
+
+    my @all_pages = map {$_->TO_JSON}
+        $self->schema->resultset('Page')->public->all;
+    $self->add_route_test(
+        '/api/pages', '*', 'GET', {}, {want => \@all_pages}
+    );
+    $self->add_route_readonly('/api/pages', '*');
 
 
+    fail('not done');
+};
+test '/pages/1/columns' => sub { fail('not done'); };
 
 
-test '/templates' => sub { fail('not done'); };
-test '/types' => sub { fail('not done'); };
+# services
+test '/templates'  => sub { fail('not done'); };
+test '/types'      => sub { fail('not done'); };
 test '/sitelinker' => sub { fail('not done'); };
-test '/lookup' => sub { fail('not done'); };
+test '/lookup'     => sub { fail('not done'); };
 
 
 
@@ -304,8 +347,9 @@ sub add_my_user {
 }
 sub _expand_my_users {
     my ($self, $users) = @_;
-    return $users eq '*' ? @{ $self->my_users }
-        : do { $self->add_my_user($users); ($users); };
+    return $users eq '*'  ? @{ $self->my_users }
+        : $users =~ m/\+/ ? split(/\+/, $users)
+        :                   do { $self->add_my_user($users); ($users); };
 }
 
 
@@ -352,11 +396,11 @@ sub add_route_test {
 
     }
 }
-sub add_route_needs_auth   { shift->add_route_test(@_, \401); }
-sub add_route_forbidden    { shift->add_route_test(@_, \403); }
-sub add_route_not_found    { shift->add_route_test(@_, \404); }
-sub add_method_not_allowed { shift->add_route_test(@_, \405); }
-sub add_route_readonly     { shift->add_route_test(@_, 'POST+PUT+DELETE', {}, \405); }
+sub add_route_needs_auth { shift->add_route_test(@_, \401); }
+sub add_route_forbidden  { shift->add_route_test(@_, \403); }
+sub add_route_not_found  { shift->add_route_test(@_, \404); }
+sub add_route_bad_method { shift->add_route_test(@_, \405); }
+sub add_route_readonly   { shift->add_route_test(@_, 'POST+PUT+DELETE', {}, \405); }
 
 sub _expand_test {
     my ($self, $test_ref) = @_;
