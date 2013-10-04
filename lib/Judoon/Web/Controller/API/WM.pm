@@ -181,7 +181,7 @@ sub authd_user_pages : Chained('authd_user_base') PathPart('pages') Args(0) Acti
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
-            set      => $c->stash->{authd_user}->pages_rs,
+            set      => $c->stash->{authd_user}->my_pages,
             writable => 0,
         }
     );
