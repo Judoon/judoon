@@ -280,17 +280,10 @@ test '/datasets' => sub {
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
-    # other user can see own datasets, but not mine
-    my $you           = $user_rs->find({username => 'you'});
-    my $your_datasets = $you->datasets_rs;
-    my @all_your_ds   = map {$_->TO_JSON} $your_datasets->all;
-    my $your_new_ds   = ();
-
-    # other user doesn't get to do anything with my datasets
+    # other users can see my public datasets, but nothing else
     $self->add_route_test("/api/datasets/$my_pub_ds_id", 'you+noone', 'GET', {}, {want => $my_pub_ds});
     $self->add_route_bad_method("/api/datasets/$my_pub_ds_id", 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found("/api/datasets/$my_priv_ds_id", 'you+noone', '*', {});
-    #$self->add_route_bad_method("/api/datasets/$my_priv_ds_id", 'you+noone', 'POST+PUT+DELETE', {});
 };
 
 
@@ -310,8 +303,71 @@ test '/pages' => sub {
     );
     $self->add_route_readonly('/api/pages', '*');
 
+    my %valid_page_fields = map {$_ => 1} qw(title preamble postamble permission);
+    my $user_rs = $self->schema->resultset('User');
 
-    fail('not done');
+    # I have full priviliges over my dataset
+    my $me             = $user_rs->find({username => 'me'});
+    my $my_pages       = $me->my_pages;
+    my $my_pub_page    = $my_pages->public->first->TO_JSON;
+    my $my_pub_page_id = $my_pub_page->{id};
+    my $my_pub_update  = clone($my_pub_page);
+    delete @{$my_pub_update}{
+        grep {!$valid_page_fields{$_}} keys %$my_pub_update
+    };
+    $my_pub_update->{title} = "Moo moo quack quack";
+    $self->add_route_test("/api/pages/$my_pub_page_id", 'me', 'GET', {}, {want => $my_pub_page});
+    $self->add_route_bad_method("/api/pages/$my_pub_page_id", 'me', 'POST', {});
+    $self->add_route_test(
+        "/api/pages/$my_pub_page_id", 'me', 'PUT', $my_pub_update, \204,
+    );
+    $self->add_route_test(
+        "/api/pages/$my_pub_page_id", 'me', 'GET', {}, {want => {
+            %$my_pub_page, title => $my_pub_update->{title}
+        }}
+    );
+    $self->add_route_test(
+        "/api/pages/$my_pub_page_id", 'me', 'DELETE', {},
+        sub {
+            my ($self, $msg) = @_;
+            ok !($my_pages->find({id => $my_pub_page_id})),
+                "$msg: public page deleted";
+        },
+    );
+
+
+    my $my_priv_page     = $my_pages->private->first->TO_JSON;
+    my $my_priv_page_id  = $my_priv_page->{id};
+    my $my_priv_update = clone($my_priv_page);
+    delete @{$my_priv_update}{
+        grep {!$valid_page_fields{$_}} keys %$my_priv_update
+    };
+    $my_priv_update->{title} = "wumpa wumpa";
+    $self->add_route_test("/api/pages/$my_priv_page_id", 'me', 'GET', {}, {want => $my_priv_page});
+    $self->add_route_bad_method("/api/pages/$my_priv_page_id", 'me', 'POST', {},);
+    $self->add_route_test("/api/pages/$my_priv_page_id", 'me', 'PUT', $my_priv_update, \204);
+    $self->add_route_test(
+        "/api/pages/$my_priv_page_id", 'me', 'GET', {}, {want => {
+            %$my_priv_page, title => $my_priv_update->{title}
+        }}
+    );
+    $self->add_route_test(
+        "/api/pages/$my_priv_page_id", 'me',  'DELETE', {},
+        sub {
+            my ($self, $msg) = @_;
+            ok !($my_pages->find({id => $my_priv_page_id})),
+                "$msg: private page deleted";
+        },
+    );
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+    # other users can see my public pages, but nothing else
+    my $my_pub_page2 = $my_pages->public->first->TO_JSON; # fixtures have been reset
+    $self->add_route_test("/api/pages/$my_pub_page_id", 'you+noone', 'GET', {}, {want => $my_pub_page2});
+    $self->add_route_bad_method("/api/pages/$my_pub_page_id", 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found("/api/pages/$my_priv_page_id", 'you+noone', '*', {});
 };
 test '/pages/1/columns' => sub { fail('not done'); };
 
