@@ -538,7 +538,142 @@ test '/pages' => sub {
 };
 
 
-test '/pages/1/columns' => sub { fail('not done'); };
+test '/pages/1/columns' => sub {
+    my ($self) = @_;
+
+    my $user_rs  = $self->schema->resultset('User');
+    my $me       = $user_rs->find({username => 'me'});
+    my $my_pages = $me->my_pages;
+
+
+    # me
+    # GET    /pages/$public/columns  == want
+    # POST   /pages/$public/columns  == want
+    # PUT    /pages/$public/columns  == 405
+    # DELETE /pages/$public/columns  == want
+
+    my $my_pub_page      = $my_pages->public->first;
+    my $my_pub_page_id   = $my_pub_page->id;
+    my @my_pub_page_cols = map {$_->TO_JSON}
+        $my_pub_page->page_columns_ordered->all;
+    my $public_col_url   = "/api/pages/$my_pub_page_id/columns";
+
+    $self->add_route_test(
+        $public_col_url, 'me', 'GET', {}, {want => \@my_pub_page_cols}
+    );
+    fail("POST $public_col_url Not Implemented!");
+    $self->add_route_bad_method($public_col_url, 'me', 'PUT', {});
+    fail("DELETE $public_col_url Not Implemented!");
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+
+    # me
+    # GET    /pages/$private/columns  == want
+    # POST   /pages/$private/columns  == want
+    # PUT    /pages/$private/columns  == 405
+    # DELETE /pages/$private/columns  == want
+
+    my $my_priv_page      = $my_pages->private->first;
+    my $my_priv_page_id   = $my_priv_page->id;
+    my @my_priv_page_cols = map {$_->TO_JSON}
+        $my_priv_page->page_columns_ordered->all;
+    my $private_col_url = "/api/pages/$my_priv_page_id/columns";
+
+    $self->add_route_test(
+        $private_col_url, 'me', 'GET', {}, {want => \@my_priv_page_cols}
+    );
+    fail("POST $private_col_url Not Implemented!");
+    $self->add_route_bad_method($private_col_url, 'me', 'PUT', {});
+    fail("DELETE $private_col_url Not Implemented!");
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+
+    # you + noone
+    # other users can see my public datasets, but nothing else
+    # refetch public columns after schema reset
+    @my_pub_page_cols = map {$_->TO_JSON}
+        $my_pub_page->page_columns_ordered->all;
+    $self->add_route_test(
+        $public_col_url, 'you+noone', 'GET', {}, {want => \@my_pub_page_cols}
+    );
+    $self->add_route_bad_method(
+        $public_col_url, 'you+noone', 'POST+PUT+DELETE', {}
+    );
+    $self->add_route_not_found($private_col_url, 'you+noone', '*', {});
+};
+
+
+test '/pages/1/columns/1' => sub {
+    my ($self) = @_;
+
+    my $user_rs  = $self->schema->resultset('User');
+    my $me       = $user_rs->find({username => 'me'});
+    my $my_pages = $me->my_pages;
+
+    # me
+    # GET    /pages/$public/columns/$id  == want
+    # POST   /pages/$public/columns/$id  == 405
+    # PUT    /pages/$public/columns/$id  == want
+    # DELETE /pages/$public/columns/$id  == want
+
+    my $my_pub_page        = $my_pages->public->first;
+    my $my_pub_page_id     = $my_pub_page->id;
+    my $my_pub_page_col    = $my_pub_page->page_columns_ordered->first->TO_JSON;
+    my $my_pub_page_col_id = $my_pub_page_col->{id};
+    my $public_col_url
+        = "/api/pages/$my_pub_page_id/columns/$my_pub_page_col_id";
+
+    $self->add_route_test(
+        $public_col_url, 'me', 'GET', {}, {want => $my_pub_page_col}
+    );
+    $self->add_route_bad_method($public_col_url, 'me', 'POST', {});
+    fail("PUT $public_col_url Not Implemented!");
+    fail("DELETE $public_col_url Not Implemented!");
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+
+    # me
+    # GET    /pags/$private/columns/$id == want
+    # POST   /pags/$private/columns/$id == 405
+    # PUT    /pags/$private/columns/$id == want
+    # DELETE /pags/$private/columns/$id == want
+
+    my $my_priv_page        = $my_pages->private->first;
+    my $my_priv_page_id     = $my_priv_page->id;
+    my $my_priv_page_col    = $my_priv_page->page_columns_ordered->first->TO_JSON;
+    my $my_priv_page_col_id = $my_priv_page_col->{id};
+    my $private_col_url
+        = "/api/pages/$my_priv_page_id/columns/$my_priv_page_col_id";
+
+    $self->add_route_test(
+        $private_col_url, 'me', 'GET', {}, {want => $my_priv_page_col}
+    );
+    $self->add_route_bad_method($private_col_url, 'me', 'POST', {});
+    fail("PUT $private_col_url Not Implemented!");
+    fail("DELETE $private_col_url Not Implemented!");
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+
+    # you + noone
+    # other users can see my public datasets, but nothing else
+    # refetch public column after schema reset
+    $my_pub_page_col = $my_pub_page->page_columns_ordered->first->TO_JSON;
+    $self->add_route_test(
+        $public_col_url, 'you+noone', 'GET', {}, {want => $my_pub_page_col}
+    );
+    $self->add_route_bad_method(
+        $public_col_url, 'you+noone', 'POST+PUT+DELETE', {}
+    );
+    $self->add_route_not_found($private_col_url, 'you+noone', '*', {});
+};
 
 
 # services
