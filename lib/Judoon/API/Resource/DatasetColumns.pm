@@ -11,6 +11,13 @@ extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
 
+sub allowed_methods {
+    my ($self) = @_;
+     return [
+        qw(GET HEAD),
+        ( $_[0]->writable ) ? (qw(POST)) : ()
+    ];
+}
 
 sub create_resource {
     my ($self, $data) = @_;
