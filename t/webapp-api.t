@@ -292,6 +292,9 @@ test '/datasets/1/columns' => sub {
     my $me          = $user_rs->find({username => 'me'});
     my $my_datasets = $me->datasets_rs;
 
+    my %valid_dscol_fields = map {$_ => 1} qw(data_type);
+
+
     # for me
     # GET    /ds/$public/columns  == want
     # POST   /ds/$public/columns  == want
@@ -318,10 +321,20 @@ test '/datasets/1/columns' => sub {
     my $my_pub_ds_col_id = $my_pub_ds_col->{id};
     my $public_col_url
         = "/api/datasets/$my_pub_ds_id/columns/$my_pub_ds_col_id";
+    my $pub_col_update = clone($my_pub_ds_col);
+    delete @{$pub_col_update}{
+        grep {!$valid_dscol_fields{$_}} keys %$pub_col_update
+    };
+    $pub_col_update->{data_type} = 'Biology_Accession_Entrez_GeneSymbol';
     $self->add_route_test(
         $public_col_url, 'me', 'GET', {}, {want => $my_pub_ds_col}
     );
-    fail("PUT $public_col_url Not Implemented!");
+    $self->add_route_test($public_col_url, 'me', 'PUT', $pub_col_update, \204);
+    $my_pub_ds_col = $my_pub_ds->ds_columns->find({id => $my_pub_ds_col_id})
+        ->TO_JSON; # refresh timestamps
+    $self->add_route_test($public_col_url, 'me', 'GET', {}, {want => {
+        %$my_pub_ds_col, data_type => $pub_col_update->{data_type}
+    }});
     $self->add_route_bad_method($public_col_url, 'me', 'POST+DELETE', {});
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
@@ -353,10 +366,20 @@ test '/datasets/1/columns' => sub {
     my $my_priv_ds_col_id = $my_priv_ds_col->{id};
     my $private_col_url
         = "/api/datasets/$my_priv_ds_id/columns/$my_priv_ds_col_id";
+    my $priv_col_update = clone($my_priv_ds_col);
+    delete @{$priv_col_update}{
+        grep {!$valid_dscol_fields{$_}} keys %$priv_col_update
+    };
+    $priv_col_update->{data_type} = 'Biology_Accession_Entrez_GeneSymbol';
     $self->add_route_test(
         $private_col_url, 'me', 'GET', {}, {want => $my_priv_ds_col}
     );
-    fail("PUT $private_col_url Not Implemented!");
+    $self->add_route_test($private_col_url, 'me', 'PUT', $priv_col_update, \204);
+    $my_priv_ds_col = $my_priv_ds->ds_columns->find({id => $my_priv_ds_col_id})
+        ->TO_JSON; # refresh timestamps
+    $self->add_route_test($private_col_url, 'me', 'GET', {}, {want => {
+        %$my_priv_ds_col, data_type => $priv_col_update->{data_type}
+    }});
     $self->add_route_bad_method($private_col_url, 'me', 'POST+DELETE', {});
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
