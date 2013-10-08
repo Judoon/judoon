@@ -165,7 +165,7 @@ test '/user' => sub {
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
-    # You can see your pages and create new ones.
+    # You can see your datasets and create new ones.
     my $your_datasets = $you->datasets_rs;
     my @all_your_ds   = map {$_->TO_JSON} $your_datasets->all;
     my $your_new_ds   = {};
@@ -220,67 +220,52 @@ test '/datasets' => sub {
     );
     $self->add_route_readonly('/api/datasets', '*');
 
-    my %valid_ds_fields = map {$_ => 1} qw(name notes permission);
-    my $user_rs = $self->schema->resultset('User');
 
-    # I have full priviliges over my dataset
-    my $me            = $user_rs->find({username => 'me'});
-    my $my_datasets   = $me->datasets_rs;
-    my $my_pub_ds     = $my_datasets->public->first->TO_JSON;
-    my $my_pub_ds_id  = $my_pub_ds->{id};
-    my $my_pub_ds_url = "/api/datasets/$my_pub_ds_id";
-    my $my_pub_update = clone($my_pub_ds);
-    delete @{$my_pub_update}{
-        grep {!$valid_ds_fields{$_}} keys %$my_pub_update
-    };
-    $my_pub_update->{notes} = "Moo moo quack quack";
-    $self->add_route_test($my_pub_ds_url, 'me', 'GET', {}, {want => $my_pub_ds});
-    $self->add_route_bad_method($my_pub_ds_url, 'me', 'POST', {});
-    $self->add_route_test($my_pub_ds_url, 'me', 'PUT', $my_pub_update, \204,);
-    $my_pub_ds = $my_datasets->public->first->TO_JSON; # refresh timestamps
-    $self->add_route_test($my_pub_ds_url, 'me', 'GET', {}, {want => {
-        %$my_pub_ds, description => $my_pub_update->{notes}
-    }});
-    $self->add_route_test($my_pub_ds_url, 'me', 'DELETE', {},
-        sub {
-            my ($self, $msg) = @_;
-            ok !($my_datasets->find({id => $my_pub_ds_id})),
-                "$msg: public dataset deleted";
-        },
+    # I have full priviliges over my datasets
+    my $user_rs         = $self->schema->resultset('User');
+    my $me              = $user_rs->find({username => 'me'});
+    my $my_datasets     = $me->datasets_rs;
+    my @valid_ds_fields = qw(name notes permission);
+    my %urls            = (public => '', private => '');
+    my @datasets        = (
+        # type       dataset
+        [ 'public',  $my_datasets->public->first->TO_JSON,  ],
+        [ 'private', $my_datasets->private->first->TO_JSON, ],
     );
+    for my $ds_test (@datasets) {
+        my ($type, $ds) = @$ds_test;
+        my $ds_id       = $ds->{id};
+        my $ds_url      = "/api/datasets/$ds_id";
+        my $update      = {
+            (map {$_ => $ds->{$_}} @valid_ds_fields),
+            notes => "Moo moo quack quack",
+        };
 
+        $self->add_route_test($ds_url, 'me', 'GET', {}, {want => $ds});
+        $self->add_route_bad_method($ds_url, 'me', 'POST', {});
+        $self->add_route_test($ds_url, 'me', 'PUT', $update, \204,);
+        $ds = $my_datasets->find({id => $ds_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($ds_url, 'me', 'GET', {}, {want => {
+            %$ds, description => $update->{notes}
+        }});
+        $self->add_route_test($ds_url, 'me', 'DELETE', {},
+            sub {
+                my ($self, $msg) = @_;
+                ok !($my_datasets->find({id => $ds_id})),
+                    "$msg: $type dataset deleted";
+            },
+        );
+        $urls{$type}  = $ds_url;
+    }
 
-    my $my_priv_ds     = $my_datasets->private->first->TO_JSON;
-    my $my_priv_ds_id  = $my_priv_ds->{id};
-    my $my_priv_ds_url = "/api/datasets/$my_priv_ds_id";
-    my $my_priv_update = clone($my_priv_ds);
-    delete @{$my_priv_update}{
-        grep {!$valid_ds_fields{$_}} keys %$my_priv_update
-    };
-    $my_priv_update->{notes} = "wumpa wumpa";
-    $self->add_route_test($my_priv_ds_url, 'me', 'GET', {}, {want => $my_priv_ds});
-    $self->add_route_bad_method($my_priv_ds_url, 'me', 'POST', {},);
-    $self->add_route_test($my_priv_ds_url, 'me', 'PUT', $my_priv_update, \204);
-    $my_priv_ds = $my_datasets->private->first->TO_JSON; # refresh timestamps
-    $self->add_route_test($my_priv_ds_url, 'me', 'GET', {}, {want => {
-        %$my_priv_ds, description => $my_priv_update->{notes}
-    }});
-    $self->add_route_test($my_priv_ds_url, 'me',  'DELETE', {},
-        sub {
-            my ($self, $msg) = @_;
-            ok !($my_datasets->find({id => $my_priv_ds_id})),
-                "$msg: private dataset deleted";
-        },
-    );
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
     # other users can see my public datasets, but nothing else
-    # refetch public dataset after schema reset
-    $my_pub_ds = $my_datasets->public->first->TO_JSON;
-    $self->add_route_test($my_pub_ds_url, 'you+noone', 'GET', {}, {want => $my_pub_ds});
-    $self->add_route_bad_method($my_pub_ds_url, 'you+noone', 'POST+PUT+DELETE', {});
-    $self->add_route_not_found($my_priv_ds_url, 'you+noone', '*', {});
+    my $my_pub_ds = $my_datasets->find({id => $datasets[0][1]->{id}})->TO_JSON;
+    $self->add_route_test($urls{public}, 'you+noone', 'GET', {}, {want => $my_pub_ds});
+    $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
 };
 
 
@@ -451,6 +436,7 @@ test '/datasets/1/pages' => sub {
 test '/pages' => sub {
     my ($self) = @_;
 
+    # /api/pages redirects to /public_pages
     my @all_pages = map {$_->TO_JSON}
         $self->schema->resultset('Page')->public->all;
     $self->add_route_test(
@@ -458,69 +444,52 @@ test '/pages' => sub {
     );
     $self->add_route_readonly('/api/pages', '*');
 
-    my %valid_page_fields = map {$_ => 1} qw(title preamble postamble permission);
+
+    # I have full priviliges over my pages
     my $user_rs           = $self->schema->resultset('User');
     my $me                = $user_rs->find({username => 'me'});
     my $my_pages          = $me->my_pages;
-
-    # I have full priviliges over my dataset
-    my $my_pub_page     = $my_pages->public->first->TO_JSON;
-    my $my_pub_page_id  = $my_pub_page->{id};
-    my $my_pub_page_url = "/api/pages/$my_pub_page_id";
-    my $my_pub_update   = clone($my_pub_page);
-    delete @{$my_pub_update}{
-        grep {!$valid_page_fields{$_}} keys %$my_pub_update
-    };
-    $my_pub_update->{title} = "Moo moo quack quack";
-    $self->add_route_test($my_pub_page_url, 'me', 'GET', {}, {want => $my_pub_page});
-    $self->add_route_bad_method($my_pub_page_url, 'me', 'POST', {});
-    $self->add_route_test($my_pub_page_url, 'me', 'PUT', $my_pub_update, \204);
-    $my_pub_page = $my_pages->find({id => $my_pub_page_id})
-        ->TO_JSON; # refresh timestamps
-    $self->add_route_test($my_pub_page_url, 'me', 'GET', {}, {want => {
-        %$my_pub_page, title => $my_pub_update->{title}
-    }});
-    $self->add_route_test($my_pub_page_url, 'me', 'DELETE', {},
-        sub {
-            my ($self, $msg) = @_;
-            ok !($my_pages->find({id => $my_pub_page_id})),
-                "$msg: public page deleted";
-        },
+    my @valid_page_fields = qw(title preamble postamble permission);
+    my %urls              = (public => '', private => '');
+    my @pages             = (
+        # type       page
+        [ 'public',  $my_pages->public->first->TO_JSON,  ],
+        [ 'private', $my_pages->private->first->TO_JSON, ],
     );
+    for my $page_test (@pages) {
+        my ($type, $page) = @$page_test;
+        my $page_id  = $page->{id};
+        my $page_url = "/api/pages/$page_id";
+        my $update   = {
+            (map {$_ => $page->{$_}} @valid_page_fields),
+            title => "Moo moo quack quack",
+        };
+        $self->add_route_test($page_url, 'me', 'GET', {}, {want => $page});
+        $self->add_route_bad_method($page_url, 'me', 'POST', {});
+        $self->add_route_test($page_url, 'me', 'PUT', $update, \204);
+        $page = $my_pages->find({id => $page_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($page_url, 'me', 'GET', {}, {want => {
+            %$page, title => $update->{title}
+        }});
+        $self->add_route_test($page_url, 'me', 'DELETE', {},
+            sub {
+                my ($self, $msg) = @_;
+                ok !($my_pages->find({id => $page_id})),
+                    "$msg: $type page deleted";
+            },
+        );
 
-
-    my $my_priv_page     = $my_pages->private->first->TO_JSON;
-    my $my_priv_page_id  = $my_priv_page->{id};
-    my $my_priv_page_url = "/api/pages/$my_priv_page_id";
-    my $my_priv_update   = clone($my_priv_page);
-    delete @{$my_priv_update}{
-        grep {!$valid_page_fields{$_}} keys %$my_priv_update
-    };
-    $my_priv_update->{title} = "wumpa wumpa";
-    $self->add_route_test($my_priv_page_url, 'me', 'GET', {}, {want => $my_priv_page});
-    $self->add_route_bad_method($my_priv_page_url, 'me', 'POST', {});
-    $self->add_route_test($my_priv_page_url, 'me', 'PUT', $my_priv_update, \204);
-    $my_priv_page = $my_pages->find({id => $my_priv_page_id})
-        ->TO_JSON; # refresh timestamps
-    $self->add_route_test($my_priv_page_url, 'me', 'GET', {}, {want => {
-        %$my_priv_page, title => $my_priv_update->{title}
-    }});
-    $self->add_route_test($my_priv_page_url, 'me',  'DELETE', {},
-        sub {
-            my ($self, $msg) = @_;
-            ok !($my_pages->find({id => $my_priv_page_id})),
-                "$msg: private page deleted";
-        },
-    );
+        $urls{$type} = $page_url;
+    }
 
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
     # other users can see my public pages, but nothing else
-    my $my_pub_page2 = $my_pages->public->first->TO_JSON; # fixtures have been reset
-    $self->add_route_test($my_pub_page_url, 'you+noone', 'GET', {}, {want => $my_pub_page2});
-    $self->add_route_bad_method($my_pub_page_url, 'you+noone', 'POST+PUT+DELETE', {});
-    $self->add_route_not_found($my_priv_page_url, 'you+noone', '*', {});
+    my $my_pub_page = $my_pages->find({id => $pages[0][1]->{id}})->TO_JSON;
+    $self->add_route_test($urls{public}, 'you+noone', 'GET', {}, {want => $my_pub_page});
+    $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
 };
 
 
