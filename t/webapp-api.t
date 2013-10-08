@@ -238,6 +238,7 @@ test '/datasets' => sub {
     $self->add_route_test(
         "/api/datasets/$my_pub_ds_id", 'me', 'PUT', $my_pub_update, \204,
     );
+    $my_pub_ds = $my_datasets->public->first->TO_JSON; # refresh timestamps
     $self->add_route_test(
         "/api/datasets/$my_pub_ds_id", 'me', 'GET', {}, {want => {
             %$my_pub_ds, description => $my_pub_update->{notes}
@@ -263,6 +264,7 @@ test '/datasets' => sub {
     $self->add_route_test("/api/datasets/$my_priv_ds_id", 'me', 'GET', {}, {want => $my_priv_ds});
     $self->add_route_bad_method("/api/datasets/$my_priv_ds_id", 'me', 'POST', {},);
     $self->add_route_test("/api/datasets/$my_priv_ds_id", 'me', 'PUT', $my_priv_update, \204);
+    $my_priv_ds = $my_datasets->private->first->TO_JSON; # refresh timestamps
     $self->add_route_test(
         "/api/datasets/$my_priv_ds_id", 'me', 'GET', {}, {want => {
             %$my_priv_ds, description => $my_priv_update->{notes}
@@ -429,9 +431,6 @@ test '/datasets/1/pages' => sub {
 };
 
 
-test '/datasets/1/data'    => sub { fail('not done'); };
-
-
 # mixed access to page properties
 test '/pages' => sub {
     my ($self) = @_;
@@ -461,6 +460,8 @@ test '/pages' => sub {
     $self->add_route_test(
         "/api/pages/$my_pub_page_id", 'me', 'PUT', $my_pub_update, \204,
     );
+    $my_pub_page = $my_pages->find({id => $my_pub_page_id})
+        ->TO_JSON; # refresh timestamps
     $self->add_route_test(
         "/api/pages/$my_pub_page_id", 'me', 'GET', {}, {want => {
             %$my_pub_page, title => $my_pub_update->{title}
@@ -486,6 +487,8 @@ test '/pages' => sub {
     $self->add_route_test("/api/pages/$my_priv_page_id", 'me', 'GET', {}, {want => $my_priv_page});
     $self->add_route_bad_method("/api/pages/$my_priv_page_id", 'me', 'POST', {},);
     $self->add_route_test("/api/pages/$my_priv_page_id", 'me', 'PUT', $my_priv_update, \204);
+    $my_priv_page = $my_pages->find({id => $my_priv_page_id})
+        ->TO_JSON; # refresh timestamps
     $self->add_route_test(
         "/api/pages/$my_priv_page_id", 'me', 'GET', {}, {want => {
             %$my_priv_page, title => $my_priv_update->{title}
@@ -615,6 +618,10 @@ test '/pages/1/columns' => sub {
     );
     $self->add_route_not_found($private_col_url, 'you+noone', '*', {});
 };
+
+
+
+test '/datasets/1/data'    => sub { fail('not done'); };
 
 
 # services
@@ -803,21 +810,4 @@ sub _DELETE_json {
 }
 
 
-
-
-
 __END__
-
-    # $self->run_responses(
-    #     \@responses,
-    #     sub {
-    #         my ($self, $route, $response) = @_;
-
-    #         $self->get_route($route);
-    #         $self->response_for_route_is($thing);
-
-    #         for my $method ($self->non_get_methods) {
-    #             $self->method_not_allowed($method, $route);
-    #         }
-    #     }
-    # );
