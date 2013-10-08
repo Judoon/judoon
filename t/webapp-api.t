@@ -281,6 +281,8 @@ test '/datasets' => sub {
     $self->load_fixtures('init','api');
 
     # other users can see my public datasets, but nothing else
+    # refetch public dataset after schema reset
+    $my_pub_ds = $my_datasets->public->first->TO_JSON;
     $self->add_route_test("/api/datasets/$my_pub_ds_id", 'you+noone', 'GET', {}, {want => $my_pub_ds});
     $self->add_route_bad_method("/api/datasets/$my_pub_ds_id", 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found("/api/datasets/$my_priv_ds_id", 'you+noone', '*', {});
