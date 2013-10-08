@@ -536,7 +536,14 @@ test '/pages/1/columns' => sub {
     );
     fail("POST $public_cols_url Not Implemented!");
     $self->add_route_bad_method($public_cols_url, 'me', 'PUT', {});
-    fail("DELETE $public_cols_url Not Implemented!");
+    $self->add_route_test(
+        $public_cols_url, 'me', 'DELETE', {}, sub {
+            my ($self, $msg) = @_;
+            is_deeply [$my_pub_page->page_columns->all], [],
+                "$msg: public page columns deleted";
+        }
+    );
+
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
@@ -554,7 +561,13 @@ test '/pages/1/columns' => sub {
     );
     $self->add_route_bad_method($public_col_url, 'me', 'POST', {});
     fail("PUT $public_col_url Not Implemented!");
-    fail("DELETE $public_col_url Not Implemented!");
+    $self->add_route_test(
+        $public_col_url, 'me', 'DELETE', {}, sub {
+            my ($self, $msg) = @_;
+            ok !($my_pub_page->page_columns->find({id => $my_pub_page_col_id})),
+                "$msg: public dataset deleted";
+        }
+    );
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
@@ -573,7 +586,13 @@ test '/pages/1/columns' => sub {
     );
     fail("POST $private_cols_url Not Implemented!");
     $self->add_route_bad_method($private_cols_url, 'me', 'PUT', {});
-    fail("DELETE $private_cols_url Not Implemented!");
+    $self->add_route_test(
+        $private_cols_url, 'me', 'DELETE', {}, sub {
+            my ($self, $msg) = @_;
+            is_deeply [$my_priv_page->page_columns->all], [],
+                "$msg: private page columns deleted";
+        }
+    );
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
@@ -591,7 +610,13 @@ test '/pages/1/columns' => sub {
     );
     $self->add_route_bad_method($private_col_url, 'me', 'POST', {});
     fail("PUT $private_col_url Not Implemented!");
-    fail("DELETE $private_col_url Not Implemented!");
+    $self->add_route_test(
+        $private_col_url, 'me', 'DELETE', {}, sub {
+            my ($self, $msg) = @_;
+            ok !($my_priv_page->page_columns->find({id => $my_priv_page_col_id})),
+                "$msg: private page column deleted";
+        }
+    );
     $self->reset_fixtures();
     $self->load_fixtures('init','api');
 
