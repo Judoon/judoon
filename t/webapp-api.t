@@ -208,6 +208,7 @@ test '/datasets' => sub {
     # /api/datasets redirects to /public_datasets
     my @all_datasets = map {$_->TO_JSON}
         $self->schema->resultset('Dataset')->public->all;
+    $self->add_route_redirects('/api/datasets', '*', 'GET', {});
     $self->add_route_test(
         '/api/datasets', '*', 'GET', {}, {want => \@all_datasets}
     );
@@ -406,6 +407,7 @@ test '/pages' => sub {
     # /api/pages redirects to /public_pages
     my @all_pages = map {$_->TO_JSON}
         $self->schema->resultset('Page')->public->all;
+    $self->add_route_redirects('/api/pages', '*', 'GET', {});
     $self->add_route_test(
         '/api/pages', '*', 'GET', {}, {want => \@all_pages}
     );
@@ -685,6 +687,15 @@ sub add_route_created {
         },
     ]);
 }
+
+sub add_route_redirects {
+    my ($self) = shift;
+    my $req_redir = $self->mech->requests_redirectable();
+    $self->mech->requests_redirectable([]);
+    $self->add_route_test(@_, \302);
+    $self->mech->requests_redirectable($req_redir);
+}
+
 
 sub _expand_test {
     my ($self, $test_ref) = @_;
