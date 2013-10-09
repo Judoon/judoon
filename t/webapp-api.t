@@ -478,7 +478,17 @@ test '/pages/1/columns' => sub {
         my @page_cols = map {$_->TO_JSON} $page->page_columns_ordered->all;
         my $cols_url  = "/api/pages/$page_id/columns";
         $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@page_cols});
-        fail("POST $cols_url Not Implemented!");
+        my $new_col = {title => "I'm new!", template => {}};
+        $self->add_route_test($cols_url, 'me', 'POST', $new_col, [
+            \201,
+            sub {
+                my($self, $msg) = @_;
+                my $loc = $self->mech->res->header('Location');
+                (my $new_id) = ($loc =~ m/(\d+)$/);
+                is $page->page_columns->find({id => $new_id})->title,
+                    $new_col->{title}, '  ...new PageColumn title matches!';
+            },
+        ]);
         $self->add_route_bad_method($cols_url, 'me', 'PUT', {});
         $self->add_route_test($cols_url, 'me', 'DELETE', {},
             sub {
