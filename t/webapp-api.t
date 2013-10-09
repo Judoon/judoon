@@ -456,17 +456,8 @@ test '/pages/1/columns' => sub {
         my @page_cols = map {$_->TO_JSON} $page->page_columns_ordered->all;
         my $cols_url  = "/api/pages/$page_id/columns";
         $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@page_cols});
-        my $new_col = {title => "I'm new!", template => {}};
-        $self->add_route_test($cols_url, 'me', 'POST', $new_col, [
-            \201,
-            sub {
-                my($self, $msg) = @_;
-                my $loc = $self->mech->res->header('Location');
-                (my $new_id) = ($loc =~ m/(\d+)$/);
-                is $page->page_columns->find({id => $new_id})->title,
-                    $new_col->{title}, '  ...new PageColumn title matches!';
-            },
-        ]);
+        my $new_col = {title => "I'm new!", template => ""};
+        $self->add_route_created($cols_url, 'me', 'POST', $new_col);
         $self->add_route_bad_method($cols_url, 'me', 'PUT', {});
         $self->add_route_test($cols_url, 'me', 'DELETE', {},
             sub {
@@ -617,7 +608,6 @@ sub _expand_methods {
 }
 
 
-sub set_route_prefix {}
 
 sub add_route_test {
     my ($self, $route, $users, $methods, $object, $test) = @_;
@@ -649,6 +639,21 @@ sub add_route_forbidden  { shift->add_route_test(@_, \403); }
 sub add_route_not_found  { shift->add_route_test(@_, \404); }
 sub add_route_bad_method { shift->add_route_test(@_, \405); }
 sub add_route_readonly   { shift->add_route_test(@_, 'POST+PUT+DELETE', {}, \405); }
+
+sub add_route_created {
+    my ($self, $url, $user, $method, $object) = @_;
+    $self->add_route_test($url, $user, $method, $object, [
+        \201,
+        sub {
+            my ($self, $msg) = @_;
+            my $loc = $self->mech->res->header('Location');
+            $self->_GET_json($loc);
+            my $new_obj = $self->decode_json($self->mech->content);
+            is_deeply {map {$_ => $new_obj->{$_}} keys %$object},
+                $object, '  ...new object was created!';
+        },
+    ]);
+}
 
 sub _expand_test {
     my ($self, $test_ref) = @_;
