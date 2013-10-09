@@ -179,10 +179,16 @@ sub authd_user_datasets : Chained('authd_user_base') PathPart('datasets') Args(0
 }
 sub authd_user_pages : Chained('authd_user_base') PathPart('pages') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
+
+    if ($c->req->method eq 'PUT' || $c->req->method eq 'DELETE') {
+        $c->res->status(405);
+        $c->res->body('');
+        $c->detach;
+    }
     return $self->wm(
         $c, 'Judoon::API::Resource::Pages', {
             set      => $c->stash->{authd_user}->my_pages,
-            writable => 0,
+            writable => 1,
         }
     );
 }
