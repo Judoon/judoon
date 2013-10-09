@@ -202,26 +202,10 @@ Pages.  These routes will have different methods available to them
 depending upon whether the user is logged in, and if the logged-in
 user owns the requested resource id.
 
- GET requires $is_public || ($authd && $authd->owns($ds_id))
- POST PUT DELETE requires $authd && $authd->owns($ds_id)
+=head2 mixed_base
 
- /datasets *XXX NO! XXX*
- /datasets/$ds_id (GET,PUT,DELETE)
- /datasets/$ds_id/columns (GET, POST, DELETE)
- /datasets/$ds_id/columns/$dscol_id (GET,PUT,DELETE) (not really delete)
- /datasets/$ds_id/pages (GET)
- /datasets/$ds_id/data (GET)
-
- GET requires $is_public || ($authd && $authd->owns($ds_id))
- POST PUT DELETE requires $authd && $authd->owns($ds_id)
-
- /pages *XXX NO! XXX*
- /pages/$page_id (GET, PUT, DELETE)
- /pages/$page_id/columns (GET, POST, DELETE)
- /pages/$page_id/columns/$dscol_id (GET, PUT, DELETE)
-
-=head2 dataset_base / datasets / dataset_id / dataset
-
+Base action for paths that allow write actions depending on who's
+logged in and what resource is being modified.
 
 =cut
 
@@ -231,6 +215,23 @@ sub mixed_base : Chained('wm_base') PathPart('') CaptureArgs(0) {
         $c->stash->{authd_user} = $c->user->get_object;
     }
 }
+
+
+=head2 dataset_base / datasets / dataset_id / dataset
+
+The canonical place for handling dataset resources.  Permitted actions:
+
+ GET requires $is_public || ($authd && $authd->owns($ds_id))
+ POST PUT DELETE requires $authd && $authd->owns($ds_id)
+
+ /datasets # redirects to /public_datasets
+ /datasets/$ds_id (GET,PUT,DELETE)
+ /datasets/$ds_id/columns (GET, POST)
+ /datasets/$ds_id/columns/$dscol_id (GET,PUT)
+ /datasets/$ds_id/pages (GET)
+ /datasets/$ds_id/data (GET)
+
+=cut
 
 sub dataset_base : Chained('mixed_base') PathPart('datasets') CaptureArgs(0) {}
 sub datasets : Chained('dataset_base') PathPart('') Args(0) {
@@ -334,7 +335,7 @@ sub ds_page : Chained('dataset_id') PathPart('pages') Args(0) ActionClass('FromP
 
 =head2 ds_data()
 
-Get the data the given dataset.
+Get the data for the given dataset.
 
 =cut
 
@@ -351,7 +352,16 @@ sub ds_data : Chained('dataset_id') PathPart('data') Args(0) ActionClass('FromPS
 =head2 page_base / pages / page_id / page
 
 Authenticated users get full access to their pages and read access
-to public pages.
+to public pages. Permitted actions:
+
+ GET requires $is_public || ($authd && $authd->owns($ds_id))
+ POST PUT DELETE requires $authd && $authd->owns($ds_id)
+
+ /pages  # redirects to /public_pages
+ /pages/$page_id (GET, PUT, DELETE)
+ /pages/$page_id/columns (GET, POST, DELETE)
+ /pages/$page_id/columns/$dscol_id (GET, PUT, DELETE)
+
 
 =cut
 
