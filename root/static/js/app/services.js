@@ -5,22 +5,34 @@
 
 var judoonSrv = angular.module('judoon.services', ['ngResource']);
 
+judoonSrv.service('User', ['$http', function($http) {
+    this.get         = function () { return $http.get('/api/user');          };
+    this.getDatasets = function () { return $http.get('/api/user/datasets'); };
+    this.getPages    = function () { return $http.get('/api/user/pages');    };
+    this.newPage     = function (page, cb) {
+        return $http.post('/api/user/pages', page)
+            .success( function(data, status, getHeader) {
+                $http.get(getHeader('Location')).success(cb);
+            });
+    };
+}]);
+
 judoonSrv.factory('Dataset', ['$resource', function($resource) {
-    return $resource('/api/dataset/:id', {id: '@id'}, {
+    return $resource('/api/datasets/:id', {id: '@id'}, {
         update: {method: 'PUT'}
     });
 }]);
 
 judoonSrv.factory('DatasetPage', ['$resource', function($resource) {
     return $resource(
-        '/api/dataset/:datasetId/page/:pageId',
-        {datasetId: '@dataset_id', pageId: '@page_id'}
+        '/api/datasets/:datasetId/pages',
+        {datasetId: '@dataset_id'}
     );
 }]);
 
 judoonSrv.factory('DatasetColumn', ['$resource', '$http', function($resource, $http) {
     var DatasetCol = $resource(
-        '/api/dataset/:datasetId/column/:colId',
+        '/api/datasets/:datasetId/columns/:colId',
         {datasetId: '@dataset_id', colId: '@id'},
         {
             update: {method: 'PUT'}
@@ -37,7 +49,7 @@ judoonSrv.factory('DatasetColumn', ['$resource', '$http', function($resource, $h
 }]);
 
 judoonSrv.factory('Page', ['$resource', '$http', function($resource, $http) {
-    var Page = $resource('/api/page/:id', {id: '@id'}, {
+    var Page = $resource('/api/pages/:id', {id: '@id'}, {
         update: {method: 'PUT'}
     });
 
@@ -52,8 +64,8 @@ judoonSrv.factory('Page', ['$resource', '$http', function($resource, $http) {
 
 judoonSrv.factory('PageColumn', ['$resource', '$http', function($resource, $http) {
     var PageCol = $resource(
-        '/api/page/:pageId/column/:colId',
-        {pageId: '@page_id', colId: '@id',},
+        '/api/pages/:pageId/columns/:colId',
+        {pageId: '@page_id', colId: '@id'},
         {
             update: {method: 'PUT'}
         }
