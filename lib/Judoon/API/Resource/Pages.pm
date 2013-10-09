@@ -9,12 +9,12 @@ extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
 
-
+sub base_uri { '/api/pages' }
 
 sub create_resource {
     my ($self, $data) = @_;
 
-    my $user       = $self->set->related_resultset('dataset')
+    my $user = $self->set->related_resultset('dataset')
         ->related_resultset('user')->search({},{distinct => 1})->single;
     my $dataset_id = $data->{dataset_id};
     my $dataset    = $user->datasets_rs->find({id => $dataset_id});
@@ -24,7 +24,7 @@ sub create_resource {
         });
     }
 
-    my $type    = delete $data->{type} // '';
+    my $type = delete $data->{type} // '';
     my $new_page;
     if ($type eq 'clone') {
         my $clone_id = $data->{clone_from} or die 'Bad request?';
