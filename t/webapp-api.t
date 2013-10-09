@@ -147,64 +147,42 @@ test '/user' => sub {
     my $me  = $user_rs->find({username => 'me'});
     my $you = $user_rs->find({username => 'you'});
 
-    $self->add_route_test('/api/user', 'me', 'GET', {}, {want => $me->TO_JSON});
-    $self->add_route_test('/api/user', 'you', 'GET', {}, {want => $you->TO_JSON});
-    $self->add_route_readonly('/api/user', 'me+you');
+    my $user_url = '/api/user';
+    $self->add_route_test($user_url, 'me',  'GET', {}, {want => $me->TO_JSON });
+    $self->add_route_test($user_url, 'you', 'GET', {}, {want => $you->TO_JSON});
+    $self->add_route_readonly($user_url, 'me+you');
 
+    my $ds_url   = '/api/user/datasets';
+    my $page_url = '/api/user/pages';
+    for my $user ($me, $you) {
+        my $name = $user->username;
 
-    # I can see my datasets and create new ones.
-    my $my_datasets = $me->datasets_rs;
-    my @all_my_ds   = map {$_->TO_JSON} $my_datasets->all;
-    my $my_new_ds   = {};
-    $self->add_route_test('/api/user/datasets', 'me', 'GET', {}, {want => \@all_my_ds});
-    fail("NOT IMPLEMENTED! me POST /api/user/datasets");
-    # $self->add_route_test('/api/user/datasets', 'me', 'POST', $my_new_ds, [\302, {want => $my_new_ds}]);
-    $self->add_route_bad_method('/api/user/datasets', 'me', 'PUT+DELETE', {});
+        # User can see their datasets and create new ones.
+        my $datasets = $user->datasets_rs;
+        my @all_ds   = map {$_->TO_JSON} $datasets->all;
+        my $new_ds   = {};
+        $self->add_route_test($ds_url, $name, 'GET', {}, {want => \@all_ds});
+        fail("NOT IMPLEMENTED! $name POST $ds_url");
+        # $self->add_route_test($ds_url, 'me', 'POST', $new_ds, [\201, {want => $new_ds}]);
+        $self->add_route_bad_method($ds_url, $name, 'PUT+DELETE', {});
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
 
+        # User can see their pages and create new ones
+        my $pages     = $user->my_pages;
+        my @all_pages = map {$_->TO_JSON} $pages->all;
+        my $new_page  = {};
+        $self->add_route_test($page_url, $name, 'GET', {}, {want => \@all_pages});
+        fail("NOT IMPLEMENTED! $name POST $page_url");
+        # $self->add_route_test($page_url, $name, 'POST', $new_page, [\201, {want => $new_page}]);
+        $self->add_route_bad_method($page_url, $name, 'PUT+DELETE', {});
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
+    }
 
-    $self->reset_fixtures();
-    $self->load_fixtures('init','api');
-
-    # You can see your datasets and create new ones.
-    my $your_datasets = $you->datasets_rs;
-    my @all_your_ds   = map {$_->TO_JSON} $your_datasets->all;
-    my $your_new_ds   = {};
-    $self->add_route_test('/api/user/datasets', 'you', 'GET', {}, {want => \@all_your_ds});
-    fail("NOT IMPLEMENTED! you POST /api/user/datasets");
-    # $self->add_route_test('/api/user/datasets', 'you', 'POST', $your_new_ds, [\302, {want => $your_new_ds}]);
-    $self->add_route_bad_method('/api/user/datasets', 'you', 'PUT+DELETE', {});
-
-    $self->reset_fixtures();
-    $self->load_fixtures('init','api');
-
-    # I can see my pages and create new ones
-    my $my_pages     = $me->my_pages;
-    my @all_my_pages = map {$_->TO_JSON} $my_pages->all;
-    my $my_new_page  = {};
-    $self->add_route_test('/api/user/pages', 'me', 'GET', {}, {want => \@all_my_pages});
-    fail("NOT IMPLEMENTED! me POST /api/user/pages");
-    # $self->add_route_test('/api/user/pages', 'me', 'POST', $my_new_page, [\302, {want => $my_new_page}]);
-    $self->add_route_bad_method('/api/user/pages', 'me', 'PUT+DELETE', {});
-
-    $self->reset_fixtures();
-    $self->load_fixtures('init','api');
-
-    # you have can see your pages and create new ones
-    my $your_pages     = $you->my_pages;
-    my @all_your_pages = map {$_->TO_JSON} $your_pages->all;
-    my $your_new_page  = {};
-    $self->add_route_test('/api/user/pages', 'you', 'GET', {}, {want => \@all_your_pages});
-    fail("NOT IMPLEMENTED! you POST /api/user/pages");
-    # $self->add_route_test('/api/user/pages', 'you', 'POST', $your_new_page, [\302, {want => $your_new_page}]);
-    $self->add_route_bad_method('/api/user/pages', 'you', 'PUT+DELETE', {});
-
-    $self->reset_fixtures();
-    $self->load_fixtures('init','api');
-
-    $self->add_route_needs_auth('/api/user', 'noone', '*', {});
-    $self->add_route_needs_auth('/api/user/datasets', 'noone', '*', {});
-    $self->add_route_needs_auth('/api/user/pages', 'noone', '*', {});
-
+    $self->add_route_needs_auth($user_url, 'noone', '*', {});
+    $self->add_route_needs_auth($ds_url,   'noone', '*', {});
+    $self->add_route_needs_auth($page_url, 'noone', '*', {});
 };
 
 
