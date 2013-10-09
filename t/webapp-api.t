@@ -171,10 +171,14 @@ test '/user' => sub {
         # User can see their pages and create new ones
         my $pages     = $user->my_pages;
         my @all_pages = map {$_->TO_JSON} $pages->all;
-        my $new_page  = {};
+        my $new_page  = {
+            dataset_id => $all_ds[0]->{id},
+            title      => 'Brand New Page',
+            preamble   => 'Hello and welcome to',
+            postamble  => 'thanks and good bye',
+        };
         $self->add_route_test($page_url, $name, 'GET', {}, {want => \@all_pages});
-        fail("NOT IMPLEMENTED! $name POST $page_url");
-        # $self->add_route_test($page_url, $name, 'POST', $new_page, [\201, {want => $new_page}]);
+        $self->add_route_created($page_url, $name, 'POST', $new_page);
         $self->add_route_bad_method($page_url, $name, 'PUT+DELETE', {});
         $self->reset_fixtures();
         $self->load_fixtures('init','api');
