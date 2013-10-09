@@ -7,6 +7,13 @@ extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
+sub allowed_methods {
+    my ($self) = @_;
+     return [
+        qw(GET HEAD),
+        ( $_[0]->writable ) ? (qw(PUT)) : ()
+    ];
+}
 
 1;
 __END__

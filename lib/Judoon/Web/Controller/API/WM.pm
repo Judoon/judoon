@@ -164,7 +164,7 @@ sub authd_user : Chained('authd_user_base') PathPart('') Args(0) ActionClass('Fr
     return $self->wm(
         $c, 'Judoon::API::Resource::User', {
             item     => $c->stash->{authd_user},
-            writable => 0,
+            writable => 1,
         }
     );
 }
