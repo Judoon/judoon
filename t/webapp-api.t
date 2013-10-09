@@ -148,9 +148,20 @@ test '/user' => sub {
     my $you = $user_rs->find({username => 'you'});
 
     my $user_url = '/api/user';
-    $self->add_route_test($user_url, 'me',  'GET', {}, {want => $me->TO_JSON });
+    $self->add_route_test($user_url, 'me', 'GET', {}, {want => $me->TO_JSON });
+    $self->add_route_test($user_url, 'me', 'PUT', {name => 'Boo'}, \204);
+    $self->add_route_test($user_url, 'me', 'GET', {}, {want => {
+        %{$me->discard_changes->TO_JSON}, name => 'Boo',
+    }});
     $self->add_route_test($user_url, 'you', 'GET', {}, {want => $you->TO_JSON});
-    $self->add_route_readonly($user_url, 'me+you');
+    $self->add_route_test($user_url, 'you', 'PUT', {name => 'Moo'}, \204);
+    $self->add_route_test($user_url, 'you', 'GET', {}, {want => {
+        %{$you->discard_changes->TO_JSON}, name => 'Moo',
+    }});
+    $self->add_route_bad_method($user_url, 'me+you', 'POST+DELETE', {});
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
 
     my $ds_url   = '/api/user/datasets';
     my $page_url = '/api/user/pages';
@@ -295,7 +306,6 @@ test '/datasets/1/columns' => sub {
         $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@ds_cols});
         $self->add_route_created($cols_url, 'me', 'POST', $new_col, $compare_col);
         $self->add_route_bad_method($cols_url, 'me', 'PUT+DELETE', {});
-
         $self->reset_fixtures();
         $self->load_fixtures('init','api');
 
