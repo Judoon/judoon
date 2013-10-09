@@ -274,10 +274,26 @@ test '/datasets/1/columns' => sub {
         # POST   /datasets/$ds_id/columns == want
         # PUT    /datasets/$ds_id/columns == 405
         # DELETE /datasets/$ds_id/columns == 405
-        my @ds_cols     = map {$_->TO_JSON} $ds->ds_columns_ordered->all;
-        my $cols_url    = "/api/datasets/$ds_id/columns";
+        my @ds_cols       = map {$_->TO_JSON} $ds->ds_columns_ordered->all;
+        my $cols_url      = "/api/datasets/$ds_id/columns";
+        my $other_ds      = $my_datasets->search({id => {'!=' => $ds_id}})->first;
+        my @other_ds_cols = map {$_->TO_JSON}
+            $other_ds->ds_columns_ordered->slice(0,1)->all;
+        my $new_col       = {
+          dataset_id         => $ds_id,
+          new_col_name       => 'Derived Column',
+          this_table_id      => $ds_id,
+          that_table_id      => 'internal_' . $other_ds->id,
+          this_joincol_id    => $ds_cols[0]->{shortname},
+          that_joincol_id    => $other_ds_cols[0]->{shortname},
+          that_selectcol_id  => $other_ds_cols[1]->{shortname},
+        };
+        my $compare_col = {
+            dataset_id => $ds_id,
+            name       => $new_col->{new_col_name},
+        };
         $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@ds_cols});
-        fail("POST $cols_url Not Implemented!");
+        $self->add_route_created($cols_url, 'me', 'POST', $new_col, $compare_col);
         $self->add_route_bad_method($cols_url, 'me', 'PUT+DELETE', {});
 
         $self->reset_fixtures();
@@ -645,7 +661,8 @@ sub add_route_bad_method { shift->add_route_test(@_, \405); }
 sub add_route_readonly   { shift->add_route_test(@_, 'POST+PUT+DELETE', {}, \405); }
 
 sub add_route_created {
-    my ($self, $url, $user, $method, $object) = @_;
+    my ($self, $url, $user, $method, $object, $compare_obj) = @_;
+    my $expect = $compare_obj || $object;
     $self->add_route_test($url, $user, $method, $object, [
         \201,
         sub {
@@ -653,8 +670,8 @@ sub add_route_created {
             my $loc = $self->mech->res->header('Location');
             $self->_GET_json($loc);
             my $new_obj = $self->decode_json($self->mech->content);
-            is_deeply {map {$_ => $new_obj->{$_}} keys %$object},
-                $object, '  ...new object was created!';
+            is_deeply {map {$_ => $new_obj->{$_}} keys %$expect},
+                $expect, '  ...new object was created!';
         },
     ]);
 }
