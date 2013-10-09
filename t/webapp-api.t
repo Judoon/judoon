@@ -458,7 +458,7 @@ test '/pages/1/columns' => sub {
     my $user_rs        = $self->schema->resultset('User');
     my $me             = $user_rs->find({username => 'me'});
     my $my_pages       = $me->my_pages;
-    my @pagecol_fields = qw(title);
+    my @pagecol_fields = qw(title template);
     my %urls;
     my @pages = (
         # type       dataset
@@ -470,7 +470,6 @@ test '/pages/1/columns' => sub {
     for my $page_test (@pages) {
         my ($type, $page) = @$page_test;
         my $page_id       = $page->id;
-
 
         # GET    /pages/$page_id/columns  == want
         # POST   /pages/$page_id/columns  == want
@@ -498,9 +497,17 @@ test '/pages/1/columns' => sub {
         my $page_col    = $page->page_columns_ordered->first->TO_JSON;
         my $page_col_id = $page_col->{id};
         my $col_url     = "/api/pages/$page_id/columns/$page_col_id";
+        my $update      = {
+            (map {$_ => $page_col->{$_}} @pagecol_fields),
+            title => 'HaberDasher',
+        };
         $self->add_route_test($col_url, 'me', 'GET', {}, {want => $page_col});
         $self->add_route_bad_method($col_url, 'me', 'POST', {});
-        fail("PUT $col_url Not Implemented!");
+        $self->add_route_test($col_url, 'me', 'PUT', $update, \204);
+        $page_col = $page->page_columns->find({id => $page_col_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($col_url, 'me', 'GET', {}, {want => {
+            %$page_col, title => $update->{title}
+        }});
         $self->add_route_test(
             $col_url, 'me', 'DELETE', {}, sub {
                 my ($self, $msg) = @_;
