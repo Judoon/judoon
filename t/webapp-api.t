@@ -170,8 +170,10 @@ test '/user' => sub {
         my @all_ds   = map {$_->TO_JSON} $datasets->all;
         my $new_ds   = {};
         $self->add_route_test($ds_url, $name, 'GET', {}, {want => \@all_ds});
-        fail("NOT IMPLEMENTED! $name POST $ds_url");
-        # $self->add_route_test($ds_url, 'me', 'POST', $new_ds, [\201, {want => $new_ds}]);
+      TODO: {
+            local $TODO = 'Not implemented';
+            $self->add_route_test($ds_url, $name, 'POST', $new_ds, \201);
+        }
         $self->add_route_bad_method($ds_url, $name, 'PUT+DELETE', {});
         $self->reset_fixtures();
         $self->load_fixtures('init','api');
@@ -613,10 +615,10 @@ test '/pages/1/columns' => sub {
 
 
 # services
-test '/templates'  => sub { fail('not done'); };
-test '/types'      => sub { fail('not done'); };
-test '/sitelinker' => sub { fail('not done'); };
-test '/lookup'     => sub { fail('not done'); };
+test '/templates'  => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+test '/types'      => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+test '/sitelinker' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+test '/lookup'     => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
 
 
 
