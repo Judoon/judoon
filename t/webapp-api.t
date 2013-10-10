@@ -12,6 +12,7 @@ with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp',
 
 use Clone qw(clone);
 use HTTP::Request::Common qw(GET POST PUT DELETE);
+use Judoon::TypeRegistry;
 use List::MoreUtils ();
 use Test::JSON;
 use Text::Table;
@@ -615,10 +616,42 @@ test '/pages/1/columns' => sub {
 
 
 # services
-test '/templates'  => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
-test '/types'      => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+# POST /template
+# else 405
+test '/template' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+
+# GET /datatype
+# GET /datatype/$id
+test '/types' => sub {
+    my ($self) = @_;
+    $self->add_route_readonly('/api/datatype', '*');
+    $self->add_route_readonly('/api/datatype/CoreType_Text', '*');
+
+    my $typereg = Judoon::TypeRegistry->new;
+    my @types = map {$_->TO_JSON} $typereg->all_types;
+    $self->add_route_test('/api/datatype', '*', 'GET', {}, {want => \@types});
+
+    my $text_type = $typereg->simple_lookup('CoreType_Text')->TO_JSON;
+    $self->add_route_test(
+        '/api/datatype/CoreType_Text', '*', 'GET', {}, {want => $text_type}
+    );
+};
+
+# GET /sitelinker => 204
+# GET /sitelinker/accession
+# GET /sitelinker/accession/$acc_id
+# GET /sitelinker/site
 test '/sitelinker' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
-test '/lookup'     => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+
+# readonly
+# /lookup
+# /lookup/$type
+# /lookup/$type/$id
+# /lookup/$type/$id/input
+# /lookup/$type/$id/input/$input_id
+# /lookup/$type/$id/input/$input_id/output
+# $type = internal || external
+test '/lookup' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
 
 
 
