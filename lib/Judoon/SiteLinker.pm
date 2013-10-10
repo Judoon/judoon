@@ -178,7 +178,7 @@ sub _build_mapping {
         $mappings{site}{$site}{$acc}      = $link_map;
     }
 
-    $mappings{accessions} = [sort {$a->{name} cmp $b->{name}} values %$accession_map];
+    $mappings{accession} = [sort {$a->{name} cmp $b->{name}} values %$accession_map];
 
     return \%mappings;
 }
