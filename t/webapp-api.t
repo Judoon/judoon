@@ -11,9 +11,11 @@ with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp',
     'Judoon::Role::JsonEncoder';
 
 use Clone qw(clone);
+use Data::Section::Simple qw(get_data_section);
 use HTTP::Request::Common qw(GET POST PUT DELETE);
+use Judoon::SiteLinker;
 use Judoon::TypeRegistry;
-use List::MoreUtils ();
+use List::AllUtils ();
 use Test::JSON;
 use Text::Table;
 
@@ -379,7 +381,7 @@ test '/datasets/1/data' => sub {
 
         my $data_table = $ds->data_table({shortname => 1});
         my $headers    = shift @$data_table;
-        my @data       = map {{List::MoreUtils::zip @$headers, @$_}}
+        my @data       = map {{List::AllUtils::zip @$headers, @$_}}
             @$data_table;
         my $data_url   = "/api/datasets/$ds_id/data";
         $self->add_route_test($data_url, 'me', 'GET', {},
@@ -400,7 +402,7 @@ test '/datasets/1/data' => sub {
     # for private datasets
     my $pub_data_table = $tests[0][1]->data_table({shortname => 1});
     my $pub_headers    = shift @$pub_data_table;
-    my @pub_data       = map {{List::MoreUtils::zip @$pub_headers, @$_}}
+    my @pub_data       = map {{List::AllUtils::zip @$pub_headers, @$_}}
         @$pub_data_table;
     $self->add_route_test(
         $urls{public}, 'you+noone', 'GET', {},
@@ -612,13 +614,27 @@ test '/pages/1/columns' => sub {
 };
 
 
-
-
-
-# services
 # POST /template
 # else 405
-test '/template' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+test '/template' => sub {
+    my ($self) = @_;
+
+    $self->add_route_bad_method('/api/template', '*', 'GET+PUT+DELETE', {});
+
+    my $template = get_data_section('js_template');
+    chomp $template;
+    my $widgets  = $self->decode_json( get_data_section('serialized') );
+    $self->add_route_test(
+        '/api/template', '*', 'POST', {template => $template},
+        {want => {template => $widgets}}
+    );
+    $self->add_route_test(
+        '/api/template', '*', 'POST', {widgets => $widgets},
+        {want => {template => $template}}
+    );
+    $self->add_route_test('/api/template', '*', 'POST', {}, \204);
+ };
+
 
 # GET /datatype
 # GET /datatype/$id
@@ -641,7 +657,33 @@ test '/types' => sub {
 # GET /sitelinker/accession
 # GET /sitelinker/accession/$acc_id
 # GET /sitelinker/site
-test '/sitelinker' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+test '/sitelinker' => sub {
+    my ($self) = @_;
+
+    my $acc_id = 'Biology_Accession_Entrez_GeneId';
+    $self->add_route_readonly("/api/sitelinker", '*');
+    $self->add_route_readonly("/api/sitelinker/accession", '*');
+    $self->add_route_readonly("/api/sitelinker/accession/$acc_id", '*');
+    $self->add_route_readonly("/api/sitelinker/site", '*');
+
+    my $sl            = Judoon::SiteLinker->new;
+    my $sites         = $sl->mapping->{site};
+    my $accs          = $sl->mapping->{accession};
+    my ($acc_gene_id) = List::AllUtils::first {$_->{name} eq $acc_id} @$accs;
+
+    $self->add_route_test("/api/sitelinker", '*', 'GET', {}, \204);
+    $self->add_route_test(
+        "/api/sitelinker/accession", '*', 'GET', {}, {want => $accs}
+    );
+    $self->add_route_test(
+        "/api/sitelinker/accession/$acc_id", '*', 'GET', {},
+        {want => {accession => $acc_gene_id}}
+    );
+    $self->add_route_test(
+        "/api/sitelinker/site", '*', 'GET', {}, {want => {sites => $sites}}
+    );
+
+};
 
 # readonly
 # /lookup
@@ -687,7 +729,7 @@ sub _build_routes { return []; }
 sub add_route {
     my ($self, $route) = @_;
     my @routes = @{ $self->routes };
-    if (List::MoreUtils::all {$route ne $_} @routes) {
+    if (List::AllUtils::all {$route ne $_} @routes) {
         push @{ $self->routes }, $route;
     }
 }
@@ -697,7 +739,7 @@ sub _build_my_users { return [qw(me you noone)]; }
 sub add_my_user {
     my ($self, $user) = @_;
     my @my_users = @{ $self->my_users };
-    if  (! List::MoreUtils::any {$_ eq $user} @my_users) {
+    if  (! List::AllUtils::any {$_ eq $user} @my_users) {
         push @{ $self->my_users }, $user;
     }
 }
@@ -713,7 +755,7 @@ sub _build_methods { return [qw(GET POST PUT DELETE)]; }
 sub add_method {
     my ($self, $method) = @_;
     my @methods = @{ $self->methods };
-    if  (! List::MoreUtils::any {$_ eq $method} @methods) {
+    if  (! List::AllUtils::any {$_ eq $method} @methods) {
         push @{ $self->methods }, $method;
     }
 }
@@ -857,4 +899,32 @@ sub _DELETE_json {
 }
 
 
-__END__
+__DATA__
+@@ js_template
+<strong><em>foo</em></strong><strong>{{bar}}</strong><br><em><a href="pre{{baz}}post">quux</a></em>
+@@ serialized
+[
+ {"type" : "text", "value" : "foo", "formatting" : ["italic", "bold"]},
+ {"type" : "variable", "name" : "bar", "formatting" : ["bold"]},
+ {"type" : "newline", "formatting" : []},
+ {
+   "type" : "link",
+   "url"  : {
+     "varstring_type"    : "variable",
+     "type"              : "varstring",
+     "accession"         : "",
+     "text_segments"     : ["pre","post"],
+     "variable_segments" : ["baz",""],
+     "formatting"        : []
+   },
+   "label" : {
+     "varstring_type"    : "static",
+     "type"              : "varstring",
+     "accession"         : "",
+     "text_segments"     : ["quux"],
+     "variable_segments" : [""],
+     "formatting"        : []
+   },
+  "formatting" : ["italic"]
+ }
+]
