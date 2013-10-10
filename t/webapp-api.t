@@ -85,9 +85,6 @@ test 'Basic Tests' => sub {
         $self->mech->get_ok($uri, "get $uri");
         is $self->mech->uri, 'http://localhost/', '  ...redirects to root';
     }
-
-    # this should eventually go away, be replaced by /datasets/1/data
-    $self->mech->get_ok('/api/datasetdata', 'get /api/datasetdata');
 };
 
 
@@ -362,6 +359,60 @@ test '/datasets/1/columns' => sub {
 };
 
 
+test '/datasets/1/data' => sub {
+    my ($self) = @_;
+
+    my $my_datasets = $self->schema->resultset('User')
+        ->find({username => 'me'})->datasets_rs;
+    my @tests = (
+        ['public',  $my_datasets->public->first,  ],
+        ['private', $my_datasets->private->first, ],
+    );
+    my %urls;
+    # I can see all my data for my datasets
+    for my $test (@tests) {
+        my ($type, $ds) = @$test;
+        my $ds_id       = $ds->id;
+
+        my $data_table = $ds->data_table({shortname => 1});
+        my $headers    = shift @$data_table;
+        my @data       = map {{List::MoreUtils::zip @$headers, @$_}}
+            @$data_table;
+        my $data_url   = "/api/datasets/$ds_id/data";
+        $self->add_route_test($data_url, 'me', 'GET', {},
+            sub {
+                my ($self, $msg) = @_;
+                is_deeply
+                    $self->decode_json($self->mech->content)->{tmplData},
+                    \@data, "$msg: got correct dataset data";
+            }
+        );
+
+        $self->add_route_readonly($data_url, 'me');
+        $urls{$type} = $data_url;
+    }
+
+
+    # other users can see public pages of public datasets, but nothing
+    # for private datasets
+    my $pub_data_table = $tests[0][1]->data_table({shortname => 1});
+    my $pub_headers    = shift @$pub_data_table;
+    my @pub_data       = map {{List::MoreUtils::zip @$pub_headers, @$_}}
+        @$pub_data_table;
+    $self->add_route_test(
+        $urls{public}, 'you+noone', 'GET', {},
+        sub {
+            my ($self, $msg) = @_;
+            is_deeply
+                $self->decode_json($self->mech->content)->{tmplData},
+                \@pub_data, "$msg: got correct dataset data";
+        }
+    );
+    $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+};
+
+
 test '/datasets/1/pages' => sub {
     my ($self) = @_;
 
@@ -559,7 +610,6 @@ test '/pages/1/columns' => sub {
 
 
 
-test '/datasets/1/data'    => sub { fail('not done'); };
 
 
 # services

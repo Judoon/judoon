@@ -339,12 +339,13 @@ Get the data for the given dataset.
 
 =cut
 
-sub ds_data : Chained('dataset_id') PathPart('data') Args(0) ActionClass('FromPSGI') {
+sub ds_data : Chained('dataset_id') PathPart('data') CaptureArgs(0) {
     my ($self, $c) = @_;
-    #http_throw(NotImplemented => {message => 'Fitz is still working on this'});
-    $c->res->status(501);
-    $c->res->body('Fitz is still working on this');
-    $c->detach;
+    if ($c->req->method ne 'GET') {
+        $c->res->status(405);
+        $c->res->body('');
+        $c->detach;
+    }
 }
 
 

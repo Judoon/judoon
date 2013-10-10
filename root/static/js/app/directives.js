@@ -67,7 +67,8 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
 
                 // this won't change over life of the directive
-                defaultOptions.sAjaxSource = "/api/datasetdata/" + scope.datasetId;
+                defaultOptions.sAjaxSource = "/api/datasets/" + scope.datasetId +
+                    '/data';
 
                 // just in case this fired after the columns watch
                 if (scope.columns && scope.columns.length) {
