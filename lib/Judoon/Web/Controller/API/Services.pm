@@ -275,6 +275,57 @@ sub look_input_to_output_final : Chained('look_input_to_output') PathPart('') Ar
 }
 
 
+=head1 DATATYPE ACTIONS
+
+=head2 type_base
+
+Base action for common actions. Currently does nothing.
+
+=head2 type_index / type_index_GET
+
+Return a serialized list of types.
+
+=head2 type_id
+
+Lookup the given type, returning 404 if not found.
+
+=head2 type / type_GET
+
+Return the serialized type.
+
+=cut
+
+sub type_base : Chained('base') PathPart('datatype') CaptureArgs(0) {}
+sub type_index : Chained('type_base') PathPart('') Args(0) ActionClass('REST') {}
+sub type_index_GET {
+    my ($self, $c) = @_;
+    my $typereg = $c->model('TypeRegistry');
+    $self->status_ok($c, entity => [map {$_->TO_JSON} $typereg->all_types]);
+}
+
+
+sub type_id : Chained('type_base') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $type_id) = @_;
+
+    $type_id //= '';
+    $c->stash->{type_id} = $type_id;
+    my $type = $c->model('TypeRegistry')->simple_lookup($type_id);
+
+    if (not $type) {
+        $self->status_not_found(
+            $c, message => qq{No such type "$type_id"},
+        );
+        $c->detach();
+    }
+    $c->stash->{type} = $type->TO_JSON;
+}
+sub type : Chained('type_id') PathPart('') Args(0)  ActionClass('REST') {}
+sub type_GET {
+    my ($self, $c) = @_;
+    $self->status_ok( $c, entity => $c->stash->{type}, );
+}
+
+
 __PACKAGE__->meta->make_immutable;
 1;
 __END__
