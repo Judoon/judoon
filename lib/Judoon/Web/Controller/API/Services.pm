@@ -103,19 +103,19 @@ sub sl_accession_base : Chained('sitelinker') PathPart('accession') CaptureArgs(
 sub sl_accession_list : Chained('sl_accession_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->status_ok(
-        $c, entity => $c->model('SiteLinker')->mapping->{accessions}
+        $c, entity => $c->model('SiteLinker')->mapping->{accession}
     );
 }
 sub sl_accession_id :Chained('sl_accession_base') PathPart('') Args(1) {
     my ($self, $c, $acc_id) = @_;
 
     $acc_id //= '';
-    if (not exists $c->model('SiteLinker')->mapping->{accession}{$acc_id}) {
+    my $accession = List::Util::first {$_->{name} eq $acc_id}
+        @{$c->model('SiteLinker')->mapping->{accession}};
+    if (not $accession) {
         $self->status_not_found($c, message => "No such accession: '$acc_id'");
         $c->detach();
     }
-
-    my $accession = $c->model('SiteLinker')->mapping->{accession}{$acc_id};
     $self->status_ok($c, entity => { accession => $accession });
 }
 
