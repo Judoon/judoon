@@ -84,7 +84,14 @@ Base action. Returns 204 (No Content).
 
 =cut
 
-sub sitelinker : Chained('base') PathPart('sitelinker') CaptureArgs(0) {}
+sub sitelinker : Chained('base') PathPart('sitelinker') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->req->method ne 'GET') {
+        $c->res->status('405');
+        $c->res->body('');
+        $c->detach();
+    }
+}
 sub sl_index : Chained('sitelinker') PathPart('') Args(0) {
     my ($self, $c) = @_;
     # should probably be 204 with link="rel" to sites/accessions
@@ -144,7 +151,14 @@ lookups for the logged-in user.
 
 =cut
 
-sub lookup : Chained('base') PathPart('lookup') CaptureArgs(0) {}
+sub lookup : Chained('base') PathPart('lookup') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->req->method ne 'GET') {
+        $c->res->status('405');
+        $c->res->body('');
+        $c->detach();
+    }
+}
 sub lookup_index : Chained('lookup') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->status_ok(
