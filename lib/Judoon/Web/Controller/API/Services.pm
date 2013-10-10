@@ -281,7 +281,7 @@ sub look_input_to_output_final : Chained('look_input_to_output') PathPart('') Ar
 
 Base action for common actions. Currently does nothing.
 
-=head2 type_index / type_index_GET
+=head2 type_index
 
 Return a serialized list of types.
 
@@ -289,21 +289,25 @@ Return a serialized list of types.
 
 Lookup the given type, returning 404 if not found.
 
-=head2 type / type_GET
+=head2 type
 
 Return the serialized type.
 
 =cut
 
-sub type_base : Chained('base') PathPart('datatype') CaptureArgs(0) {}
-sub type_index : Chained('type_base') PathPart('') Args(0) ActionClass('REST') {}
-sub type_index_GET {
+sub type_base : Chained('base') PathPart('datatype') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->req->method ne 'GET') {
+        $c->res->status('405');
+        $c->res->body('');
+        $c->detach();
+    }
+}
+sub type_index : Chained('type_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
     my $typereg = $c->model('TypeRegistry');
     $self->status_ok($c, entity => [map {$_->TO_JSON} $typereg->all_types]);
 }
-
-
 sub type_id : Chained('type_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $type_id) = @_;
 
@@ -319,8 +323,7 @@ sub type_id : Chained('type_base') PathPart('') CaptureArgs(1) {
     }
     $c->stash->{type} = $type->TO_JSON;
 }
-sub type : Chained('type_id') PathPart('') Args(0)  ActionClass('REST') {}
-sub type_GET {
+sub type : Chained('type_id') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->status_ok( $c, entity => $c->stash->{type}, );
 }
