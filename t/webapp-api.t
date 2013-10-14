@@ -1,18 +1,15 @@
 #!/usr/bin/env perl
 
-use Test::Roo;
-use v5.16;
-
-use lib 't/lib';
-
-with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
-    'Judoon::Role::JsonEncoder';
-
 use Clone qw(clone);
 use Data::Section::Simple qw(get_data_section);
 use Judoon::SiteLinker;
 use Judoon::TypeRegistry;
 use List::AllUtils ();
+
+use Test::Roo;
+use lib 't/lib';
+with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
+    'Judoon::Role::JsonEncoder';
 
 
 my %users = (
