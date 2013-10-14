@@ -158,6 +158,12 @@ sub lookup : Chained('base') PathPart('lookup') CaptureArgs(0) {
         $c->res->body('');
         $c->detach();
     }
+
+    if (not $c->user) {
+        $c->res->status('401');
+        $c->res->body('');
+        $c->detach();
+    }
 }
 sub lookup_index : Chained('lookup') PathPart('') Args(0) {
     my ($self, $c) = @_;
