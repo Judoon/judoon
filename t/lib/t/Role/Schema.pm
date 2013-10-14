@@ -1,5 +1,21 @@
 package t::Role::Schema;
 
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+t::Role::Schema - a role for setting up a test database
+
+=head1 DESCRIPTION
+
+Test files using L</Test::Roo> can consume this role to get a
+temporary instance of L<Judoon::Schema> to test against.
+
+=cut
+
+
 use Judoon::Tmpl;
 use MooX::Types::MooseLike::Base qw(InstanceOf HashRef);
 require Test::DBIx::Class;
@@ -7,6 +23,13 @@ use Try::Tiny;
 
 use Test::Roo::Role;
 
+=head1 ATTRIBUTES / METHODS
+
+=head2 schema_config / _build_schema_config
+
+Default configuration for our test database.
+
+=cut
 
 has schema_config => (
     is  => 'lazy',
@@ -27,6 +50,13 @@ sub _build_schema_config {
 }
 
 
+=head2 schema / _build_schema
+
+Build a connection to a test schema using L</Test::DBIx::Class> and
+the configuration defined in C<< $self->schema_config >>.
+
+=cut
+
 has schema => (
     is      => 'lazy',
     isa     => InstanceOf['Judoon::Schema'],
@@ -40,43 +70,12 @@ sub _build_schema {
 
 
 
-sub init_fixtures {
-    my ($self) = @_;
+=head2 users / _build_users
 
-    try {
-        $self->load_fixtures('basic');
-    }
-    catch {
-        my $exception = $_;
-        BAIL_OUT( 'Fixture creation failed: ' . $exception );
-    };
-}
+A C<HashRef> of well-known users. Suitable for passing to
+C<< Judoon::Schema::ResultSet::User->create_user() >>.
 
-sub load_fixtures {
-    my ($self, @fixtures) = @_;
-
-    for my $fixture (@fixtures) {
-        my $fixture_sub = $self->fixtures->{$fixture}
-            or die "No such fixture set: $fixture";
-        $fixture_sub->($self);
-    }
-
-    return;
-}
-
-sub reset_fixtures {
-    my ($self) = @_;
-
-    for my $user ($self->schema->resultset('User')->all) {
-        $self->schema->storage->dbh->do(
-            'DROP SCHEMA ' . $user->schema_name . ' CASCADE'
-        );
-    }
-    reset_schema();
-    return;
-}
-
-
+=cut
 
 has users => (
     is  => 'lazy',
@@ -101,9 +100,15 @@ sub _build_users {
 }
 
 
+=head2 fixtures / _build_fixtures
+
+A C<HashRef> of fixture definitions.  A fixture value is a code ref
+that populates data into C<< $self->schema >>.
+
+=cut
 
 has fixtures => (
-    is => 'lazy',
+    is  => 'lazy',
     isa => HashRef,
 );
 sub _build_fixtures {
@@ -207,9 +212,50 @@ sub _build_fixtures {
     };
 }
 
+
+=head3 add_fixture( $fixture_name, $code )
+
+Add a new fixture definition to the internal fixtures
+dictionary. C<$code> will receive C<$self> as its only argument.
+
+=head3 load_fixtures( @fixture_names )
+
+Run the fixture code found in C<< $self->fixtures >> for each name in
+C<@fixture_names>.  Fixtures are run in passed order.
+
+=head3 reset_fixtures()
+
+Wipe the Judoon schema and delete all user schemas.
+
+=cut
+
 sub add_fixture {
     my ($self, $key, $code) = @_;
     $self->fixtures->{$key} = $code;
+}
+
+sub load_fixtures {
+    my ($self, @fixtures) = @_;
+
+    for my $fixture (@fixtures) {
+        my $fixture_sub = $self->fixtures->{$fixture}
+            or die "No such fixture set: $fixture";
+        $fixture_sub->($self);
+    }
+
+    return;
+}
+
+sub reset_fixtures {
+    my ($self) = @_;
+
+    for my $user ($self->schema->resultset('User')->all) {
+        $self->schema->storage->dbh->do(
+            'DROP SCHEMA ' . $user->schema_name . ' CASCADE'
+        );
+    }
+    reset_schema();
+    return;
 }
 
 
