@@ -693,7 +693,65 @@ test '/sitelinker' => sub {
 # /lookup/$type/$id/input/$input_id
 # /lookup/$type/$id/input/$input_id/output
 # $type = internal || external
-test '/lookup' => sub { TODO: { local $TODO = 'not done'; fail('not done'); } };
+test '/lookup' => sub {
+    my ($self) = @_;
+
+    my @routes = qw(
+        /api/lookup
+        /api/lookup/external
+        /api/lookup/external/uniprot
+        /api/lookup/external/uniprot/input
+        /api/lookup/external/uniprot/input/FLYBASE_ID
+        /api/lookup/external/uniprot/input/FLYBASE_ID/output
+    );
+
+    for my $route (@routes) {
+        $self->add_route_needs_auth($route, 'noone', 'GET', {});
+        $self->add_route_readonly($route, '*');
+    }
+
+    my $user_rs = $self->schema->resultset('User');
+    my $me      = $user_rs->find({username => 'me'});
+    my $you     = $user_rs->find({username => 'you'});
+
+    for my $user ($me, $you) {
+        my $name = $user->username;
+
+        my $lookup_reg = Judoon::LookupRegistry->new({user => $user});
+        my @all        = map {$_->TO_JSON} $lookup_reg->all_lookups();
+        my @ext        = grep {$_->{group_id} eq 'external'} @all;
+        my @int        = grep {$_->{group_id} eq 'internal'} @all;
+        my ($uniprot)  = grep {$_->{id} eq 'uniprot'} @ext;
+
+        my $up_obj     = $lookup_reg->find_by_type_and_id('external','uniprot');
+        my $up_cols    = $up_obj->input_columns;
+        my ($flybase)  = grep {$_->{id} eq 'FLYBASE_ID'} @$up_cols;
+        my $outputs    = $up_obj->output_columns_for($flybase);
+
+        $self->add_route_test(
+            "/api/lookup", $name, 'GET', {}, {want => \@all}
+        );
+        $self->add_route_test(
+            "/api/lookup/external", $name, 'GET', {}, {want => \@ext}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot", $name, 'GET', {},
+            {want => $uniprot}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot/input", $name, 'GET', {},
+            {want => $up_cols}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot/input/FLYBASE_ID", $name, 'GET', {},
+            {want => $flybase}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot/input/FLYBASE_ID/output", $name,
+             'GET', {}, {want => $outputs}
+        );
+    }
+};
 
 
 
