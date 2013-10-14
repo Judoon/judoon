@@ -1,12 +1,11 @@
 package t::Role::Schema;
 
-use Test::Roo::Role;
-
-require Test::DBIx::Class;
-
 use Judoon::Tmpl;
 use MooX::Types::MooseLike::Base qw(InstanceOf HashRef);
+require Test::DBIx::Class;
 use Try::Tiny;
+
+use Test::Roo::Role;
 
 
 has schema_config => (
@@ -79,24 +78,26 @@ sub reset_fixtures {
 
 
 
-has testuser => (
-    is  => 'lazy',
-    isa => HashRef,
-);
-sub _build_testuser {
-    return {
-        username => 'testuser', password => 'testpass',
-        name => 'Test User', email_address => 'testuser@example.com',
-    };
-}
-
 has users => (
     is  => 'lazy',
     isa => HashRef,
 );
 sub _build_users {
     my ($self) = @_;
-    return { testuser => $self->testuser };
+    return {
+        testuser => {
+            username => 'testuser', password => 'testpass',
+            name => 'Test User', email_address => 'testuser@example.com',
+        },
+        me  => {
+            username => 'me', password => 'mypassword',
+            name => 'Me Who I Am', email_address => 'me@example.com',
+        },
+        you => {
+            username => 'you', password => 'yourpassword',
+            name => 'You Who You Are', email_address => 'you@example.com',
+        },
+    };
 }
 
 
@@ -131,29 +132,10 @@ sub _build_fixtures {
         },
         basic => sub {
             my ($self) = @_;
-            $self->schema()->resultset('TtDscolumnDatatype')->populate([
-                ['data_type',                           ],
-                ['CoreType_Text',                       ],
-                ['CoreType_Numeric',                    ],
-                ['CoreType_Datetime',                   ],
-                ['Biology_Accession_Entrez_GeneId',     ],
-                ['Biology_Accession_Entrez_GeneSymbol', ],
-                ['Biology_Accession_Entrez_RefseqId',   ],
-                ['Biology_Accession_Entrez_ProteinId',  ],
-                ['Biology_Accession_Entrez_UnigeneId',  ],
-                ['Biology_Accession_Pubmed_Pmid',       ],
-                ['Biology_Accession_Uniprot_Acc',       ],
-                ['Biology_Accession_Uniprot_Id',        ],
-                ['Biology_Accession_Flybase_Id',        ],
-                ['Biology_Accession_Wormbase_Id',       ],
-                ['Biology_Accession_Cmkb_ComplexAcc',   ],
-                ['Biology_Accession_Cmkb_FamilyAcc',    ],
-                ['Biology_Accession_Cmkb_OrthologAcc',  ],
-            ]);
 
             my $user_rs = $self->schema()->resultset('User');
-            my $user = $user_rs->find({username => $self->testuser()->{username}})
-                // $user_rs->create_user($self->testuser());
+            my $user = $user_rs->find({username => $self->users->{testuser}->{username}})
+                // $user_rs->create_user($self->users->{testuser});
 
             my $dataset = $user->import_data_by_filename('t/etc/data/basic.xls');
             $dataset->create_basic_page();
@@ -162,8 +144,8 @@ sub _build_fixtures {
             my ($self) = @_;
 
             my $user_rs = $self->schema()->resultset('User');
-            my $user = $user_rs->find({username => $self->testuser()->{username}})
-                // $user_rs->create_user($self->testuser());
+            my $user = $user_rs->find({username => $self->users->{testuser}->{username}})
+                // $user_rs->create_user($self->users->{testuser});
 
             my $clone1_ds = $user->import_data_by_filename('t/etc/data/clone1.xls');
             $clone1_ds->create_basic_page();
@@ -190,6 +172,38 @@ sub _build_fixtures {
             my $clone2_ds = $user->import_data_by_filename('t/etc/data/clone2.xls');
             $clone2_ds->create_basic_page();
         },
+        api => sub {
+            my ($self) = @_;
+            my $user_rs = $self->schema()->resultset('User');
+
+            # build fixtures for me user
+            my %me = (object => $user_rs->create_user( $self->users->{'me'} ));
+            my $my_pub_ds
+                = $me{object}->import_data_by_filename('t/etc/data/api/me-public.xls')
+                    ->update({permission => 'public'});
+            my $my_priv_ds
+                = $me{object}->import_data_by_filename('t/etc/data/api/me-private.xls');
+            $me{public_ds} = {
+                object       => $my_pub_ds,
+                public_page  => $my_pub_ds->create_basic_page->update({permission => 'public'}),
+                private_page => $my_pub_ds->create_basic_page,
+            };
+            $me{private_ds} = {
+                object       => $my_priv_ds,
+                public_page  => $my_priv_ds->create_basic_page->update({permission => 'public'}),
+                private_page => $my_priv_ds->create_basic_page,
+            };
+
+            # build fixtures for you user
+            my %you = (object => $user_rs->create_user( $self->users->{'you'} ));
+            my $you_pub_ds
+                = $you{object}->import_data_by_filename('t/etc/data/api/you-public.xls')
+                    ->update({permission => 'public'});
+            $you{public_ds} = {
+                object      => $you_pub_ds,
+                public_page => $you_pub_ds->create_basic_page->update({permission => 'public'}),
+            };
+        }
     };
 }
 

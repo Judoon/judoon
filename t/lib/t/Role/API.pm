@@ -15,17 +15,6 @@ has methods  => (is => 'lazy', isa => ArrayRef,);
 has _tests   => (is => 'lazy', isa => HashRef,);
 has debug    => (is => 'rw', default => 0,);
 
-my %users = (
-    me  => {
-        username => 'me', password => 'mypassword',
-        name => 'Me Who I Am', email_address => 'me@example.com',
-    },
-    you => {
-        username => 'you', password => 'yourpassword',
-        name => 'You Who You Are', email_address => 'you@example.com',
-    },
-);
-
 
 # HELPER METHODS
 
@@ -83,7 +72,7 @@ sub add_route_test {
     my $test_sub = $self->_expand_test($test);
     for my $user (@users) {
 
-        $self->login( @{$users{$user}}{qw(username password)} )
+        $self->login( @{$self->users->{$user}}{qw(username password)} )
             unless ($user eq 'noone');
         for my $method (@methods) {
             my $test_method = "_${method}_json";

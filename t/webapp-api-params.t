@@ -7,64 +7,15 @@ use v5.16;
 
 use lib 't/lib';
 
-with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp',
+with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
     'Judoon::Role::JsonEncoder';
 
-my %users = (
-    me  => {
-        username => 'me', password => 'mypassword',
-        name => 'Me Who I Am', email_address => 'me@example.com',
-    },
-    you => {
-        username => 'you', password => 'yourpassword',
-        name => 'You Who You Are', email_address => 'you@example.com',
-    },
-);
+use Clone qw(clone);
 
 after setup => sub {
     my ($self) = @_;
-    $self->load_fixtures('init');
-
-    $self->add_fixture(
-        'api' => sub {
-            my ($self) = @_;
-            my $user_rs = $self->schema()->resultset('User');
-
-            # build fixtures for me user
-            my %me = (object => $user_rs->create_user($users{me}));
-            my $my_pub_ds
-                = $me{object}->import_data_by_filename('t/etc/data/api/me-public.xls')
-                    ->update({permission => 'public'});
-            my $my_priv_ds
-                = $me{object}->import_data_by_filename('t/etc/data/api/me-private.xls');
-            $me{public_ds} = {
-                object       => $my_pub_ds,
-                public_page  => $my_pub_ds->create_basic_page->update({permission => 'public'}),
-                private_page => $my_pub_ds->create_basic_page,
-            };
-            $me{private_ds} = {
-                object       => $my_priv_ds,
-                public_page  => $my_priv_ds->create_basic_page->update({permission => 'public'}),
-                private_page => $my_priv_ds->create_basic_page,
-            };
-
-            # build fixtures for you user
-            my %you = (object => $user_rs->create_user($users{you}));
-            my $you_pub_ds
-                = $you{object}->import_data_by_filename('t/etc/data/api/you-public.xls')
-                    ->update({permission => 'public'});
-            $you{public_ds} = {
-                object      => $you_pub_ds,
-                public_page => $you_pub_ds->create_basic_page->update({permission => 'public'}),
-            };
-
-        }
-    );
-
-    $self->load_fixtures('api');
+    $self->load_fixtures(qw(init api));
 };
-
-
 
 
 # PUT  /user
