@@ -140,6 +140,7 @@ test_requires 'Test::postgresql';
 test_requires 'Test::Roo';
 test_requires 'Test::Spelling';
 test_requires 'Test::WWW::Mechanize::Catalyst';
+test_requires 'Text::Table';
 
 
 
