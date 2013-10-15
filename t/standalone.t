@@ -1,14 +1,5 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-
-use lib q{t/lib};
-
-use Test::More;
-use Test::Fatal;
-use t::DB;
-
 use Archive::Extract;
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -18,28 +9,47 @@ use Plack::App::CGIBin;
 use Plack::App::File;
 use Plack::App::URLMap;
 use Plack::Test;
+use Test::Fatal;
 
-my $schema = t::DB::get_schema();
-my $page = $schema->resultset('Page')->first();
-ok my $standalone = Judoon::Standalone->new({page => $page}),
-    'can create standalone object';
+use Test::Roo;
+use lib 't/lib';
+with 't::Role::Schema';
 
-subtest 'save to zip' => sub {
-    my $archive_path = $standalone->compress('zip');
+
+after setup => sub {
+    my ($self) = @_;
+    $self->load_fixtures(qw(init basic));
+};
+
+has standalone => (is => 'rw');
+
+test 'basic' => sub {
+    my ($self) = @_;
+    my $page = $self->schema->resultset('Page')->first();
+    ok my $standalone = Judoon::Standalone->new({page => $page}),
+        'can create standalone object';
+    $self->standalone($standalone);
+};
+
+test 'save to zip' => sub {
+    my ($self) = @_;
+    my $archive_path = $self->standalone->compress('zip');
     ok -e $archive_path, 'archive exists';
     my $archive = Archive::Extract->new(archive => $archive_path);
     ok $archive->is_zip, 'saved archive isa zip file';
     test_contents($archive);
 };
 
-subtest 'save to tar' => sub {
-    my $archive_path = $standalone->compress('tar.gz');
+test 'save to tar' => sub {
+    my ($self) = @_;
+    my $archive_path = $self->standalone->compress('tar.gz');
     ok -e $archive_path, 'archive exists';
     my $archive = Archive::Extract->new(archive => $archive_path);
     ok $archive->is_tgz, 'saved archive isa tar.gz file';
     test_contents($archive);
 };
 
+run_me();
 done_testing();
 
 

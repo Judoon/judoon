@@ -1,15 +1,6 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
 use utf8;
-
-use lib q{t/lib};
-
-use Test::More;
-use Test::Fatal;
-use Test::JSON;
-use t::DB;
 
 use Data::Printer;
 use DateTime;
@@ -17,16 +8,30 @@ use Judoon::Spreadsheet;
 use Judoon::Tmpl;
 use Judoon::Types::Core qw(CoreType_Text);
 use Spreadsheet::ParseExcel;
+use Test::Fatal;
+use Test::JSON;
 
-sub ResultSet { return t::DB::get_schema()->resultset($_[0]); }
+use Test::Roo;
+use lib 't/lib';
+with 't::Role::Schema';
+
+
+sub ResultSet { return $_[0]->schema->resultset($_[1]); }
 sub is_result { return isa_ok $_[0], 'DBIx::Class'; }
 
 
 my $DATA_DIR = 't/etc/data';
 
 
-subtest 'Result::User' => sub {
-    my $user_rs = ResultSet('User');
+after setup => sub {
+    my ($self) = @_;
+    $self->load_fixtures(qw(init basic));
+};
+
+test 'Result::User' => sub {
+    my ($self) = @_;
+
+    my $user_rs = $self->ResultSet('User');
     is_result my $user = $user_rs->find({username => 'testuser'});
 
     $user->change_password('testuser');
@@ -49,8 +54,10 @@ subtest 'Result::User' => sub {
 
 };
 
-subtest 'ResultSet::User' => sub {
-    my $user_rs = ResultSet('User');
+test 'ResultSet::User' => sub {
+    my ($self) = @_;
+
+    my $user_rs = $self->ResultSet('User');
 
     ok $user_rs->validate_username('boo'),     'validate simple username';
     ok !$user_rs->validate_username('b!!o'),   'reject invalid username';
@@ -106,8 +113,10 @@ subtest 'ResultSet::User' => sub {
     ok !$inactive->active, 'inactive user is inactive';
 };
 
-subtest 'Result::Dataset' => sub {
-    my $dataset = ResultSet('Dataset')->first;
+test 'Result::Dataset' => sub {
+    my ($self) = @_;
+
+    my $dataset = $self->ResultSet('Dataset')->first;
     ok $dataset->create_basic_page(), 'create_basic_page() works';
 
     is $dataset->nbr_columns, 3, 'nbr_columns is three';
@@ -129,7 +138,7 @@ subtest 'Result::Dataset' => sub {
     ];
 
     # mutating methods, create new dataset
-    my $user = ResultSet('User')->find({username => 'testuser'});
+    my $user = $self->ResultSet('User')->find({username => 'testuser'});
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
     is $mutable_ds->name, 'Dog Roster', '  ..and name is correct';
 
@@ -173,17 +182,17 @@ subtest 'Result::Dataset' => sub {
     my $table_name  = $mutable_ds->tablename;
     ok !exception { $mutable_ds->delete; }, 'can delete dataset okay';
     ok !$mutable_ds->_table_exists($table_name), '  ...datastore table is dropped';
-    my $sth_table_exists = t::DB::get_schema->storage->dbh->table_info(undef, $schema_name, $table_name, 'TABLE');
+    my $sth_table_exists = $self->schema->storage->dbh->table_info(undef, $schema_name, $table_name, 'TABLE');
     is_deeply $sth_table_exists->fetchall_arrayref, [], '  ...double checking, yep';
     for my $linked (@linked_ids) {
         my ($rs_name, $ids) = @$linked;
-        is ResultSet($rs_name)->search({id => {in => $ids}})->count,
+        is $self->ResultSet($rs_name)->search({id => {in => $ids}})->count,
             0, "  ...all linked ${rs_name}s gone.";
     }
 
 
     # test page cloning
-    t::DB::load_fixtures('clone_set');
+    $self->load_fixtures('clone_set');
     my $cloneable_page = $user->my_pages->search({title => {like => '%All Time'},})->first;
     my $new_ds         = $user->datasets_rs->find({name => 'IMDB Bottom 5'});
     my $cloned_page    = $new_ds->new_related('pages',{})
@@ -250,8 +259,10 @@ subtest 'Result::Dataset' => sub {
 
 };
 
-subtest 'Result::DatasetColumn' => sub {
-    my $ds_column_rs = ResultSet('DatasetColumn');
+test 'Result::DatasetColumn' => sub {
+    my ($self) = @_;
+
+    my $ds_column_rs = $self->ResultSet('DatasetColumn');
     my $ds_column = $ds_column_rs->first;
 
     my $dataset = $ds_column->dataset;
@@ -276,7 +287,7 @@ subtest 'Result::DatasetColumn' => sub {
     }), 'can create column w/ non-ascii name';
 
     # mutating methods, create new dataset
-    my $user = ResultSet('User')->first;
+    my $user = $self->ResultSet('User')->first;
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
 
 
@@ -291,7 +302,7 @@ subtest 'Result::DatasetColumn' => sub {
 
 
     # make sure we can import datasets w/ duplicate column names
-    $user = ResultSet('User')->first;
+    $user = $self->ResultSet('User')->first;
     is_result my $dupe_cols_ds
         = $user->import_data_by_filename('t/etc/data/dupe_colnames.xls'),
             'Can successfully import dataset with duplicate column names';
@@ -302,8 +313,10 @@ subtest 'Result::DatasetColumn' => sub {
 };
 
 
-subtest 'Result::Page' => sub {
-    my $page = ResultSet('Page')->first;
+test 'Result::Page' => sub {
+    my ($self) = @_;
+
+    my $page = $self->ResultSet('Page')->first;
 
     is $page->nbr_columns, 3, '::nbr_columns is correct';
     is $page->nbr_rows, 5,    '::nbr_rows is correct';
@@ -315,7 +328,7 @@ subtest 'Result::Page' => sub {
         'page_columns_ordered gets columns in their proper order';
 
 
-    my $movie_ds = ResultSet('Dataset')->find({name => 'IMDB Top 5',});
+    my $movie_ds = $self->ResultSet('Dataset')->find({name => 'IMDB Top 5',});
     my $movie_page = $movie_ds->create_related(
         'pages', {qw(title a preamble b postamble c)}
     );
@@ -340,8 +353,10 @@ subtest 'Result::Page' => sub {
 };
 
 
-subtest 'Result::PageColumn' => sub {
-    my $page_column = ResultSet('PageColumn')->first;
+test 'Result::PageColumn' => sub {
+    my ($self) = @_;
+
+    my $page_column = $self->ResultSet('PageColumn')->first;
 
     ok $page_column->template->to_jstmpl, 'can produce jquery';
     ok $page_column->template->get_nodes, 'can produce objects';
@@ -354,9 +369,11 @@ subtest 'Result::PageColumn' => sub {
 };
 
 
-subtest 'Result(Set)?::Token' => sub {
-    my $token_rs = ResultSet('Token');
-    my $user  = ResultSet('User')->first;
+test 'Result(Set)?::Token' => sub {
+    my ($self) = @_;
+
+    my $token_rs = $self->ResultSet('Token');
+    my $user  = $self->ResultSet('User')->first;
 
     my $token = $token_rs->new_result({user => $user});
     $token->password_reset();
@@ -402,4 +419,5 @@ subtest 'Result(Set)?::Token' => sub {
 
 };
 
+run_me();
 done_testing();
