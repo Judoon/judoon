@@ -35,11 +35,15 @@ primary_column id => {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
+    is_serializable   => 1,
+    is_numeric        => 1,
 };
 column user_id => {
-    data_type      => "integer",
-    is_foreign_key => 1,
-    is_nullable    => 0,
+    data_type       => "integer",
+    is_foreign_key  => 1,
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric        => 1,
 };
 column name => {
     data_type       => "text",
@@ -52,22 +56,26 @@ column notes => {
     is_serializable => 1,
 };
 column original => {
-    data_type   => "text",
-    is_nullable => 0,
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 0,
 };
 column tablename => {
-    data_type   => "text",
-    is_nullable => 0,
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 0,
 };
 column nbr_rows => {
-    data_type   => "integer",
-    is_nullable => 0,
-    is_numeric  => 1,
+    data_type       => "integer",
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric      => 1,
 };
 column nbr_columns => {
-    data_type   => "integer",
-    is_nullable => 0,
-    is_numeric  => 1,
+    data_type       => "integer",
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric      => 1,
 };
 
 
