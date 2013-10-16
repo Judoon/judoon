@@ -7,6 +7,10 @@ extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
+sub update_allows { return qw(name); }
+with 'Judoon::API::Resource::Role::ValidateParams';
+
+
 sub allowed_methods {
     my ($self) = @_;
      return [
@@ -14,6 +18,7 @@ sub allowed_methods {
         ( $_[0]->writable ) ? (qw(PUT)) : ()
     ];
 }
+
 
 1;
 __END__
@@ -29,5 +34,11 @@ Judoon::API::Resource::User - An individual User
 =head1 DESCRIPTION
 
 See L</Web::Machine::Resource>.
+
+=head1 METHODS
+
+=head2 update_allows()
+
+List of updatable parameters.
 
 =cut
