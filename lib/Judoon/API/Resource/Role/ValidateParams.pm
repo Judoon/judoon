@@ -34,6 +34,8 @@ a list of fields that can be updated.
 =cut
 
 requires 'update_allows';
+requires 'update_ignore';
+requires 'update_valid';
 
 
 =head2 update_resource( \%params ) (before)
@@ -47,7 +49,7 @@ HTTP 422 'Unprocessable Entity' error is validation fails.
 before update_resource => sub {
     my ($self, $params) = @_;
 
-    delete @{$params}{qw(created modified)};
+    delete @{$params}{ $self->update_ignore() };
 
     my %update_allows = map {$_ => 1} $self->update_allows();
 
@@ -70,14 +72,12 @@ before update_resource => sub {
     } keys %update_allows;
 
 
-    if ($update_allows{permission} && exists $params->{permission}) {
-        push @errors, ['bad_value','permission']
-            unless (
-                defined($params->{permission})
-                    &&
-                ($params->{permission} =~ m/^(?:public|private)$/)
-            );
-    }
+    my $update_valid = $self->update_valid();
+    push @errors, map {['bad_value',$_]} grep {
+        defined($params->{$_})
+            &&
+        ($params->{$_} !~ $update_valid->{$_})
+    } keys %$update_valid;
 
     if (@errors) {
         my @messages;

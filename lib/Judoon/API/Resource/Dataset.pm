@@ -7,8 +7,9 @@ extends 'Web::Machine::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
-
 sub update_allows { return qw(name description permission); }
+sub update_ignore { return qw(created modified); }
+sub update_valid  { return {permission => qr/^(?:public|private)$/}; }
 with 'Judoon::API::Resource::Role::ValidateParams';
 
 

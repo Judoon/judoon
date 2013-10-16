@@ -62,14 +62,14 @@ test '/user' => sub {
         $self->load_fixtures(qw(init api));
     }
 
-    diag('??? POST /user/datasets');
-    diag('??? POST /user/pages');
+    subtest 'POST /user/datasets' => sub { fail 'not yet tested'; };
+    subtest 'POST /user/pages' => sub { fail 'not yet tested'; };
 };
 
 
 
 # PUT    /datasets/$ds_id
-# DELETE /datasets/$ds_id
+# DELETE /datasets/$ds_id <protected by access control>
 # POST   /datasets/$ds_id/columns
 # PUT    /datasets/$ds_id/columns/$dscol_id
 test '/datasets' => sub {
@@ -81,71 +81,112 @@ test '/datasets' => sub {
     my $ds_id   = $ds->id;
     my $ds_url  = "/api/datasets/$ds_id";
 
-    # dataset
-    # name        type    null? fk? serial? numeric? default
-    # id          integer 0     0   1       -        -
-    # user_id     integer 0     1   1       -        -
-    # name        text    0     0   1       -        -
-    # description text    0     0   1       -        -
-    # xxxoriginal    text    0     0   0       -        -
-    # tablename   text    0     0   0       -        -
-    # nbr_rows    integer 0     0   1       1        -
-    # nbr_columns integer 0     0   1       1        -
-    # permission  text    0     0   1       0        'private'
+    $self->add_route_not_found('/api/datasets/moo', '*', 'GET', {});
 
-    my @ds_tests_fail = (
-        # key            newval
-        [ 'id',          14,    ],
-        [ 'id',          undef, ],
-        [ 'user_id',     14,    ],
-        [ 'user_id',     undef, ],
-        [ 'description', undef, ],
-        [ 'tablename',   'moo', ],
-        [ 'tablename',   undef, ],
-        [ 'nbr_rows',    20,    ],
-        [ 'nbr_rows',    'moo', ],
-        [ 'nbr_rows',    undef, ],
-        [ 'nbr_columns', 20,    ],
-        [ 'nbr_columns', 'moo', ],
-        [ 'nbr_columns', undef, ],
-        [ 'permission',  'moo', ],
-        [ 'permission',  '',    ],
-        [ 'permission',  undef, ],
-    );
-    for my $test (@ds_tests_fail) {
-        $self->update_fails_ok($ds_url, 'me', $ds, @$test);
-    }
+    subtest 'PUT /datasets/$ds_id' => sub {
 
-    my @ds_tests_ok = (
-        [ 'name',        'moo',     ],
-        [ 'name',        '',        ],
-        [ 'description', 'moo',     ],
-        [ 'description', '',        ],
-        [ 'permission',  'private', ],
-    );
-    for my $test (@ds_tests_ok) {
-        $self->update_ok($ds_url, 'me', $ds, @$test);
-        $self->reset_fixtures();
-        $self->load_fixtures(qw(init api));
-    }
+        # dataset
+        # name        type    null? fk? serial? numeric? default
+        # id          integer 0     0   1       -        -
+        # user_id     integer 0     1   1       -        -
+        # name        text    0     0   1       -        -
+        # description text    0     0   1       -        -
+        # xxxoriginal    text    0     0   0       -        -
+        # tablename   text    0     0   0       -        -
+        # nbr_rows    integer 0     0   1       1        -
+        # nbr_columns integer 0     0   1       1        -
+        # permission  text    0     0   1       0        'private'
+
+        my @ds_tests_fail = (
+            # key            newval
+            [ 'id',          14,    ],
+            [ 'id',          undef, ],
+            [ 'user_id',     14,    ],
+            [ 'user_id',     undef, ],
+            [ 'description', undef, ],
+            [ 'tablename',   'moo', ],
+            [ 'tablename',   undef, ],
+            [ 'nbr_rows',    20,    ],
+            [ 'nbr_rows',    'moo', ],
+            [ 'nbr_rows',    undef, ],
+            [ 'nbr_columns', 20,    ],
+            [ 'nbr_columns', 'moo', ],
+            [ 'nbr_columns', undef, ],
+            [ 'permission',  'moo', ],
+            [ 'permission',  '',    ],
+            [ 'permission',  undef, ],
+        );
+        for my $test (@ds_tests_fail) {
+            $self->update_fails_ok($ds_url, 'me', $ds, @$test);
+        }
+
+        my @ds_tests_ok = (
+            [ 'name',        'moo',     ],
+            [ 'name',        '',        ],
+            [ 'description', 'moo',     ],
+            [ 'description', '',        ],
+            [ 'permission',  'private', ],
+        );
+        for my $test (@ds_tests_ok) {
+            $self->update_ok($ds_url, 'me', $ds, @$test);
+            $self->reset_fixtures();
+            $self->load_fixtures(qw(init api));
+        }
+    };
+
+    subtest 'DELETE /datasets/$ds_id' => sub { pass 'tested in webapp-api.t' };
+
+    subtest 'POST /datasets/$ds_id/columns' => sub { fail 'not yet tested'; };
+    subtest 'PUT /datasets/$ds_id/columns/$dscol_id' => sub {
+
+        # dataset column
+        # name       type    null? fk? serial? numeric? default
+        # id         integer  0     0  1       1        -
+        # dataset_id integer  0     1  1       1        -
+        # name       text     0     0  1       0        -
+        # shortname  text     1     0  1       0        -
+        # sort       integer  0     0  1       1        -
+        # data_type  text     0     1  1       0        -
+        # -- JSON
+        # data_type
+        # sample_data
+
+        my $dscol = $ds->ds_columns_ordered->first;
+        my $dscol_url = "$ds_url/columns/" . $dscol->id;
 
 
+        my @dscol_tests_fail = (
+            # key            newval
+            [ 'id',          14,    ],
+            [ 'id',          undef, ],
+            [ 'dataset_id',  14,    ],
+            [ 'dataset_id',  undef, ],
+            [ 'name',        'moo', ],
+            [ 'name',        undef, ],
+            [ 'shortname',   'moo', ],
+            [ 'shortname',   undef, ],
+            [ 'sort',        14,    ],
+            [ 'sort',        undef, ],
+            [ 'sample_data', 'moo', ],
+            [ 'sample_data', undef, ],
+            [ 'data_type',   'moo', ],
+            [ 'data_type',   undef, ],
+        );
+        for my $test (@dscol_tests_fail) {
+            $self->update_fails_ok($dscol_url, 'me', $dscol, @$test);
+        }
 
-    # dataset column
-    # name       type    null? fk? serial? numeric? default
-    # id         integer  0     0  1       1        -
-    # dataset_id integer  0     1  1       1        -
-    # name       text     0     0  1       0        -
-    # shortname  text     1     0  1       0        -
-    # sort       integer  0     0  1       1        -
-    # data_type  text     0     1  1       0        -
+        my @dscol_tests_ok = (
+            [ 'data_type',   'Biology_Accession_Entrez_GeneSymbol', ],
+        );
+        for my $test (@dscol_tests_ok) {
+            $self->update_ok($dscol_url, 'me', $dscol, @$test);
+            $self->reset_fixtures();
+            $self->load_fixtures(qw(init api));
+        }
+    };
 
 
-    diag('??? PUT    /datasets/$ds_id');
-    diag('??? DELETE /datasets/$ds_id');
-    diag('??? POST   /datasets/$ds_id/columns');
-    diag('??? PUT    /datasets/$ds_id/columns/$dscol_id');
-    pass('fake');
 };
 
 
@@ -177,13 +218,12 @@ test '/pages' => sub {
     # sort        integer 0     0
 
 
-    diag('??? PUT    /pages/$page_id');
-    diag('??? DELETE /pages/$page_id');
-    diag('??? POST   /pages/$page_id/columns');
-    diag('??? DELETE /pages/$page_id/columns');
-    diag('??? PUT    /pages/$page_id/columns/$dscol_id');
-    diag('??? DELETE /pages/$page_id/columns/$dscol_id');
-    pass('fake');
+    subtest 'PUT    /pages/$page_id' => sub { fail 'nyi' };
+    subtest 'DELETE /pages/$page_id' => sub { fail 'nyi' };
+    subtest 'POST   /pages/$page_id/columns' => sub { fail 'nyi' };
+    subtest 'DELETE /pages/$page_id/columns' => sub { fail 'nyi' };
+    subtest 'PUT    /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
+    subtest 'DELETE /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
 };
 
 
@@ -191,8 +231,7 @@ test '/pages' => sub {
 test '/services' => sub {
     my ($self) = @_;
 
-    diag('??? /template');
-    pass('fake');
+    subtest 'POST /template' => sub { fail 'nyi'; };
 };
 
 

@@ -8,6 +8,8 @@ with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
 sub update_allows { return qw(name); }
+sub update_ignore { return qw(created modified); }
+sub update_valid  { return {}; }
 with 'Judoon::API::Resource::Role::ValidateParams';
 
 
