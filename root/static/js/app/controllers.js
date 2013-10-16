@@ -50,10 +50,10 @@ judoonCtrl.controller(
          $scope.saveDataset = function() {
              Dataset.update(
                  {}, {
-                     id:         $scope.datasetId,
-                     name:       $scope.dataset.name,
-                     notes:      $scope.dataset.notes,
-                     permission: $scope.dataset.permission
+                     id:          $scope.datasetId,
+                     name:        $scope.dataset.name,
+                     description: $scope.dataset.description,
+                     permission:  $scope.dataset.permission
                  },
                  function() { $scope.addAlert('success', 'Dataset updated!'); },
                  function() { $scope.addAlert('error', 'Something went wrong!'); }

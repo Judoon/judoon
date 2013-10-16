@@ -172,7 +172,7 @@ sub import_data {
     my $dataset;
     $self->result_source->schema->txn_do( sub {
         $dataset = $self->create_related('datasets',{
-            map({$_ => q{}} qw(name tablename original notes)),
+            map({$_ => q{}} qw(name tablename original description)),
             map({$_ => 0}   qw(nbr_rows nbr_columns)),
         });
         $dataset->import_from_spreadsheet($spreadsheet);

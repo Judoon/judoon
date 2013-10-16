@@ -50,7 +50,7 @@ column name => {
     is_nullable     => 0,
     is_serializable => 1,
 };
-column notes => {
+column description => {
     data_type       => "text",
     is_nullable     => 0,
     is_serializable => 1,
@@ -139,9 +139,7 @@ for serialization.
 
 sub TO_JSON {
     my ($self) = @_;
-
     my $json = $self->next::method();
-    $json->{description} = delete $json->{notes};
     return $json;
 }
 
@@ -207,7 +205,7 @@ sub import_from_spreadsheet {
     $self->tablename($table_name);
     $self->nbr_rows($spreadsheet->nbr_rows);
     $self->nbr_columns($spreadsheet->nbr_columns);
-    $self->notes(q{});
+    $self->description(q{});
     $self->original(q{});
     $self->update;
 

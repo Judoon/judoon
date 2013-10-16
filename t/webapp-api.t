@@ -157,7 +157,7 @@ test '/datasets' => sub {
     my $user_rs         = $self->schema->resultset('User');
     my $me              = $user_rs->find({username => 'me'});
     my $my_datasets     = $me->datasets_rs;
-    my @valid_ds_fields = qw(name notes permission);
+    my @valid_ds_fields = qw(name description permission);
     my %urls            = (public => '', private => '');
     my @datasets        = (
         # type       dataset
@@ -170,7 +170,7 @@ test '/datasets' => sub {
         my $ds_url      = "/api/datasets/$ds_id";
         my $update      = {
             (map {$_ => $ds->{$_}} @valid_ds_fields),
-            notes => "Moo moo quack quack",
+            description => "Moo moo quack quack",
         };
 
         $self->add_route_test($ds_url, 'me', 'GET', {}, {want => $ds});
@@ -178,7 +178,7 @@ test '/datasets' => sub {
         $self->add_route_test($ds_url, 'me', 'PUT', $update, \204,);
         $ds = $my_datasets->find({id => $ds_id})->TO_JSON; # refresh timestamps
         $self->add_route_test($ds_url, 'me', 'GET', {}, {want => {
-            %$ds, description => $update->{notes}
+            %$ds, description => $update->{description}
         }});
         $self->add_route_test($ds_url, 'me', 'DELETE', {},
             sub {

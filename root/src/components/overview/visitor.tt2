@@ -8,7 +8,7 @@
       <td>[% loop.count %]</td>
       <td>
         <p><a href="[% dataset_obj.dataset_url %]">[%- dataset_obj.name -%]</a> - [%- dataset_obj.nbr_columns -%] columns, [%- dataset_obj.nbr_rows -%] rows</p>
-        [%- IF dataset_obj.notes -%]<p><strong>About this dataset:</strong> [%- dataset_obj.notes -%]</p>[%- END -%]
+        [%- IF dataset_obj.description -%]<p><strong>About this dataset:</strong> [%- dataset_obj.description -%]</p>[%- END -%]
         <p>
           <strong>Download:</strong>
           <a href="[% dataset_obj.dataset_url _ '?view=raw' %]">raw</a>,

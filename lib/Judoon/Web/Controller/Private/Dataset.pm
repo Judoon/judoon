@@ -38,13 +38,13 @@ __PACKAGE__->config(
     # DBIC result class
     class                   =>  'User::Dataset',
     # Columns required to create
-    create_requires         =>  [qw/name notes original permission user_id/],
+    create_requires         =>  [qw/name description original permission user_id/],
     # Additional non-required columns that create allows
     create_allows           =>  [qw//],
     # Columns that update allows
-    update_allows           =>  [qw/name notes original permission user_id/],
+    update_allows           =>  [qw/name description original permission user_id/],
     # Columns that list returns
-    list_returns            =>  [qw/id user_id name notes original data permission/],
+    list_returns            =>  [qw/id user_id name description original data permission/],
 
 
     # Every possible prefetch param allowed
@@ -57,7 +57,7 @@ __PACKAGE__->config(
     list_ordered_by         => [qw/id/],
     # columns that can be searched on via list
     list_search_exposes     => [
-        qw/id user_id name notes original nbr_rows nbr_columns tablename permission/,
+        qw/id user_id name description original nbr_rows nbr_columns tablename permission/,
         { 'ds_columns' => [qw/id dataset_id name sort data_type shortname/] },
         { 'pages'      => [qw/id dataset_id title preamble postamble permission/] },
     ],

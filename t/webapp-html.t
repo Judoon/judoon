@@ -439,9 +439,9 @@ test 'Dataset' => sub {
 
     # PUT dataset/object
     $self->puts_ok('dataset', $dataset_uri, 'dataset_edit', {
-        'dataset.name'       => 'Brand New Name',
-        'dataset.notes'      => 'These are some notes',
-        'dataset.permission' => 'public',
+        'dataset.name'        => 'Brand New Name',
+        'dataset.description' => 'These are some description',
+        'dataset.permission'  => 'public',
     });
 
     # DELETE dataset/object
@@ -740,11 +740,11 @@ test 'Complete Coverage' => sub {
     $self->mech->get('/user/testuser/dataset/1');
     $self->mech->post_ok(
         $self->mech->uri,
-        { 'dataset.name' => 'boo', 'x-tunneled-method' => 'PUT', 'dataset.notes' => undef, },
+        { 'dataset.name' => 'boo', 'x-tunneled-method' => 'PUT', 'dataset.description' => undef, },
         'can update dataset w/ undef param',
     );
     $self->mech->form_name('dataset_edit');
-    my ($ds_input) = $self->mech->grep_inputs({name => qr/^dataset\.notes$/});
+    my ($ds_input) = $self->mech->grep_inputs({name => qr/^dataset\.description$/});
     is $ds_input->value, q{}, "ExtractParams sets undef parameter to q{}";
 };
 
