@@ -126,6 +126,7 @@ test '/datasets' => sub {
     subtest 'DELETE /datasets/$ds_id' => sub { pass 'tested in webapp-api.t' };
 
     subtest 'POST /datasets/$ds_id/columns' => sub { fail 'not yet tested'; };
+
     subtest 'PUT /datasets/$ds_id/columns/$dscol_id' => sub {
 
         my $dscol = $ds->ds_columns_ordered->first;
@@ -245,7 +246,7 @@ test '/pages' => sub {
     subtest 'DELETE /pages/$page_id/columns' => sub { pass 'tested in webapp-api.t' };
 
 
-    subtest 'PUT /pages/$page_id/columns/$dscol_id' => sub {
+    subtest 'PUT /pages/$page_id/columns/$pagecol_id' => sub {
 
         my $pagecol     = $page->page_columns_ordered->first;
         my $pagecol_url = "$page_url/columns/" . $pagecol->id;
@@ -290,7 +291,41 @@ test '/pages' => sub {
     };
 
 
-    subtest 'DELETE /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
+    subtest 'DELETE /pages/$page_id/columns/$pagecol_id' => sub {
+
+        # A: $page_id valid?
+        # B: $pagecol_id valid?
+        # C: $pagecol->owns($pagecol_id)?
+
+        #  A?  B?  C?  Res
+        #  0   *   *   \404
+        #  1   0   *   \404
+        #  1   1   0   \404
+        #  1   1   1   200
+
+        my $good_page_id    = $page_id;
+        my $bad_page_id     = 'moo';
+        my $invalid_pagecol = 'moo';
+        my $my_pagecol      = $page->page_columns->first->id;
+        my $your_pagecol    = $self->schema->resultset('PageColumn')
+            ->search({page_id => {'!=' => $good_page_id}})->first->id;
+
+        my @tests;
+        for my $test_page ($good_page_id, $bad_page_id) {
+            for my $test_pagecol ($my_pagecol, $your_pagecol, $invalid_pagecol) {
+                push @tests, [$test_page, $test_pagecol, \404];
+            }
+        }
+        $tests[0][2] = \204;
+        for my $test (@tests) {
+            my ($p_id, $pcol_id, $resp) = @$test;
+            $self->add_route_test(
+                "/api/pages/$p_id/columns/$pcol_id", 'me', 'DELETE', {}, $resp,
+            );
+        }
+
+
+    };
 };
 
 

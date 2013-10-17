@@ -443,6 +443,13 @@ sub pagecols : Chained('pagecol_base') PathPart('') Args(0) ActionClass('FromPSG
 }
 sub pagecol : Chained('pagecol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
+    $id //= '';
+    if ($id !~ m/^\d+$/) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
+
     my $item = $c->stash->{pagecol_rs}
         ? $c->stash->{pagecol_rs}->find({id => $id}) : undef;
     return $self->wm(
