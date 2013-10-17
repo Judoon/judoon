@@ -45,11 +45,14 @@ HTTP 422 'Unprocessable Entity' error is validation fails.
 
 =cut
 
-around update_resource => sub {
-    my ($orig, $self, $params) = @_;
+before update_resource => sub {
+    my ($self, $params) = @_;
 
+    # get updatable params, empty original param list, copy back valid params
     my %valid_params = map {$_ => $params->{$_}} grep {exists $params->{$_}}
         $self->update_allows();
+    delete @{$params}{ keys %$params };
+    @{$params}{keys %valid_params} = (values %valid_params);
 
     my @errors;
     push @errors, map {['invalid_null', $_]} grep {
@@ -94,9 +97,6 @@ around update_resource => sub {
             message     => join("\n", @messages),
         });
     }
-
-    $params = \%valid_params;
-    $orig->($self, $params);
 };
 
 
