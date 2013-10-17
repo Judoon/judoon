@@ -384,6 +384,12 @@ sub pages : Chained('page_base') PathPart('') Args(0) {
 sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
     $id //= '';
+    if ($id !~ m/^\d+$/) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
+
     $c->stash->{page_id}     = $id;
     $c->stash->{page_object} = $c->model('User::Page')->find({id => $id});
 

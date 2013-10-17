@@ -77,7 +77,7 @@ test '/datasets' => sub {
     my $ds_id   = $ds->id;
     my $ds_url  = "/api/datasets/$ds_id";
 
-    $self->add_route_not_found('/api/datasets/moo', '*', 'GET', {});
+    $self->add_route_not_found('/api/datasets/moo', '*', '*', {});
 
     subtest 'PUT /datasets/$ds_id' => sub {
 
@@ -189,6 +189,9 @@ test '/pages' => sub {
     my $page_id  = $page->id;
     my $page_url = "/api/pages/$page_id";
 
+    $self->add_route_not_found('/api/pages/moo', '*', '*', {});
+    $self->add_route_not_found('/api/pages/moo/columns', '*', '*', {});
+
     subtest 'PUT /pages/$page_id' => sub {
         # page
         # name        type    null? fk? serial? numeric? default
@@ -235,9 +238,11 @@ test '/pages' => sub {
     };
 
 
-    subtest 'DELETE /pages/$page_id' => sub { fail 'nyi' };
+    subtest 'DELETE /pages/$page_id' => sub { pass 'tested in webapp-api.t' };
+
     subtest 'POST   /pages/$page_id/columns' => sub { fail 'nyi' };
-    subtest 'DELETE /pages/$page_id/columns' => sub { fail 'nyi' };
+
+    subtest 'DELETE /pages/$page_id/columns' => sub { pass 'tested in webapp-api.t' };
 
 
     subtest 'PUT /pages/$page_id/columns/$dscol_id' => sub {
