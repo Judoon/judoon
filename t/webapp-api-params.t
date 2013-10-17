@@ -180,15 +180,65 @@ test '/datasets' => sub {
 test '/pages' => sub {
     my ($self) = @_;
 
-    # page
-    # name        type    null? fk? serial? numeric? default
-    # id          integer 0     0   1       1        -
-    # dataset_id  integer 0     1   1       1        -
-    # title       text    0     0   1       0        -
-    # preamble    text    0     0   1       0        -
-    # postamble   text    0     0   1       0        -
-    # permission  text    0     0   1       0        'private'
+    my $user_rs  = $self->schema->resultset('User');
+    my $me       = $user_rs->find({username => 'me'});
+    my $ds       = $me->datasets->first;
+    my $ds_id    = $ds->id;
+    my $ds_url   = "/api/datasets/$ds_id";
+    my $page     = $ds->pages_ordered->first;
+    my $page_id  = $page->id;
+    my $page_url = "/api/pages/$page_id";
 
+    subtest 'PUT /pages/$page_id' => sub {
+        # page
+        # name        type    null? fk? serial? numeric? default
+        # id          integer 0     0   1       1        -
+        # dataset_id  integer 0     1   1       1        -
+        # title       text    0     0   1       0        -
+        # preamble    text    0     0   1       0        -
+        # postamble   text    0     0   1       0        -
+        # permission  text    0     0   1       0        'private'
+        # -- from JSON
+        # nbr_rows
+        # nbr_columns
+        $self->run_update_tests(
+            $page_url, $page, [
+                [ 'ignore', 'id',          14,    ],
+                [ 'ignore', 'id',          undef, ],
+                [ 'ignore', 'dataset_id',  14,    ],
+                [ 'ignore', 'dataset_id',  undef, ],
+                [ 'ignore', 'nbr_rows',    20,    ],
+                [ 'ignore', 'nbr_rows',    'moo', ],
+                [ 'ignore', 'nbr_rows',    undef, ],
+                [ 'ignore', 'nbr_columns', 20,    ],
+                [ 'ignore', 'nbr_columns', 'moo', ],
+                [ 'ignore', 'nbr_columns', undef, ],
+
+                [ 'fail',   'title',       undef, ],
+                [ 'fail',   'preamble',    undef, ],
+                [ 'fail',   'postamble',   undef, ],
+                [ 'fail',   'permission',  'moo', ],
+                [ 'fail',   'permission',  '',    ],
+                [ 'fail',   'permission',  undef, ],
+
+                [ 'pass',   'title',       'moo',     ],
+                [ 'pass',   'title',       '',        ],
+                [ 'pass',   'preamble',    'moo',     ],
+                [ 'pass',   'preamble',    '',        ],
+                [ 'pass',   'postamble',   'moo',     ],
+                [ 'pass',   'postamble',   '',        ],
+                [ 'pass',   'permission',  'private', ],
+                [ 'pass',   'permission',  'public',  ],
+            ],
+        );
+
+    };
+
+
+    subtest 'DELETE /pages/$page_id' => sub { fail 'nyi' };
+    subtest 'POST   /pages/$page_id/columns' => sub { fail 'nyi' };
+    subtest 'DELETE /pages/$page_id/columns' => sub { fail 'nyi' };
+    subtest 'PUT    /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
     # page column
     # name        type    null? fk? serial? numeric? default
     # id          integer 0
@@ -196,13 +246,6 @@ test '/pages' => sub {
     # title       text    0     0   1
     # template    text    0     0   0
     # sort        integer 0     0
-
-
-    subtest 'PUT    /pages/$page_id' => sub { fail 'nyi' };
-    subtest 'DELETE /pages/$page_id' => sub { fail 'nyi' };
-    subtest 'POST   /pages/$page_id/columns' => sub { fail 'nyi' };
-    subtest 'DELETE /pages/$page_id/columns' => sub { fail 'nyi' };
-    subtest 'PUT    /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
     subtest 'DELETE /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
 };
 
