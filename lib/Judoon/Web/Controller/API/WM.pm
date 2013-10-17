@@ -307,8 +307,21 @@ sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') 
 }
 sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
+    $id //= '';
+    if ($id !~ m/^\d+$/) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
+
     my $item = $c->stash->{dscol_rs}
         ? $c->stash->{dscol_rs}->find($id) : undef;
+    if (not $item) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
+
     return $self->wm(
         $c, 'Judoon::API::Resource::DatasetColumn', {
             item      => $item,

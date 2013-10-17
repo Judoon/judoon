@@ -198,6 +198,9 @@ test '/datasets' => sub {
     $self->add_route_test($urls{public}, 'you+noone', 'GET', {}, {want => $my_pub_ds});
     $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/datasets/moo', '*', '*', {});
 };
 
 
@@ -297,6 +300,27 @@ test '/datasets/1/columns' => sub {
         $urls{public}{item}, 'you+noone', 'POST+PUT+DELETE', {}
     );
     $self->add_route_not_found($urls{private}{item}, 'you+noone', '*', {});
+
+    # nonsense / mismatched ids are rejected
+    $self->add_route_not_found('/api/datasets/moo/columns', '*', '*', {});
+    my @ds_ids    = ($dscolumns[0][1]->id, $dscolumns[1][1]->id, 'moo');
+    my @dscol_ids = (
+        $dscolumns[0][1]->ds_columns_ordered->first->id,
+        $dscolumns[1][1]->ds_columns_ordered->first->id,
+        'moo'
+    );
+    for my $ds_idx (0..$#ds_ids) {
+        for my $dscol_idx (0..$#dscol_ids) {
+            next if ($ds_idx == $dscol_idx);
+
+            my ($ds_id, $dscol_id)
+                = ($ds_ids[$ds_idx], $dscol_ids[$dscol_idx]);
+            my $url = "/api/datasets/$ds_id/columns/$dscol_id";
+            $self->add_route_not_found($url, 'me', 'DELETE', {});
+            $self->fudge_route_test($url, 'me', 'GET+PUT+POST');
+            $self->fudge_route_test($url, 'you+noone', '*');
+        }
+    }
 };
 
 
@@ -351,6 +375,9 @@ test '/datasets/1/data' => sub {
     );
     $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/datasets/moo/data', '*', '*', {});
 };
 
 
@@ -389,6 +416,9 @@ test '/datasets/1/pages' => sub {
     );
     $self->add_route_bad_method("/api/datasets/$my_pub_ds_id/pages", 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found("/api/datasets/$my_priv_ds_id/pages", 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/datasets/moo/pages', '*', '*', {});
 };
 
 
@@ -451,6 +481,9 @@ test '/pages' => sub {
     $self->add_route_test($urls{public}, 'you+noone', 'GET', {}, {want => $my_pub_page});
     $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
     $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/pages/moo', '*', '*', {});
 };
 
 
@@ -547,6 +580,29 @@ test '/pages/1/columns' => sub {
         $urls{public}{item}, 'you+noone', 'POST+PUT+DELETE', {}
     );
     $self->add_route_not_found($urls{private}{item}, 'you+noone', '*', {});
+
+
+    # nonsense / mismatched ids are rejected
+    $self->add_route_not_found('/api/pages/moo/columns', '*', '*', {});
+    my @page_ids    = ($pages[0][1]->id, $pages[1][1]->id, 'moo');
+    my @pagecol_ids = (
+        $pages[0][1]->page_columns_ordered->first->id,
+        $pages[1][1]->page_columns_ordered->first->id,
+        'moo'
+    );
+    for my $page_idx (0..$#page_ids) {
+        for my $pagecol_idx (0..$#pagecol_ids) {
+            next if ($page_idx == $pagecol_idx);
+
+            my ($page_id, $pagecol_id)
+                = ($page_ids[$page_idx], $pagecol_ids[$pagecol_idx]);
+            my $url = "/api/pages/$page_id/columns/$pagecol_id";
+            $self->add_route_not_found($url, 'me', 'DELETE', {});
+            $self->fudge_route_test($url, 'me', 'GET+PUT+POST');
+            $self->fudge_route_test($url, 'you+noone', '*');
+        }
+    }
+
 };
 
 

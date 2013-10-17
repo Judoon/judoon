@@ -253,6 +253,29 @@ sub add_route_test {
     }
 }
 
+
+=head2 fudge_route_test( $route, $userspec, $methodspec )
+
+Some things just aren't worth testing. Mark as tested, but don't
+actually.
+
+=cut
+
+sub fudge_route_test {
+    my ($self, $route, $users, $methods) = @_;
+
+    $self->add_api_route($route);
+    my @users = $self->_expand_api_users($users);
+    my @methods = $self->_expand_api_methods($methods);
+
+    for my $user (@users) {
+        for my $method (@methods) {
+            $self->add_api_test($route, $user, $method);
+        }
+    }
+}
+
+
 =head1 CONVENIENCE TESTS
 
 For simplicty, the following common tests are provided.  Note, that if
