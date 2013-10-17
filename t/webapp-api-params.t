@@ -38,30 +38,25 @@ test '/user' => sub {
     # name             text        0        1
     # email_address    text        0        1
     # active           boolean     0        0
+    $self->run_update_tests(
+        '/api/user', $me, [
+            # type      key                 newval
+            [ 'ignore', 'id',               14,                 ],
+            [ 'ignore', 'username',         'moo',              ],
+            [ 'ignore', 'password',         'thunkabump',       ],
+            [ 'ignore', 'password',         undef,              ],
+            [ 'ignore', 'email_address',    '',                 ],
+            [ 'ignore', 'active',           0,                  ],
+            [ 'ignore', 'active',           'moo',              ],
+            [ 'ignore', 'password_expires', DateTime->now . "", ],
+            [ 'ignore', 'password_expires', 'moo',              ],
 
-    my @user_tests = (
-        # type      key                 newval
-        [ 'ignore', 'id',               14,                 ],
-        [ 'ignore', 'username',         'moo',              ],
-        [ 'ignore', 'password',         'thunkabump',       ],
-        [ 'ignore', 'password',         undef,              ],
-        [ 'ignore', 'email_address',    '',                 ],
-        [ 'ignore', 'active',           0,                  ],
-        [ 'ignore', 'active',           'moo',              ],
-        [ 'ignore', 'password_expires', DateTime->now . "", ],
-        [ 'ignore', 'password_expires', 'moo',              ],
+            [ 'fail',   'name',             undef,              ],
 
-        [ 'fail',   'name',             undef,              ],
-
-        [ 'pass',   'name',             'moo',              ],
-        [ 'pass',   'name',             '',                 ],
+            [ 'pass',   'name',             'moo',              ],
+            [ 'pass',   'name',             '',                 ],
+        ],
     );
-    for my $test (@user_tests) {
-        my ($type, $key, $val) = @$test;
-        $self->_test_update($type, '/api/user', 'me', $me, $key, $val);
-        $self->reset_fixtures();
-        $self->load_fixtures(qw(init api));
-    }
 
     subtest 'POST /user/datasets' => sub { fail 'not yet tested'; };
     subtest 'POST /user/pages' => sub { fail 'not yet tested'; };
@@ -97,46 +92,44 @@ test '/datasets' => sub {
         # nbr_rows    integer 0     0   1       1        -
         # nbr_columns integer 0     0   1       1        -
         # permission  text    0     0   1       0        'private'
+        $self->run_update_tests(
+            $ds_url, $ds, [
+                # expect    key            newval
+                [ 'ignore', 'id',          14,    ],
+                [ 'ignore', 'id',          undef, ],
+                [ 'ignore', 'user_id',     14,    ],
+                [ 'ignore', 'user_id',     undef, ],
+                [ 'ignore', 'tablename',   'moo', ],
+                [ 'ignore', 'tablename',   undef, ],
+                [ 'ignore', 'nbr_rows',    20,    ],
+                [ 'ignore', 'nbr_rows',    'moo', ],
+                [ 'ignore', 'nbr_rows',    undef, ],
+                [ 'ignore', 'nbr_columns', 20,    ],
+                [ 'ignore', 'nbr_columns', 'moo', ],
+                [ 'ignore', 'nbr_columns', undef, ],
 
-        my @ds_tests = (
-            # expect    key            newval
-            [ 'ignore', 'id',          14,    ],
-            [ 'ignore', 'id',          undef, ],
-            [ 'ignore', 'user_id',     14,    ],
-            [ 'ignore', 'user_id',     undef, ],
-            [ 'ignore', 'tablename',   'moo', ],
-            [ 'ignore', 'tablename',   undef, ],
-            [ 'ignore', 'nbr_rows',    20,    ],
-            [ 'ignore', 'nbr_rows',    'moo', ],
-            [ 'ignore', 'nbr_rows',    undef, ],
-            [ 'ignore', 'nbr_columns', 20,    ],
-            [ 'ignore', 'nbr_columns', 'moo', ],
-            [ 'ignore', 'nbr_columns', undef, ],
+                [ 'fail',   'name',        undef, ],
+                [ 'fail',   'description', undef, ],
+                [ 'fail',   'permission',  'moo', ],
+                [ 'fail',   'permission',  '',    ],
+                [ 'fail',   'permission',  undef, ],
 
-            [ 'fail',   'name',        undef, ],
-            [ 'fail',   'description', undef, ],
-            [ 'fail',   'permission',  'moo', ],
-            [ 'fail',   'permission',  '',    ],
-            [ 'fail',   'permission',  undef, ],
-
-            [ 'pass',   'name',        'moo',     ],
-            [ 'pass',   'name',        '',        ],
-            [ 'pass',   'description', 'moo',     ],
-            [ 'pass',   'description', '',        ],
-            [ 'pass',   'permission',  'private', ],
+                [ 'pass',   'name',        'moo',     ],
+                [ 'pass',   'name',        '',        ],
+                [ 'pass',   'description', 'moo',     ],
+                [ 'pass',   'description', '',        ],
+                [ 'pass',   'permission',  'private', ],
+            ],
         );
-        for my $test (@ds_tests) {
-            my ($type, $key, $val) = @$test;
-            $self->_test_update($type, $ds_url, 'me', $ds, $key, $val);
-            $self->reset_fixtures();
-            $self->load_fixtures(qw(init api));
-        }
     };
 
     subtest 'DELETE /datasets/$ds_id' => sub { pass 'tested in webapp-api.t' };
 
     subtest 'POST /datasets/$ds_id/columns' => sub { fail 'not yet tested'; };
     subtest 'PUT /datasets/$ds_id/columns/$dscol_id' => sub {
+
+        my $dscol = $ds->ds_columns_ordered->first;
+        my $dscol_url = "$ds_url/columns/" . $dscol->id;
 
         # dataset column
         # name       type    null? fk? serial? numeric? default
@@ -149,37 +142,28 @@ test '/datasets' => sub {
         # -- JSON
         # data_type
         # sample_data
+        $self->run_update_tests(
+            $dscol_url, $dscol, [
+                # expect    key            newval
+                [ 'ignore', 'id',          14,    ],
+                [ 'ignore', 'id',          undef, ],
+                [ 'ignore', 'dataset_id',  14,    ],
+                [ 'ignore', 'dataset_id',  undef, ],
+                [ 'ignore', 'name',        'moo', ],
+                [ 'ignore', 'name',        undef, ],
+                [ 'ignore', 'shortname',   'moo', ],
+                [ 'ignore', 'shortname',   undef, ],
+                [ 'ignore', 'sort',        14,    ],
+                [ 'ignore', 'sort',        undef, ],
+                [ 'ignore', 'sample_data', 'moo', ],
+                [ 'ignore', 'sample_data', undef, ],
 
-        my $dscol = $ds->ds_columns_ordered->first;
-        my $dscol_url = "$ds_url/columns/" . $dscol->id;
+                [ 'fail',   'data_type',   'moo', ],
+                [ 'fail',   'data_type',   undef, ],
 
-
-        my @dscol_tests = (
-            # expect    key            newval
-            [ 'ignore', 'id',          14,    ],
-            [ 'ignore', 'id',          undef, ],
-            [ 'ignore', 'dataset_id',  14,    ],
-            [ 'ignore', 'dataset_id',  undef, ],
-            [ 'ignore', 'name',        'moo', ],
-            [ 'ignore', 'name',        undef, ],
-            [ 'ignore', 'shortname',   'moo', ],
-            [ 'ignore', 'shortname',   undef, ],
-            [ 'ignore', 'sort',        14,    ],
-            [ 'ignore', 'sort',        undef, ],
-            [ 'ignore', 'sample_data', 'moo', ],
-            [ 'ignore', 'sample_data', undef, ],
-
-            [ 'fail',   'data_type',   'moo', ],
-            [ 'fail',   'data_type',   undef, ],
-
-            [ 'pass',   'data_type',   'Biology_Accession_Entrez_GeneSymbol', ],
+                [ 'pass',   'data_type',   'Biology_Accession_Entrez_GeneSymbol', ],
+            ],
         );
-        for my $test (@dscol_tests) {
-            my ($type, $key, $val) = @$test;
-            $self->_test_update($type, $dscol_url, 'me', $dscol, $key, $val);
-            $self->reset_fixtures();
-            $self->load_fixtures(qw(init api));
-        }
     };
 
 
@@ -235,6 +219,15 @@ run_me();
 done_testing();
 
 
+sub run_update_tests {
+    my ($self, $url, $obj, $tests) = @_;
+    for my $test (@$tests) {
+        my ($type, $key, $val) = @$test;
+        $self->_test_update($type, $url, 'me', $obj, $key, $val);
+        $self->reset_fixtures();
+        $self->load_fixtures(qw(init api));
+    }
+}
 
 sub _test_update {
     my ($self, $type, $route, $userspec, $orig_obj, $key, $val) = @_;
