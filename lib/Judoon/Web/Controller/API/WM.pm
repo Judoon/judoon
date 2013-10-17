@@ -152,8 +152,7 @@ sub authd_user_base : Chained('wm_base') PathPart('user') CaptureArgs(0) {
         $c->stash->{authd_user} = $c->user->get_object;
     }
     else {
-        $c->res->status(401);
-        $c->res->body('');
+        $self->http_not_authorized($c);
         $c->detach;
     }
 }
@@ -179,8 +178,7 @@ sub authd_user_pages : Chained('authd_user_base') PathPart('pages') Args(0) Acti
     my ($self, $c) = @_;
 
     if ($c->req->method eq 'PUT' || $c->req->method eq 'DELETE') {
-        $c->res->status(405);
-        $c->res->body('');
+        $self->http_bad_method($c);
         $c->detach;
     }
     return $self->wm(
@@ -238,8 +236,7 @@ sub datasets : Chained('dataset_base') PathPart('') Args(0) {
         $self->go_here($c, '/api/wm/public_datasets');
     }
     else {
-        $c->res->status(405);
-        $c->res->body('');
+        $self->http_bad_method($c);
     }
     $c->detach;
 }
@@ -247,8 +244,7 @@ sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
     $id //= '';
     if ($id !~ m/^\d+$/) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
@@ -257,8 +253,7 @@ sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
         ->find({id => $id});
 
     if (not $c->stash->{dataset_object}) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
@@ -267,8 +262,7 @@ sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
         && $c->stash->{authd_user}->datasets_rs->search({id => $id})->count;
 
     unless ($is_public || $c->stash->{authd_owns}) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
@@ -308,15 +302,13 @@ sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
     my ($self, $c, $id) = @_;
     $id //= '';
     if ($id !~ m/^\d+$/) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
     my $item = $c->stash->{dscol_rs}->find($id);
     if (not $item) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
@@ -356,8 +348,7 @@ Get the data for the given dataset.
 sub ds_data : Chained('dataset_id') PathPart('data') CaptureArgs(0) {
     my ($self, $c) = @_;
     if ($c->req->method ne 'GET') {
-        $c->res->status(405);
-        $c->res->body('');
+        $self->http_bad_method($c);
         $c->detach;
     }
 }
@@ -387,8 +378,7 @@ sub pages : Chained('page_base') PathPart('') Args(0) {
         $self->go_here($c, '/api/wm/public_pages');
     }
     else {
-        $c->res->status(405);
-        $c->res->body('');
+        $self->http_bad_method($c);
     }
     $c->detach;
 }
@@ -396,8 +386,7 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
     $id //= '';
     if ($id !~ m/^\d+$/) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
@@ -405,8 +394,7 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     $c->stash->{page_object} = $c->model('User::Page')->find({id => $id});
 
     if (not $c->stash->{page_object}) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 
@@ -415,8 +403,7 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
         && $c->stash->{authd_user}->my_pages->search({'pages.id' => $id})->count;
 
     unless ($is_public || $c->stash->{authd_owns}) {
-        $c->res->status(404);
-        $c->res->body('');
+        $self->http_not_found($c);
         $c->detach;
     }
 }
@@ -455,9 +442,8 @@ sub pagecol : Chained('pagecol_base') PathPart('') Args(1) ActionClass('FromPSGI
     my ($self, $c, $id) = @_;
     $id //= '';
     if ($id !~ m/^\d+$/) {
-        $c->res->status(404);
-        $c->res->body('');
-        $c->detach;
+        $self->http_not_found($c);
+        $c->detach();
     }
 
     my $item = $c->stash->{pagecol_rs}->find({id => $id});
@@ -470,6 +456,32 @@ sub pagecol : Chained('pagecol_base') PathPart('') Args(1) ActionClass('FromPSGI
 }
 
 
+=head1 Helper methods
+
+=head2 http_not_authorized() / http_not_found() / http_bad_method()
+
+These helper methods set the appropriate HTTP response codes (401,
+401, and 405 respectively) and set the response body to empty.
+
+=cut
+
+sub http_not_authorized {
+    my ($self, $c) = @_;
+    $c->res->status(401);
+    $c->res->body('');
+}
+
+sub http_not_found {
+    my ($self, $c) = @_;
+    $c->res->status(404);
+    $c->res->body('');
+}
+
+sub http_bad_method {
+    my ($self, $c) = @_;
+    $c->res->status(405);
+    $c->res->body('');
+}
 
 1;
 __END__
