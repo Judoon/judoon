@@ -293,8 +293,7 @@ restricted to the parent dataset's columns.
 
 sub dscol_base : Chained('dataset_id') PathPart('columns') CaptureArgs(0) {
     my ($self, $c) = @_;
-    my $ds = $c->stash->{dataset_object};
-    $c->stash->{dscol_rs} = $ds ? $ds->ds_columns_ordered : undef;
+    $c->stash->{dscol_rs} = $c->stash->{dataset_object}->ds_columns_ordered;
 }
 sub dscols : Chained('dscol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
@@ -314,8 +313,7 @@ sub dscol : Chained('dscol_base') PathPart('') Args(1) ActionClass('FromPSGI') {
         $c->detach;
     }
 
-    my $item = $c->stash->{dscol_rs}
-        ? $c->stash->{dscol_rs}->find($id) : undef;
+    my $item = $c->stash->{dscol_rs}->find($id);
     if (not $item) {
         $c->res->status(404);
         $c->res->body('');
@@ -442,8 +440,7 @@ restricted to the parent page's columns.
 
 sub pagecol_base : Chained('page_id') PathPart('columns') CaptureArgs(0) {
     my ($self, $c) = @_;
-    my $page = $c->stash->{page_object};
-    $c->stash->{pagecol_rs} = $page ? $page->page_columns_ordered : undef;
+    $c->stash->{pagecol_rs} = $c->stash->{page_object}->page_columns_ordered;
 }
 sub pagecols : Chained('pagecol_base') PathPart('') Args(0) ActionClass('FromPSGI') {
     my ($self, $c) = @_;
@@ -463,8 +460,7 @@ sub pagecol : Chained('pagecol_base') PathPart('') Args(1) ActionClass('FromPSGI
         $c->detach;
     }
 
-    my $item = $c->stash->{pagecol_rs}
-        ? $c->stash->{pagecol_rs}->find({id => $id}) : undef;
+    my $item = $c->stash->{pagecol_rs}->find({id => $id});
     return $self->wm(
         $c, 'Judoon::API::Resource::PageColumn', {
             item      => $item,
