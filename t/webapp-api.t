@@ -213,13 +213,13 @@ test '/datasets/1/columns' => sub {
     my $my_datasets  = $me->datasets_rs;
     my @dscol_fields = qw(data_type);
     my %urls;
-    my @dscolumns = (
+    my @datasets = (
         # type       dataset
         [ 'public',  $my_datasets->public->first,  ],
         [ 'private', $my_datasets->private->first, ],
     );
 
-    for my $dscol_test (@dscolumns) {
+    for my $dscol_test (@datasets) {
         my ($type, $ds) = @$dscol_test;
         my $ds_id       = $ds->id;
 
@@ -282,7 +282,7 @@ test '/datasets/1/columns' => sub {
     # you + noone
     # other users can see my public datasets, but nothing else
     # refetch public columns after schema reset
-    my @pub_ds_cols = map {$_->TO_JSON} $dscolumns[0][1]->ds_columns_ordered->all;
+    my @pub_ds_cols = map {$_->TO_JSON} $datasets[0][1]->ds_columns_ordered->all;
     $self->add_route_test(
         $urls{public}{set}, 'you+noone', 'GET', {}, {want => \@pub_ds_cols}
     );
@@ -292,7 +292,7 @@ test '/datasets/1/columns' => sub {
     $self->add_route_not_found($urls{private}{set}, 'you+noone', '*', {});
 
     # refetch public column after schema reset
-    my $pub_ds_col = $dscolumns[0][1]->ds_columns_ordered->first->TO_JSON;
+    my $pub_ds_col = $datasets[0][1]->ds_columns_ordered->first->TO_JSON;
     $self->add_route_test(
         $urls{public}{item}, 'you+noone', 'GET', {}, {want => $pub_ds_col}
     );
@@ -303,10 +303,10 @@ test '/datasets/1/columns' => sub {
 
     # nonsense / mismatched ids are rejected
     $self->add_route_not_found('/api/datasets/moo/columns', '*', '*', {});
-    my @ds_ids    = ($dscolumns[0][1]->id, $dscolumns[1][1]->id, 'moo');
+    my @ds_ids    = ($datasets[0][1]->id, $datasets[1][1]->id, 'moo');
     my @dscol_ids = (
-        $dscolumns[0][1]->ds_columns_ordered->first->id,
-        $dscolumns[1][1]->ds_columns_ordered->first->id,
+        $datasets[0][1]->ds_columns_ordered->first->id,
+        $datasets[1][1]->ds_columns_ordered->first->id,
         'moo'
     );
     for my $ds_idx (0..$#ds_ids) {
