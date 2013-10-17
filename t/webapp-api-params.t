@@ -238,14 +238,53 @@ test '/pages' => sub {
     subtest 'DELETE /pages/$page_id' => sub { fail 'nyi' };
     subtest 'POST   /pages/$page_id/columns' => sub { fail 'nyi' };
     subtest 'DELETE /pages/$page_id/columns' => sub { fail 'nyi' };
-    subtest 'PUT    /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
-    # page column
-    # name        type    null? fk? serial? numeric? default
-    # id          integer 0
-    # page_id     integer 0     1
-    # title       text    0     0   1
-    # template    text    0     0   0
-    # sort        integer 0     0
+
+
+    subtest 'PUT /pages/$page_id/columns/$dscol_id' => sub {
+
+        my $pagecol     = $page->page_columns_ordered->first;
+        my $pagecol_url = "$page_url/columns/" . $pagecol->id;
+
+        # PAGE COLUMN
+        # NAME        TYPE    NULL? FK? SERIAL? NUMERIC? DEFAULT
+        # id          integer 0     0   1       1        -
+        # page_id     integer 0     1   1       1        -
+        # title       text    0     0   1       0        -
+        # template    text    0     0   0       0        -
+        # sort        integer 0     0   1       1        -
+        # --- JSON
+        # template
+        # widgets
+
+        $self->run_update_tests(
+            $pagecol_url, $pagecol, [
+                # expect    key            newval
+                [ 'ignore', 'id',          14,    ],
+                [ 'ignore', 'id',          undef, ],
+                [ 'ignore', 'page_id',     14,    ],
+                [ 'ignore', 'page_id',     undef, ],
+                [ 'ignore', 'sort',        14,    ],
+                [ 'ignore', 'template',    'moo', ],
+                [ 'ignore', 'template',    undef, ],
+
+                [ 'fail',  'title',   undef, ],
+                [ 'fail',  'sort',    undef, ],
+                [ 'fail',  'sort',    'moo', ],
+                [ 'fail',  'widgets', '',    ],
+
+                [ 'pass',   'title',    'moo', ],
+                [ 'pass',   'title',    '',    ],
+                [ 'pass',   'sort',     10,    ],
+                [ 'pass',   'sort',     -1,    1, ],
+
+                [ 'pass',   'widgets', [],    ],
+
+            ],
+        );
+
+    };
+
+
     subtest 'DELETE /pages/$page_id/columns/$dscol_id' => sub { fail 'nyi' };
 };
 
@@ -265,19 +304,20 @@ done_testing();
 sub run_update_tests {
     my ($self, $url, $obj, $tests) = @_;
     for my $test (@$tests) {
-        my ($type, $key, $val) = @$test;
-        $self->_test_update($type, $url, 'me', $obj, $key, $val);
+        my ($type, $key, $val, $expval) = @$test;
+        $self->_test_update($type, $url, 'me', $obj, $key, $val, $expval);
         $self->reset_fixtures();
         $self->load_fixtures(qw(init api));
     }
 }
 
 sub _test_update {
-    my ($self, $type, $route, $userspec, $orig_obj, $key, $val) = @_;
-    diag "$type: $userspec PUT $route \{" . $key . ' ==> ' . _stringy_val($val) . '}'
+    my ($self, $type, $route, $userspec, $orig_obj, $key, $val, $expval) = @_;
+    diag "$type: $userspec PUT $route \{" . $key . ' ==> ' . _stringy_val($val)
+        . (defined($expval) ? ' ==> ' . _stringy_val($expval) : '') . '}'
         if ($self->param_debug);
 
-    my ($status, $expect) = $type eq 'pass'   ? (\204, {$key => $val})
+    my ($status, $expect) = $type eq 'pass'   ? (\204, {$key => $expval // $val})
                           : $type eq 'fail'   ? (\422, {})
                           : $type eq 'ignore' ? (\204, {})
                           :      die "Invalid type ($type) in _test_update";
