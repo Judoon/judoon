@@ -8,8 +8,14 @@ with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
 sub update_allows { return qw(data_type); }
-sub update_ignore { return qw(created modified sample_data); }
-sub update_valid  { return {data_type => qr/^\w+$/}; }
+sub update_valid  { return {
+    data_type => sub {
+        my ($self, $val) = @_;
+        return $self->item->result_source->schema
+            ->resultset('TtDscolumnDatatype')->search({data_type => $val})
+            ->count;
+    },
+} }
 with 'Judoon::API::Resource::Role::ValidateParams';
 
 sub allowed_methods {
@@ -41,5 +47,9 @@ See L</Web::Machine::Resource>.
 =head2 update_allows()
 
 List of updatable parameters.
+
+=head2 update_valid()
+
+List of validation checks
 
 =cut

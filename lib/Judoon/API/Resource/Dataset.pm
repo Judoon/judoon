@@ -8,7 +8,6 @@ with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 
 sub update_allows { return qw(name description permission); }
-sub update_ignore { return qw(created modified); }
 sub update_valid  { return {permission => qr/^(?:public|private)$/}; }
 with 'Judoon::API::Resource::Role::ValidateParams';
 
@@ -33,5 +32,9 @@ See L</Web::Machine::Resource>.
 =head2 update_allows()
 
 List of updatable parameters.
+
+=head2 update_valid()
+
+List of validation checks
 
 =cut

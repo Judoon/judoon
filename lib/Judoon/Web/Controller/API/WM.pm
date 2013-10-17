@@ -23,7 +23,6 @@ BEGIN {extends 'Judoon::Web::Controller'; }
 use Judoon::API::Machine;
 use Module::Load;
 use HTTP::Response;
-use HTTP::Throwable::Factory qw(http_throw);
 
 
 =head1 Methods
@@ -153,7 +152,6 @@ sub authd_user_base : Chained('wm_base') PathPart('user') CaptureArgs(0) {
         $c->stash->{authd_user} = $c->user->get_object;
     }
     else {
-        #http_throw(Unauthorized => {www_authenticate => "moo"});
         $c->res->status(401);
         $c->res->body('');
         $c->detach;
@@ -248,11 +246,17 @@ sub datasets : Chained('dataset_base') PathPart('') Args(0) {
 sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     my ($self, $c, $id) = @_;
     $id //= '';
-    $c->stash->{dataset_id}     = $id;
-    $c->stash->{dataset_object} = $c->model('User::Dataset')->find({id => $id});
+    if ($id !~ m/^\d+$/) {
+        $c->res->status(404);
+        $c->res->body('');
+        $c->detach;
+    }
+
+    $c->stash->{dataset_id} = $id;
+    $c->stash->{dataset_object} = $c->model('User::Dataset')
+        ->find({id => $id});
 
     if (not $c->stash->{dataset_object}) {
-        # http_throw('NotFound');
         $c->res->status(404);
         $c->res->body('');
         $c->detach;
@@ -262,7 +266,6 @@ sub dataset_id : Chained('dataset_base') PathPart('') CaptureArgs(1) {
     $c->stash->{authd_owns} = $c->stash->{authd_user}
         && $c->stash->{authd_user}->datasets_rs->search({id => $id})->count;
 
-    #http_throw('NotFound')
     unless ($is_public || $c->stash->{authd_owns}) {
         $c->res->status(404);
         $c->res->body('');
@@ -385,7 +388,6 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     $c->stash->{page_object} = $c->model('User::Page')->find({id => $id});
 
     if (not $c->stash->{page_object}) {
-        # http_throw('NotFound');
         $c->res->status(404);
         $c->res->body('');
         $c->detach;
@@ -395,7 +397,6 @@ sub page_id : Chained('page_base') PathPart('') CaptureArgs(1) {
     $c->stash->{authd_owns}      = $c->stash->{authd_user}
         && $c->stash->{authd_user}->my_pages->search({'pages.id' => $id})->count;
 
-    #http_throw('NotFound')
     unless ($is_public || $c->stash->{authd_owns}) {
         $c->res->status(404);
         $c->res->body('');

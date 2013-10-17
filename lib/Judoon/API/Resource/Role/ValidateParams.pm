@@ -34,7 +34,6 @@ a list of fields that can be updated.
 =cut
 
 requires 'update_allows';
-requires 'update_ignore';
 requires 'update_valid';
 
 
@@ -46,46 +45,40 @@ HTTP 422 'Unprocessable Entity' error is validation fails.
 
 =cut
 
-before update_resource => sub {
-    my ($self, $params) = @_;
+around update_resource => sub {
+    my ($orig, $self, $params) = @_;
 
-    delete @{$params}{ $self->update_ignore() };
-
-    my %update_allows = map {$_ => 1} $self->update_allows();
-
+    my %valid_params = map {$_ => $params->{$_}} grep {exists $params->{$_}}
+        $self->update_allows();
 
     my @errors;
-    push @errors, map {['cant_modify', $_]} grep {
-        !$update_allows{$_} && (
-            (defined $params->{$_} xor defined $self->item->get_column($_))
-                ||
-            (not defined $params->{$_})
-                ||
-            ($params->{$_} ne $self->item->get_column($_))
-        )
-    } keys %$params;
-
     push @errors, map {['invalid_null', $_]} grep {
-        (not defined $params->{$_})
+        (not defined $valid_params{$_})
             &&
         (not $self->item->column_info($_)->{is_nullable})
-    } keys %update_allows;
+    } keys %valid_params;
 
 
     my $update_valid = $self->update_valid();
+    for my $key (keys %$update_valid) {
+        my $validator = $update_valid->{$key};
+        if (ref $validator eq 'Regexp') {
+            $update_valid->{$key} = sub {
+                my ($self, $val) = @_;
+                return $val =~ $validator;
+            };
+        }
+    }
+
     push @errors, map {['bad_value',$_]} grep {
-        defined($params->{$_})
+        defined($valid_params{$_})
             &&
-        ($params->{$_} !~ $update_valid->{$_})
+        (not $update_valid->{$_}->( $self, $valid_params{$_} ) )
     } keys %$update_valid;
 
     if (@errors) {
         my @messages;
 
-        if (my @cant_modify = grep {$_[0] eq 'cant_modify'} @errors) {
-            push @messages,
-                "Update not allowed for: " . join(', ', @cant_modify);
-        }
         if (my @invalid_null = grep {$_[0] eq 'invalid_null'} @errors) {
             push @messages,
                 "Null not allowed for : " . join(', ', @invalid_null);
@@ -101,6 +94,9 @@ before update_resource => sub {
             message     => join("\n", @messages),
         });
     }
+
+    $params = \%valid_params;
+    $orig->($self, $params);
 };
 
 
