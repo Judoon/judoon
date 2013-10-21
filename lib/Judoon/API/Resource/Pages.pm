@@ -1,6 +1,9 @@
 package Judoon::API::Resource::Pages;
 
 use HTTP::Throwable::Factory qw(http_throw);
+use Safe::Isa;
+use Try::Tiny;
+
 
 use Moo;
 use namespace::clean;
@@ -8,6 +11,14 @@ use namespace::clean;
 extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
+
+sub allowed_methods {
+    return [
+        qw(GET HEAD),
+        ( $_[0]->writable ) ? (qw(POST)) : ()
+    ];
+}
+
 
 sub base_uri { '/api/pages' }
 
@@ -19,33 +30,55 @@ sub create_resource {
     my $dataset_id = $data->{dataset_id};
     my $dataset    = $user->datasets_rs->find({id => $dataset_id});
     if (!$dataset) {
-        http_throw(Forbidden => {
-            message => "You don't have permission to access the given dataset",
+        http_throw(NotFound => {
+            message => "You don't have a dataset with id: " . $dataset_id,
         });
     }
 
-    my $type = delete $data->{type} // '';
+    my $type = delete $data->{type} // 'blank';
     my $new_page;
     if ($type eq 'clone') {
-        my $clone_id = $data->{clone_from} or die 'Bad request?';
-        my $existing_page = $user->my_pages->find({id => $clone_id})
-            or die q{That view doesn't exist!};
+        my $clone_id = $data->{clone_from};
+        unless ($clone_id && $clone_id =~ m/^\d+$/) {
+            http_throw(UnprocessableEntity => {
+                message => 'No clone specified'
+            });
+        }
 
-        $new_page = $dataset->new_related('pages',{})
-            ->clone_from_existing($existing_page);
+        my $existing_page = $user->my_pages->find({id => $clone_id})
+            or http_throw(UnprocessableEntity => {
+                message => 'No such clone page',
+            });
+
+        try {
+            $new_page = $dataset->new_related('pages',{})
+                ->clone_from_existing($existing_page);
+        }
+        catch {
+            my $e = $_;
+
+            if ($e->$_DOES('Judoon::Error::Template')) {
+                http_throw(UnprocessableEntity => {
+                    message => "The page with id: " . $existing_page->id
+                        . " is not clonable with this dataset.\nSee:\n" . $e,
+                });
+            }
+            else {
+                die $e;
+            }
+        };
     }
-    elsif ($type eq 'template') {
-        my $uploads = $self->req->uploads;
-        my $fh = $uploads->{'page.clone_template'}->fh;
-        my $page_template = do { local $/ = undef; <$fh>; };
-        $new_page = $dataset->new_related('pages',{})
-            ->clone_from_dump($page_template);
+    elsif ($type eq 'basic') {
+        $new_page = $dataset->create_basic_page();
     }
-    else {
+    elsif ($type eq 'blank') {
         $data->{title}     //= q{New Blank Page};
         $data->{preamble}  //= q{};
         $data->{postamble} //= q{};
         $new_page = $self->set->create($data);
+    }
+    else {
+        http_throw(UnprocessableEntity => {message => 'No such clone page'});
     }
 
     return $new_page;

@@ -31,36 +31,135 @@ test '/user' => sub {
     my $user_rs = $self->schema->resultset('User');
     my $me      = $user_rs->find({username => 'me'});
 
-    # name             type        nullable serializable
-    # id               integer     0        1
-    # username         varchar(40) 0        1
-    # password         text        0        0
-    # password_expires timestamp   1        0
-    # name             text        0        1
-    # email_address    text        0        1
-    # active           boolean     0        0
-    $self->run_update_tests(
-        '/api/user', $me, [
-            # type      key                 newval
-            [ 'ignore', 'id',               14,                 ],
-            [ 'ignore', 'username',         'moo',              ],
-            [ 'ignore', 'password',         'thunkabump',       ],
-            [ 'ignore', 'password',         undef,              ],
-            [ 'ignore', 'email_address',    '',                 ],
-            [ 'ignore', 'active',           0,                  ],
-            [ 'ignore', 'active',           'moo',              ],
-            [ 'ignore', 'password_expires', DateTime->now . "", ],
-            [ 'ignore', 'password_expires', 'moo',              ],
+    subtest 'PUT /user' => sub {
 
-            [ 'fail',   'name',             undef,              ],
+        # User
+        # NAME             TYPE        NULL? SERIAL? NUMERIC?
+        # --------------------------------------------------
+        # id               integer     0     1       1
+        # username         varchar(40) 0     1       0
+        # password         text        0     0       0
+        # password_expires timestamp   1     0       0
+        # name             text        0     1       0
+        # email_address    text        0     1       0
+        # active           boolean     0     0       0
+        $self->run_update_tests(
+            '/api/user', $me, [
+                # type      key                 newval
+                [ 'ignore', 'id',               14,                 ],
+                [ 'ignore', 'username',         'moo',              ],
+                [ 'ignore', 'password',         'thunkabump',       ],
+                [ 'ignore', 'password',         undef,              ],
+                [ 'ignore', 'email_address',    '',                 ],
+                [ 'ignore', 'active',           0,                  ],
+                [ 'ignore', 'active',           'moo',              ],
+                [ 'ignore', 'password_expires', DateTime->now . "", ],
+                [ 'ignore', 'password_expires', 'moo',              ],
 
-            [ 'pass',   'name',             'moo',              ],
-            [ 'pass',   'name',             '',                 ],
-        ],
-    );
+                [ 'fail',   'name',             undef,              ],
 
-    subtest 'POST /user/datasets' => sub { fail 'not yet tested'; };
-    subtest 'POST /user/pages' => sub { fail 'not yet tested'; };
+                [ 'pass',   'name',             'moo',              ],
+                [ 'pass',   'name',             '',                 ],
+            ],
+        );
+    };
+
+
+    subtest 'POST /user/datasets' => sub {
+      TODO: {
+            local $TODO = 'Dataset upload not yet implemented';
+            fail('not yet implemented');
+        }
+    };
+
+
+    subtest 'POST /user/pages' => sub {
+
+        # Pages
+        # valid params:
+        #   dataset_id: $num
+        #   type:       (clone, basic, blank)
+        #   clone_from: when $type=clone
+        # ignore params: use defaults
+        #   title / preamble / postamble / permission / id
+        # when (type = blank | basic)
+        #    title/preamble/postamble/permission = defaults
+        # when (type = clone)
+        #  clone_from = $page_id
+        # errors:
+        #   if dataset_id->is_not_owned by user => Forbidden
+        #   if type = undef                     => ok, assume 'blank'
+        #   if type != any(clone, basic, blank) => 422?
+        #   if type = blank:                    => ok, has sensible defaults
+        #   if type = basic:                    => ok, has sensible defaults
+        #   if type = clone:
+        #    if !clone_from or clone_from != \d+     => 422
+        #    if user->not_owned(clone_from)          => Forbidden
+        #    if clone->ds_columns != our->ds_columns => ???
+        #    else                                    => ok
+
+
+        my $my_ds         = $me->datasets->first;
+        my $my_ds_id      = $my_ds->id;
+        my $my_clone_page = $my_ds->pages->first;
+        my $my_clone_id   = $my_clone_page->id;
+        my $my_mismatched_clone = ($me->datasets->all)[-1]->pages->first->id;
+
+        my $you           = $user_rs->find({username => 'you'});
+        my $your_ds       = $you->datasets->first;
+        my $your_ds_id    = $your_ds->id;
+        my $your_clone_id = $your_ds->pages->first->id;
+
+        my $blank_page = {
+            title      => q{New Blank Page},
+            preamble   => '',
+            postamble  => '',
+            permission => 'private',
+            dataset_id => $my_ds_id,
+        };
+        my $basic_page = {
+            title      => $my_ds->name,
+            permission => 'private',
+            dataset_id => $my_ds_id,
+        };
+        my $clone_page = {
+            title      => $my_clone_page->title,
+            preamble   => $my_clone_page->preamble,
+            postamble  => $my_clone_page->postamble,
+            permission => 'private',
+            dataset_id => $my_ds_id,
+        };
+
+        my @tests_ok = (
+            [{                }, $blank_page, ],
+            [{type => 'blank',}, $blank_page, ],
+            [{type => 'basic',}, $basic_page, ],
+            [{type => 'clone', clone_from => $my_clone_id,}, $clone_page],
+        );
+        for my $test (@tests_ok) {
+            my ($new_page, $compare_obj) = @$test;
+            $new_page->{dataset_id} = $my_ds_id;
+            $self->add_route_created(
+                '/api/user/pages', 'me', 'POST', $new_page, $compare_obj,
+            );
+        }
+
+        my @tests_fail = (
+            [{type => 'blank', dataset_id => $your_ds_id,          }, \404, ],
+            [{type => 'moo',                                       }, \422, ],
+            [{type => 'clone',                                     }, \422, ],
+            [{type => 'clone', clone_from => 'moo',                }, \422, ],
+            [{type => 'clone', clone_from => $your_clone_id,       }, \422, ],
+            [{type => 'clone', clone_from => $my_mismatched_clone, }, \422, ],
+        );
+        for my $test (@tests_fail) {
+            my ($new_page, $error_code) = @$test;
+            $new_page->{dataset_id} //= $my_ds_id;
+            $self->add_route_test(
+                '/api/user/pages', 'me', 'POST', $new_page, $error_code
+            );
+        }
+    };
 };
 
 
@@ -121,7 +220,20 @@ test '/datasets' => sub {
         );
     };
 
-    subtest 'POST /datasets/$ds_id/columns' => sub { fail 'not yet tested'; };
+    subtest 'POST /datasets/$ds_id/columns' => sub {
+
+        # DatasetColumns
+        # valid params:
+        #  dataset_id: ignore or error if it doesn't agree w/ $ds_id in url
+        #  that_table_id: 
+        #  new_col_name: 
+        #  rest of data gets passed to build_actor();
+
+      TODO: {
+            local $TODO = "not yet implemented";
+            fail 'not yet tested';
+        }
+    };
 
     subtest 'PUT /datasets/$ds_id/columns/$dscol_id' => sub {
 
@@ -227,7 +339,25 @@ test '/pages' => sub {
     };
 
 
-    subtest 'POST /pages/$page_id/columns' => sub { fail 'nyi' };
+    subtest 'POST /pages/$page_id/columns' => sub {
+
+        # PageColumns
+        # valid params:
+        #   template: must be translated
+        #   widgets:  nyi
+        #   title:
+        #   sort: 
+        # ignore params:
+        #   page_id: get from url
+        #   id: ignore
+        # when ()
+        # errors:
+
+      TODO: {
+            local $TODO = "not yet implemented";
+            fail 'not yet tested';
+        }
+    };
 
 
     subtest 'PUT /pages/$page_id/columns/$pagecol_id' => sub {
