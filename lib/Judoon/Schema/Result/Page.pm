@@ -274,6 +274,7 @@ sub get_cloneable_columns {
     my %me = $self->get_columns;
     delete $me{id};
     delete $me{dataset_id};
+    delete $me{permission};
     return %me;
 }
 
