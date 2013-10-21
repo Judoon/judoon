@@ -6,13 +6,12 @@
 
 
 use Clone qw(clone);
-use Data::Section::Simple qw(get_data_section);
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef);
 
 use Test::Roo;
 use lib 't/lib';
 with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
-    'Judoon::Role::JsonEncoder';
+    'Judoon::Role::JsonEncoder', 't::Role::TmplFixtures';
 
 has param_debug => (is => 'rw', default => 0);
 
@@ -434,12 +433,10 @@ test '/services' => sub {
         #   1      1      1         0         \422
         #   1      1      1         1         \422
 
-        my $good_tmpl = get_data_section('js_template');
-        chomp $good_tmpl;
-        my $bad_tmpl  = '<a href="foo"><p>thing</p></a>';
-
-        my $good_widgets = $self->decode_json( get_data_section('serialized') );
-        my $bad_widgets  = [{type => 'mpp'}];
+        my ($good_tmpl, $good_widgets)
+            = @{ $self->get_tmpl_fixture('basic_equiv') }{ qw(jstmpl widgets) };
+        my ($bad_tmpl, $bad_widgets)
+            = @{ $self->get_tmpl_fixture('invalid') }{ qw(jstmpl widgets) };
 
         my @tests_fail = (
             [{                                                  } ],
@@ -512,35 +509,3 @@ sub add_route_get_like {
 
 sub _stringy_val { return !defined($_[0]) ? '*undef*' : ($_[0] eq '') ? q{''} : $_[0]; }
 
-
-
-
-__DATA__
-@@ js_template
-<strong><em>foo</em></strong><strong>{{bar}}</strong><br><em><a href="pre{{baz}}post">quux</a></em>
-@@ serialized
-[
- {"type" : "text", "value" : "foo", "formatting" : ["italic", "bold"]},
- {"type" : "variable", "name" : "bar", "formatting" : ["bold"]},
- {"type" : "newline", "formatting" : []},
- {
-   "type" : "link",
-   "url"  : {
-     "varstring_type"    : "variable",
-     "type"              : "varstring",
-     "accession"         : "",
-     "text_segments"     : ["pre","post"],
-     "variable_segments" : ["baz",""],
-     "formatting"        : []
-   },
-   "label" : {
-     "varstring_type"    : "static",
-     "type"              : "varstring",
-     "accession"         : "",
-     "text_segments"     : ["quux"],
-     "variable_segments" : [""],
-     "formatting"        : []
-   },
-  "formatting" : ["italic"]
- }
-]

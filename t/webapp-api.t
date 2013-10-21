@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
 use Clone qw(clone);
-use Data::Section::Simple qw(get_data_section);
 use Judoon::SiteLinker;
 use Judoon::TypeRegistry;
 use List::AllUtils ();
@@ -9,7 +8,7 @@ use List::AllUtils ();
 use Test::Roo;
 use lib 't/lib';
 with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
-    'Judoon::Role::JsonEncoder';
+    'Judoon::Role::JsonEncoder', 't::Role::TmplFixtures';
 
 after setup => sub {
     my ($self) = @_;
@@ -613,9 +612,8 @@ test '/template' => sub {
 
     $self->add_route_bad_method('/api/template', '*', 'GET+PUT+DELETE', {});
 
-    my $template = get_data_section('js_template');
-    chomp $template;
-    my $widgets  = $self->decode_json( get_data_section('serialized') );
+    my ($template, $widgets)
+        = @{ $self->get_tmpl_fixture('basic_equiv') }{ qw(jstmpl widgets) };
     $self->add_route_test(
         '/api/template', '*', 'POST', {template => $template},
         {want => {widgets => $widgets}}
@@ -754,36 +752,3 @@ after teardown => sub {
 
 run_me();
 done_testing();
-
-
-
-
-__DATA__
-@@ js_template
-<strong><em>foo</em></strong><strong>{{bar}}</strong><br><em><a href="pre{{baz}}post">quux</a></em>
-@@ serialized
-[
- {"type" : "text", "value" : "foo", "formatting" : ["italic", "bold"]},
- {"type" : "variable", "name" : "bar", "formatting" : ["bold"]},
- {"type" : "newline", "formatting" : []},
- {
-   "type" : "link",
-   "url"  : {
-     "varstring_type"    : "variable",
-     "type"              : "varstring",
-     "accession"         : "",
-     "text_segments"     : ["pre","post"],
-     "variable_segments" : ["baz",""],
-     "formatting"        : []
-   },
-   "label" : {
-     "varstring_type"    : "static",
-     "type"              : "varstring",
-     "accession"         : "",
-     "text_segments"     : ["quux"],
-     "variable_segments" : [""],
-     "formatting"        : []
-   },
-  "formatting" : ["italic"]
- }
-]
