@@ -61,18 +61,44 @@ sub template_POST {
     my ($self, $c) = @_;
 
     my $params = $c->req->data;
-    if ($params->{widgets}) {
-        my $tmpl = Judoon::Tmpl->new_from_data($params->{widgets});
-        $self->status_ok($c, entity => { template => $tmpl->to_jstmpl });
+
+    if (not (exists($params->{template}) xor exists($params->{widgets}))) {
+        $c->res->status(422);
+        $c->res->body('');
+        $c->detach();
     }
-    elsif ($params->{template}) {
-        my $tmpl = Judoon::Tmpl->new_from_jstmpl($params->{template});
-        $self->status_ok($c, entity => { template => $tmpl->to_data });
+
+    my $entity;
+    if (exists $params->{widgets}) {
+        my $tmpl;
+        eval {
+            $tmpl = Judoon::Tmpl->new_from_data($params->{widgets});
+        };
+        unless ($@) {
+            $entity = { template => $tmpl->to_jstmpl };
+        }
+    }
+    elsif (exists $params->{template}) {
+        my $tmpl;
+        eval {
+            $tmpl = Judoon::Tmpl->new_from_jstmpl($params->{template});
+        };
+        unless ($@) {
+            $entity = { widgets => $tmpl->to_data };
+        }
 
     }
     else {
-        $self->status_no_content($c);
+        die 'Unreachable condition';
     }
+
+    if (not $entity) {
+        $c->res->status(422);
+        $c->res->body('');
+        $c->detach();
+    }
+
+    $self->status_ok($c, entity => $entity);
 }
 
 

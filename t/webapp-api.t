@@ -618,13 +618,13 @@ test '/template' => sub {
     my $widgets  = $self->decode_json( get_data_section('serialized') );
     $self->add_route_test(
         '/api/template', '*', 'POST', {template => $template},
-        {want => {template => $widgets}}
+        {want => {widgets => $widgets}}
     );
     $self->add_route_test(
         '/api/template', '*', 'POST', {widgets => $widgets},
         {want => {template => $template}}
     );
-    $self->add_route_test('/api/template', '*', 'POST', {}, \204);
+    $self->add_route_test('/api/template', '*', 'POST', {}, \422);
  };
 
 
