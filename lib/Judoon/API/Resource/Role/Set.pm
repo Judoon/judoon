@@ -30,7 +30,6 @@ provide.
 =cut
 
 use Safe::Isa;
-use Try::Tiny;
 
 use Moo::Role;
 
@@ -120,22 +119,10 @@ sub to_json {
 sub from_json {
     my ($self) = @_;
     my $content = $self->request->content;
-    my $obj;
-    my $ret = try {
-        $obj = $self->create_resource(
-            $self->decode_json( $content )
-        );
-    }
-    catch {
-        my $e = $_;
-        if ( $e->$_DOES('HTTP::Throwable') ) {
-            return \ $e->status_code;
-        }
-        die $e;
-    };
+    my $obj = $self->create_resource(
+        $self->decode_json( $content )
+    );
     $self->_set_obj($obj);
-
-    return $ret;
 }
 
 
