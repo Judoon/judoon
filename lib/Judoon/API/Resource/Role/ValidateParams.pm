@@ -18,8 +18,7 @@ and analyzes the contents of C<$params> for errors.
 
 =cut
 
-use HTTP::Throwable::Factory ();
-use Safe::Isa;
+use HTTP::Throwable::Factory qw(http_throw);
 
 use Moo::Role;
 
@@ -91,10 +90,8 @@ before update_resource => sub {
                 "Bad value for : " . join(', ', @bad_values);
         }
 
-        HTTP::Throwable::Factory->throw({
-            status_code => 422,
-            reason      => 'Unprocessable Entity',
-            message     => join("\n", @messages),
+        http_throw(UnprocessableEntity => {
+            message => join("\n", @messages),
         });
     }
 };
