@@ -3,7 +3,7 @@ package Judoon::API::Resource::Users;
 use Moo;
 use namespace::clean;
 
-extends 'Web::Machine::Resource';
+extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Set';
 

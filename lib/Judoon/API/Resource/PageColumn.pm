@@ -6,7 +6,7 @@ use Regexp::Common qw(RE_num_int);
 use Moo;
 use namespace::clean;
 
-extends 'Web::Machine::Resource';
+extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
 

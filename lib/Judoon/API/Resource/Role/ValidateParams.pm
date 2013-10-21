@@ -100,25 +100,6 @@ before update_resource => sub {
 };
 
 
-=head2 finish_request() (override)
-
-Overrides the C<finish_request()> method of L</Web::Machine::Resource>
-to handle non-standard errors.
-
-=cut
-
-sub finish_request {
-    my ($self, $metadata) = @_;
-    if (my $e = $metadata->{exception}) {
-        if ($e->$_DOES('HTTP::Throwable')) {
-            $self->response->status( $e->status_code );
-            $self->response->body( $e->message );
-        }
-        else {
-            warn $e;
-        }
-    }
-}
 
 
 1;
