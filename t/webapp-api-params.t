@@ -344,17 +344,93 @@ test '/pages' => sub {
         # valid params:
         #   template: must be translated
         #   widgets:  nyi
-        #   title:
-        #   sort: 
+        #   title:    text
         # ignore params:
+        #   sort:    default to end, to update, PUT all?
         #   page_id: get from url
-        #   id: ignore
+        #   id:      ignore
         # when ()
         # errors:
+        #   if {title, sort} exists but not defined
 
-      TODO: {
-            local $TODO = "not yet implemented";
-            fail 'not yet tested';
+
+        my $pagecols_url = "${page_url}/columns";
+        my ($good_tmpl, $good_widgets)
+            = @{ $self->get_tmpl_fixture('basic_equiv') }{ qw(jstmpl widgets) };
+        my $basic_pagecol = {
+            page_id  => $page_id,
+            template => $good_tmpl,
+            widgets  => $good_widgets,
+        };
+        my $pagecol_count = $page->page_columns_rs->count + 1;
+
+        my @tests_ok = (
+            [{title => 'hello', template => $good_tmpl,   }, ],
+            [{title => 'hello', widgets  => $good_widgets,}, ],
+            [{title => '',      template => $good_tmpl,   }, ],
+        );
+        for my $test (@tests_ok) {
+            my ($new_pagecol) = @$test;
+            my $compare_obj = {
+                %$basic_pagecol, title => $new_pagecol->{title},
+                sort => $pagecol_count++,
+            };
+            $self->add_route_created(
+                $pagecols_url, 'me', 'POST', $new_pagecol, $compare_obj,
+            );
+        }
+        $self->reset_fixtures();
+        $self->load_fixtures(qw(init api));
+
+        # hack: Create dummay pagecol, guess next id and sort by adding one
+        my $dummy_pagecol = $page->create_related(
+            'page_columns', {title => 'hello', template => $good_tmpl}
+        );
+        my $pagecol_id = $dummy_pagecol->id + 1;
+        $pagecol_count = $dummy_pagecol->sort + 1;
+        my @tests_ignore = (
+            [{sort    => 1,    }],
+            [{sort    => undef,}],
+            [{sort    => 'moo',}],
+            [{id      => 1,    }],
+            [{id      => undef,}],
+            [{id      => 'moo',}],
+            [{page_id => 1,    }],
+            [{page_id => undef,}],
+            [{page_id => 'moo',}],
+        );
+        for my $test (@tests_ignore) {
+            my ($new_page) = @$test;
+
+            my $new_pagecol = {
+                title => 'hello', template => $good_tmpl, %$new_page,
+            };
+            my $compare_obj = {
+                %$basic_pagecol, title => 'hello', sort => $pagecol_count++,
+                id => $pagecol_id++,
+            };
+
+            $self->add_route_created(
+                $pagecols_url, 'me', 'POST', $new_pagecol, $compare_obj,
+            );
+        }
+
+        my ($bad_tmpl, $bad_widgets)
+            = @{ $self->get_tmpl_fixture('invalid') }{ qw(jstmpl widgets) };
+        my @tests_fail = (
+            [{title => undef}, \422],
+            [{sort  => undef}, \422],
+            [{sort  => 'moo'}, \422],
+            [{template => $bad_tmpl}, \422],
+            [{widgets => $bad_widgets}, \422],
+            [{widgets => $bad_widgets}, \422],
+            [{template => $good_tmpl, widgets => $good_widgets}, \422],
+        );
+        for my $test (@tests_fail) {
+            my ($new_page, $error_code) = @$test;
+            $self->add_route_test(
+                $pagecols_url, 'me', 'POST', $new_page, $error_code
+            );
         }
     };
 
