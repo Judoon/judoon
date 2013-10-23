@@ -28,6 +28,7 @@ would be C<uniprot>.
 
 =cut
 
+use Judoon::Error::Input;
 use Judoon::Lookup::Internal;
 use Judoon::Lookup::External;
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef InstanceOf);
@@ -128,8 +129,8 @@ of this package.
 sub find_by_type_and_id {
     my ($self, $type, $id) = @_;
     $type //= '';
-    return $type eq 'internal' ? 0 #$self->new_internal_from_id($id)
-         : $type eq 'external' ? 0 #$self->new_external_from_id($id)
+    return $type eq 'internal' ? $self->new_internal_from_id($id)
+         : $type eq 'external' ? $self->new_external_from_id($id)
          :   Judoon::Error::Input->throw({
                message  => "$type is not a valid lookup type",
                got      => $type,
