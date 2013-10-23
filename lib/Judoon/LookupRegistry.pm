@@ -28,7 +28,6 @@ would be C<uniprot>.
 
 =cut
 
-use Judoon::Error::Input;
 use Judoon::Lookup::Internal;
 use Judoon::Lookup::External;
 use MooX::Types::MooseLike::Base qw(ArrayRef HashRef InstanceOf);
@@ -131,24 +130,14 @@ sub find_by_type_and_id {
     $type //= '';
     return $type eq 'internal' ? $self->new_internal_from_id($id)
          : $type eq 'external' ? $self->new_external_from_id($id)
-         :   Judoon::Error::Input->throw({
-               message  => "$type is not a valid lookup type",
-               got      => $type,
-               expected => 'internal or external',
-             });
+         :                       die "$type is not a valid lookup type";
 }
 
 sub find_by_full_id {
     my ($self, $full_id) = @_;
 
     $full_id //= '';
-    if (!$full_id || $full_id !~ $LOOKUP_ID_RE) {
-        Judoon::Error::Input->throw({
-            message  => "$full_id is not a valid lookup id",
-            got      => $full_id,
-            expected => 'internal_${dataset_id} or external_${database_name}',
-        });
-    }
+    die "$full_id is not a valid lookup id" unless ($full_id =~ $LOOKUP_ID_RE);
     return $self->find_by_type_and_id(split /_/, $full_id);
 }
 
@@ -177,23 +166,10 @@ sub new_internal_from_obj {
 sub new_internal_from_id {
     my ($self, $id) = @_;
     $id //= '';
-    if ($id !~ $INTERNAL_ID_RE) {
-        Judoon::Error::Input->throw({
-            message  => "$id is not a valid internal id",
-            got      => $id,
-            expected => '$dataset_id',
-        });
-    }
+    die "$id is not a valid internal id" unless ($id =~ $INTERNAL_ID_RE);
 
     my $dataset = $self->user->datasets_rs->find({id => $id});
-    if (!$dataset) {
-        Judoon::Error::Input->throw({
-            message  => "No dataset found with id: $id",
-            got      => 'undef',
-            expected => 'a dataset',
-        });
-    }
-
+    die "No dataset found with id: $id" unless ($dataset);
     return $self->new_internal({dataset => $dataset});
 }
 sub new_internal {
@@ -225,13 +201,8 @@ sub new_external_from_obj {
 sub new_external_from_id {
     my ($self, $id) = @_;
     $id //= '';
-    if ($id !~ $EXTERNAL_ID_RE) {
-        Judoon::Error::Input->throw({
-            message  => "$id is not a valid external id",
-            got      => $id,
-            expected => '$database_name',
-        });
-    }
+    die "$id is not a valid external id" unless ($id =~ $EXTERNAL_ID_RE);
+
     # my $dataset = $self->schema->resultset('ExternalDataset')
     #     ->find({id => $id});
     my $dataset;
@@ -241,14 +212,7 @@ sub new_external_from_id {
             last;
         }
     }
-    if (!$dataset) {
-        Judoon::Error::Input->throw({
-            message  => "No database found called: $id",
-            got      => 'undef',
-            expected => 'a database',
-        });
-    }
-
+    die "No database found called: $id" unless ($dataset);
     return $self->new_external({dataset => $dataset});
 }
 sub new_external {
