@@ -223,15 +223,163 @@ test '/datasets' => sub {
 
         # DatasetColumns
         # valid params:
-        #  dataset_id: ignore or error if it doesn't agree w/ $ds_id in url
-        #  that_table_id: 
+        #  that_table_id: (internal_<ds_id>|external_<label>)
         #  new_col_name: 
         #  rest of data gets passed to build_actor();
+        # ignore params:
+        #   id:         auto
+        #   dataset_id: from_url
+        #   shortname:  auto
+        #   sort:       auto
+        #   data_type:  from_transform
+        #   name:       from new_col_name
+        # invalid params:
+        #   that_table_id:
+        #     !~ m/^(?:internal_\d+|external_\w+)/
+        #     internal: \d+ not a ds_id
+        #     external: \w+ not in %dbs
+        # errors:
+        #   that_table_id is null/empty: 422
+        #   that_table_id is invalid:    ???what does Lookup Registry do???
+        #   that_table_is is internal + bad ds_id: 404
+        #   errors from new_computed_column:
+        #     invalid new_col_name?
+        #     invalid lookup data?
+        $self->load_fixtures('lookup');
 
-      TODO: {
-            local $TODO = "not yet implemented";
-            fail 'not yet tested';
+        my $active_ds      = $me->datasets_rs->find({name => 'Lookup-Active'});
+        my $active_ds_id   = $active_ds->id;
+        my $dscols_url     = "/api/datasets/${active_ds_id}/columns";
+        my $active_joincol = $active_ds->ds_columns_rs->find({name => 'ThisJoin'});
+
+        my $lookup_ds      = $me->datasets_rs->find({name => 'Lookup-Lookup'});
+        my $lookup_ds_id   = $lookup_ds->id;
+        my $lookup_joincol = $lookup_ds->ds_columns_rs->find({name => 'ThatJoin'});
+        my $lookup_selcol  = $lookup_ds->ds_columns_rs->find({name => 'ThatSelect'});
+        my $good_lookup_id = "internal_${lookup_ds_id}";
+
+        my %new_dscol_params = (
+            new_col_name   => 'fancy_compcol_name',
+            that_table_id     => $good_lookup_id,
+            this_joincol_id   => $active_joincol->shortname,
+            that_joincol_id   => $lookup_joincol->shortname,
+            that_selectcol_id => $lookup_selcol->shortname,
+        );
+        my @default_data = sort (qw(co00002365 co00001638 co00002364), '', 'co00999999');
+
+        my %ext_lookup = (
+            that_table_id     => 'external_uniprot',
+            this_joincol_id   => $active_joincol->shortname,
+            that_joincol_id   => 'P_ENTREZGENEID',
+            that_selectcol_id => 'ID',
+        );
+        my @uniprot_ids = sort (qw(TLN1_HUMAN AKT3_HUMAN VINC_HUMAN CALC_CANFA), '');
+
+        my $registry    = Judoon::LookupRegistry->new({user => $me});
+        my $lookup      = $registry->find_by_full_id($good_lookup_id);
+
+        my @tests_ok = (
+            [{},                       {},           ], # defaults
+            [{new_col_name => '',},    {name => '(untitled column)', shortname => 'untitled'}, ],
+            [{%ext_lookup},            {data_type => 'Biology_Accession_Uniprot_Id'}, \@uniprot_ids,],
+
+            # all of these should be ignored
+            [{id => 1},                {},],
+            [{id => undef},            {},],
+            [{dataset_id => 1},        {},],
+            [{dataset_id => undef},    {},],
+            [{sort => 1},              {},],
+            [{sort => undef},          {},],
+            [{shortname => 'moo'},     {},],
+            [{shortname => undef},     {},],
+            [{data_type => 'moo'},     {},],
+            [{data_type => undef},     {},],
+            [{name => 'anythingelse'}, {},],
+            [{name => undef},          {},],
+        );
+        for my $test (@tests_ok) {
+            my ($provide, $expect_col, $expect_data) = @$test;
+
+            # hack: Create dummay pagecol, guess next id and sort by adding one
+            my $dummy_dscol = $active_ds->new_computed_column(
+                'dummycol', $lookup->build_actor( \%new_dscol_params ),
+            );
+            my $dscol_id    = $dummy_dscol->id + 1;
+            my $dscol_count = $dummy_dscol->sort + 1;
+
+            my $new_dscol = {%new_dscol_params, %$provide};
+            my $compare_obj = {
+                name => $new_dscol_params{new_col_name},
+                shortname => $new_dscol_params{new_col_name},
+                dataset_id => $active_ds_id, data_type => 'CoreType_Text',
+                id => $dscol_id, sort => $dscol_count,
+                %$expect_col
+            };
+
+            $self->add_route_created(
+                $dscols_url, 'me', 'POST', $new_dscol, $compare_obj,
+            );
+
+            $self->add_route_test(
+                "/api/datasets/${active_ds_id}/data", #columns/$dscol_id
+                "me", "GET", {}, sub {
+                    my ($self, $msg) = @_;
+                    my $data = $self->decode_json($self->mech->content);
+                    my @thingit = sort map {$_->{ $compare_obj->{shortname} }}
+                        @{ $data->{tmplData} };
+                    is_deeply \@thingit, ($expect_data // \@default_data),
+                        "$msg: compare data is correct";
+                },
+            );
+
+            $self->reset_fixtures();
+            $self->load_fixtures(qw(init api lookup));
         }
+
+
+        my $your_ds_id = $user_rs->find({username => 'you'})->datasets_rs
+            ->first->id;
+
+        my @tests_fail = (
+
+            [{that_table_id => undef},       \422],
+            [{that_table_id => 'moo_thing'}, \422],
+            [{that_table_id => 'derp'},      \422],
+
+            [{that_table_id => 'internal_'},            \422],
+            [{that_table_id => 'internal'},             \422],
+            [{that_table_id => 'internal_moo'},         \422],
+            [{that_table_id => "internal_$your_ds_id"}, \422],
+            [{that_table_id => "internal_999"},         \422],
+
+            [{that_table_id => "external"},         \422],
+            [{that_table_id => "external_"},        \422],
+            [{that_table_id => "external_moo"},     \422],
+            [{that_table_id => "external_dep&#pl"}, \422],
+
+            [{new_col_name => undef,},      \422],
+            [{this_joincol_id => undef,},   \422],
+            [{this_joincol_id => 999,},     \422],
+            [{that_joincol_id => undef,},   \422],
+            [{that_joincol_id => 999,},     \422],
+            [{that_selectcol_id => undef,}, \422],
+            [{that_selectcol_id => 999,},   \422],
+
+            [{%ext_lookup, that_joincol_id => undef,},   \422],
+            [{%ext_lookup, that_joincol_id => 999,},     \422],
+            [{%ext_lookup, that_joincol_id => 'ID',},     \422],
+            [{%ext_lookup, that_selectcol_id => undef,}, \422],
+            [{%ext_lookup, that_selectcol_id => 999,},   \422],
+            [{%ext_lookup, that_selectcol_id => 'ACC+ID',},   \422],
+        );
+        for my $test (@tests_fail) {
+            my ($fail_params, $error_code) = @$test;
+            my $new_dscol = { %new_dscol_params, %$fail_params };
+            $self->add_route_test(
+                $dscols_url, 'me', 'POST', $new_dscol, $error_code
+            );
+        }
+
     };
 
     subtest 'PUT /datasets/$ds_id/columns/$dscol_id' => sub {

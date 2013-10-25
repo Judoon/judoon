@@ -66,11 +66,31 @@ The L<Judoon::Type> of the product of the lookup.
 The subroutine that performs the transform. Takes an arrayref of data
 to lookup and returns an similarly sized arrayref of the lookup data.
 
+=head2 validate_args()
+
+Validates that C<that_joincol_id> and C<that_selectcol_id> are valid
+identifiers in C<join_dataset>.
+
 =cut
 
 requires 'result_data_type';
 requires 'lookup';
+requires 'validate_args';
 
+
+=head1 METHODS
+
+=head2 BUILD
+
+Validate the arguments to the actor after object construction.
+
+=cut
+
+sub BUILD {
+    my ($self) = @_;
+    die 'Invalid Actor Parameters!'
+        unless ( $self->validate_args() );
+}
 
 1;
 __END__

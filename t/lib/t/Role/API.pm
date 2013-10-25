@@ -22,6 +22,11 @@ routes/user/method combinations that were not tested.  'Tested' in
 this case refers to tests run through the add_route_test() method or
 its related helper functions.
 
+Also, I apologize: I really should have built in a way to set / modify
+the test description. I should probably make that the first argument
+to C<add_route_test()>, but that'll have to wait until I have time to
+write descriptions for all of our API tests. I Have Fear.
+
 =cut
 
 use HTTP::Request::Common qw(GET POST PUT DELETE);

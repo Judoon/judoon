@@ -232,6 +232,11 @@ the form of a C<Judoon::Lookup::*Actor>) to an existing column.
 sub new_computed_column {
     my ($self, $name, $lookup_actor) = @_;
 
+    my $join_col = $lookup_actor->this_joincol_id // '';
+    if (! grep {$_->shortname eq $join_col} $self->ds_columns_rs->all) {
+        die "This dataset does not have a column named '$join_col'";
+    }
+
     my $computed_ds = $self->new_related('ds_columns', {}); #computed => 1,});
 
     my ($longname, $shortname) = @{ ($self->_unique_names($name))[0] };

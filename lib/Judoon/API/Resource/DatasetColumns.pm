@@ -22,33 +22,44 @@ sub allowed_methods {
 sub create_resource {
     my ($self, $data) = @_;
 
+    if (not defined $data->{new_col_name}) {
+        http_throw(UnprocessableEntity => {
+            message => "'new_col_name' must not be undefined",
+        });
+    }
+
     my $dataset = $self->set->first->dataset;
     my $owner   = $dataset->user;
 
     my $registry = Judoon::LookupRegistry->new({user => $owner,});
     my $full_id  = $data->{that_table_id} // '';
-    my $lookup   = $registry->find_by_full_id($full_id);
-    if (not $lookup) {
-        http_throw(Forbidden => {
+    my ($lookup, $lookup_actor);
+    eval {
+        $lookup       = $registry->find_by_full_id($full_id);
+        $lookup_actor = $lookup->build_actor( $data );
+    };
+    if ($@ || !$lookup ) {
+        http_throw(UnprocessableEntity => {
             message => "No such lookup: $full_id",
         });
     }
-    elsif ($lookup->group_id eq 'internal') {
-        if (!$owner->datasets_rs->find({id => $lookup->id})) {
-            http_throw(Forbidden => {
-                message => "You don't have permission to access the joined dataset",
-            });
-        }
-    }
+
 
     my $new_col;
-    $dataset->result_source->schema->txn_do(
-        sub {
-            $new_col = $dataset->new_computed_column(
-                $data->{new_col_name}, $lookup->build_actor( $data ),
-            );
-        }
-    );
+    eval {
+        $new_col = $dataset->result_source->schema->txn_do(
+            sub {
+                return $dataset->new_computed_column(
+                    $data->{new_col_name}, $lookup_actor,
+                );
+            }
+        );
+    };
+    if ($@ || !$new_col) {
+        http_throw(UnprocessableEntity => {
+            message => "Lookup failed. Check your parameters."
+        });
+    }
 
     return $new_col;
 }

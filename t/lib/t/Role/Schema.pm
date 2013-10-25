@@ -113,6 +113,8 @@ has fixtures => (
 );
 sub _build_fixtures {
     return {
+
+        # standard fixtures needed by everyone
         init  => sub {
             my ($self) = @_;
             $self->schema()->resultset('TtDscolumnDatatype')->populate([
@@ -135,6 +137,8 @@ sub _build_fixtures {
                 ['Biology_Accession_Cmkb_OrthologAcc',  ],
             ]);
         },
+
+        # a simple one-user, one-ds, one-page fixture
         basic => sub {
             my ($self) = @_;
 
@@ -145,6 +149,8 @@ sub _build_fixtures {
             my $dataset = $user->import_data_by_filename('t/etc/data/basic.xls');
             $dataset->create_basic_page();
         },
+
+        # fixtures for testing Page cloning
         clone_set => sub {
             my ($self) = @_;
 
@@ -177,6 +183,8 @@ sub _build_fixtures {
             my $clone2_ds = $user->import_data_by_filename('t/etc/data/clone2.xls');
             $clone2_ds->create_basic_page();
         },
+
+        # fixtures for testing the Judoon API
         api => sub {
             my ($self) = @_;
             my $user_rs = $self->schema()->resultset('User');
@@ -208,7 +216,16 @@ sub _build_fixtures {
                 object      => $you_pub_ds,
                 public_page => $you_pub_ds->create_basic_page->update({permission => 'public'}),
             };
-        }
+        },
+
+        # fixture for testing Judoon::Lookups
+        lookup => sub {
+            my ($self) = @_;
+            my $user_rs   = $self->schema()->resultset('User');
+            my $me        = $user_rs->find_or_create( $self->users->{me} );
+            my $active_ds = $me->import_data_by_filename('t/etc/data/lookup/me-active.xls');
+            my $lookup_ds = $me->import_data_by_filename('t/etc/data/lookup/me-lookup.xls');
+        },
     };
 }
 

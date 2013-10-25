@@ -68,6 +68,35 @@ for my $id (@ids) {
 
 =head1 METHODS
 
+=head2 validate_args
+
+Dies unless: C<that_joincol_id> is a valid identifier for a Uniprot
+Id-Mapper input B<AND> C<that_selectcol_id> is a valid identifier for
+a Uniprot Id-mapper output C<AND> a mapping exists between C<that_joincol_id>
+and C<that_selectcol_id>.
+
+=cut
+
+sub validate_args {
+    my ($self) = @_;
+
+    # Uniprot can map a Uniprot accession (ACC or ID) to any of the
+    # other accession types and vice-versa.  It cannot map from a
+    # non-Uniprot accession to a nother non-Uniprot accession. The
+    # test for this is the direction for joincol and selectcol cannot
+    # both be 'both'.
+    return
+        exists($input_keys{ $self->that_joincol_id })
+        &&
+        exists($output_keys{ $self->that_selectcol_id })
+        &&
+        grep {$_->{dir} ne 'both'} (
+            $input_keys{ $self->that_joincol_id },
+            $output_keys{ $self->that_selectcol_id },
+        );
+}
+
+
 =head2 result_data_type
 
 The data type of the selected output type.
