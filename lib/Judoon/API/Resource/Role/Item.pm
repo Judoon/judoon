@@ -56,6 +56,15 @@ Indicates whether this resource can be modified.
 
 has writable => (is => 'ro',);
 
+=head2 is_authorized / forbidden
+
+Let external code decide when 401 or 403 should be returned.
+
+=cut
+
+has forbidden => (is => 'ro', default => 0);
+has is_authorized => (is => 'ro', default => 1);
+
 
 =head1 METHODS FROM Web::Machine::Resource
 
@@ -69,7 +78,7 @@ DELETE are available when the C<writable> attribute is set.
 sub allowed_methods {
    return [
       qw(GET HEAD),
-      ( $_[0]->writable || 1 ) ? (qw(PUT DELETE)) : ()
+      ( $_[0]->writable ) ? (qw(PUT DELETE)) : ()
    ];
 }
 

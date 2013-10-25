@@ -1,8 +1,8 @@
 <h2>[% dataset.object.title %]</h2>
 
 
-<section id="notes">
-[% dataset.object.notes | html_para %]
+<section id="description">
+[% dataset.object.description | html_para %]
 </section>
 
 

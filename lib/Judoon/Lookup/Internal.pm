@@ -98,9 +98,8 @@ performing the requested lookup.
 
 sub build_actor {
     my ($self, $args) = @_;
-    my $join_dataset = $self->user->datasets_rs->find({id => $self->id});
     return Judoon::Lookup::InternalActor->new({
-        %$args, join_dataset => $join_dataset,
+        %$args, join_dataset => $self->dataset,
     });
 }
 

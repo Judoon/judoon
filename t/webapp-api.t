@@ -1,298 +1,754 @@
 #!/usr/bin/env perl
 
+use Clone qw(clone);
+use Judoon::SiteLinker;
+use Judoon::TypeRegistry;
+use List::AllUtils ();
+
 use Test::Roo;
-use v5.16;
-
 use lib 't/lib';
-
-with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp',
-    'Judoon::Role::JsonEncoder';
-
-
-use HTTP::Request::Common qw(GET POST PUT DELETE);
-use Test::JSON;
-
-my ($user_rs, $testuser, $otheruser, $otheruser_tkn,
-    $other_ds_rs, $test_ds_rs, $access_token);
-
+with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
+    'Judoon::Role::JsonEncoder', 't::Role::TmplFixtures';
 
 after setup => sub {
     my ($self) = @_;
-    $self->load_fixtures('basic');
-
-    my $otheruser = $self->resultset('User')->create_user({
-        username => 'otheruser', password => 'otheruser',
-        name => 'Other User', email_address => 'otheruser@example.com',
-    });
-
-    # public dataset/page
-    my $dataset = $otheruser->import_data_by_filename('t/etc/data/basic.xls');
-    $dataset->permission('public');
-    $dataset->update();
-    my $page = $dataset->create_basic_page();
-    $page->permission('public');
-    $page->update();
-
-    # private dataset/page
-    $otheruser->import_data_by_filename('t/etc/data/basic.xls')
-        ->create_basic_page();
-
-    $user_rs     = $self->schema->resultset('User');
-    $testuser    = $user_rs->find({username => 'testuser'});
-    $otheruser   = $user_rs->find({username => 'otheruser'});
-    $other_ds_rs = $otheruser->datasets_rs;
-    $test_ds_rs  = $testuser->datasets_rs;
-
-    $otheruser_tkn = $otheruser->new_or_refresh_access_token->value;
-    $access_token  = "?access_token=$otheruser_tkn";
-
+    $self->load_fixtures(qw(init api));
 };
-#after each_test => sub { $_[0]->reset_fixtures(); };
 
 
 test 'Basic Tests' => sub {
     my ($self) = @_;
-
     for my $uri (qw(/api /api/)) {
         $self->mech->get_ok($uri, "get $uri");
         is $self->mech->uri, 'http://localhost/', '  ...redirects to root';
     }
-
-    $self->mech->get_ok('/api/datasetdata', 'get /api/datasetdata');
 };
 
 
-test 'dataset data' => sub {
+# READONLY ROUTES
+
+# A read-only route for getting information about all / other users
+test '/users' => sub {
     my ($self) = @_;
 
-    my $dataset = $self->schema->resultset('Dataset')->first;
-    $self->_GET_json("/api/datasetdata/" . $dataset->id);
-    ok $self->mech->success, 'can get dataset data';
+    my $user_rs     = $self->schema->resultset('User');
+    my @all_users   = map {$_->TO_JSON} $user_rs->all;
+    my $me          = $user_rs->find({username => 'me'})->TO_JSON;
+    my $me_no_email = clone($me);
+    # delete $me_no_email->{email_address};
 
-    my $response = $self->mech->content;
-    is_valid_json($response, '  ...response is valid json');
-    my $data = $self->decode_json($response);
-    is_deeply $data->{tmplData}[0],
-        {name => 'Chewie', gender => 'male', age => 5},
-            '   ...expected content';
-};
-
-
-test 'dataset' => sub {
-    my ($self) = @_;
-
-    my %datasets = (
-        public     => { obj => $other_ds_rs->public->first,  },
-        private    => { obj => $other_ds_rs->private->first, },
-        restricted => { obj => $test_ds_rs->private->first,  },
+    my @responses = (
+        ['me',    '/api/users',    {want => \@all_users,  },],
+        ['me',    '/api/users/me', {want => $me,          },],
+        ['you',   '/api/users',    {want => \@all_users,  },],
+        ['you',   '/api/users/me', {want => $me_no_email, },],
+        ['noone', '/api/users',    {want => \@all_users,  },],
+        ['noone', '/api/users/me', {want => $me_no_email, },],
     );
-
-    for my $ds (values %datasets) {
-        my $obj     = $ds->{obj};
-        $ds->{id}   = $obj->id;
-        $ds->{url}  = "/api/dataset/" . $ds->{id};
-        $ds->{json} = $obj->TO_JSON;
+    for my $response (@responses) {
+        my ($user, $route, $res) = @{$response};
+        $self->add_route_test($route, $user, 'GET', {}, $res);
     }
+    $self->add_route_readonly('/api/users',    '*');
+    $self->add_route_readonly('/api/users/me', '*');
 
-    $self->_access_control_ok(@datasets{qw(public private restricted)});
+};
+
+test '/public_datasets' => sub {
+    my ($self) = @_;
+    my @datasets = map {$_->TO_JSON} $self->schema->resultset('Dataset')->public->all;
+    $self->add_route_test(
+        '/api/public_datasets', '*', 'GET', {}, {want => \@datasets}
+    );
+    $self->add_route_readonly('/api/public_datasets', '*');
+};
+
+test '/public_pages' => sub {
+    my ($self) = @_;
+    my @pages = map {$_->TO_JSON} $self->schema->resultset('Page')->public->all;
+    $self->add_route_test(
+        '/api/public_pages', '*', 'GET', {}, {want => \@pages}
+    );
+    $self->add_route_readonly('/api/public_pages', '*');
 };
 
 
-test 'dataset column' => sub {
+# Authd routes
+test '/user' => sub {
     my ($self) = @_;
 
-    my %ds_cols = (
-        public     => { obj => $other_ds_rs->public->first->ds_columns_ordered->first,  },
-        private    => { obj => $other_ds_rs->private->first->ds_columns_ordered->first, },
-        restricted => { obj => $test_ds_rs->private->first->ds_columns_ordered->first,  },
-    );
-    for my $ds_col (values %ds_cols) {
-        my $obj     = $ds_col->{obj};
-        $ds_col->{id}   = $obj->id;
-        $ds_col->{url}  = "/api/dataset/" . $obj->dataset->id . "/column/" . $ds_col->{id};
-        $ds_col->{json} = $obj->TO_JSON;
-    }
+    my $user_rs = $self->schema->resultset('User');
+    my $me  = $user_rs->find({username => 'me'});
+    my $you = $user_rs->find({username => 'you'});
 
-    $self->_access_control_ok(@ds_cols{qw(public private restricted)});
-};
+    my $user_url = '/api/user';
+    $self->add_route_test($user_url, 'me', 'GET', {}, {want => $me->TO_JSON });
+    $self->add_route_test($user_url, 'me', 'PUT', {name => 'Boo'}, \204);
+    $self->add_route_test($user_url, 'me', 'GET', {}, {want => {
+        %{$me->discard_changes->TO_JSON}, name => 'Boo',
+    }});
+    $self->add_route_test($user_url, 'you', 'GET', {}, {want => $you->TO_JSON});
+    $self->add_route_test($user_url, 'you', 'PUT', {name => 'Moo'}, \204);
+    $self->add_route_test($user_url, 'you', 'GET', {}, {want => {
+        %{$you->discard_changes->TO_JSON}, name => 'Moo',
+    }});
+    $self->add_route_bad_method($user_url, 'me+you', 'POST+DELETE', {});
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
 
 
-test 'page' => sub {
-    my ($self) = @_;
+    my $ds_url   = '/api/user/datasets';
+    my $page_url = '/api/user/pages';
+    for my $user ($me, $you) {
+        my $name = $user->username;
 
-    my %pages = (
-        public     => { obj => $other_ds_rs->related_resultset('pages')->public->first,  },
-        private    => { obj => $other_ds_rs->related_resultset('pages')->private->first, },
-        restricted => { obj => $test_ds_rs->related_resultset('pages')->private->first,  },
-    );
+        # User can see their datasets and create new ones.
+        my $datasets = $user->datasets_rs;
+        my @all_ds   = map {$_->TO_JSON} $datasets->all;
+        my $new_ds   = {};
+        $self->add_route_test($ds_url, $name, 'GET', {}, {want => \@all_ds});
+      TODO: {
+            local $TODO = 'Not implemented';
+            fail("POST $name $ds_url");
+            # $self->add_route_test($ds_url, $name, 'POST', $new_ds, \201);
+        }
+        $self->add_route_bad_method($ds_url, $name, 'PUT+DELETE', {});
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
 
-    for my $page (values %pages) {
-        my $obj       = $page->{obj};
-        $page->{id}   = $obj->id;
-        $page->{url}  = "/api/page/" . $page->{id};
-        $page->{json} = $obj->TO_JSON,
-    }
-
-    $self->_access_control_ok(@pages{qw(public private restricted)});
-
-    my $private = $pages{private};
-    subtest 'new page' => sub {
-        my $new_page = {
-            dataset_id => 0+$private->{obj}->dataset->id,
-            title     => "New POSTed Page",
-            preamble  => "This is how it starts.",
-            postamble => "...how it ends is up to you.",
+        # User can see their pages and create new ones
+        my $pages     = $user->my_pages;
+        my @all_pages = map {$_->TO_JSON} $pages->all;
+        my $new_page  = {
+            dataset_id => $all_ds[0]->{id},
+            title      => 'Brand New Page',
+            preamble   => 'Hello and welcome to',
+            postamble  => 'thanks and good bye',
         };
-        $self->_POST_json("/api/page/" . $access_token, $new_page);
-        ok($self->mech->success, "succesfully POSTed new page");
-        my $new_url = $self->mech->res->headers->header('Location');
-        $self->_GET_json($new_url);
-        my $expected = {
-            %$new_page, permission => 'private', nbr_columns => 0,
-            nbr_rows => 0+$private->{obj}->dataset->nbr_rows,
-            dataset_id => 0+$private->{obj}->dataset->id,
-            id => 0+($new_url =~ s{.+/}{}r),
+        $self->add_route_test($page_url, $name, 'GET', {}, {want => \@all_pages});
+        $self->add_route_created($page_url, $name, 'POST', $new_page);
+        $self->add_route_bad_method($page_url, $name, 'PUT+DELETE', {});
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
+    }
+
+    $self->add_route_needs_auth($user_url, 'noone', '*', {});
+    $self->add_route_needs_auth($ds_url,   'noone', '*', {});
+    $self->add_route_needs_auth($page_url, 'noone', '*', {});
+};
+
+
+# read-write the logged-in users dataset
+test '/datasets' => sub {
+    my ($self) = @_;
+
+    # /api/datasets redirects to /public_datasets
+    my @all_datasets = map {$_->TO_JSON}
+        $self->schema->resultset('Dataset')->public->all;
+    $self->add_route_redirects('/api/datasets', '*', 'GET', {});
+    $self->add_route_test(
+        '/api/datasets', '*', 'GET', {}, {want => \@all_datasets}
+    );
+    $self->add_route_readonly('/api/datasets', '*');
+
+
+    # I have full priviliges over my datasets
+    my $user_rs         = $self->schema->resultset('User');
+    my $me              = $user_rs->find({username => 'me'});
+    my $my_datasets     = $me->datasets_rs;
+    my @valid_ds_fields = qw(name description permission);
+    my %urls            = (public => '', private => '');
+    my @datasets        = (
+        # type       dataset
+        [ 'public',  $my_datasets->public->first->TO_JSON,  ],
+        [ 'private', $my_datasets->private->first->TO_JSON, ],
+    );
+    for my $ds_test (@datasets) {
+        my ($type, $ds) = @$ds_test;
+        my $ds_id       = $ds->{id};
+        my $ds_url      = "/api/datasets/$ds_id";
+        my $update      = {
+            (map {$_ => $ds->{$_}} @valid_ds_fields),
+            description => "Moo moo quack quack",
         };
-        my $got = $self->decode_json($self->mech->content);
-        delete @{$got}{qw(created modified)};
-        is_deeply $got, $expected, ' ..new page has expected contents';
 
-        my $update = { %$expected };
-        $update->{title} = "Brand New Title";
-        delete @{ $update }{qw(nbr_columns nbr_rows)};
-        $self->_PUT_json($new_url, $update);
-        ok($self->mech->success, 'successfully PUTed update');
-        $self->_GET_json($new_url);
-        my $got_put = $self->decode_json($self->mech->content);
-        delete @{$got_put}{qw(created modified)};
-        is_deeply $got_put, {%$expected, title=>$update->{title}},
-            '  ..new page has expected contents';
+        $self->add_route_test($ds_url, 'me', 'GET', {}, {want => $ds});
+        $self->add_route_bad_method($ds_url, 'me', 'POST', {});
+        $self->add_route_test($ds_url, 'me', 'PUT', $update, \204,);
+        $ds = $my_datasets->find({id => $ds_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($ds_url, 'me', 'GET', {}, {want => {
+            %$ds, description => $update->{description}
+        }});
+        $self->add_route_test($ds_url, 'me', 'DELETE', {},
+            sub {
+                my ($self, $msg) = @_;
+                ok !($my_datasets->find({id => $ds_id})),
+                    "$msg: $type dataset deleted";
+            },
+        );
+        $urls{$type}  = $ds_url;
+    }
 
-        $self->_DELETE_json($new_url);
-        ok($self->mech->success, 'successfully DELETEd page');
-        $self->_GET_json($new_url);
-        is $self->mech->status, 404, "  ...yep, it's gone!";
-    };
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
 
+    # other users can see my public datasets, but nothing else
+    my $my_pub_ds = $my_datasets->find({id => $datasets[0][1]->{id}})->TO_JSON;
+    $self->add_route_test($urls{public}, 'you+noone', 'GET', {}, {want => $my_pub_ds});
+    $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/datasets/moo', '*', '*', {});
+};
+
+
+# mixed access to dataset properties
+test '/datasets/1/columns' => sub {
+    my ($self) = @_;
+
+    my $user_rs      = $self->schema->resultset('User');
+    my $me           = $user_rs->find({username => 'me'});
+    my $my_datasets  = $me->datasets_rs;
+    my @dscol_fields = qw(data_type);
+    my %urls;
+    my @datasets = (
+        # type       dataset
+        [ 'public',  $my_datasets->public->first,  ],
+        [ 'private', $my_datasets->private->first, ],
+    );
+
+    for my $dscol_test (@datasets) {
+        my ($type, $ds) = @$dscol_test;
+        my $ds_id       = $ds->id;
+
+        # GET    /datasets/$ds_id/columns == want
+        # POST   /datasets/$ds_id/columns == want
+        # PUT    /datasets/$ds_id/columns == 405
+        # DELETE /datasets/$ds_id/columns == 405
+        my @ds_cols       = map {$_->TO_JSON} $ds->ds_columns_ordered->all;
+        my $cols_url      = "/api/datasets/$ds_id/columns";
+        my $other_ds      = $my_datasets->search({id => {'!=' => $ds_id}})->first;
+        my @other_ds_cols = map {$_->TO_JSON}
+            $other_ds->ds_columns_ordered->slice(0,1)->all;
+        my $new_col       = {
+          dataset_id         => $ds_id,
+          new_col_name       => 'Derived Column',
+          this_table_id      => $ds_id,
+          that_table_id      => 'internal_' . $other_ds->id,
+          this_joincol_id    => $ds_cols[0]->{shortname},
+          that_joincol_id    => $other_ds_cols[0]->{shortname},
+          that_selectcol_id  => $other_ds_cols[1]->{shortname},
+        };
+        my $compare_col = {
+            dataset_id => $ds_id,
+            name       => $new_col->{new_col_name},
+        };
+        $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@ds_cols});
+        $self->add_route_created($cols_url, 'me', 'POST', $new_col, $compare_col);
+        $self->add_route_bad_method($cols_url, 'me', 'PUT+DELETE', {});
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
+
+        # GET    /datasets/$ds_id/columns/$col_id == want
+        # POST   /datasets/$ds_id/columns/$col_id == 405
+        # PUT    /datasets/$ds_id/columns/$col_id == want
+        # DELETE /datasets/$ds_id/columns/$col_id == 405
+        my $ds_col    = $ds->ds_columns_ordered->first->TO_JSON;
+        my $ds_col_id = $ds_col->{id};
+        my $col_url   = "$cols_url/$ds_col_id";
+        my $update    = {
+            (map {$_ => $ds_col->{$_}} @dscol_fields),
+            data_type => 'Biology_Accession_Entrez_GeneSymbol',
+        };
+        $self->add_route_test($col_url, 'me', 'GET', {}, {want => $ds_col});
+        $self->add_route_test($col_url, 'me', 'PUT', $update, \204);
+        $ds_col = $ds->ds_columns->find({id => $ds_col_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($col_url, 'me', 'GET', {}, {want => {
+            %$ds_col, data_type => $update->{data_type}
+        }});
+        $self->add_route_bad_method($col_url, 'me', 'POST+DELETE', {});
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
+
+        $urls{$type} = {
+            set  => $cols_url,
+            item => $col_url,
+        };
+    }
+
+
+    # you + noone
+    # other users can see my public datasets, but nothing else
+    # refetch public columns after schema reset
+    my @pub_ds_cols = map {$_->TO_JSON} $datasets[0][1]->ds_columns_ordered->all;
+    $self->add_route_test(
+        $urls{public}{set}, 'you+noone', 'GET', {}, {want => \@pub_ds_cols}
+    );
+    $self->add_route_bad_method(
+        $urls{public}{set}, 'you+noone', 'POST+PUT+DELETE', {}
+    );
+    $self->add_route_not_found($urls{private}{set}, 'you+noone', '*', {});
+
+    # refetch public column after schema reset
+    my $pub_ds_col = $datasets[0][1]->ds_columns_ordered->first->TO_JSON;
+    $self->add_route_test(
+        $urls{public}{item}, 'you+noone', 'GET', {}, {want => $pub_ds_col}
+    );
+    $self->add_route_bad_method(
+        $urls{public}{item}, 'you+noone', 'POST+PUT+DELETE', {}
+    );
+    $self->add_route_not_found($urls{private}{item}, 'you+noone', '*', {});
+
+    # nonsense / mismatched ids are rejected
+    $self->add_route_not_found('/api/datasets/moo/columns', '*', '*', {});
+    my @ds_ids    = ($datasets[0][1]->id, $datasets[1][1]->id, 'moo');
+    my @dscol_ids = (
+        $datasets[0][1]->ds_columns_ordered->first->id,
+        $datasets[1][1]->ds_columns_ordered->first->id,
+        'moo'
+    );
+    for my $ds_idx (0..$#ds_ids) {
+        for my $dscol_idx (0..$#dscol_ids) {
+            next if ($ds_idx == $dscol_idx);
+
+            my ($ds_id, $dscol_id)
+                = ($ds_ids[$ds_idx], $dscol_ids[$dscol_idx]);
+            my $url = "/api/datasets/$ds_id/columns/$dscol_id";
+            $self->add_route_not_found($url, 'me', 'DELETE', {});
+            $self->fudge_route_test($url, 'me', 'GET+PUT+POST');
+            $self->fudge_route_test($url, 'you+noone', '*');
+        }
+    }
+};
+
+
+test '/datasets/1/data' => sub {
+    my ($self) = @_;
+
+    my $my_datasets = $self->schema->resultset('User')
+        ->find({username => 'me'})->datasets_rs;
+    my @tests = (
+        ['public',  $my_datasets->public->first,  ],
+        ['private', $my_datasets->private->first, ],
+    );
+    my %urls;
+    # I can see all my data for my datasets
+    for my $test (@tests) {
+        my ($type, $ds) = @$test;
+        my $ds_id       = $ds->id;
+
+        my $data_table = $ds->data_table({shortname => 1});
+        my $headers    = shift @$data_table;
+        my @data       = map {{List::AllUtils::zip @$headers, @$_}}
+            @$data_table;
+        my $data_url   = "/api/datasets/$ds_id/data";
+        $self->add_route_test($data_url, 'me', 'GET', {},
+            sub {
+                my ($self, $msg) = @_;
+                is_deeply
+                    $self->decode_json($self->mech->content)->{tmplData},
+                    \@data, "$msg: got correct dataset data";
+            }
+        );
+
+        $self->add_route_readonly($data_url, 'me');
+        $urls{$type} = $data_url;
+    }
+
+
+    # other users can see public pages of public datasets, but nothing
+    # for private datasets
+    my $pub_data_table = $tests[0][1]->data_table({shortname => 1});
+    my $pub_headers    = shift @$pub_data_table;
+    my @pub_data       = map {{List::AllUtils::zip @$pub_headers, @$_}}
+        @$pub_data_table;
+    $self->add_route_test(
+        $urls{public}, 'you+noone', 'GET', {},
+        sub {
+            my ($self, $msg) = @_;
+            is_deeply
+                $self->decode_json($self->mech->content)->{tmplData},
+                \@pub_data, "$msg: got correct dataset data";
+        }
+    );
+    $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/datasets/moo/data', '*', '*', {});
+};
+
+
+test '/datasets/1/pages' => sub {
+    my ($self) = @_;
+
+    my $my_datasets = $self->schema->resultset('User')
+        ->find({username => 'me'})->datasets_rs;
+
+    # I can see all my pages for my public dataset
+    my $my_pub_ds     = $my_datasets->public->first;
+    my $my_pub_ds_id  = $my_pub_ds->id;
+    my @my_pub_ds_pages = map {$_->TO_JSON} $my_pub_ds->pages_rs->all;
+    $self->add_route_test(
+        "/api/datasets/$my_pub_ds_id/pages", 'me', 'GET', {},
+        { want => \@my_pub_ds_pages },
+    );
+    $self->add_route_readonly("/api/datasets/$my_pub_ds_id/pages", 'me');
+
+    # I can see all my pages for my private dataset
+    my $my_priv_ds     = $my_datasets->private->first;
+    my $my_priv_ds_id  = $my_priv_ds->id;
+    my @my_priv_ds_pages = map {$_->TO_JSON} $my_priv_ds->pages_rs->all;
+    $self->add_route_test(
+        "/api/datasets/$my_priv_ds_id/pages", 'me', 'GET', {},
+        { want => \@my_priv_ds_pages },
+    );
+    $self->add_route_readonly("/api/datasets/$my_priv_ds_id/pages", 'me');
+
+    # other users can see public pages of public datasets, but nothing
+    # for private datasets
+    my @my_pub_ds_pub_pages = map {$_->TO_JSON} $my_pub_ds->pages_rs->public->all;
+    $self->add_route_test(
+        "/api/datasets/$my_pub_ds_id/pages", 'you+noone', 'GET', {},
+        { want => \@my_pub_ds_pub_pages, }
+    );
+    $self->add_route_bad_method("/api/datasets/$my_pub_ds_id/pages", 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found("/api/datasets/$my_priv_ds_id/pages", 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/datasets/moo/pages', '*', '*', {});
+};
+
+
+# mixed access to page properties
+test '/pages' => sub {
+    my ($self) = @_;
+
+    # /api/pages redirects to /public_pages
+    my @all_pages = map {$_->TO_JSON}
+        $self->schema->resultset('Page')->public->all;
+    $self->add_route_redirects('/api/pages', '*', 'GET', {});
+    $self->add_route_test(
+        '/api/pages', '*', 'GET', {}, {want => \@all_pages}
+    );
+    $self->add_route_readonly('/api/pages', '*');
+
+
+    # I have full priviliges over my pages
+    my $user_rs           = $self->schema->resultset('User');
+    my $me                = $user_rs->find({username => 'me'});
+    my $my_pages          = $me->my_pages;
+    my @valid_page_fields = qw(title preamble postamble permission);
+    my %urls              = (public => '', private => '');
+    my @pages             = (
+        # type       page
+        [ 'public',  $my_pages->public->first->TO_JSON,  ],
+        [ 'private', $my_pages->private->first->TO_JSON, ],
+    );
+    for my $page_test (@pages) {
+        my ($type, $page) = @$page_test;
+        my $page_id  = $page->{id};
+        my $page_url = "/api/pages/$page_id";
+        my $update   = {
+            (map {$_ => $page->{$_}} @valid_page_fields),
+            title => "Moo moo quack quack",
+        };
+        $self->add_route_test($page_url, 'me', 'GET', {}, {want => $page});
+        $self->add_route_bad_method($page_url, 'me', 'POST', {});
+        $self->add_route_test($page_url, 'me', 'PUT', $update, \204);
+        $page = $my_pages->find({id => $page_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($page_url, 'me', 'GET', {}, {want => {
+            %$page, title => $update->{title}
+        }});
+        $self->add_route_test($page_url, 'me', 'DELETE', {},
+            sub {
+                my ($self, $msg) = @_;
+                ok !($my_pages->find({id => $page_id})),
+                    "$msg: $type page deleted";
+            },
+        );
+
+        $urls{$type} = $page_url;
+    }
+
+    $self->reset_fixtures();
+    $self->load_fixtures('init','api');
+
+    # other users can see my public pages, but nothing else
+    my $my_pub_page = $my_pages->find({id => $pages[0][1]->{id}})->TO_JSON;
+    $self->add_route_test($urls{public}, 'you+noone', 'GET', {}, {want => $my_pub_page});
+    $self->add_route_bad_method($urls{public}, 'you+noone', 'POST+PUT+DELETE', {});
+    $self->add_route_not_found($urls{private}, 'you+noone', '*', {});
+
+    # nonsense ids are rejected
+    $self->add_route_not_found('/api/pages/moo', '*', '*', {});
+};
+
+
+test '/pages/1/columns' => sub {
+    my ($self) = @_;
+
+    my $user_rs        = $self->schema->resultset('User');
+    my $me             = $user_rs->find({username => 'me'});
+    my $my_pages       = $me->my_pages;
+    my @pagecol_fields = qw(title template);
+    my %urls;
+    my @pages = (
+        # type       dataset
+        [ 'public',  $my_pages->public->first,  ],
+        [ 'private', $my_pages->private->first, ],
+    );
+
+
+    for my $page_test (@pages) {
+        my ($type, $page) = @$page_test;
+        my $page_id       = $page->id;
+
+        # GET    /pages/$page_id/columns  == want
+        # POST   /pages/$page_id/columns  == want
+        # PUT    /pages/$page_id/columns  == 405
+        # DELETE /pages/$page_id/columns  == want
+        my @page_cols = map {$_->TO_JSON} $page->page_columns_ordered->all;
+        my $cols_url  = "/api/pages/$page_id/columns";
+        $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@page_cols});
+        my $new_col = {title => "I'm new!", template => ""};
+        $self->add_route_created($cols_url, 'me', 'POST', $new_col);
+        $self->add_route_bad_method($cols_url, 'me', 'PUT', {});
+        $self->add_route_test($cols_url, 'me', 'DELETE', {},
+            sub {
+                my ($self, $msg) = @_;
+                is_deeply [$page->page_columns->all], [],
+                    "$msg: $type page columns deleted";
+            }
+        );
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
+
+        # GET    /pages/$page_id/columns/$col_id  == want
+        # POST   /pages/$page_id/columns/$col_id  == 405
+        # PUT    /pages/$page_id/columns/$col_id  == want
+        # DELETE /pages/$page_id/columns/$col_id  == want
+        my $page_col    = $page->page_columns_ordered->first->TO_JSON;
+        my $page_col_id = $page_col->{id};
+        my $col_url     = "/api/pages/$page_id/columns/$page_col_id";
+        my $update      = {
+            (map {$_ => $page_col->{$_}} @pagecol_fields),
+            title => 'HaberDasher',
+        };
+        $self->add_route_test($col_url, 'me', 'GET', {}, {want => $page_col});
+        $self->add_route_bad_method($col_url, 'me', 'POST', {});
+        $self->add_route_test($col_url, 'me', 'PUT', $update, \204);
+        $page_col = $page->page_columns->find({id => $page_col_id})->TO_JSON; # refresh timestamps
+        $self->add_route_test($col_url, 'me', 'GET', {}, {want => {
+            %$page_col, title => $update->{title}
+        }});
+        $self->add_route_test(
+            $col_url, 'me', 'DELETE', {}, sub {
+                my ($self, $msg) = @_;
+                ok !($page->page_columns->find({id => $page_col_id})),
+                    "$msg: $type dataset deleted";
+            }
+        );
+        $self->reset_fixtures();
+        $self->load_fixtures('init','api');
+
+        $urls{$type} = {set => $cols_url, item => $col_url};
+    }
+
+
+    # you + noone
+    # other users can see my public datasets, but nothing else
+    # refetch public columns after schema reset
+    my @pub_page_cols = map {$_->TO_JSON}
+        $pages[0][1]->page_columns_ordered->all;
+    $self->add_route_test(
+        $urls{public}{set}, 'you+noone', 'GET', {}, {want => \@pub_page_cols}
+    );
+    $self->add_route_bad_method(
+        $urls{public}{set}, 'you+noone', 'POST+PUT+DELETE', {}
+    );
+    $self->add_route_not_found($urls{private}{set}, 'you+noone', '*', {});
+
+    # refetch public column after schema reset
+    my $pub_page_col = $pages[0][1]->page_columns_ordered->first->TO_JSON;
+    $self->add_route_test(
+        $urls{public}{item}, 'you+noone', 'GET', {}, {want => $pub_page_col}
+    );
+    $self->add_route_bad_method(
+        $urls{public}{item}, 'you+noone', 'POST+PUT+DELETE', {}
+    );
+    $self->add_route_not_found($urls{private}{item}, 'you+noone', '*', {});
+
+
+    # nonsense / mismatched ids are rejected
+    $self->add_route_not_found('/api/pages/moo/columns', '*', '*', {});
+    my @page_ids    = ($pages[0][1]->id, $pages[1][1]->id, 'moo');
+    my @pagecol_ids = (
+        $pages[0][1]->page_columns_ordered->first->id,
+        $pages[1][1]->page_columns_ordered->first->id,
+        'moo'
+    );
+    for my $page_idx (0..$#page_ids) {
+        for my $pagecol_idx (0..$#pagecol_ids) {
+            next if ($page_idx == $pagecol_idx);
+
+            my ($page_id, $pagecol_id)
+                = ($page_ids[$page_idx], $pagecol_ids[$pagecol_idx]);
+            my $url = "/api/pages/$page_id/columns/$pagecol_id";
+            $self->add_route_not_found($url, 'me', 'DELETE', {});
+            $self->fudge_route_test($url, 'me', 'GET+PUT+POST');
+            $self->fudge_route_test($url, 'you+noone', '*');
+        }
+    }
 
 };
 
 
-test 'page column' => sub {
+# POST /template
+# else 405
+test '/template' => sub {
     my ($self) = @_;
 
-    my %page_cols = (
-        public     => { obj => $other_ds_rs->related_resultset('pages')->public->first->page_columns_ordered->first,  },
-        private    => { obj => $other_ds_rs->related_resultset('pages')->private->first->page_columns_ordered->first, },
-        restricted => { obj => $test_ds_rs->related_resultset('pages')->private->first->page_columns_ordered->first,  },
+    $self->add_route_bad_method('/api/template', '*', 'GET+PUT+DELETE', {});
+
+    my ($template, $widgets)
+        = @{ $self->get_tmpl_fixture('basic_equiv') }{ qw(jstmpl widgets) };
+    $self->add_route_test(
+        '/api/template', '*', 'POST', {template => $template},
+        {want => {widgets => $widgets}}
     );
-    for my $page_col (values %page_cols) {
-        my $obj           = $page_col->{obj};
-        $page_col->{id}   = $obj->id;
-        $page_col->{url}  = "/api/page/" . $obj->page->id . "/column/" . $page_col->{id};
-        $page_col->{json} = $obj->TO_JSON;
+    $self->add_route_test(
+        '/api/template', '*', 'POST', {widgets => $widgets},
+        {want => {template => $template}}
+    );
+    $self->add_route_test('/api/template', '*', 'POST', {}, \422);
+ };
+
+
+# GET /datatype
+# GET /datatype/$id
+test '/types' => sub {
+    my ($self) = @_;
+    $self->add_route_readonly('/api/datatype', '*');
+    $self->add_route_readonly('/api/datatype/CoreType_Text', '*');
+
+    my $typereg = Judoon::TypeRegistry->new;
+    my @types = map {$_->TO_JSON} $typereg->all_types;
+    $self->add_route_test('/api/datatype', '*', 'GET', {}, {want => \@types});
+
+    my $text_type = $typereg->simple_lookup('CoreType_Text')->TO_JSON;
+    $self->add_route_test(
+        '/api/datatype/CoreType_Text', '*', 'GET', {}, {want => $text_type}
+    );
+};
+
+# GET /sitelinker => 204
+# GET /sitelinker/accession
+# GET /sitelinker/accession/$acc_id
+# GET /sitelinker/site
+test '/sitelinker' => sub {
+    my ($self) = @_;
+
+    my $acc_id = 'Biology_Accession_Entrez_GeneId';
+    $self->add_route_readonly("/api/sitelinker", '*');
+    $self->add_route_readonly("/api/sitelinker/accession", '*');
+    $self->add_route_readonly("/api/sitelinker/accession/$acc_id", '*');
+    $self->add_route_readonly("/api/sitelinker/site", '*');
+
+    my $sl            = Judoon::SiteLinker->new;
+    my $sites         = $sl->mapping->{site};
+    my $accs          = $sl->mapping->{accession};
+    my ($acc_gene_id) = List::AllUtils::first {$_->{name} eq $acc_id} @$accs;
+
+    $self->add_route_test("/api/sitelinker", '*', 'GET', {}, \204);
+    $self->add_route_test(
+        "/api/sitelinker/accession", '*', 'GET', {}, {want => $accs}
+    );
+    $self->add_route_test(
+        "/api/sitelinker/accession/$acc_id", '*', 'GET', {},
+        {want => {accession => $acc_gene_id}}
+    );
+    $self->add_route_test(
+        "/api/sitelinker/site", '*', 'GET', {}, {want => {sites => $sites}}
+    );
+
+};
+
+# readonly
+# /lookup
+# /lookup/$type
+# /lookup/$type/$id
+# /lookup/$type/$id/input
+# /lookup/$type/$id/input/$input_id
+# /lookup/$type/$id/input/$input_id/output
+# $type = internal || external
+test '/lookup' => sub {
+    my ($self) = @_;
+
+    my @routes = qw(
+        /api/lookup
+        /api/lookup/external
+        /api/lookup/external/uniprot
+        /api/lookup/external/uniprot/input
+        /api/lookup/external/uniprot/input/FLYBASE_ID
+        /api/lookup/external/uniprot/input/FLYBASE_ID/output
+    );
+
+    for my $route (@routes) {
+        $self->add_route_needs_auth($route, 'noone', 'GET', {});
+        $self->add_route_readonly($route, '*');
     }
 
-    $self->_access_control_ok(@page_cols{qw(public private restricted)});
+    my $user_rs = $self->schema->resultset('User');
+    my $me      = $user_rs->find({username => 'me'});
+    my $you     = $user_rs->find({username => 'you'});
+
+    for my $user ($me, $you) {
+        my $name = $user->username;
+
+        my $lookup_reg = Judoon::LookupRegistry->new({user => $user});
+        my @all        = map {$_->TO_JSON} $lookup_reg->all_lookups();
+        my @ext        = grep {$_->{group_id} eq 'external'} @all;
+        my @int        = grep {$_->{group_id} eq 'internal'} @all;
+        my ($uniprot)  = grep {$_->{id} eq 'uniprot'} @ext;
+
+        my $up_obj     = $lookup_reg->find_by_type_and_id('external','uniprot');
+        my $up_cols    = $up_obj->input_columns;
+        my ($flybase)  = grep {$_->{id} eq 'FLYBASE_ID'} @$up_cols;
+        my $outputs    = $up_obj->output_columns_for($flybase);
+
+        $self->add_route_test(
+            "/api/lookup", $name, 'GET', {}, {want => \@all}
+        );
+        $self->add_route_test(
+            "/api/lookup/external", $name, 'GET', {}, {want => \@ext}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot", $name, 'GET', {},
+            {want => $uniprot}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot/input", $name, 'GET', {},
+            {want => $up_cols}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot/input/FLYBASE_ID", $name, 'GET', {},
+            {want => $flybase}
+        );
+        $self->add_route_test(
+            "/api/lookup/external/uniprot/input/FLYBASE_ID/output", $name,
+             'GET', {}, {want => $outputs}
+        );
+    }
 };
 
 
 after teardown => sub {
     my ($self) = @_;
-    $self->schema->storage->disconnect;
+    $self->report_untested_routes();
 };
 
 
 run_me();
 done_testing();
-
-
-# utility functions
-
-
-sub _get_json_ok {
-    my ($self, $url, $object_json, $descr) = @_;
-
-    $self->_GET_json($url);
-    ok($self->mech->success, $descr,);
-    my $response = $self->mech->content;
-    is_valid_json($response, q{  ...and it's valid json});
-    is_json($response, $self->encode_json($object_json),
-            q{  ...and it matches what we expect});
-}
-
-sub _not_found_ok {
-    my ($self, $url, $descr) = @_;
-    my $r = GET($url, 'Accept' => 'application/json');
-    $self->mech->request($r);
-    is $self->mech->status, 404, $descr;
-}
-
-
-sub _GET_json {
-    my ($self, $url) = @_;
-    my $r = GET($url, 'Accept' => 'application/json');
-    $self->mech->request($r);
-}
-
-sub _POST_json {
-    my ($self, $url, $object) = @_;
-    my $r = POST(
-        $url, 'Accept' => 'application/json',
-        'Content-Type' => 'application/json',
-        Content => $self->encode_json($object),
-    );
-    $self->mech->request($r);
-}
-
-sub _PUT_json {
-    my ($self, $url, $object) = @_;
-    my $r = PUT(
-        $url, 'Accept' => 'application/json',
-        'Content-Type' => 'application/json',
-        Content => $self->encode_json($object),
-    );
-    $self->mech->request($r);
-}
-
-sub _DELETE_json {
-    my ($self, $url) = @_;
-    my $r = DELETE($url, 'Accept' => 'application/json',);
-    $self->mech->request($r);
-}
-
-
-sub _access_control_ok {
-    my ($self, $public, $private, $restricted) = @_;
-
-    subtest 'no auth' => sub {
-        $self->logout();
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url}, 'forbidden for private url');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url'),
-    };
-
-    subtest 'with login' => sub {
-        $self->login(qw(otheruser otheruser));
-        $self->_get_json_ok($public->{url}, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url}, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url}, 'forbidden for restricted url');
-        $self->logout();
-    };
-
-    subtest 'with access token' => sub {
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_get_json_ok($private->{url} . $access_token, $private->{json}, 'can GET private object');
-        $self->_not_found_ok($restricted->{url} . $access_token, 'forbidden for restricted url');
-    };
-
-    subtest 'login takes priority' => sub {
-        $self->logout;
-        $self->login(qw(testuser), $self->testuser->{password});
-        $self->_get_json_ok($public->{url} . $access_token, $public->{json}, 'can GET public object',);
-        $self->_not_found_ok($private->{url} . $access_token, 'forbidden for private url');
-        $self->_get_json_ok($restricted->{url} . $access_token, $restricted->{json}, 'can GET testuser object');
-        $self->logout();
-    };
-
-}

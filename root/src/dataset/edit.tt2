@@ -28,9 +28,9 @@
     </div>
 
     <div class="control-group">
-      <label class="control-label" for="dataset.notes">Notes</label>
+      <label class="control-label" for="dataset.description">Description</label>
       <div class="controls">
-        <textarea class="span6" form="dataset_edit" name="dataset.notes" id="dataset.notes">[% dataset.object.notes %]</textarea>
+        <textarea class="span6" form="dataset_edit" name="dataset.description" id="dataset.description">[% dataset.object.description %]</textarea>
       </div>
     </div>
 

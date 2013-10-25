@@ -2,7 +2,7 @@ package Judoon::Web::Controller::API::DatasetData;
 
 =pod
 
-=for stopwords ActionClass Datatables
+=for stopwords Datatables
 
 =encoding utf8
 
@@ -15,57 +15,40 @@ Judoon::Web::Controller::API::DatasetData - Data API Controller
 use Moose;
 use namespace::autoclean;
 
-BEGIN {extends 'Catalyst::Controller::REST'; }
+BEGIN { extends 'Judoon::Web::Controller'; }
 
 use List::AllUtils qw();
 use SQL::Abstract;
 
+__PACKAGE__->config(
+    'stash_key' => 'rest',
+    'default'   => 'application/json',
+    'map'       => {
+        'application/json' => 'JSON',
+    },
+);
+
 
 =head1 ACTIONS
 
-=head2 base
+=head2 begin / end
 
-Does nothing currently, but calls to the api pass through here.
+Deserialize / serialize the request / response.
 
-=head2 index
+=head2 data
 
-Return a simple response.
-
-=head2 id
-
-Grabs the dataset id from the url, looks it up in the database, then
-stuffs it into the stash.
+Calling GET on this action returns the data for the dataset in the
+stash, filtered by the query parameters.  The query parameters are
+those set by the jQuery Datatables plugin.
 
 =cut
 
-sub base : Chained('/api/base') PathPart('datasetdata')  CaptureArgs(0) {}
-sub index :Chained('base')  PathPart('')    Args(0) {
-    my ($self, $c) = @_;
-    $c->res->body('got here');
-}
-sub id : Chained('base') PathPart('') CaptureArgs(1) {
-    my ($self, $c, $ds_id) = @_;
-
-    $c->stash->{dataset}{id} = $ds_id;
-    $c->stash->{dataset}{object} = $c->model('User::Dataset')->find({id => $ds_id});
-    $c->stash->{ds_column}{list} = [$c->stash->{dataset}{object}->ds_columns_ordered->all];
-}
-
-
-=head2 object / object_GET
-
-REST ActionClass action.  Calling GET on this action returns the data
-for the dataset in the stash, filtered by the query parameters.  The
-query parameters are those set by the jQuery Datatables plugin.
-
-=cut
-
-sub object : Chained('id') PathPart('') Args(0) ActionClass('REST') {}
-
-sub object_GET {
+sub begin : ActionClass('Deserialize') { }
+sub end   : ActionClass('Serialize')   { }
+sub data  : Chained('/api/wm/ds_data') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
-    my $dataset      = $c->stash->{dataset}{object};
+    my $dataset      = $c->stash->{dataset_object};
     my $tbl_name     = $dataset->schema_name . '.' . $dataset->tablename;
     my $dbic_storage = $dataset->result_source->storage;
     my $params       = $c->req->params();
@@ -130,15 +113,13 @@ sub object_GET {
 
     my @tmpl_data = grep {defined} @{$results}[$offset..$offset+$limit];
 
-
     # return results
-    $self->status_ok($c,
-        entity => {
-            tmplData             => \@tmpl_data,
-            iTotalRecords        => $total,
-            iTotalDisplayRecords => $filtered,
-        },
-    );
+    $c->res->status(200);
+    $c->stash->{rest} = {
+        tmplData             => \@tmpl_data,
+        iTotalRecords        => $total,
+        iTotalDisplayRecords => $filtered,
+    };
 }
 
 

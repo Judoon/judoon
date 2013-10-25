@@ -3,9 +3,28 @@ package Judoon::API::Resource::DatasetColumn;
 use Moo;
 use namespace::clean;
 
-extends 'Web::Machine::Resource';
+extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
+
+sub update_allows { return qw(data_type); }
+sub update_valid  { return {
+    data_type => sub {
+        my ($self, $val) = @_;
+        return $self->item->result_source->schema
+            ->resultset('TtDscolumnDatatype')->search({data_type => $val})
+            ->count;
+    },
+} }
+with 'Judoon::API::Resource::Role::ValidateParams';
+
+sub allowed_methods {
+    my ($self) = @_;
+     return [
+        qw(GET HEAD),
+        ( $_[0]->writable ) ? (qw(PUT)) : ()
+    ];
+}
 
 
 1;
@@ -22,5 +41,15 @@ Judoon::API::Resource::DatasetColumn - An individual DatasetColumn
 =head1 DESCRIPTION
 
 See L</Web::Machine::Resource>.
+
+=head1 METHODS
+
+=head2 update_allows()
+
+List of updatable parameters.
+
+=head2 update_valid()
+
+List of validation checks
 
 =cut

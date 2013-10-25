@@ -89,8 +89,8 @@ main: {
         my $ds_doc = $domain->create(
             dataset => {
                 title       => $dataset->name,
-                description => $dataset->notes,
-                content     => $dataset->notes,
+                description => $dataset->description,
+                content     => $dataset->description,
                 url         => Judoon::Web->uri_for_action(
                     '/private/dataset/object',
                     [$dataset->user->username, $dataset->id]

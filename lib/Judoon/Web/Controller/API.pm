@@ -3,7 +3,7 @@ package Judoon::Web::Controller::API;
 use Moose;
 use namespace::autoclean;
 
-BEGIN {extends 'Catalyst::Controller'; }
+BEGIN { extends 'Judoon::Web::Controller'; }
 
 sub base : Chained('/') PathPart('api') CaptureArgs(0) {
     my ( $self, $c ) = @_;
@@ -44,7 +44,7 @@ The base controller for our various API endpoints
 
 =head2 base
 
-Our base chained action for api actions
+Our base chained action for api actions. Manages API authentication.
 
 =head2 list
 

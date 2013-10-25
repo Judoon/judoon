@@ -61,18 +61,44 @@ sub template_POST {
     my ($self, $c) = @_;
 
     my $params = $c->req->data;
-    if ($params->{widgets}) {
-        my $tmpl = Judoon::Tmpl->new_from_data($params->{widgets});
-        $self->status_ok($c, entity => { template => $tmpl->to_jstmpl });
+
+    if (not (exists($params->{template}) xor exists($params->{widgets}))) {
+        $c->res->status(422);
+        $c->res->body('');
+        $c->detach();
     }
-    elsif ($params->{template}) {
-        my $tmpl = Judoon::Tmpl->new_from_jstmpl($params->{template});
-        $self->status_ok($c, entity => { template => $tmpl->to_data });
+
+    my $entity;
+    if (exists $params->{widgets}) {
+        my $tmpl;
+        eval {
+            $tmpl = Judoon::Tmpl->new_from_data($params->{widgets});
+        };
+        unless ($@) {
+            $entity = { template => $tmpl->to_jstmpl };
+        }
+    }
+    elsif (exists $params->{template}) {
+        my $tmpl;
+        eval {
+            $tmpl = Judoon::Tmpl->new_from_jstmpl($params->{template});
+        };
+        unless ($@) {
+            $entity = { widgets => $tmpl->to_data };
+        }
 
     }
     else {
-        $self->status_no_content($c);
+        die 'Unreachable condition';
     }
+
+    if (not $entity) {
+        $c->res->status(422);
+        $c->res->body('');
+        $c->detach();
+    }
+
+    $self->status_ok($c, entity => $entity);
 }
 
 
@@ -84,7 +110,14 @@ Base action. Returns 204 (No Content).
 
 =cut
 
-sub sitelinker : Chained('base') PathPart('sitelinker') CaptureArgs(0) {}
+sub sitelinker : Chained('base') PathPart('sitelinker') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->req->method ne 'GET') {
+        $c->res->status('405');
+        $c->res->body('');
+        $c->detach();
+    }
+}
 sub sl_index : Chained('sitelinker') PathPart('') Args(0) {
     my ($self, $c) = @_;
     # should probably be 204 with link="rel" to sites/accessions
@@ -103,19 +136,19 @@ sub sl_accession_base : Chained('sitelinker') PathPart('accession') CaptureArgs(
 sub sl_accession_list : Chained('sl_accession_base') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->status_ok(
-        $c, entity => $c->model('SiteLinker')->mapping->{accessions}
+        $c, entity => $c->model('SiteLinker')->mapping->{accession}
     );
 }
 sub sl_accession_id :Chained('sl_accession_base') PathPart('') Args(1) {
     my ($self, $c, $acc_id) = @_;
 
     $acc_id //= '';
-    if (not exists $c->model('SiteLinker')->mapping->{accession}{$acc_id}) {
+    my $accession = List::Util::first {$_->{name} eq $acc_id}
+        @{$c->model('SiteLinker')->mapping->{accession}};
+    if (not $accession) {
         $self->status_not_found($c, message => "No such accession: '$acc_id'");
         $c->detach();
     }
-
-    my $accession = $c->model('SiteLinker')->mapping->{accession}{$acc_id};
     $self->status_ok($c, entity => { accession => $accession });
 }
 
@@ -144,7 +177,20 @@ lookups for the logged-in user.
 
 =cut
 
-sub lookup : Chained('base') PathPart('lookup') CaptureArgs(0) {}
+sub lookup : Chained('base') PathPart('lookup') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->req->method ne 'GET') {
+        $c->res->status('405');
+        $c->res->body('');
+        $c->detach();
+    }
+
+    if (not $c->user) {
+        $c->res->status('401');
+        $c->res->body('');
+        $c->detach();
+    }
+}
 sub lookup_index : Chained('lookup') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->status_ok(
@@ -272,6 +318,60 @@ sub look_input_to_output : Chained('look_input_id') PathPart('output') CaptureAr
 sub look_input_to_output_final : Chained('look_input_to_output') PathPart('') Args(0) {
     my ($self, $c) = @_;
     $self->status_ok($c, entity => $c->stash->{lookup}{output}{list});
+}
+
+
+=head1 DATATYPE ACTIONS
+
+=head2 type_base
+
+Base action for common actions. Currently does nothing.
+
+=head2 type_index
+
+Return a serialized list of types.
+
+=head2 type_id
+
+Lookup the given type, returning 404 if not found.
+
+=head2 type
+
+Return the serialized type.
+
+=cut
+
+sub type_base : Chained('base') PathPart('datatype') CaptureArgs(0) {
+    my ($self, $c) = @_;
+    if ($c->req->method ne 'GET') {
+        $c->res->status('405');
+        $c->res->body('');
+        $c->detach();
+    }
+}
+sub type_index : Chained('type_base') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    my $typereg = $c->model('TypeRegistry');
+    $self->status_ok($c, entity => [map {$_->TO_JSON} $typereg->all_types]);
+}
+sub type_id : Chained('type_base') PathPart('') CaptureArgs(1) {
+    my ($self, $c, $type_id) = @_;
+
+    $type_id //= '';
+    $c->stash->{type_id} = $type_id;
+    my $type = $c->model('TypeRegistry')->simple_lookup($type_id);
+
+    if (not $type) {
+        $self->status_not_found(
+            $c, message => qq{No such type "$type_id"},
+        );
+        $c->detach();
+    }
+    $c->stash->{type} = $type->TO_JSON;
+}
+sub type : Chained('type_id') PathPart('') Args(0) {
+    my ($self, $c) = @_;
+    $self->status_ok( $c, entity => $c->stash->{type}, );
 }
 
 

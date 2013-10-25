@@ -35,39 +35,47 @@ primary_column id => {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
+    is_serializable   => 1,
+    is_numeric        => 1,
 };
 column user_id => {
-    data_type      => "integer",
-    is_foreign_key => 1,
-    is_nullable    => 0,
+    data_type       => "integer",
+    is_foreign_key  => 1,
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric        => 1,
 };
 column name => {
     data_type       => "text",
     is_nullable     => 0,
     is_serializable => 1,
 };
-column notes => {
+column description => {
     data_type       => "text",
     is_nullable     => 0,
     is_serializable => 1,
 };
 column original => {
-    data_type   => "text",
-    is_nullable => 0,
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 0,
 };
 column tablename => {
-    data_type   => "text",
-    is_nullable => 0,
+    data_type       => "text",
+    is_nullable     => 0,
+    is_serializable => 0,
 };
 column nbr_rows => {
-    data_type   => "integer",
-    is_nullable => 0,
-    is_numeric  => 1,
+    data_type       => "integer",
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric      => 1,
 };
 column nbr_columns => {
-    data_type   => "integer",
-    is_nullable => 0,
-    is_numeric  => 1,
+    data_type       => "integer",
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric      => 1,
 };
 
 
@@ -131,9 +139,7 @@ for serialization.
 
 sub TO_JSON {
     my ($self) = @_;
-
     my $json = $self->next::method();
-    $json->{description} = delete $json->{notes};
     return $json;
 }
 
@@ -199,7 +205,7 @@ sub import_from_spreadsheet {
     $self->tablename($table_name);
     $self->nbr_rows($spreadsheet->nbr_rows);
     $self->nbr_columns($spreadsheet->nbr_columns);
-    $self->notes(q{});
+    $self->description(q{});
     $self->original(q{});
     $self->update;
 
@@ -225,6 +231,11 @@ the form of a C<Judoon::Lookup::*Actor>) to an existing column.
 
 sub new_computed_column {
     my ($self, $name, $lookup_actor) = @_;
+
+    my $join_col = $lookup_actor->this_joincol_id // '';
+    if (! grep {$_->shortname eq $join_col} $self->ds_columns_rs->all) {
+        die "This dataset does not have a column named '$join_col'";
+    }
 
     my $computed_ds = $self->new_related('ds_columns', {}); #computed => 1,});
 

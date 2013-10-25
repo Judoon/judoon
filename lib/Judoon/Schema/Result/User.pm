@@ -31,11 +31,14 @@ primary_column id => {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
+    is_serializable   => 1,
+    is_numeric        => 1,
 };
 unique_column username => {
-    data_type   => "varchar",
-    size        => 40,
-    is_nullable => 0,
+    data_type       => "varchar",
+    size            => 40,
+    is_nullable     => 0,
+    is_serializable => 1,
 };
 column password => {
     data_type       => "text",
@@ -58,9 +61,10 @@ unique_column email_address => {
     is_serializable => 1,
 };
 column active => {
-    data_type     => "boolean",
-    default_value => \'true',
-    is_nullable   => 0,
+    data_type       => "boolean",
+    default_value   => \'true',
+    is_nullable     => 0,
+    is_serializable => 0,
 };
 
 
@@ -168,7 +172,7 @@ sub import_data {
     my $dataset;
     $self->result_source->schema->txn_do( sub {
         $dataset = $self->create_related('datasets',{
-            map({$_ => q{}} qw(name tablename original notes)),
+            map({$_ => q{}} qw(name tablename original description)),
             map({$_ => 0}   qw(nbr_rows nbr_columns)),
         });
         $dataset->import_from_spreadsheet($spreadsheet);

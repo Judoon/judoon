@@ -1,36 +1,36 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
 use utf8;
 
-use Test::More;
+use Encode;
+use Judoon::Tmpl;
 use Test::Differences;
 use Test::Fatal;
 
-use Data::Section::Simple qw(get_data_section);
-use Encode;
-use Judoon::Tmpl;
-use JSON::MaybeXS;
+use Test::Roo;
+
+use lib 't/lib';
+with 'Judoon::Role::JsonEncoder', 't::Role::TmplFixtures';
 
 
-subtest 'basic tests' => sub {
+
+test 'basic tests' => sub {
+    my ($self) = @_;
+
     my $tmpl;
     ok !exception { $tmpl = Judoon::Tmpl->new },
         'Can create a new empty Judoon::Tmpl';
     is_deeply $tmpl->nodes, [], 'initial nodelist is empty';
 };
 
-subtest 'from / to formats' => sub {
-    my %formats = (
-        jstmpl => get_data_section('js_template'),
-        native => get_data_section('serialized'),
-        data   => decode_json( get_data_section('serialized') ),
-    );
+test 'from / to formats' => sub {
+    my ($self) = @_;
 
-    for my $in_format (keys %formats) {
-        my $input = $formats{$in_format};
-        my $constructor = "new_from_${in_format}";
+    my %method_map = qw(jstmpl jstmpl native native widgets data);
+    my $formats = $self->get_tmpl_fixture('basic_equiv');
+    for my $in_format (keys %$formats) {
+        my $input = $formats->{$in_format};
+        my $constructor = "new_from_" . $method_map{$in_format};
         ok my $tmpl = Judoon::Tmpl->$constructor($input),
             "can build Tmpl from $in_format";
 
@@ -47,10 +47,10 @@ subtest 'from / to formats' => sub {
         is_deeply [$tmpl->get_variables], ['bar', 'baz'],
             '  ..get_variables() returns correct variables';
 
-        for my $out_format (keys %formats) {
-            my $output = $formats{$out_format};
-            my $output_method = "to_${out_format}";
-            my $out_constructor = "new_from_${out_format}";
+        for my $out_format (keys %$formats) {
+            my $output = $formats->{$out_format};
+            my $output_method = "to_" . $method_map{$out_format};
+            my $out_constructor = "new_from_" . $method_map{$out_format};
             ok my $out_tmpl = Judoon::Tmpl->$out_constructor(
                 $tmpl->$output_method()
             ), "  ..can build Tmpl from its $out_format";
@@ -62,7 +62,7 @@ subtest 'from / to formats' => sub {
 
 
     # tests for specific formats
-    unlike(Judoon::Tmpl->new_from_data($formats{data})->to_native,
+    unlike(Judoon::Tmpl->new_from_data($formats->{widgets})->to_native,
         qr{__CLASS__}, '__CLASS__ keys have been scrubbed from data');
 
     {
@@ -70,12 +70,12 @@ subtest 'from / to formats' => sub {
         my $utf8_text    = encode("utf-8", $perl_text);
         my $utf8_to_utf8 = Judoon::Tmpl->new_from_native($utf8_text)
             ->to_native();
-        my $json = JSON->new->utf8->canonical;
+
         my $output_canon;
-        ok !exception { $output_canon = $json->decode($utf8_to_utf8); },
+        ok !exception { $output_canon = $self->decode_json($utf8_to_utf8); },
             "output is properly encoded as utf8";
 
-        my $expected_canon = $json->decode($utf8_text);
+        my $expected_canon = $self->decode_json($utf8_text);
         eq_or_diff $output_canon, $expected_canon,
             ' ..and has correct structure';
     }
@@ -99,7 +99,9 @@ subtest 'from / to formats' => sub {
 };
 
 
-subtest 'node factory' => sub {
+test 'node factory' => sub {
+    my ($self) = @_;
+
     my @node_types = qw(Text Variable Newline VarString Link);
     my $varstring_args = {
         varstring_type    => 'static',
@@ -180,7 +182,8 @@ subtest 'node factory' => sub {
 
 # };
 
-subtest 'input validation' => sub {
+test 'input validation' => sub {
+    my ($self) = @_;
 
     my $no_new_on_self   = qr{Don't call .* on an object}i;
     my $arg_must_be_array = qr{Argument to .* must be an arrayref}i;
@@ -215,30 +218,5 @@ subtest 'input validation' => sub {
     }
 };
 
-
+run_me();
 done_testing();
-
-
-__DATA__
-@@ js_template
-<strong><em>foo</em></strong><strong>{{bar}}</strong><br><em><a href="pre{{baz}}post">quux</a></em>
-@@ serialized
-[
- {"type" : "text", "value" : "foo", "formatting" : ["italic", "bold"]},
- {"type" : "variable", "name" : "bar", "formatting" : ["bold"]},
- {"type" : "newline"},
- {
-   "type" : "link",
-   "url"  : {
-     "varstring_type"    : "variable",
-     "text_segments"     : ["pre","post"],
-     "variable_segments" : ["baz",""]
-   },
-   "label" : {
-     "varstring_type"    : "static",
-     "text_segments"     : ["quux"],
-     "variable_segments" : [""]
-   },
-  "formatting" : ["italic"]
- }
-]

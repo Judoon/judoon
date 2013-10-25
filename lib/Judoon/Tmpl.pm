@@ -386,7 +386,7 @@ sub _get_nodes_from_tree {
             Judoon::Error::Input->throw({
                 message => 'html tags found inside <a></a>',
                 got     => $element->as_HTML,
-            }) if (@label_content > 1);
+            }) if (grep {ref $_} @label_content);
 
             my $label_literal = $label_content[0];
             my $link_node = {

@@ -27,11 +27,15 @@ primary_column id => {
     data_type         => "integer",
     is_auto_increment => 1,
     is_nullable       => 0,
+    is_serializable   => 1,
+    is_numeric        => 1,
 };
 column dataset_id => {
-    data_type      => "integer",
-    is_foreign_key => 1,
-    is_nullable    => 0,
+    data_type       => "integer",
+    is_foreign_key  => 1,
+    is_nullable     => 0,
+    is_serializable => 1,
+    is_numeric      => 1,
 };
 column title => {
     data_type       => "text",
@@ -270,6 +274,7 @@ sub get_cloneable_columns {
     my %me = $self->get_columns;
     delete $me{id};
     delete $me{dataset_id};
+    delete $me{permission};
     return %me;
 }
 

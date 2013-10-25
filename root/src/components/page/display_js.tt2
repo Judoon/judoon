@@ -18,7 +18,7 @@
       });
 
       $('#demo_page').dataTable({
-          "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/object', [dataset.id]) %]",
+          "sAjaxSource" : "[% c.uri_for_action('/api/datasetdata/data', [dataset.id]) %]",
           "fnServerData" : function ( sSource, aoData, fnCallback ) {
             $.ajax( {
                 "dataType": "json",

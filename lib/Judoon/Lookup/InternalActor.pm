@@ -14,6 +14,19 @@ has join_dataset => (
 );
 
 
+sub validate_args {
+    my ($self) = @_;
+    return
+        $self->_ds_has_column( $self->that_joincol_id )
+        &&
+        $self->_ds_has_column( $self->that_selectcol_id );
+}
+
+sub _ds_has_column {
+    my ($self, $col_shortname) = @_;
+    return $self->join_dataset->ds_columns_rs->find({shortname => $col_shortname}) ? 1 : 0;
+}
+
 sub result_data_type {
     my ($self, $attrs) = @_;
     return $self->join_dataset->ds_columns_rs->find({
@@ -76,6 +89,11 @@ An instance of L<Judoon::Schema::Result::Dataset> that new new data
 will be retrieved from.
 
 =head1 METHODS
+
+=head2 validate_args()
+
+Validates that both C<that_joincol_id> and C<that_selectcol_id> are
+valid C<shortname>s for C<DatasetColumn>s in C<join_dataset>.
 
 =head2 result_data_type
 

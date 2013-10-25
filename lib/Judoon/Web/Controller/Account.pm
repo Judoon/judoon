@@ -56,7 +56,7 @@ sub list : Chained('base') PathPart('') Args(0) {
             $self->set_error($c, <<'ERRMSG');
 Your password reset token has expired. Please request another one.
 ERRMSG
-            $self->go_here($c, '/account/resend_password');
+            $self->go_here($c, '/account/resend_password', {});
             $c->detach();
         }
         else {

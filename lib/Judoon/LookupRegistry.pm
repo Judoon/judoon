@@ -35,6 +35,10 @@ use MooX::Types::MooseLike::Base qw(ArrayRef HashRef InstanceOf);
 use Moo;
 use namespace::clean;
 
+my $INTERNAL_ID_RE = qr/^\d+$/;
+my $EXTERNAL_ID_RE = qr/^\w+$/;
+my $LOOKUP_ID_RE   = qr/^(?:internal_\d+|external_\w+)$/;
+
 
 =head1 ATTRIBUTES
 
@@ -123,13 +127,17 @@ of this package.
 
 sub find_by_type_and_id {
     my ($self, $type, $id) = @_;
+    $type //= '';
     return $type eq 'internal' ? $self->new_internal_from_id($id)
          : $type eq 'external' ? $self->new_external_from_id($id)
-         :                       undef;
+         :                       die "$type is not a valid lookup type";
 }
 
 sub find_by_full_id {
     my ($self, $full_id) = @_;
+
+    $full_id //= '';
+    die "$full_id is not a valid lookup id" unless ($full_id =~ $LOOKUP_ID_RE);
     return $self->find_by_type_and_id(split /_/, $full_id);
 }
 
@@ -157,7 +165,11 @@ sub new_internal_from_obj {
 }
 sub new_internal_from_id {
     my ($self, $id) = @_;
+    $id //= '';
+    die "$id is not a valid internal id" unless ($id =~ $INTERNAL_ID_RE);
+
     my $dataset = $self->user->datasets_rs->find({id => $id});
+    die "No dataset found with id: $id" unless ($dataset);
     return $self->new_internal({dataset => $dataset});
 }
 sub new_internal {
@@ -188,6 +200,9 @@ sub new_external_from_obj {
 }
 sub new_external_from_id {
     my ($self, $id) = @_;
+    $id //= '';
+    die "$id is not a valid external id" unless ($id =~ $EXTERNAL_ID_RE);
+
     # my $dataset = $self->schema->resultset('ExternalDataset')
     #     ->find({id => $id});
     my $dataset;
@@ -197,6 +212,7 @@ sub new_external_from_id {
             last;
         }
     }
+    die "No database found called: $id" unless ($dataset);
     return $self->new_external({dataset => $dataset});
 }
 sub new_external {

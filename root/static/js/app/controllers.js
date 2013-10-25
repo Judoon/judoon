@@ -9,9 +9,9 @@ var judoonCtrl = angular.module('judoon.controllers', []);
 judoonCtrl.controller(
     'DatasetCtrl',
     ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn',
-     'Page', 'DatasetPage', 'DataType',
+     'Page', 'DatasetPage', 'DataType', 'User',
      function ($scope, $routeParams, $http, Dataset, DatasetColumn,
-               Page, DatasetPage, DataType) {
+               Page, DatasetPage, DataType, User) {
 
 
          // *** Alerts ***
@@ -50,10 +50,10 @@ judoonCtrl.controller(
          $scope.saveDataset = function() {
              Dataset.update(
                  {}, {
-                     id:         $scope.datasetId,
-                     name:       $scope.dataset.name,
-                     notes:      $scope.dataset.notes,
-                     permission: $scope.dataset.permission
+                     id:          $scope.datasetId,
+                     name:        $scope.dataset.name,
+                     description: $scope.dataset.description,
+                     permission:  $scope.dataset.permission
                  },
                  function() { $scope.addAlert('success', 'Dataset updated!'); },
                  function() { $scope.addAlert('error', 'Something went wrong!'); }
@@ -82,11 +82,11 @@ judoonCtrl.controller(
 
 
          // *** Pages ***
-         Page.query({}, function (pages) { $scope.allPages = pages; });
+         User.getPages().success(function(pages) { $scope.allPages = pages; });
 
          $scope.newPage = {type: 'blank', dataset_id: $scope.datasetId};
          $scope.createPage = function() {
-             Page.saveAndFetch($scope.newPage, function(page) {
+             User.newPage($scope.newPage, function(page) {
                  $scope.dataset.pages.push(page);
              });
          };

@@ -88,3 +88,4 @@ Uniprot
 DBIC
 serializable
 sitelinker
+updatable
