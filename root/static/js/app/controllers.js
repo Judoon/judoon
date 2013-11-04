@@ -9,20 +9,13 @@ var judoonCtrl = angular.module('judoon.controllers', []);
 judoonCtrl.controller(
     'DatasetCtrl',
     ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn',
-     'Page', 'DatasetPage', 'DataType', 'User',
+     'Page', 'DatasetPage', 'DataType', 'User', 'Alerts',
      function ($scope, $routeParams, $http, Dataset, DatasetColumn,
-               Page, DatasetPage, DataType, User) {
+               Page, DatasetPage, DataType, User, Alerts) {
 
 
          // *** Alerts ***
-         $scope.alerts = [];
-         $scope.addAlert = function(type, msg) {
-             $scope.alerts.push({type: type, msg: msg});
-         };
-         $scope.closeAlert = function(index) {
-             $scope.alerts.splice(index, 1);
-         };
-
+         $scope.alerter = Alerts;
 
          // *** Dataset ***
          $scope.userName  = $routeParams.userName;
@@ -55,8 +48,8 @@ judoonCtrl.controller(
                      description: $scope.dataset.description,
                      permission:  $scope.dataset.permission
                  },
-                 function() { $scope.addAlert('success', 'Dataset updated!'); },
-                 function() { $scope.addAlert('error', 'Something went wrong!'); }
+                 function() { Alerts.alertSuccess('Dataset updated!'); },
+                 function() { Alerts.alertError('Something went wrong!'); }
              );
              $scope.datasetOriginal = $scope.dataset;
          };
@@ -128,8 +121,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'DatasetColumnCtrl',
-    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Lookup', '$window',
-     function ($scope, $routeParams, Dataset, DatasetColumn, Lookup, $window) {
+    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Lookup', '$window', 'Alerts',
+     function ($scope, $routeParams, Dataset, DatasetColumn, Lookup, $window, Alerts) {
 
          Lookup.query({}, function (lookups) {
              var self_idx;
@@ -221,10 +214,10 @@ judoonCtrl.controller(
              DatasetColumn.save(
                  {}, data,
                  function() {
-                     $scope.addAlert('success', 'Column added!');
+                     Alerts.alertSuccess('Column added!');
                      $window.location.reload();
                  },
-                 function() { $scope.addAlert('error', 'Something went wrong!'); }
+                 function() { Alerts.alertError('Something went wrong!'); }
              );
          };
 
@@ -237,12 +230,13 @@ judoonCtrl.controller(
 judoonCtrl.controller(
     'PageCtrl',
     ['$scope', '$routeParams', '$http',
-     'Page', 'PageColumn', 'Dataset', 'DatasetColumn',
+     'Page', 'PageColumn', 'Dataset', 'DatasetColumn', 'Alerts',
      function ($scope, $routeParams, $http, Page, PageColumn, Dataset,
-               DatasetColumn) {
+               DatasetColumn, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
+         $scope.alerter = Alerts;
 
          $scope.userName = $routeParams.userName;
          $scope.pageId = $routeParams.pageId;
@@ -321,6 +315,8 @@ judoonCtrl.controller(
              $scope.pageDirty = 0;
              $scope.pageOriginal = angular.copy($scope.page);
              $scope.pageColumnsOriginal = angular.copy($scope.pageColumns);
+
+             Alerts.alertSuccess('Page saved.');
          };
 
          $scope.addColumn = function() {
@@ -333,7 +329,8 @@ judoonCtrl.controller(
              PageColumn.saveAndFetch(newColumn, function(fullCol) {
                  $scope.pageColumns.push(fullCol);
                  $scope.currentColumn = fullCol;
-             } );
+                 Alerts.alertSuccess('New Column "' + fullCol.title + '" added!');
+             });
          };
 
          $scope.removeColumn = function() {
@@ -426,22 +423,11 @@ judoonCtrl.controller(
                      $scope.currentColumn.template = data.template;
                  })
                  .error(function() {
-                     $scope.alertError('Unable to translate template!');
+                     Alerts.alertError('Unable to translate template!');
                  });
          }, true);
 
 
-         $scope.alerts = [];
-         $scope.alertSuccess = curryAlert('success');
-         $scope.alertError   = curryAlert('error');
-         $scope.alertWarning = curryAlert('warning');
-         $scope.alertInfo    = curryAlert('info');
-         function curryAlert(type) {
-             return function(msg) { $scope.alerts.push({type: type, msg: msg}); };
-         }
-         $scope.closeAlert = function(index) {
-             $scope.alerts.splice(index, 1);
-         };
 
 
          $scope.getServerData = function ( sSource, aoData, fnCallback ) {

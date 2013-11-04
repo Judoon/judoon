@@ -12,7 +12,7 @@
     <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
   </ul>
 
-  <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+  <alert ng-repeat="alert in alerter.alerts" type="alert.type" close="alerter.closeAlert($index)">{{alert.msg}}</alert>
 
   <p ng-show="!editmode" class="muted">This view is <strong>{{page.permission}}</strong>.</p>
   <div id="page_actions" ng-show="editmode">

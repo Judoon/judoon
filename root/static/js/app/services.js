@@ -103,3 +103,22 @@ judoonSrv.factory('Lookup', ['$resource', function($resource) {
 
     return Lookup;
 }]);
+
+
+judoonSrv.service('Alerts', [function() {
+    this.alerts = [];
+
+    function curryAlert(type) {
+        return function(msg) { this.alerts.push({type: type, msg: msg}); };
+    }
+    function closeAlertAt(index) {
+        this.alerts.splice(index, 1);
+    }
+
+    this.alertSuccess = curryAlert('success');
+    this.alertError   = curryAlert('error');
+    this.alertWarning = curryAlert('warning');
+    this.alertInfo    = curryAlert('info');
+    this.closeAlert   = closeAlertAt;
+}]);
+
