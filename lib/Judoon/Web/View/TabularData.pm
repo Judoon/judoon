@@ -21,7 +21,7 @@ extends 'Catalyst::View';
 
 use Excel::Writer::XLSX ();
 use Spreadsheet::WriteExcel ();
-use Text::CSV::Encoded ();
+use Text::CSV ();
 
 
 __PACKAGE__->config(
@@ -119,7 +119,7 @@ sub _normalize_name {
 
 =head2 _render_tab
 
-Create a tab-delimited file via Text::CSV::Encoded. Forwards to
+Create a tab-delimited file via Text::CSV. Forwards to
 L</_render_xsv>.
 
 =cut
@@ -133,7 +133,7 @@ sub _render_tab {
 
 =head2 _render_csv
 
-Create a comma-delimited file via Text::CSV::Encoded. Forwards to
+Create a comma-delimited file via Text::CSV. Forwards to
 L</_render_xsv>.
 
 =cut
@@ -147,14 +147,14 @@ sub _render_csv {
 
 =head2 _render_xsv
 
-Create a delimited file via Text::CSV::Encoded.
+Create a delimited file via Text::CSV.
 
 =cut
 
 sub _render_xsv {
     my ($self, $xsv_args, $data_config) = @_;
 
-    my $csv = Text::CSV::Encoded->new({
+    my $csv = Text::CSV->new({
         encoding_out => 'utf-8',
         binary       => 1,
         eol          => "\n",
