@@ -26,8 +26,6 @@ sub dataset_view : Chained('base') PathPart('datasource') Args(1) {
         );
         $c->detach();
     }
-
-    $c->stash->{dataset}{object} = $dataset;
 }
 
 
@@ -47,8 +45,6 @@ sub page_view : Chained('base') PathPart('page') Args(1) {
         );
         $c->detach();
     }
-
-    $c->stash->{page}{object} = $page;
 }
 
 
