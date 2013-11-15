@@ -14,16 +14,18 @@ judoonCtrl.controller(
          $scope.alerter = Alerts;
          $scope.user    = user;
 
-         $scope.deleteDataset = function(dataset) {
-             $scope.user.deleteDataset(dataset);
-         };
+         $scope.$on('UserDatasetCtrl::deleteThisDataset', function(event, dataset) {
+             $scope.user.deleteDataset(dataset).then(
+                 function() { Alerts.alertSuccess("Dataset '" + dataset.name + "' deleted!");     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
 
          $scope.openHowTo = function() {
             $modal.open({
                 templateUrl: 'whatnow.html',
                 controller: 'WhatNowCtrl'
             });
-
          };
      }
     ]
@@ -37,57 +39,49 @@ judoonCtrl.controller(
 );
 
 
+judoonCtrl.controller(
     'UserDatasetCtrl',
     ['$scope', 'Alerts',
      function ($scope, Alerts) {
 
+         $scope.newPage = {type: 'blank', title: 'New Page'};
          $scope.createPage = function() {
-             $scope.dataset.createPage(
-                 {type: 'blank', dataset_id: $scope.dataset.id}
+             $scope.dataset.createPage($scope.newPage).then(
+                 function() { Alerts.alertSuccess('New view added!');     },
+                 function() { Alerts.alertError('Something went wrong!'); }
              );
          };
 
          $scope.deleteThisDataset = function() {
-             $scope.dataset.deleteThis().error(
-                 function(err) { Alerts.alertError(err); }
-             );
-         };
-
-         $scope.actions = {
-             deletePage: function (page) {
-                 var index = $scope.dataset.pages.indexOf( page );
-                 if ( index >= 0 ) {
-                     $scope.dataset.pages.splice( index, 1 );
-                 }
+             var confirmed = window.confirm("Are you sure you want to delete this dataset?");
+             if (confirmed) {
+                 $scope.$emit('UserDatasetCtrl::deleteThisDataset', $scope.dataset);
              }
          };
+
+         $scope.$on('UserPageCtrl::deleteThisPage', function(event, page) {
+             $scope.dataset.deletePage(page).then(
+                 function() { Alerts.alertSuccess("View '" + page.title + "' deleted!");     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
      }
     ]
 );
 
 judoonCtrl.controller(
     'UserPageCtrl',
-    ['$scope', 'Dataset', 'DatasetColumn',
-     'Page', 'DatasetPage', 'DataType', 'User', 'Alerts',
-     function ($scope, Dataset, DatasetColumn,
-               Page, DatasetPage, DataType, User, Alerts) {
+    ['$scope', 'Alerts',
+     function ($scope, Alerts) {
 
          $scope.isActionBlockCollapsed = true;
          $scope.isInfoBlockCollapsed   = true;
 
          $scope.deleteThisPage = function() {
-             Page.delete(
-                 {},{id: $scope.page.id},
-                 function() {
-                     $scope.$parent.actions.deletePage($scope.page);
-                 },
-                 function(err) { Alerts.alertError(err); }
-             );
-         };
-
-         $scope.doAThing = function() {
-             $scope.itsame = 'mario';
-             $scope.$parent.actions.deletePage($scope.page);
+             var confirmed = window.confirm("Are you sure you want to delete this view?");
+             if (confirmed) {
+                 $scope.$emit('UserPageCtrl::deleteThisPage', $scope.page);
+             }
          };
      }
     ]
