@@ -99,9 +99,6 @@
   </div>
 </script>
 
-  <a class="btn" ng-click="makeItFail()">Fail Me</a>
-  <a class="btn" ng-click="makeItYay()">Yay Me</a>
-
 
   <h2>Datasets</h2>
   <tabset direction="'left'">
@@ -109,9 +106,6 @@
       <div ng-controller="UserDatasetCtrl">
       <h3>{{dataset.name}}</h3>
 
-
-      <a class="btn" ng-click="makeDsFail()">DS Fail Me</a>
-      <a class="btn" ng-click="makeDsYay()">DS Yay Me</a>
 
       <h4>Actions</h4>
       <div class="btn-toolbar" style="margin-bottom: 20px;">
@@ -154,9 +148,6 @@
                 <div class="btn-group"><button class="btn btn-mini" ng-click="isActionBlockCollapsed = !isActionBlockCollapsed">More Actions</button></div>
                 <div class="btn-group"><button class="btn btn-mini" ng-click="isInfoBlockCollapsed = !isInfoBlockCollapsed">More Info</button></div>
               </div>
-
-              <a class="btn" ng-click="makePageFail()">Page Fail Me</a>
-              <a class="btn" ng-click="makePageYay()">Page Yay Me</a>
 
 
               <div id="page_actions_{{page.id}}" class="page_actions" collapse="isActionBlockCollapsed">

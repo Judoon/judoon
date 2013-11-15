@@ -18,9 +18,6 @@ judoonCtrl.controller(
              $scope.user.deleteDataset(dataset);
          };
 
-         $scope.makeItFail = function() { Alerts.alertError("It Failed!"); };
-         $scope.makeItYay  = function() { Alerts.alertSuccess("It Worked!"); };
-
          $scope.openHowTo = function() {
             $modal.open({
                 templateUrl: 'whatnow.html',
@@ -64,10 +61,6 @@ judoonCtrl.controller(
                  }
              }
          };
-
-         $scope.makeDsFail = function() { Alerts.alertError("DS " + $scope.dataset.id + " Failed!"); };
-         $scope.makeDsYay  = function() { Alerts.alertSuccess("DS " + $scope.dataset.id + " Worked!"); };
-
      }
     ]
 );
@@ -96,10 +89,6 @@ judoonCtrl.controller(
              $scope.itsame = 'mario';
              $scope.$parent.actions.deletePage($scope.page);
          };
-
-         $scope.makePageFail = function() { Alerts.alertError("Page " + $scope.page.id + " Failed!"); };
-         $scope.makePageYay  = function() { Alerts.alertSuccess("Page " + $scope.page.id + " Worked!"); };
-
      }
     ]
 );
