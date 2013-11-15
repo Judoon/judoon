@@ -12,7 +12,7 @@
   <div class="row-fluid">
     <div class="span2">
       <p class="help-inline">
-        <a href="#howto_modal" data-toggle="modal">What now?</a>
+        <a ng-click="openHowTo()">What now?</a>
       </p>
     </div>
     <div class="span10">
@@ -37,7 +37,9 @@
     </div>
   </div>
 
-  <div id="howto_modal" class="modal hide fade">
+
+  <script type="text/ng-template" id="whatnow.html">
+  <div>
     <div class="modal-header">
       <h3>How this works.</h3>
     </div>
@@ -92,9 +94,10 @@
         </li>
     </div>
     <div class="modal-footer">
-      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+      <button class="btn" ng-click="closeWhatNow()" aria-hidden="true">Close</button>
     </div>
   </div>
+</script>
 
   <a class="btn" ng-click="makeItFail()">Fail Me</a>
   <a class="btn" ng-click="makeItYay()">Yay Me</a>

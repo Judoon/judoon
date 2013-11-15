@@ -4,12 +4,12 @@
 
 'use strict';
 
-var judoonCtrl = angular.module('judoon.controllers', []);
+var judoonCtrl = angular.module('judoon.controllers', ['ngSanitize']);
 
 judoonCtrl.controller(
     'UserCtrl',
-    ['$scope', 'user', 'Alerts',
-     function ($scope, user, Alerts) {
+    ['$scope', '$modal', 'user', 'Alerts',
+     function ($scope, $modal, user, Alerts) {
 
          $scope.alerter = Alerts;
          $scope.user    = user;
@@ -20,11 +20,26 @@ judoonCtrl.controller(
 
          $scope.makeItFail = function() { Alerts.alertError("It Failed!"); };
          $scope.makeItYay  = function() { Alerts.alertSuccess("It Worked!"); };
+
+         $scope.openHowTo = function() {
+            $modal.open({
+                templateUrl: 'whatnow.html',
+                controller: 'WhatNowCtrl'
+            });
+
+         };
      }
     ]
 );
 
 judoonCtrl.controller(
+    'WhatNowCtrl',
+    ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+        $scope.closeWhatNow = function() { $modalInstance.dismiss(); };
+    }]
+);
+
+
     'UserDatasetCtrl',
     ['$scope', 'Alerts',
      function ($scope, Alerts) {
