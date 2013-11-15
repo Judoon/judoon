@@ -154,7 +154,7 @@ sub delete {
     my ($self) = @_;
     $self->next::method(@_);
     $self->_delete_datastore();
-    return;
+    return $self;
 }
 
 
