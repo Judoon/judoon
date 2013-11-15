@@ -169,7 +169,7 @@ sub authd_user_datasets : Chained('authd_user_base') PathPart('datasets') Args(0
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Datasets', {
-            set      => $c->stash->{authd_user}->datasets_rs,
+            set      => $c->stash->{authd_user}->datasets_rs->ordered,
             writable => 0,
         }
     );
