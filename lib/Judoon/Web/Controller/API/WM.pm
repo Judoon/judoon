@@ -21,7 +21,6 @@ use namespace::autoclean;
 BEGIN {extends 'Judoon::Web::Controller'; }
 
 use Judoon::API::Machine;
-use Module::Load;
 use HTTP::Response;
 
 
@@ -36,7 +35,6 @@ with the given arguments (C<$machine_args>).
 
 sub wm {
     my ($self, $c, $machine_class, $machine_args) = @_;
-    load $machine_class;
     Judoon::API::Machine->new(
         resource      => $machine_class,
         resource_args => [ %{ $machine_args } ],

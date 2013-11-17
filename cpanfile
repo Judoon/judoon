@@ -68,7 +68,6 @@ requires 'IO::File';
 requires 'JSON::MaybeXS';
 requires 'List::AllUtils';
 requires 'MIME::Base64';
-requires 'Module::Load';
 requires 'Module::Pluggable';
 requires 'Module::Versions';
 requires 'Moo' => '1.001000';
@@ -103,7 +102,7 @@ requires 'Try::Tiny';
 requires 'Type::Registry';
 requires 'Type::Tiny';
 requires 'URI';
-requires 'Web::Machine';
+requires 'Web::Machine' => '0.13';
 
 
 # Excel::Reader::XLSX deps
