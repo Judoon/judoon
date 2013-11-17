@@ -221,11 +221,7 @@ after object_GET => sub {
         $c->detach();
     }
 
-
-    $self->table_view(
-        $c, $view, $page->title,
-        $page->headers, $page->data_table,
-    );
+    $self->table_view($c, $view, $page);
 
     if ($view eq 'standalone') {
         my $type = $c->req->param('format') // 'zip';

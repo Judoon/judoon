@@ -2,6 +2,7 @@
 
 use Clone qw(clone);
 use Judoon::SiteLinker;
+use Judoon::Table;
 use Judoon::TypeRegistry;
 use List::AllUtils ();
 
@@ -338,7 +339,9 @@ test '/datasets/1/data' => sub {
         my ($type, $ds) = @$test;
         my $ds_id       = $ds->id;
 
-        my $data_table = $ds->data_table({shortname => 1});
+        my $data_table = Judoon::Table->new({
+            data_source => $ds, header_type => 'short', format => 'tsv',
+        })->table;
         my $headers    = shift @$data_table;
         my @data       = map {{List::AllUtils::zip @$headers, @$_}}
             @$data_table;
@@ -359,7 +362,9 @@ test '/datasets/1/data' => sub {
 
     # other users can see public pages of public datasets, but nothing
     # for private datasets
-    my $pub_data_table = $tests[0][1]->data_table({shortname => 1});
+    my $pub_data_table = Judoon::Table->new({
+        data_source => $tests[0][1], header_type => 'short', format => 'tsv',
+    })->table;
     my $pub_headers    = shift @$pub_data_table;
     my @pub_data       = map {{List::AllUtils::zip @$pub_headers, @$_}}
         @$pub_data_table;

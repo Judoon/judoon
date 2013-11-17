@@ -68,6 +68,7 @@ requires 'IO::File';
 requires 'JSON::MaybeXS';
 requires 'List::AllUtils';
 requires 'MIME::Base64';
+requires 'MIME::Types';
 requires 'Module::Pluggable';
 requires 'Module::Versions';
 requires 'Moo' => '1.001000';

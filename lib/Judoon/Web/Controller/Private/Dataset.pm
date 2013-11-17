@@ -181,13 +181,7 @@ after object_GET => sub {
         $c->detach();
     }
 
-
-    my $data_table = $dataset->data_table;
-    my $headers = shift @$data_table;
-    $self->table_view(
-        $c, $view, $dataset->name,
-        $headers, $data_table,
-    );
+    $self->table_view($c, $view, $dataset);
 
     if (my (@pages) = $dataset->pages_rs->all) {
         $c->stash->{page}{list} = [

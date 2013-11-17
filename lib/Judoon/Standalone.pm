@@ -37,6 +37,7 @@ installation as easy as possible for non-technical users.
 use Archive::Builder;
 use File::Temp qw(tempfile);
 use Judoon::Error::Devel::Foreign;
+use Judoon::Table;
 use Judoon::TypeRegistry;
 use Path::Class qw(dir);
 use Template;
@@ -172,9 +173,10 @@ sub _build_archive {
 
     # add database
     my $dataset = $self->page->dataset;
-    $archive_section->new_file(
-        $self->standalone_db, 'string', $dataset->as_raw({shortname => 1})
-    );
+    my $raw_data = Judoon::Table->new({
+        data_source => $dataset, header_type => 'short', format => 'tsv',
+    })->render;
+    $archive_section->new_file($self->standalone_db, 'string', $raw_data);
 
     # add datatypes
     $archive_section->new_file(

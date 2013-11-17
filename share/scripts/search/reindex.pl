@@ -100,7 +100,7 @@ main: {
 
                 owner       => $user_map{$dataset->user->username},
                 data        => join("\n", map { join("\t", map {$_ // q()} @$_) } @{$dataset->data}),
-                headers     => join("\t", $dataset->long_headers),
+                headers     => join("\t", @{$dataset->long_headers}),
                 nbr_rows    => $dataset->nbr_rows,
                 nbr_columns => $dataset->nbr_columns,
                 created     => $dataset->created,
@@ -134,7 +134,7 @@ main: {
 
                 owner       => $user_map{$page->dataset->user->username},
                 data        => join("\n", map { join("\t", map {$_ // q()} @$_) } @{$page->data_table}),
-                headers     => join("\t", map {$_ // q()} @{$page->headers}),
+                headers     => join("\t", map {$_ // q()} @{$page->long_headers}),
                 nbr_rows    => $page->nbr_rows,
                 nbr_columns => $page->nbr_columns,
                 created     => $page->created,

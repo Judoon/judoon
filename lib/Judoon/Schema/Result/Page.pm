@@ -76,6 +76,7 @@ Add <created> and <modified> columns to C<Page>.
 =cut
 
 with qw(
+    Judoon::Schema::Role::Result::DoesTabularData
     Judoon::Schema::Role::Result::HasPermissions
     Judoon::Schema::Role::Result::HasTimestamps
 );
@@ -278,16 +279,35 @@ sub get_cloneable_columns {
     return %me;
 }
 
+=head2 tabular_name
 
-=head2 headers
+For C<::DoesTabularData>: name for this table
+
+=cut
+
+sub tabular_name { $_[0]->title }
+
+
+=head2 long_headers
 
 Get an arrayref of page headers
 
 =cut
 
-sub headers {
+sub long_headers {
     my ($self) = @_;
-    return [map {$_->title} $self->page_columns_ordered->all];
+    return [$self->page_columns_ordered->get_column('title')->all];
+}
+
+=head2 short_headers
+
+Get an arrayref of page headers
+
+=cut
+
+sub short_headers {
+    my ($self) = @_;
+    return [$self->page_columns_ordered->get_column('id')->all];
 }
 
 
@@ -303,8 +323,8 @@ sub data_table {
     my @col_templates = map {$_->template->to_jstmpl}
         $self->page_columns_ordered->all;
 
-    my $data = $self->dataset->data_table({shortname => 1});
-    my $data_labels = shift @$data; # get rid of headers
+    my $data = $self->dataset->data_table();
+    my $data_labels = $self->dataset->short_headers;
 
 
     my $tt = Template->new({
