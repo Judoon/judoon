@@ -168,25 +168,24 @@ judoonCtrl.controller(
 
 
          $scope.getServerData = function ( sSource, aoData, fnCallback ) {
-             $.ajax( {
-                 "dataType" : "json",
-                 "type"     : "GET",
-                 "url"      : sSource,
-                 "data"     : aoData,
-                 "success": [
-                     function(data) {
-                         var new_data = [];
-                         for (var i = 0; i < data.tmplData.length; i++) {
-                             new_data[i] = [];
-                             for (var j = 0; j < $scope.dataset.columns.length; j++) {
-                                 new_data[i][j] = data.tmplData[i][$scope.dataset.columns[j].shortname];
-                             }
-                         }
-                         data.aaData = new_data;
-                     },
-                     fnCallback
-                 ],
-             } );
+             var params = {};
+             angular.forEach(aoData, function(val) {
+                 params[val.name] = val.value;
+             });
+             $http.get(sSource, {params: params})
+              .then( function(response) {
+                  var data = response.data;
+                  var new_data = [];
+                  for (var i = 0; i < data.tmplData.length; i++) {
+                      new_data[i] = [];
+                      for (var j = 0; j < $scope.dataset.columns.length; j++) {
+                          new_data[i][j] = data.tmplData[i][$scope.dataset.columns[j].shortname];
+                      }
+                  }
+                  data.aaData = new_data;
+                  return data;
+              })
+              .then( fnCallback );
          };
 
 
@@ -513,30 +512,29 @@ judoonCtrl.controller(
 
 
          $scope.getServerData = function ( sSource, aoData, fnCallback ) {
-             $.ajax( {
-                 "dataType": "json",
-                 "type": "GET",
-                 "url": sSource,
-                 "data": aoData,
-                 "success": [
-                     function(data) {
-                         var templates = [];
-                         angular.forEach($scope.pageColumns, function (value, key) {
-                             templates.push( Handlebars.compile(value.template) );
-                         } );
+             var params = {};
+             angular.forEach(aoData, function(val) {
+                 params[val.name] = val.value;
+             });
+             $http.get(sSource, {params: params})
+                 .then( function(response) {
+                     var data = response.data;
+                     var templates = [];
+                     angular.forEach($scope.page.columns, function (value, key) {
+                         templates.push( Handlebars.compile(value.template) );
+                     } );
 
-                         var new_data = [];
-                         for (var i = 0; i < data.tmplData.length; i++) {
-                             new_data[i] = [];
-                             for (var j = 0; j < templates.length; j++) {
-                                 new_data[i][j] = templates[j](data.tmplData[i]);
-                             }
+                     var new_data = [];
+                     for (var i = 0; i < data.tmplData.length; i++) {
+                         new_data[i] = [];
+                         for (var j = 0; j < templates.length; j++) {
+                             new_data[i][j] = templates[j](data.tmplData[i]);
                          }
-                         data.aaData = new_data;
-                     },
-                     fnCallback
-                 ]
-             } );
+                     }
+                     data.aaData = new_data;
+                     return data;
+                 })
+                 .then( fnCallback );
          };
 
      }]);
