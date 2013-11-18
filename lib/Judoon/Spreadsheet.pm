@@ -31,7 +31,6 @@ getting at the name, columns, and data of that spreadsheet.
 use Data::Printer;
 use Encode qw(decode);
 use Encode::Guess;
-use Excel::Reader::XLSX;
 use IO::File ();
 use Judoon::Error::Devel::Arguments;
 use Judoon::Error::Devel::Foreign;
@@ -45,6 +44,7 @@ use MooX::Types::MooseLike::Base qw(Str Int ArrayRef HashRef FileHandle);
 use Regexp::Common;
 use Safe::Isa;
 use Spreadsheet::ParseExcel;
+use Spreadsheet::ParseXLSX;
 use Text::CSV;
 
 use Moo;
@@ -129,9 +129,9 @@ sub BUILD {
     my ($self) = @_;
 
     my %parsertype_map = (
-        xls  => { build => '_build_from_xls',  data_type => '_get_xls_data_type',  },
-        xlsx => { build => '_build_from_xlsx', data_type => '_get_xlsx_data_type', },
         csv  => { build => '_build_from_csv',  data_type => '_get_csv_data_type',  },
+        xls  => { build => '_build_from_xls',  data_type => '_get_excel_data_type', },
+        xlsx => { build => '_build_from_xlsx', data_type => '_get_excel_data_type', },
     );
     my $build_meth  = $parsertype_map{ $self->filetype }->{build};
     my $type_meth   = $parsertype_map{ $self->filetype }->{data_type};
@@ -177,8 +177,19 @@ has _parser_obj => (is => 'ro', init_arg => undef,);
 
 sub _build_from_xls {
     my ($self) = @_;
+    my $parser = Spreadsheet::ParseExcel->new;
+    return $self->_parse_excel($parser);
+}
 
-    my $parser    = Spreadsheet::ParseExcel->new;
+sub _build_from_xlsx {
+    my ($self) = @_;
+    my $parser = Spreadsheet::ParseXLSX->new;
+    return $self->_parse_excel($parser);
+}
+
+sub _parse_excel {
+    my ($self, $parser) = @_;
+
     my $workbook  = $parser->parse($self->filehandle);
     my @allsheets = $workbook->worksheets;
     my $worksheet = $allsheets[0];
@@ -243,11 +254,12 @@ sub _build_from_xls {
     return ($name, \@data);
 }
 
-sub _get_xls_data_type {
+sub _get_excel_data_type {
     my ($self, $column_idx) = @_;
     return $self->_parser_obj->get_cell(2,$column_idx)
         ->$_call_if_object('type');
 }
+
 
 
 sub _build_from_csv {
@@ -283,48 +295,6 @@ sub _build_from_csv {
 }
 
 sub _get_csv_data_type { return 'text'; }
-
-
-sub _build_from_xlsx {
-    my ($self) = @_;
-
-    my $parser    = Excel::Reader::XLSX->new;
-    my $workbook  = $parser->read_filehandle( $self->filehandle )
-        or Judoon::Error::Devel::Foreign->throw({
-            message => q{Couldn't parse xlsx file'},
-            module  => 'Excel::Reader::XLSX',
-            foreign_message => $parser->error(),
-        });
-    my @allsheets = $workbook->worksheets;
-    my $worksheet = $allsheets[0];
-    Judoon::Error::Spreadsheet->throw({
-        message  => "Couldn't find a worksheet",
-        filetype => $self->filetype,
-    }) unless ($worksheet);
-
-    $self->{_parser_obj} = $worksheet;
-
-
-    my ($maxcol, @data) = (0);
-    while ( my $row = $worksheet->next_row() ) {
-        if ($row->{_max_cell_index} > $maxcol) {
-            $maxcol = $row->{_max_cell_index};
-        }
-        push @data, [$row->values()];
-    }
-
-    # Excel::Reader::XLSX doesn't include empty rows at the end, so
-    # append empty strings to pad out the row to the maximum row
-    # length.
-    for my $row (@data) {
-        if (@$row < $maxcol) {
-            push @$row, ('') x ($maxcol - @$row);
-        }
-    }
-
-    return ($worksheet->name, \@data);
-}
-sub _get_xlsx_data_type { return 'text'; }
 
 
 =head2 name

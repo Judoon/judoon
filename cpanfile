@@ -93,6 +93,7 @@ requires 'Regexp::Common';
 requires 'Safe::Isa';
 requires 'Scalar::Util';
 requires 'Spreadsheet::ParseExcel';
+requires 'Spreadsheet::ParseXLSX';
 requires 'Spreadsheet::WriteExcel';
 requires 'Sub::Name';
 requires 'Template';
@@ -104,12 +105,6 @@ requires 'Type::Registry';
 requires 'Type::Tiny';
 requires 'URI';
 requires 'Web::Machine' => '0.13';
-
-
-# Excel::Reader::XLSX deps
-requires 'Archive::Zip';
-requires 'OLE::Storage_Lite';
-requires 'XML::LibXML';
 
 
 # deployment deps
