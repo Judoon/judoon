@@ -53,7 +53,7 @@ builder {
 
     my $mimetypes = MIME::Types->new;
     my %mapping = map {$_ => $mimetypes->mimeTypeOf($_)->type()}
-        qw(tsv csv xls xlsx);
+        qw(tsv csv xls xlsx zip tgz);
 
     enable_if { $_[0]->{PATH_INFO} =~ m{^/api/}; }
         SetAccept => from => 'suffix', mapping => \%mapping;
