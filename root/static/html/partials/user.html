@@ -167,13 +167,13 @@
                       <li><a download="{{page.title}}.xlsx" target="_self" ng-href="{{page.url()}}.xlsx">Excel 2007</a></li>
                     </ul>
                   </div>
-                  <div class="btn-group">
+                  <div class="btn-group dropdown">
                     <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
                       Download standalone app: <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                      <a ng-click="fetchPageApp('zip')">zip</a>
-                      <a ng-click="fetchPageApp('tar')">tar.gz</a>
+                      <li><a download="{{page.title}}.zip" target="_self" ng-href="{{page.url()}}.zip">zip</a></li>
+                      <li><a download="{{page.title}}.tgz" target="_self" ng-href="{{page.url()}}.tgz">tar.gz</a></li>
                     </ul>
                   </div>
                 </div>
