@@ -88,6 +88,7 @@ requires 'Params::Validate';
 requires 'Path::Class';
 requires 'Plack::Middleware::Debug';
 requires 'Plack::Middleware::Debug::DBIC::QueryLog';
+requires 'Plack::Middleware::SetAccept';
 requires 'Pod::Usage';
 requires 'Regexp::Common';
 requires 'Safe::Isa';

@@ -24,8 +24,11 @@ BEGIN {
 }
 
 use Judoon::Web;
+use MIME::Types;
 use Moose::Util ();
 use Plack::Builder;
+use Plack::Middleware::SetAccept;
+
 
 builder {
 
@@ -48,6 +51,12 @@ builder {
         );
     }
 
+    my $mimetypes = MIME::Types->new;
+    my %mapping = map {$_ => $mimetypes->mimeTypeOf($_)->type()}
+        qw(tsv csv xls xlsx);
+
+    enable_if { $_[0]->{PATH_INFO} =~ m{^/api/}; }
+        SetAccept => from => 'suffix', mapping => \%mapping;
 
     # mount app
     mount '/' => Judoon::Web->apply_default_middlewares(Judoon::Web->psgi_app);
