@@ -18,11 +18,7 @@ use Moose;
 use namespace::autoclean;
 
 extends 'Catalyst::View';
-
-use MIME::Types;
-
-has mime_types => (is => 'ro', lazy => 1, builder => '_build_mime_types');
-sub _build_mime_types { return MIME::Types->new; }
+with 'Judoon::Role::MimeTypes';
 
 
 =head1 METHODS
@@ -41,7 +37,7 @@ sub process {
 
     my $table = $c->stash->{tabular_data};
     my $ext   = $table->format;
-    $c->res->headers->header('Content-Type' => $self->_mime_type_for($ext));
+    $c->res->headers->header('Content-Type' => $self->mime_type_for($ext));
 
     my $name = $self->_normalize_name($table->tabular_name);
     $c->res->headers->header(
@@ -67,11 +63,6 @@ sub _normalize_name {
     return $name || 'untitled';
 }
 
-
-sub _mime_type_for {
-    my ($self, $ext);
-    return $self->mime_types->mimeTypeOf($_)->type();
-}
 
 __PACKAGE__->meta->make_immutable;
 1;
