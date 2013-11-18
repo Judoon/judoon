@@ -111,8 +111,8 @@ around BUILDARGS => sub {
 
         Judoon::Error::Spreadsheet::Type->throw({
             message => "Invalid file format: $filetype",
-        }) if ($filetype !~ m/^xlsx?|csv|tab/);
-        $args->{filetype} = $filetype eq 'tab' ? 'csv' : $filetype;
+        }) if ($filetype !~ m/^(?:xlsx?|[ct]sv)$/);
+        $args->{filetype} = $filetype;
 
         my $spreadsheet_fh = IO::File->new($filename, 'r')
             or Judoon::Error::Input::File->throw({
@@ -129,9 +129,10 @@ sub BUILD {
     my ($self) = @_;
 
     my %parsertype_map = (
-        csv  => { build => '_build_from_csv',  data_type => '_get_csv_data_type',  },
         xls  => { build => '_build_from_xls',  data_type => '_get_excel_data_type', },
         xlsx => { build => '_build_from_xlsx', data_type => '_get_excel_data_type', },
+        csv  => { build => '_build_from_csv',  data_type => '_get_xsv_data_type',   },
+        tsv  => { build => '_build_from_tsv',  data_type => '_get_xsv_data_type',   },
     );
     my $build_meth  = $parsertype_map{ $self->filetype }->{build};
     my $type_meth   = $parsertype_map{ $self->filetype }->{data_type};
@@ -271,6 +272,25 @@ sub _build_from_csv {
             module  => 'Text::CSV',
             foreign_message => Text::CSV->error_diag,
         });
+    return $self->_build_from_xsv($parser);
+}
+
+sub _build_from_tsv {
+    my ($self) = @_;
+
+    my $parser = Text::CSV->new({binary => 1, sep_char => "\t"})
+        or Judoon::Error::Devel::Foreign->throw({
+            message => q{Couldn't create CSV decoder object'},
+            module  => 'Text::CSV',
+            foreign_message => Text::CSV->error_diag,
+        });
+    return $self->_build_from_xsv($parser);
+}
+
+
+sub _build_from_xsv {
+    my ($self, $parser) = @_;
+
     $self->{_parser_obj} = $parser;
 
     my @data;
@@ -294,7 +314,7 @@ sub _build_from_csv {
     return ($name, \@data);
 }
 
-sub _get_csv_data_type { return 'text'; }
+sub _get_xsv_data_type { return 'text'; }
 
 
 =head2 name
