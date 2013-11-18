@@ -352,7 +352,7 @@ judoonSrv.factory(
 
 judoonSrv.factory(
     'Pagesp',
-    ['$http', '$sce', 'PageColumnsp', function($http, $sce, PageColumnsp) {
+    ['$http', 'PageColumnsp', function($http, PageColumnsp) {
         var wrapper = {
             update: function() {
                 var future,

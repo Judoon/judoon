@@ -4,6 +4,7 @@
     <script src="/static/js/vendor/angular/angular-route.min.js"></script>
     <script src="/static/js/vendor/angular/angular-resource.min.js"></script>
     <script src="/static/js/vendor/angular/angular-sanitize.min.js"></script>
+    <script src="/static/js/vendor/angular/angular-contenteditable.min.js"></script>
     <script src="/static/js/vendor/angular/ui-bootstrap-tpls-0.6.0.min.js"></script>
 
     <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>

@@ -5,7 +5,7 @@
 
 var judoonApp = angular.module(
     'judoon',
-    ['ngRoute', 'ngSanitize', 'ui.bootstrap',
+    ['ngRoute', 'ngSanitize', 'contenteditable', 'ui.bootstrap',
      'judoon.services', 'judoon.controllers', 'judoon.directives']
 );
 
