@@ -6,6 +6,7 @@ use namespace::clean;
 extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
 with 'Judoon::API::Resource::Role::Item';
+with 'Judoon::API::Resource::Role::Tabular';
 
 sub update_allows { return qw(title preamble postamble permission); }
 sub update_valid  { return {permission => qr/^(?:public|private)$/}; }
