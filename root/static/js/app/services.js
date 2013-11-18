@@ -220,11 +220,17 @@ judoonSrv.factory(
 judoonSrv.factory(
     'Datasetp',
     ['$http', 'Pagesp', 'DatasetColumnsp', function($http, Pagesp, DatasetColumnsp) {
+        var apiBase = '/api/datasets/';
+
     var wrapper = {
+        url: function() {
+            var _this = this;
+            return apiBase + _this.id;
+        },
         update: function() {
             var future,
                 _this = this;
-            future = $http.put('/api/datasets/' + _this.id, {
+            future = $http.put(_this.url, {
                 name:        _this.name,
                 description: _this.description,
                 permission:  _this.permission
@@ -234,13 +240,13 @@ judoonSrv.factory(
         deleteMe: function() {
             var future,
                 _this = this;
-            future = $http.delete('/api/datasets/' + _this.id);
+            future = $http.delete(_this.url());
             return future;
         },
         getColumns: function() {
             var future,
                 _this = this;
-            future = $http.get('/api/datasets/' + _this.id + '/columns');
+            future = $http.get(_this.url() + '/columns');
             return future.then(function(response) {
                 _this.columns = [];
                 angular.forEach(response.data, function(value) {
@@ -252,7 +258,7 @@ judoonSrv.factory(
         getPages: function() {
             var future,
                 _this = this;
-            future = $http.get('/api/datasets/' + _this.id + '/pages');
+            future = $http.get(_this.url() + '/pages');
             return future.then(function(response) {
                 _this.pages = [];
                 angular.forEach(response.data, function(value) {
@@ -293,7 +299,7 @@ judoonSrv.factory(
         get: function(datasetId) {
             var future,
                 _this = this;
-            future = $http.get('/api/datasets/' + datasetId);
+            future = $http.get(apiBase + datasetId);
             return future.then(
                 function(response) { return _this._buildDataset(response.data); }
             )
@@ -353,11 +359,17 @@ judoonSrv.factory(
 judoonSrv.factory(
     'Pagesp',
     ['$http', 'PageColumnsp', function($http, PageColumnsp) {
+        var apiBase = '/api/pages/';
+
         var wrapper = {
+            url: function() {
+                var _this = this;
+                return apiBase + _this.id;
+            },
             update: function() {
                 var future,
                     _this = this;
-                future = $http.put('/api/pages/' + _this.id, {
+                future = $http.put(_this.url(), {
                     title:      _this.title,
                     preamble:   _this.preamble,
                     postamble:  _this.postamble,
@@ -368,7 +380,7 @@ judoonSrv.factory(
             getColumns: function() {
                 var future,
                     _this = this;
-                future = $http.get('/api/pages/' + _this.id + '/columns');
+                future = $http.get(_this.url() + '/columns');
                 return future.then(function(response) {
                     _this.columns = [];
                     angular.forEach(response.data, function(value) {
@@ -380,7 +392,7 @@ judoonSrv.factory(
             createColumn: function (newColumn) {
                 var _this = this;
                 newColumn.template = '';
-                return $http.post('/api/pages/' + _this.id, newColumn)
+                return $http.post(_this.url(), newColumn)
                     .success( function(data, status, getHeader) {
                         var column = $http.get(getHeader('Location'))
                                 .success( function(columnData) {
@@ -402,7 +414,7 @@ judoonSrv.factory(
             deleteMe: function() {
                 var future,
                     _this = this;
-                future = $http.delete('/api/pages/' + _this.id);
+                future = $http.delete(_this.url());
                 return future;
             }
         };
@@ -411,7 +423,7 @@ judoonSrv.factory(
             get: function(pageId) {
                 var future,
                     _this = this;
-                future = $http.get('/api/pages/' + pageId);
+                future = $http.get(apiBase + pageId);
                 return future.then(
                     function(response) { return _this._buildPage(response.data); }
                 )
