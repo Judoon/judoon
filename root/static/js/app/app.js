@@ -15,7 +15,7 @@ judoonApp.config(['$locationProvider', '$routeProvider', function($locationProvi
         .when('/userp/:userName', {
             templateUrl: '/static/html/partials/user.html',
             controller: 'UserCtrl',
-            // reloadOnSearch: false, // I don't know what this is.
+            reloadOnSearch: false, // I don't know what this is.
             resolve: {
                 user: ['$route', 'Userp', function($route, Userp) {
                     var userName = $route.current.params.userName;

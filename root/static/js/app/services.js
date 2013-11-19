@@ -137,6 +137,7 @@ judoonSrv.factory(
                     _this.datasets = [];
                     angular.forEach(response.data, function(value) {
                         _this.datasets.push(Datasetp._buildDataset(value));
+                        _this.datasetsLoaded = 1;
                     });
                     return _this.datasets;
                 });

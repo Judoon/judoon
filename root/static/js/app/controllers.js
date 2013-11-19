@@ -8,8 +8,8 @@ var judoonCtrl = angular.module('judoon.controllers', ['ngSanitize']);
 
 judoonCtrl.controller(
     'UserCtrl',
-    ['$scope', '$modal', 'user', 'Alerts',
-     function ($scope, $modal, user, Alerts) {
+    ['$scope', '$location', '$modal', 'user', 'Alerts',
+     function ($scope, $location, $modal, user, Alerts) {
 
          $scope.alerter = Alerts;
          $scope.user    = user;
@@ -26,6 +26,53 @@ judoonCtrl.controller(
                 templateUrl: 'whatnow.html',
                 controller: 'WhatNowCtrl'
             });
+         };
+
+
+         // support hash-linking of tabs
+         var ignoreNextUpdateUrl = 1;
+         var ignoreNextUpdateTab = 0;
+         $scope.$watch('user.datasetsLoaded', function() {
+             if (user.datasetsLoaded) {
+                 updateTabFromUrl();
+             }
+         });
+         $scope.$on('$routeUpdate', function() {
+             updateTabFromUrl();
+         });
+
+         function updateTabFromUrl() {
+             if (ignoreNextUpdateTab) {
+                 ignoreNextUpdateTab = 0;
+                 return;
+             }
+             var hash = $location.hash();
+             if (!hash) {
+                 return;
+             }
+             angular.forEach($scope.user.datasets, function(value) {
+                 value.tabActive = value.id == hash ? true : false;
+             });
+             ignoreNextUpdateUrl = 1;
+         }
+
+
+         $scope.updateUrlFromTab = function() {
+             if (ignoreNextUpdateUrl) {
+                 ignoreNextUpdateUrl = 0;
+                 return;
+             }
+             var selectedDs,
+                 hash = $location.hash();
+             angular.forEach($scope.user.datasets, function(value) {
+                 if (value.tabActive && hash != value.id) {
+                     selectedDs = value;
+                 }
+             });
+             if (selectedDs) {
+                 $location.hash( selectedDs.id );
+             }
+             ignoreNextUpdateTab = 1;
          };
      }
     ]

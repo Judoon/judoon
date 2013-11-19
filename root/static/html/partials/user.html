@@ -102,7 +102,7 @@
 
   <h2>Datasets</h2>
   <tabset direction="'left'">
-    <tab ng-repeat="dataset in user.datasets" heading="{{dataset.name}}">
+    <tab ng-repeat="dataset in user.datasets" heading="{{dataset.name}}" active="dataset.tabActive" select="updateUrlFromTab()">
       <div ng-controller="UserDatasetCtrl">
       <h3>{{dataset.name}}</h3>
 
