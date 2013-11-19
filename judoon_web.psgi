@@ -58,7 +58,18 @@ builder {
     enable_if { $_[0]->{PATH_INFO} =~ m{^/api/}; }
         SetAccept => from => 'suffix', mapping => \%mapping;
 
+    enable_if { $_[0]->{PATH_INFO} =~ m{^/api/user/datasets}; }
+        LocationToRedirect => process_location => sub {
+            my ($env, $location) = @_;
+            my ($ds_id) = ($location =~ m/(\d+)$/);
+            my $new_loc = $env->{HTTP_REFERER} . "/datasource/$ds_id";
+            $new_loc =~ s/userp/user/;
+            return $new_loc;
+        };
+
     # mount app
     mount '/' => Judoon::Web->apply_default_middlewares(Judoon::Web->psgi_app);
+
+
 };
 
