@@ -121,15 +121,15 @@
         <div class="btn-group">
           <a class="btn btn-mini action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
         </div>
-        <div class="btn-group">
+        <div class="btn-group dropdown">
           <a class="btn btn-mini dropdown-toggle action_download_tabular">
             Download as: <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <a ng-click="fetchDataset('tab')">tab</a>
-            <a ng-click="fetchDataset('csv')">csv</a>
-            <a ng-click="fetchDataset('xls')">Excel 97</a>
-            <a ng-click="fetchDataset('xlsx')">Excel 2007</a>
+            <li><a download="{{dataset.name}}.tsv"  target="_self" ng-href="{{dataset.url()}}.tsv">tab</a></li>
+            <li><a download="{{dataset.name}}.csv"  target="_self" ng-href="{{dataset.url()}}.csv">csv</a></li>
+            <li><a download="{{dataset.name}}.xls"  target="_self" ng-href="{{dataset.url()}}.xls">Excel 97</a></li>
+            <li><a download="{{dataset.name}}.xlsx" target="_self" ng-href="{{dataset.url()}}.xlsx">Excel 2007</a></li>
           </ul>
         </div>
       </div>
@@ -156,15 +156,15 @@
                   <div class="btn-group">
                     <a class="btn btn-mini action_delete_page" ng-click="deleteThisPage()">Delete View</a>
                   </div>
-                  <div class="btn-group">
+                  <div class="btn-group dropdown">
                     <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
                       Download as: <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
-                      <a ng-click="fetchPage('tab')">tab</a>
-                      <a ng-click="fetchPage('csv')">csv</a>
-                      <a ng-click="fetchPage('xls')">Excel 97</a>
-                      <a ng-click="fetchPage('xlsx')">Excel 2007</a>
+                      <li><a download="{{page.title}}.tsv"  target="_self" ng-href="{{page.url()}}.tsv">tab</a></li>
+                      <li><a download="{{page.title}}.csv"  target="_self" ng-href="{{page.url()}}.csv">csv</a></li>
+                      <li><a download="{{page.title}}.xls"  target="_self" ng-href="{{page.url()}}.xls">Excel 97</a></li>
+                      <li><a download="{{page.title}}.xlsx" target="_self" ng-href="{{page.url()}}.xlsx">Excel 2007</a></li>
                     </ul>
                   </div>
                   <div class="btn-group">
