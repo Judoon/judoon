@@ -45,7 +45,7 @@ sub list : Chained('base') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
     if (my $user = $c->user) {
-        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $self->go_here($c, '/jsapp/user_view', [$user->get('username')]);
     }
     else {
         $self->go_here($c, '/login/login');
@@ -83,7 +83,7 @@ that user.
 
 =cut
 
-sub edit : Chained('id') PathPart('') Args(0) {
+sub edit : Chained('id') PathPart('obsolete') Args(0) {
     my ($self, $c) = @_;
     $c->stash->{template} = 'user/edit.tt2';
 

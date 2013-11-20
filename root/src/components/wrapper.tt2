@@ -60,7 +60,7 @@
               <i class="icon-user"></i> [%- user_this.username -%] <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="[% c.uri_for_action('/user/edit', [user_this.username]) %]">Overview</a></li>
+              <li><a href="[% c.uri_for_action('/jsapp/user_view', [user_this.username]) %]">Overview</a></li>
               <li><a href="[% c.uri_for_action('/account/profile') %]">Profile</a></li>
               <li><a href="[% c.uri_for_action('/account/settings_view') %]">Settings</a></li>
             </ul>

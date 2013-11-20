@@ -65,7 +65,7 @@ ERRMSG
         }
     }
     elsif (my $user = $c->user) {
-        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $self->go_here($c, '/jsapp/user_view', [$user->get('username')]);
         $c->detach();
     }
     else {
@@ -117,7 +117,7 @@ sub signup_POST {
     });
     $c->user_exists(1);
 
-    $self->go_here($c, '/user/edit', [$user->username]);
+    $self->go_here($c, '/jsapp/user_view', [$user->username]);
     $c->detach;
 }
 
@@ -133,7 +133,7 @@ reset link.
 sub resend_password : Chained('base') PathPart('password_reset') Args(0) ActionClass('REST') {
     my ($self, $c) = @_;
     if (my $user = $c->user) {
-        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $self->go_here($c, '/jsapp/user_view', [$user->get('username')]);
         $c->detach();
     }
 }
@@ -294,7 +294,7 @@ sub password_POST {
     }
 
     $self->set_success($c, 'Your password has been updated.');
-    $self->go_here($c, '/user/edit', [$user->username]);
+    $self->go_here($c, '/jsapp/user_view', [$user->username]);
 }
 
 

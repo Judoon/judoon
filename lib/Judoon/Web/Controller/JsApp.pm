@@ -11,19 +11,10 @@ sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {
 }
 
 
-sub user_view : Chained('/') PathPart('userp') Args(1) {
-    my ($self, $c, $username) = @_;
+sub user_view : Chained('base') PathPart('') Args(0) {}
 
-    my $user = $c->model('User::User')->find({username => $username});
-    if (!$user || !$c->user || $c->user->username ne $user->username) {
-        $c->forward('/default');
-        $c->detach;
-    }
 
-    $c->stash->{template} = 'jsapp/jsapp.tt2';
-}
-
-sub dataset_view : Chained('base') PathPart('datasource') Args(1) {
+sub dataset_view : Chained('base') PathPart('dataset') Args(1) {
     my ($self, $c, $ds_id) = @_;
 
     my $dataset = $c->stash->{user}{object}->datasets_rs->find({id => $ds_id});
@@ -85,8 +76,7 @@ Sets the template, AngularJS takes care of the rest.
 
 =head2 user_view
 
-Extract the L<Judoon::Schema::Result::User> username and checks to make sure
-requesting user has valid permissions to access it.
+Does nothing right now.
 
 =head2 dataset_view
 

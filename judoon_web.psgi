@@ -62,8 +62,7 @@ builder {
         LocationToRedirect => process_location => sub {
             my ($env, $location) = @_;
             my ($ds_id) = ($location =~ m/(\d+)$/);
-            my $new_loc = $env->{HTTP_REFERER} . "/datasource/$ds_id";
-            $new_loc =~ s/userp/user/;
+            my $new_loc = $env->{HTTP_REFERER} . "/dataset/$ds_id";
             return $new_loc;
         };
 

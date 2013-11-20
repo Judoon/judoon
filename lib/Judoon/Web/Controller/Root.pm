@@ -75,7 +75,7 @@ sub denied :Chained('') PathPart('') CaptureArgs(0) {
     my ($self, $c) = @_;
     if ($c->user_exists) {
         $self->set_error($c, q{You don't have permission to see that page});
-        $self->go_here($c, '/user/edit', [$c->user->username]);
+        $self->go_here($c, '/jsapp/user_view', [$c->user->username]);
     }
     else {
         $c->stash->{template} = 'denied.tt2';
