@@ -1,2 +1,0 @@
-[% INCLUDE 'components/breadcrumbs/overview.tt2' divider=1 active=1 %]
-<li>[% UNLESS active %]Dataset: [% dataset.object.name %][% ELSE %]<a href="[% c.uri_for_action('/private/dataset/object', [user.id, dataset.id]) %]">Dataset: [% dataset.object.name %]</a>[% IF divider %] <span class="divider">/</span>[% END %][% END %]</li>
