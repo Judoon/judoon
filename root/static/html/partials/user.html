@@ -150,7 +150,7 @@
               </div>
 
 
-              <div id="page_actions_{{page.id}}" class="page_actions" collapse="isActionBlockCollapsed">
+              <div id="page_actions_{{page.id}}" class="page_actions" ng-class="{in: !isActionBlockCollapsed}" collapse="isActionBlockCollapsed">
                 <h5>Actions</h5>
                 <div class="btn-toolbar" style="margin-bottom: 20px;">
                   <div class="btn-group">
@@ -179,7 +179,7 @@
                 </div>
               </div>
 
-              <div id="page_info_{{page.id}}" class="page_info" collapse="isInfoBlockCollapsed">
+              <div id="page_info_{{page.id}}" class="page_info" ng-class="{in: !isInfoBlockCollapsed}" collapse="isInfoBlockCollapsed">
                 <h5>About this view</h5>
                 <ul>
                   <li><strong>Created on:</strong> {{page.created}}</li>
