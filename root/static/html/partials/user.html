@@ -1,9 +1,219 @@
-<div ng-controller="UserCtrl">
+<div>
 
   <style type="text/css">
   </style>
 
-  <h4 ng-click="hideProperties = !hideProperties">Properties</h4>
-  <form class="form-horizontal" collapse="hideProperties">
-  </form>
+  <ul class="breadcrumb">
+    <li>Overview</li>
+  </ul>
+
+  <alert ng-repeat="alert in alerter.alerts" type="alert.type" close="alerter.closeAlert($index)">{{alert.msg}}</alert>
+
+  <div class="row-fluid">
+    <div class="span2">
+      <p class="help-inline">
+        <a href="#howto_modal" data-toggle="modal">What now?</a>
+      </p>
+    </div>
+    <div class="span10">
+      <div class="pull-right">
+        <form name="add_dataset" id="add_dataset" action="[% c.uri_for_action('/private/dataset/list', [user.object.username]) %]" method="post" enctype="multipart/form-data" class="form-inline">
+          <h4 class="help-inline">Add dataset:</h4>
+          <input style="display:none;" type="file" id="dataset" form="add_dataset" name="dataset.file" class="">
+          <input id="dataset_fake" class="input-large" type="text" form="add_dataset">
+          <a class="btn" onclick="$('input[id=dataset]').click();">Browse</a>
+          <button class="btn btn-primary" form="add_dataset" type="submit"><i class="icon-upload"></i> Upload</button>
+          <a data-toggle="collapse" data-target="#dataset_upload_help">Help</a>
+          <section id="dataset_upload_help" class="collapse">
+            <h6>Accepted file types are:</h6>
+            <dl>
+              <dt>.xls</dt><dd>Excel 97</dd>
+              <dt>.xlsx</dt><dd>Excel XML</dd>
+              <dt>.csv</dt><dd><abbr title="comma-separated values">CSV</abbr></dd>
+            </dl>
+          </section>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="howto_modal" class="modal hide fade">
+    <div class="modal-header">
+      <h3>How this works.</h3>
+    </div>
+    <div class="modal-body">
+      <p>New to Judoon?  Here are the steps to get started:</p>
+      <ol>
+        <li>
+          <h5>Upload a spreadsheet</h5>
+          <p>
+            In the box labeled &quot;<strong>Add dataset</strong>&quot;
+            click the <span class="text-info">Browse</span> button, select
+            an Excel file for upload, then click <span class="text-info">Upload</span>.
+          </p>
+          <p>
+            If all goes well, a new dataset named after your worksheet
+            will appear in the list titled <strong>Datasets</strong>.
+            You will also see a new entry in the <strong>Views</strong>
+            list.  When you upload a spreadsheet, we automatically build
+            a view that looks exactly like it.  If you're happy with the
+            formatting, then you're done!.
+          </p>
+        </li>
+
+        <li>
+          <h5>Annotate your dataset</h5>
+          <p>
+            When you annotate your dataset, that tells us what kind of
+            data is in each column of your spreadsheet.  It is not
+            necessary to do this, but can help us to provide more
+            intelligent sorting or even preconstructed links to external
+            databases.  Click on the <span class="text-info">Annotate
+              dataset</span> button to do this.
+          </p>
+        </li>
+
+        <li>
+          <h5>Build a custom view</h5>
+          <p>
+            You can create a new view here by clicking
+            the <span class="text-info">Create a Custom View</span> button
+            below the dataset's name.  This will take you your new
+            View's overview, where you can set your new View's title,
+            opening text, and afterword.
+          </p>
+          <p>
+            Below that will be a section called <strong>View
+              Columns</strong>, where you will see a list (initially empty)
+            of all the columns in your view.  To add a new column, type
+            a title into the <span class="text-info">Column Title</span>
+            and click &quot;<span class="text-info">Add column</span>&quot;.
+          </p>
+        </li>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+  </div>
+
+  <a class="btn" ng-click="makeItFail()">Fail Me</a>
+  <a class="btn" ng-click="makeItYay()">Yay Me</a>
+
+
+  <h2>Datasets</h2>
+  <tabset direction="'left'">
+    <tab ng-repeat="dataset in user.datasets" heading="{{dataset.name}}">
+      <div ng-controller="UserDatasetCtrl">
+      <h3>{{dataset.name}}</h3>
+
+
+      <a class="btn" ng-click="makeDsFail()">DS Fail Me</a>
+      <a class="btn" ng-click="makeDsYay()">DS Yay Me</a>
+
+      <h4>Actions</h4>
+      <div class="btn-toolbar" style="margin-bottom: 20px;">
+        <div class="btn-group">
+          <a class="btn btn-mini action_edit_dataset" ng-href="/user/{{user.username}}/datasource/{{dataset.id}}">Edit Dataset</a>
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-mini action_annotate_cols" ng-href="/user/{{user.username}}/datasource/{{dataset.id}}#annotate_cols">Annotate Columns</a>
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-mini action_custom_page" ng-click="createPage()">Create A Custom View</a>
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-mini action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-mini dropdown-toggle action_download_tabular">
+            Download as: <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <a ng-click="fetchDataset('tab')">tab</a>
+            <a ng-click="fetchDataset('csv')">csv</a>
+            <a ng-click="fetchDataset('xls')">Excel 97</a>
+            <a ng-click="fetchDataset('xlsx')">Excel 2007</a>
+          </ul>
+        </div>
+      </div>
+
+      <h4>Views</h4>
+      <table ng-show="dataset.pages.length" class="table table-striped table-condensed page_list">
+        <tbody>
+          <tr ng-controller="UserPageCtrl" ng-repeat="page in dataset.pages">
+            <td>{{$index + 1}}<a name="page_{{page.id}}"></a></td>
+            <td>
+              <p style="display: inline-block;">
+                <a href="/user/{{user.username}}/page/{{page.id}}">{{page.title}}</a>
+                - {{page.nbr_columns}} columns, {{page.nbr_rows}} rows
+              </p>
+              <div class="btn-toolbar pull-right">
+                <div class="btn-group"><button class="btn btn-mini" ng-click="isActionBlockCollapsed = !isActionBlockCollapsed">More Actions</button></div>
+                <div class="btn-group"><button class="btn btn-mini" ng-click="isInfoBlockCollapsed = !isInfoBlockCollapsed">More Info</button></div>
+              </div>
+
+              <a class="btn" ng-click="makePageFail()">Page Fail Me</a>
+              <a class="btn" ng-click="makePageYay()">Page Yay Me</a>
+
+
+              <div id="page_actions_{{page.id}}" class="page_actions" collapse="isActionBlockCollapsed">
+                <h5>Actions</h5>
+                <div class="btn-toolbar" style="margin-bottom: 20px;">
+                  <div class="btn-group">
+                    <a class="btn btn-mini action_delete_page" ng-click="doAThing()">Delete View</a>
+                  </div>
+                  <div class="btn-group">
+                    <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
+                      Download as: <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <a ng-click="fetchPage('tab')">tab</a>
+                      <a ng-click="fetchPage('csv')">csv</a>
+                      <a ng-click="fetchPage('xls')">Excel 97</a>
+                      <a ng-click="fetchPage('xlsx')">Excel 2007</a>
+                    </ul>
+                  </div>
+                  <div class="btn-group">
+                    <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
+                      Download standalone app: <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <a ng-click="fetchPageApp('zip')">zip</a>
+                      <a ng-click="fetchPageApp('tar')">tar.gz</a>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div id="page_info_{{page.id}}" class="page_info" collapse="isInfoBlockCollapsed">
+                <h5>About this view</h5>
+                <ul>
+                  <li><strong>Created on:</strong> {{page.created}}</li>
+                  <li>This view is <strong>{{page.permission}}</strong>.</li>
+                  <li><strong>Columns:</strong> <span ng-repeat="page_col in page.columns">{{page_col.title}}, </span></li>
+                </ul>
+              </div>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p ng-show="!dataset.pages.length">No views created yet.</p>
+
+      <h4>About this dataset</h4>
+      <ul>
+        <li>{{dataset.nbr_columns}} columns, {{dataset.nbr_rows}} rows</li>
+        <li><strong>Created on:</strong> {{dataset.created}}</li>
+        <li><strong>Description:</strong> <span ng-show="dataset.description">{{dataset.description}}</span><span ng-show="!dataset.description">-</span></li>
+        <li>This dataset is <strong>{{dataset.permission}}</strong>.</li>
+        <li><strong>Columns:</strong> <span ng-repeat="ds_col in dataset.columns">{{ds_col.name}}, </span></li>
+      </ul>
+
+      </div>
+    </tab>
+  </tabset>
+
+  <p ng-show="!user.datasets">You haven't uploaded any datasets yet.</p>
+
 </div>

@@ -10,6 +10,19 @@ sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {
     $c->stash->{template} = 'jsapp/jsapp.tt2';
 }
 
+
+sub user_view : Chained('/') PathPart('userp') Args(1) {
+    my ($self, $c, $username) = @_;
+
+    my $user = $c->model('User::User')->find({username => $username});
+    if (!$user || !$c->user || $c->user->username ne $user->username) {
+        $c->forward('/default');
+        $c->detach;
+    }
+
+    $c->stash->{template} = 'jsapp/jsapp.tt2';
+}
+
 sub dataset_view : Chained('base') PathPart('datasource') Args(1) {
     my ($self, $c, $ds_id) = @_;
 
@@ -70,14 +83,19 @@ As a result, it doesn't do much except basic access control.
 
 Sets the template, AngularJS takes care of the rest.
 
+=head2 user_view
+
+Extract the L<Judoon::Schema::Result::User> username and checks to make sure
+requesting user has valid permissions to access it.
+
 =head2 dataset_view
 
-Extract the L<Judoon::Schema::Result::Dataset> id, checks to make sure
+Extract the L<Judoon::Schema::Result::Dataset> id and check to make sure
 requesting user has valid permissions to access it.
 
 =head2 page_view
 
-Extract the L<Judoon::Schema::Result::Page> id, checks to make sure
+Extract the L<Judoon::Schema::Result::Page> id and check to make sure
 requesting user has valid permissions to access it.
 
 

@@ -7,6 +7,90 @@
 var judoonCtrl = angular.module('judoon.controllers', []);
 
 judoonCtrl.controller(
+    'UserCtrl',
+    ['$scope', 'user', 'Alerts',
+     function ($scope, user, Alerts) {
+
+         $scope.alerter = Alerts;
+         $scope.user    = user;
+
+         $scope.deleteDataset = function(dataset) {
+             $scope.user.deleteDataset(dataset);
+         };
+
+         $scope.makeItFail = function() { Alerts.alertError("It Failed!"); };
+         $scope.makeItYay  = function() { Alerts.alertSuccess("It Worked!"); };
+     }
+    ]
+);
+
+judoonCtrl.controller(
+    'UserDatasetCtrl',
+    ['$scope', 'Alerts',
+     function ($scope, Alerts) {
+
+         $scope.createPage = function() {
+             $scope.dataset.createPage(
+                 {type: 'blank', dataset_id: $scope.dataset.id}
+             );
+         };
+
+         $scope.deleteThisDataset = function() {
+             $scope.dataset.deleteThis().error(
+                 function(err) { Alerts.alertError(err); }
+             );
+         };
+
+         $scope.actions = {
+             deletePage: function (page) {
+                 var index = $scope.dataset.pages.indexOf( page );
+                 if ( index >= 0 ) {
+                     $scope.dataset.pages.splice( index, 1 );
+                 }
+             }
+         };
+
+         $scope.makeDsFail = function() { Alerts.alertError("DS " + $scope.dataset.id + " Failed!"); };
+         $scope.makeDsYay  = function() { Alerts.alertSuccess("DS " + $scope.dataset.id + " Worked!"); };
+
+     }
+    ]
+);
+
+judoonCtrl.controller(
+    'UserPageCtrl',
+    ['$scope', 'Dataset', 'DatasetColumn',
+     'Page', 'DatasetPage', 'DataType', 'User', 'Alerts',
+     function ($scope, Dataset, DatasetColumn,
+               Page, DatasetPage, DataType, User, Alerts) {
+
+         $scope.isActionBlockCollapsed = true;
+         $scope.isInfoBlockCollapsed   = true;
+
+         $scope.deleteThisPage = function() {
+             Page.delete(
+                 {},{id: $scope.page.id},
+                 function() {
+                     $scope.$parent.actions.deletePage($scope.page);
+                 },
+                 function(err) { Alerts.alertError(err); }
+             );
+         };
+
+         $scope.doAThing = function() {
+             $scope.itsame = 'mario';
+             $scope.$parent.actions.deletePage($scope.page);
+         };
+
+         $scope.makePageFail = function() { Alerts.alertError("Page " + $scope.page.id + " Failed!"); };
+         $scope.makePageYay  = function() { Alerts.alertSuccess("Page " + $scope.page.id + " Worked!"); };
+
+     }
+    ]
+);
+
+
+judoonCtrl.controller(
     'DatasetCtrl',
     ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn',
      'Page', 'DatasetPage', 'DataType', 'User', 'Alerts',
