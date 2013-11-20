@@ -28,7 +28,6 @@ getting at the name, columns, and data of that spreadsheet.
 =cut
 
 
-use Data::Printer;
 use Encode qw(decode);
 use Encode::Guess;
 use IO::File ();
