@@ -23,6 +23,8 @@ BEGIN {
 
 }
 
+
+use Judoon::Middleware::RedirectNewDatasets;
 use Judoon::Web;
 use MIME::Types;
 use Moose::Util ();
@@ -59,14 +61,7 @@ builder {
         SetAccept => from => 'suffix', mapping => \%mapping;
 
     enable_if { $_[0]->{PATH_INFO} =~ m{^/api/user/datasets}; }
-        LocationToRedirect => process_location => sub {
-            my ($env, $link) = @_;
-            my ($page_id) = ($link =~ m/(\d+)$/);
-            my $new_loc   = $env->{HTTP_REFERER} . "/page/$page_id";
-            my $host      = $env->{HTTP_HOST};
-            $new_loc      =~ s{^http.?://$host}{};
-            return $new_loc;
-        };
+        '+Judoon::Middleware::RedirectNewDatasets';
 
     # mount app
     mount '/' => Judoon::Web->apply_default_middlewares(Judoon::Web->psgi_app);
