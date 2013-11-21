@@ -30,6 +30,7 @@ judoonCtrl.controller(
 
 
          // support hash-linking of tabs
+         var hashPrefix          = "dataset";
          var ignoreNextUpdateUrl = 1;
          var ignoreNextUpdateTab = 0;
          $scope.$watch('user.datasetsLoaded', function() {
@@ -46,12 +47,12 @@ judoonCtrl.controller(
                  ignoreNextUpdateTab = 0;
                  return;
              }
-             var hash = $location.hash();
-             if (!hash) {
+             var hashId = hashToId();
+             if (!hashId) {
                  return;
              }
              angular.forEach($scope.user.datasets, function(value) {
-                 value.tabActive = value.id == hash ? true : false;
+                 value.tabActive = value.id == hashId ? true : false;
              });
              ignoreNextUpdateUrl = 1;
          }
@@ -63,17 +64,20 @@ judoonCtrl.controller(
                  return;
              }
              var selectedDs,
-                 hash = $location.hash();
+                 hashId = hashToId();
              angular.forEach($scope.user.datasets, function(value) {
-                 if (value.tabActive && hash != value.id) {
+                 if (value.tabActive && hashId != value.id) {
                      selectedDs = value;
                  }
              });
              if (selectedDs) {
-                 $location.hash( selectedDs.id );
+                 idToHash( selectedDs.id );
              }
              ignoreNextUpdateTab = 1;
          };
+
+         function hashToId()   { return $location.hash().replace(hashPrefix, ''); }
+         function idToHash(id) { $location.hash( hashPrefix + id ); }
      }
     ]
 );
