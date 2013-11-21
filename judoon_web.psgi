@@ -60,11 +60,11 @@ builder {
 
     enable_if { $_[0]->{PATH_INFO} =~ m{^/api/user/datasets}; }
         LocationToRedirect => process_location => sub {
-            my ($env, $location) = @_;
-            my ($ds_id) = ($location =~ m/(\d+)$/);
-            my $new_loc = $env->{HTTP_REFERER} . "/dataset/$ds_id";
-            my $host    = $env->{HTTP_HOST};
-            $new_loc    =~ s{^http.?://$host}{};
+            my ($env, $link) = @_;
+            my ($page_id) = ($link =~ m/(\d+)$/);
+            my $new_loc   = $env->{HTTP_REFERER} . "/page/$page_id";
+            my $host      = $env->{HTTP_HOST};
+            $new_loc      =~ s{^http.?://$host}{};
             return $new_loc;
         };
 

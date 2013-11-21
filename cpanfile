@@ -61,6 +61,7 @@ requires 'Getopt::Long';
 requires 'HTML::Scrubber';
 requires 'HTML::Selector::XPath::Simple';
 requires 'HTML::TreeBuilder';
+requires 'HTTP::Headers::ActionPack';
 requires 'HTTP::Throwable';
 requires 'IO::All';
 requires 'IO::File';

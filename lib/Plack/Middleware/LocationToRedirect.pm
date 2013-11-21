@@ -6,6 +6,7 @@ use warnings;
 use parent qw(Plack::Middleware);
 use Plack::Util::Accessor qw( process_location );
 use Plack::Util ();
+use HTTP::Headers::ActionPack::LinkHeader;
 
 sub call {
     my ($self, $env) = @_;
@@ -13,13 +14,16 @@ sub call {
         my $res = shift;
 
         my $h = Plack::Util::headers($res->[1]);
-        my $location = $h->get('Location');
-        return unless ($res->[0] == 201 && $location);
+        my $link_header = $h->get('Link');
+        return unless ($res->[0] == 201 && $link_header);
 
         # JSON requests pass through just fine
         return if ($env->{HTTP_ACCEPT} =~ m{application/json});
 
-        my $new_loc = $self->process_location->( $env, $location );
+        my $link = HTTP::Headers::ActionPack::LinkHeader->new_from_string(
+            $link_header
+        );
+        my $new_loc = $self->process_location->( $env, $link->href );
         $h->set('Location', $new_loc);
         $res->[0] = 302;
         return;
