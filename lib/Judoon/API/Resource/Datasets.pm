@@ -42,8 +42,8 @@ sub from_form {
 
     my $req    = $self->request;
     my $upload = $req->uploads->{'dataset.file'};
-    my $owner  = $self->set->related_resultset('user')->first;
-    my $new_ds = $owner->import_data_by_filename($upload->{tempname});
+    my $owner  = $self->set->get_our_owner();
+    my $new_ds = $owner->import_data_by_filename($upload->tempname);
     $self->_set_obj($new_ds);
 }
 
