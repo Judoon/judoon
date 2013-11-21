@@ -17,6 +17,7 @@ BEGIN { extends 'Judoon::Web::Controller'; }
 
 with qw(
     Judoon::Web::Controller::Role::PublicDirectory
+    Judoon::Role::JsonEncoder
 );
 
 
@@ -29,6 +30,25 @@ __PACKAGE__->config(
     stash_key       => 'dataset',
     template_dir    => 'public_dataset',
 );
+
+
+=head1 METHODS
+
+=head2 populate_stash
+
+Fill in the stash with the necessary data.
+
+=cut
+
+sub populate_stash {
+    my ($self, $c, $dataset) = @_;
+    my @ds_columns = $dataset->ds_columns_ordered->hri->all;
+    $c->stash->{dataset_column}{list} = \@ds_columns;
+    $c->stash->{column_names_json} = $self->encode_json(
+        [map {$_->{shortname}} @ds_columns]
+    );
+    return;
+}
 
 
 __PACKAGE__->meta->make_immutable;

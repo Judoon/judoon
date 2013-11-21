@@ -16,6 +16,17 @@ use Moose::Role;
 use MooseX::MethodAttributes::Role;
 use namespace::autoclean;
 
+=head1 REQUIRES
+
+=head2 populate_stash($c, $object)
+
+Consuming classes must provide this method that takes in an object and
+sets the relevant stash keys for the view.
+
+=cut
+
+requires 'populate_stash';
+
 
 =head1 CONFIG
 
@@ -34,12 +45,13 @@ has template_dir    => (is => 'ro', isa => 'Str');
 
 =head1 ACTIONS
 
-=head2 base / list
+=head2 base / list / view
 
 Basic actions for a Public Directory. All requests pass through
 C<base>.  C<list> gets the list of public resources and sets the list
-template.  All of these actions call a private method to do the real
-work, to simplify overriding.
+template. C<view> fetches the requested object and fills in the stash
+data. All of these actions call a private method to do the real work,
+to simplify overriding.
 
 =cut
 
@@ -49,31 +61,73 @@ sub base : Chained('fixme') PathPart('fixme') CaptureArgs(0) {
 sub list : Chained('base') PathPart('') Args() {
     shift->private_list(@_);
 }
+sub view : Chained('base') PathPart('') Args(1) {
+    shift->private_view(@_);
+}
 
 
 =head1 METHODS
 
-=head2 C<B<private_base>>
+=head2 private_base
 
 Empty method, just here to be overridden.
 
 =cut
 
-sub private_base {}
+sub private_base {
+    my ($self, $c) = @_;
+
+    my $rs = $c->model($self->resultset_class);
+    my @searches = ($rs->public);
+    if ($c->user) {
+        push @searches, $rs->for_user($c->user->get_object);
+    }
+    $c->stash->{public_rs} = $rs->search_or(\@searches);
+
+    return;
+
+}
 
 
-=head2 C<B<private_list>>
+=head2 private_list
 
-List all public entities.
+List all public entities and entities owned by the logged-in user.
 
 =cut
 
 sub private_list {
     my ($self, $c) = @_;
-    my @public_objects = $c->model($self->resultset_class)->public()->all;
+    my @public_objects = $c->stash->{public_rs}->with_columns->with_owner->hri->all;
+    for my $obj  (@public_objects) {
+        $obj->{view_url} = $c->uri_for_action(
+            $c->controller->action_for('view'), $obj->{id}
+        );
+    }
     $c->stash->{$self->stash_key}{list} = \@public_objects;
     $c->stash->{template} = $self->template_dir . '/list.tt2';
 }
+
+
+=head2 private_view
+
+Display a particular Dataset or Page.
+
+=cut
+
+sub private_view {
+    my ($self, $c, $id) = @_;
+
+    my $object = $c->stash->{public_rs}->with_columns->with_owner->find({id => $id});
+    if (not $object) {
+        $c->forward('/default');
+        $c->detach();
+    }
+
+    $c->stash->{$self->stash_key} = {id => $id, object => $object->TO_JSON};
+    $self->populate_stash($c, $object);
+    $c->stash->{template} = $self->template_dir . '/view.tt2';
+}
+
 
 
 1;

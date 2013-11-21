@@ -24,10 +24,7 @@ sub dataset_view : Chained('base') PathPart('dataset') Args(1) {
     }
 
     if (not $c->stash->{user}{is_owner}) {
-        $self->go_here(
-            $c, '/private/dataset/object',
-            [$c->stash->{user}{id}, $ds_id],
-        );
+        $self->go_here($c, '/dataset/view', [$ds_id]);
         $c->detach();
     }
 }
@@ -43,10 +40,7 @@ sub page_view : Chained('base') PathPart('page') Args(1) {
     }
 
     if (not $c->stash->{user}{is_owner}) {
-        $self->go_here(
-            $c, '/private/page/object',
-            [$c->stash->{user}{id}, $page->dataset_id, $page->id],
-        );
+        $self->go_here($c, '/page/view', [$page->id]);
         $c->detach();
     }
 }

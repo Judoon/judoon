@@ -92,7 +92,7 @@ main: {
                 description => $dataset->description,
                 content     => $dataset->description,
                 url         => Judoon::Web->uri_for_action(
-                    '/private/dataset/object',
+                    '/dataset/view',
                     [$dataset->user->username, $dataset->id]
                 ),
 
@@ -125,9 +125,8 @@ main: {
                         ($page->preamble, $page->postamble)
                 ),
                 url         => Judoon::Web->uri_for_action(
-                    '/private/page/object',
-                    [$page->dataset->user->username,
-                     $page->dataset->id, $page->id,]
+                    '/page/view',
+                    [$page->dataset->user->username, $page->id,]
                 ),
 
                 private     => $page->is_private,

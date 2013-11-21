@@ -23,9 +23,9 @@
       [%- FOREACH dataset_obj IN dataset.list -%]
       <tr>[% dataset_owner = dataset_obj.user %]
         <td>[%- loop.count -%]<a name="dataset_[%- dataset_obj.id -%]"></a></td>
-        <td><a href="[%- c.uri_for_action('/private/dataset/object', [dataset_owner.username, dataset_obj.id]) -%]">[%- dataset_obj.name -%]</a></td>
+        <td><a href="[%- dataset_obj.view_url -%]">[%- dataset_obj.name -%]</a></td>
         <td>[%- dataset_obj.nbr_columns -%] / [%- dataset_obj.nbr_rows -%]</td>
-        <td>[%- '-' -%]</td>
+        <td>[%- dataset_obj.notes || '-' | truncate(30) -%]</td>
         <td>[%- dataset_owner.name -%]</td>
       </tr>
       [%- END -%]

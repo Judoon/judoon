@@ -100,7 +100,7 @@ sub for_user {
 
 =head2 get_our_owner
 
-This is a fragile and not-well-tesed method that retrieves the owner
+This is a fragile and not-well-tested method that retrieves the owner
 from and C<ResultSet::Dataset> that could be empty and should have
 only one owner.
 
@@ -114,5 +114,28 @@ sub get_our_owner {
     return $schema->resultset('User')->find({id => $user_id});
 }
 
+
+=head2 with_owner
+
+Prefetch the owner.
+
+=cut
+
+sub with_owner {
+    my ($self) = @_;
+    return $self->prefetch('user');
+}
+
+
+=head2 with_columns
+
+Prefetch the subordinate columns.
+
+=cut
+
+sub with_columns {
+    my ($self) = @_;
+    return $self->prefetch('ds_columns');
+}
 
 1;
