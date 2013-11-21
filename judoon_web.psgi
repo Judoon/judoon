@@ -63,6 +63,8 @@ builder {
             my ($env, $location) = @_;
             my ($ds_id) = ($location =~ m/(\d+)$/);
             my $new_loc = $env->{HTTP_REFERER} . "/dataset/$ds_id";
+            my $host    = $env->{HTTP_HOST};
+            $new_loc    =~ s{^http.?://$host}{};
             return $new_loc;
         };
 

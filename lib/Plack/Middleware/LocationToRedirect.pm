@@ -1,21 +1,15 @@
 package Plack::Middleware::LocationToRedirect;
 
 use strict;
-use 5.008001;
+use warnings;
 
 use parent qw(Plack::Middleware);
-use Plack::Response;
 use Plack::Util::Accessor qw( process_location );
-use Plack::Util;
-
-use List::Util ();
+use Plack::Util ();
 
 sub call {
-    my($self, $env) = @_;
-
-    my $res = $self->app->($env);
-
-    $self->response_cb($res, sub {
+    my ($self, $env) = @_;
+    $self->response_cb($self->app->($env), sub {
         my $res = shift;
 
         my $h = Plack::Util::headers($res->[1]);
@@ -25,10 +19,10 @@ sub call {
         # JSON requests pass through just fine
         return if ($env->{HTTP_ACCEPT} =~ m{application/json});
 
-        my $new_loc  = $self->process_location->( $env, $location );
-        my $response = Plack::Response->new;
-        $response->redirect( $new_loc );
-        @$res = @{$response->finalize};
+        my $new_loc = $self->process_location->( $env, $location );
+        $h->set('Location', $new_loc);
+        $res->[0] = 302;
+        return;
     });
 }
 
