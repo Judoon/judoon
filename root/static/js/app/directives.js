@@ -140,6 +140,31 @@ judoonDir.directive('judoonCkeditor', [function() {
     };
 }]);
 
+
+judoonDir.directive(
+    'judoonFileInput',
+    ['$timeout', function($timeout) {
+        return {
+            restrict    : 'E',
+            replace     : true,
+            templateUrl : '/static/html/partials/judoon-file-input.html',
+            scope       : { inputName : '@' },
+            link        : function(scope, elem, attrs) {
+                elem.find('input[type="file"]').attr('name', attrs.inputName);
+                elem.find('.fake-uploader').click(function() {
+                    elem.find('input[type="file"]').click();
+                });
+            },
+            controller: ['$scope', function ($scope) {
+                $scope.setFile = function (elem) {
+                    $scope.filePath = elem.files[0].name;
+                    $scope.$apply();
+                };
+            }]
+        };
+    }]
+);
+
 judoonDir.directive(
     'judoonWidgetFactory',
     ['$compile', function($compile) {

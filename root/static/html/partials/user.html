@@ -19,10 +19,9 @@
       <div class="pull-right">
         <form name="add_dataset" id="add_dataset" action="/api/user/datasets" method="post" enctype="multipart/form-data" class="form-inline">
           <h4 class="help-inline">Add dataset:</h4>
-          <input style="display:none;" type="file" id="dataset" form="add_dataset" name="dataset.file" class="">
-          <input id="dataset_fake" class="input-large" type="text" form="add_dataset">
-          <a class="btn" onclick="$('input[id=dataset]').click();">Browse</a>
-          <button class="btn btn-primary" form="add_dataset" type="submit"><i class="icon-upload"></i> Upload</button>
+
+          <judoon-file-input input-name="dataset.file">
+
           <a data-toggle="collapse" data-target="#dataset_upload_help">Help</a>
           <section id="dataset_upload_help" class="collapse">
             <h6>Accepted file types are:</h6>
