@@ -527,12 +527,17 @@ judoonSrv.factory(
 
 judoonSrv.factory(
     'PageColumnsp', ['$http', function($http) {
+
         var wrapper = {
+            url: function() {
+                var _this = this;
+                return '/api/pages/' + _this.page_id + '/columns/' + _this.id;
+            },
             update: function(sort) {
                 var future,
                     _this = this;
                 future = $http.put(
-                    '/api/pages/' + _this.page_id + '/columns/' + _this.id,
+                    _this.url(),
                     {
                         title:   _this.title,
                         widgets: _this.widgets,
@@ -544,7 +549,7 @@ judoonSrv.factory(
             deleteMe: function() {
                 var future,
                     _this = this;
-                future = $http.delete('/api/pages/' + _this.page_id + '/column/' + _this.id);
+                future = $http.delete(_this.url());
                 return future;
             }
         };
