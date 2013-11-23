@@ -80,6 +80,26 @@ body {}
     border-top: thin lightgray solid;
 }
 
+#column_canvas { min-height: 8em; }
+
+#canvas_cursor {
+    border: thin #aaa solid;
+    height: 1em;
+    width: 0.5em;
+    display: inline-block;
+}
+
+.widget-object { margin-right: 3px; margin-top: 3px; }
+.widget-type-text { display: inline-block; }
+.widget-type-data { display: inline-block; }
+.widget-type-link { display: inline-block; }
+.widget-type-newline { display: block; }
+.widget-type-newline-icon { display: inline-block; }
+
+
+.widget-formatting-bold { font-weight: bold; }
+.widget-formatting-italic { font-style: italic; }
+
 
 
 /* ========== DataTables ========== */
