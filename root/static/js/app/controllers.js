@@ -231,6 +231,61 @@ judoonCtrl.controller(
 
          // *** DataTypes ***
          $scope.data_types = DataType.query();
+
+
+         // *** Tabs ***
+         $scope.activeTab = {
+             properties : 0,
+             data       : 0,
+             columns    : 0,
+             addColumn  : 0,
+             view       : 0
+         };
+
+         var hashPrefix          = "";
+         var ignoreNextUpdateUrl = 1;
+         var ignoreNextUpdateTab = 0;
+         updateTabFromUrl();
+         $scope.$on('$routeUpdate', function() {
+             updateTabFromUrl();
+         });
+
+         function updateTabFromUrl() {
+             if (ignoreNextUpdateTab) {
+                 ignoreNextUpdateTab = 0;
+                 return;
+             }
+             var hashId = hashToId();
+             if (!hashId) {
+                 return;
+             }
+             angular.forEach($scope.activeTab, function(value, key) {
+                 $scope.activeTab[key] = key == hashId ? true : false;
+             });
+             ignoreNextUpdateUrl = 1;
+         }
+
+
+         $scope.updateUrlFromTab = function() {
+             if (ignoreNextUpdateUrl) {
+                 ignoreNextUpdateUrl = 0;
+                 return;
+             }
+             var selectedTab,
+                 hashId = hashToId();
+             angular.forEach($scope.activeTab, function(value, key) {
+                 if (value && hashId != key) {
+                     selectedTab = key;
+                 }
+             });
+             if (selectedTab) {
+                 idToHash( selectedTab );
+             }
+             ignoreNextUpdateTab = 1;
+         };
+
+         function hashToId()   { return $location.hash().replace(hashPrefix, ''); }
+         function idToHash(id) { $location.hash( hashPrefix + id ); }
      }
     ]
 );

@@ -11,7 +11,7 @@
   <tabset>
 
     <!-- ******************** PROPERTIES ******************** -->
-    <tab heading="Properties">
+    <tab heading="Properties" active="activeTab.properties" select="updateUrlFromTab()">
 
       <form class="form-horizontal" ng-submit="saveDataset()">
         <fieldset>
@@ -49,7 +49,7 @@
 
 
     <!-- ******************** DATA ******************** -->
-    <tab heading="Data">
+    <tab heading="Data" active="activeTab.data" select="updateUrlFromTab()">
       <div class="outer-hscroll"><div class="inner-hscroll">
 
           <judoon-data-table
@@ -64,7 +64,7 @@
 
 
     <!-- ******************** COLUMNS ******************** -->
-    <tab heading="Data Columns">
+    <tab heading="Data Columns" active="activeTab.columns" select="updateUrlFromTab()">
       <form ng-submit="saveColumns()">
 
         <div class="outer-hscroll"><div class="inner-hscroll">
@@ -106,13 +106,13 @@
 
 
     <!-- ******************** NEW COLUMNS ******************** -->
-    <tab heading="Add Data Column">
+    <tab heading="Add Data Column" active="activeTab.addColumn" select="updateUrlFromTab()">
       <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
     </tab>
 
 
     <!-- ******************** VIEWS ******************** -->
-    <tab heading="Views">
+    <tab heading="Views" active="activeTab.view" select="updateUrlFromTab()">
 
       <ul>
         <li ng-repeat="page in dataset.pages">

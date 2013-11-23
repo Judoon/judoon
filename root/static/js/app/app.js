@@ -27,9 +27,10 @@ judoonApp.config(
                  }
              })
              .when('/user/:userName/dataset/:datasetId', {
-                 templateUrl: '/static/html/partials/dataset.html',
-                 controller: 'DatasetCtrl',
-                 resolve: {
+                 templateUrl    : '/static/html/partials/dataset.html',
+                 controller     : 'DatasetCtrl',
+                 reloadOnSearch : false,
+                 resolve        : {
                      user: ['$route', 'Userp', function($route, Userp) {
                          var userName = $route.current.params.userName;
                          return Userp.get(userName);
