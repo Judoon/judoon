@@ -422,11 +422,17 @@ judoonCtrl.controller(
              $scope.dataset = dataset;
 
              $scope.ds_columns = {accessions: [], dict: {}};
-             angular.forEach($scope.dataset.columns, function(value, key) {
-                 $scope.ds_columns.dict[value.shortname] = value;
-                 if (value.data_type.match(/accession/i)) {
-                     $scope.ds_columns.accessions.push(value);
+             $scope.$watch('dataset.columnsLoaded', function() {
+                 if (!$scope.dataset.columnsLoaded) {
+                     return;
                  }
+
+                 angular.forEach($scope.dataset.columns, function(value, key) {
+                     $scope.ds_columns.dict[value.shortname] = value;
+                     if (value.data_type.match(/accession/i)) {
+                         $scope.ds_columns.accessions.push(value);
+                     }
+                 });
              });
          });
 
