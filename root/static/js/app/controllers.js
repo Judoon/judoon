@@ -405,10 +405,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', 'user', 'page', '$http',
-     'Page', 'PageColumn', 'Datasetp', 'DatasetColumn', 'Alerts',
-     function ($scope, user, page, $http, Page, PageColumn, Datasetp,
-               DatasetColumn, Alerts) {
+    ['$scope', 'user', 'page', '$http', 'Datasetp', 'Alerts',
+     function ($scope, user, page, $http, Datasetp, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
