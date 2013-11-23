@@ -465,13 +465,14 @@ judoonCtrl.controller(
                      angular.forEach($scope.page.columns, function (value, key) {
                          value.update();
                      });
+                     Alerts.alertSuccess('Page saved.');
                  } );
 
              $scope.pageDirty = 0;
              $scope.pageOriginal = angular.copy($scope.page);
              $scope.pageColumnsOriginal = angular.copy($scope.page.columns);
 
-             Alerts.alertSuccess('Page saved.');
+
          };
 
          $scope.addColumn = function() {
