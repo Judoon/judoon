@@ -475,14 +475,14 @@ judoonCtrl.controller(
          };
 
          $scope.addColumn = function() {
-             $scope.page.createColumn({
-                 title: $scope.newColumnName
-             }).success( function(newColumn) {
-                 $scope.currentColumn = newColumn;
-                 Alerts.alertSuccess('New Column "' + newColumn.title + '" added!');
-             }).error( function() {
-                 Alerts.alertError('Failed to add new column');
-             });
+             $scope.page.createColumn({title: $scope.newColumnName})
+                 .success( function(newColumn) {
+                     $scope.currentColumn = newColumn;
+                     Alerts.alertSuccess('New Column "' + newColumn.title + '" added!');
+                 })
+                 .error( function() {
+                     Alerts.alertError('Failed to add new column');
+                 });
          };
 
          $scope.removeColumn = function() {

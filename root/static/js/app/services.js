@@ -477,14 +477,14 @@ judoonSrv.factory(
             createColumn: function (newColumn) {
                 var _this = this;
                 newColumn.template = '';
-                return $http.post(_this.url(), newColumn)
+                return $http.post(_this.url() + '/columns', newColumn)
                     .success( function(data, status, getHeader) {
-                        var column = $http.get(getHeader('Location'))
-                                .success( function(columnData) {
-                                    return PageColumnsp._buildPageColumn(columnData);
-                                } );
-                        _this.columns.push(column);
-                        return column;
+                        $http.get(getHeader('Location'))
+                            .success( function(columnData) {
+                                var column = PageColumnsp._buildPageColumn(columnData);
+                                _this.columns.push(column);
+                            } );
+                        return;
                     });
             },
             deleteColumn: function(column) {
