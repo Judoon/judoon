@@ -81,11 +81,62 @@ judoonSrv.factory('PageColumn', ['$resource', '$http', function($resource, $http
 }]);
 
 
-judoonSrv.factory('DataType', ['$resource', function($resource) {
-    return $resource(
-        '/api/datatype/:typeId',
-        {typeId: '@id'}
-    );
+
+// Yes, I'm basically reimplementing ngResource here...
+judoonSrv.factory('DataType', ['$http', function($http) {
+    var wrapper = {};
+
+    return {
+        get: function(typeId) {
+            var promise,
+                value = {},
+                _this = this;
+
+            promise = $http.get('/api/datatype/' + typeId).then(
+                function(response) {
+                    var data = response.data,
+                        promise = value.$promise;
+
+                    angular.copy(_this._buildDataType(data), value);
+
+                    value.$resolved = true;
+                    response.resource = value;
+                    return response;
+                }
+            );
+
+            value.$promise  = promise;
+            value.$resolved = false;
+            return value;
+        },
+        query: function() {
+            var promise,
+                _this = this,
+                value = [];
+            
+            promise = $http.get('/api/datatype').then( function(response) {
+                var data = response.data,
+                    promise = value.$promise;
+
+                value.length = 0;
+                angular.forEach(data, function(dataType) {
+                    value.push(_this._buildDataType(dataType));
+                });
+
+                value.$resolved = true;
+                response.resource = value;
+                return response;
+            });
+
+            value.$promise  = promise;
+            value.$resolved = false;
+            return value;
+        },
+        _buildDataType: function(dataType) {
+            _.extend(dataType, wrapper);
+            return dataType;
+        }
+    };
 }]);
 
 
