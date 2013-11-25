@@ -2,7 +2,7 @@
 
   <ul class="breadcrumb">
     <li><a ng-href="/user/{{user.username}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
-    <li><a ng-href="/user/{{user.username}}/dataset/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}/dataset/{{page.dataset_id}}#view">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
     <li>View: <span ng-bind-html="page.title"></span></li>
   </ul>
 
