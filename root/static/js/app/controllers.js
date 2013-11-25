@@ -405,8 +405,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', 'user', 'page', '$http', 'Datasetp', 'Alerts',
-     function ($scope, user, page, $http, Datasetp, Alerts) {
+    ['$scope', 'user', 'page', '$http', 'Dataset', 'Alerts',
+     function ($scope, user, page, $http, Dataset, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
@@ -418,7 +418,7 @@ judoonCtrl.controller(
          $scope.pageColumnsOriginal = angular.copy(page.columns);
          $scope.pageColumnsLoaded = 1;
 
-         Datasetp.get(page.dataset_id).then( function (dataset) {
+         Dataset.get(page.dataset_id).then( function (dataset) {
              $scope.dataset = dataset;
 
              $scope.ds_columns = {accessions: [], dict: {}};

@@ -100,8 +100,8 @@ judoonSrv.service('Alerts', [function() {
 
 
 judoonSrv.factory(
-    'Userp',
-    ['$http', 'Datasetp', 'Pagesp', function($http, Datasetp, Pagesp) {
+    'User',
+    ['$http', 'Dataset', 'Pages', function($http, Dataset, Pages) {
 
         var wrapper = {
             getDatasets: function() {
@@ -111,7 +111,7 @@ judoonSrv.factory(
                 return future.then(function(response) {
                     _this.datasets = [];
                     angular.forEach(response.data, function(value) {
-                        _this.datasets.push(Datasetp._buildDataset(value));
+                        _this.datasets.push(Dataset._buildDataset(value));
                         _this.datasetsLoaded = 1;
                     });
                     return _this.datasets;
@@ -153,7 +153,7 @@ judoonSrv.factory(
 
                         value.length = 0;
                         angular.forEach(data, function(page) {
-                            value.push(Pagesp._buildPage(page));
+                            value.push(Pages._buildPage(page));
                         });
 
                         value.$resolved = true;
@@ -197,9 +197,9 @@ judoonSrv.factory(
 
 
 judoonSrv.factory(
-    'Datasetp',
-    ['$http', 'Pagesp', 'DatasetColumnsp',
-     function($http, Pagesp, DatasetColumnsp) {
+    'Dataset',
+    ['$http', 'Pages', 'DatasetColumns',
+     function($http, Pages, DatasetColumns) {
          var apiBase = '/api/datasets/';
 
          var wrapper = {
@@ -230,7 +230,7 @@ judoonSrv.factory(
             return future.then(function(response) {
                 _this.columns = [];
                 angular.forEach(response.data, function(value) {
-                    _this.columns.push(DatasetColumnsp._buildDatasetColumn(value));
+                    _this.columns.push(DatasetColumns._buildDatasetColumn(value));
                 });
                 _this.columnsLoaded = 1;
                 return _this.columns;
@@ -242,7 +242,7 @@ judoonSrv.factory(
                 .then( function(response) {
                     return $http.get(response.headers('Location'))
                         .then( function(response) {
-                            var column = DatasetColumnsp._buildDatasetColumn(response.data);
+                            var column = DatasetColumns._buildDatasetColumn(response.data);
                             _this.columns.push(column);
                             return column;
                         } );
@@ -260,7 +260,7 @@ judoonSrv.factory(
 
                     value.length = 0;
                     angular.forEach(data, function(page) {
-                        value.push(Pagesp._buildPage(page));
+                        value.push(Pages._buildPage(page));
                     });
                     
                     value.$resolved = true;
@@ -286,7 +286,7 @@ judoonSrv.factory(
                 .then( function(response) {
                     return $http.get(response.headers('Location'))
                         .then( function(response) {
-                            var page = Pagesp._buildPage(response.data);
+                            var page = Pages._buildPage(response.data);
                             _this.pages.push(page);
                             return page;
                         } );
@@ -327,7 +327,7 @@ judoonSrv.factory(
 
 
 judoonSrv.factory(
-    'DatasetColumnsp', ['$http', function($http) {
+    'DatasetColumns', ['$http', function($http) {
         var wrapper = {
             url: function() {
                 var _this = this;
@@ -365,8 +365,8 @@ judoonSrv.factory(
 
 
 judoonSrv.factory(
-    'Pagesp',
-    ['$http', 'PageColumnsp', function($http, PageColumnsp) {
+    'Pages',
+    ['$http', 'PageColumns', function($http, PageColumns) {
         var apiBase = '/api/pages/';
 
         var wrapper = {
@@ -392,7 +392,7 @@ judoonSrv.factory(
                 return future.then(function(response) {
                     _this.columns = [];
                     angular.forEach(response.data, function(value) {
-                        _this.columns.push(PageColumnsp._buildPageColumn(value));
+                        _this.columns.push(PageColumns._buildPageColumn(value));
                     });
                     return _this.columns;
                 });
@@ -404,7 +404,7 @@ judoonSrv.factory(
                     .then( function(response) {
                         return $http.get(response.headers('Location'))
                             .then( function(response) {
-                                var column = PageColumnsp._buildPageColumn(response.data);
+                                var column = PageColumns._buildPageColumn(response.data);
                                 _this.columns.push(column);
                                 return column;
                             } );
@@ -449,7 +449,7 @@ judoonSrv.factory(
 
 
 judoonSrv.factory(
-    'PageColumnsp', ['$http', function($http) {
+    'PageColumns', ['$http', function($http) {
 
         var wrapper = {
             url: function() {

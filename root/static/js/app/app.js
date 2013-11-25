@@ -20,9 +20,9 @@ judoonApp.config(
                  controller     : 'UserCtrl',
                  reloadOnSearch : false,
                  resolve        : {
-                     user: ['$route', 'Userp', function($route, Userp) {
+                     user: ['$route', 'User', function($route, User) {
                          var userName = $route.current.params.userName;
-                         return Userp.get(userName);
+                         return User.get(userName);
                      }]
                  }
              })
@@ -31,13 +31,13 @@ judoonApp.config(
                  controller     : 'DatasetCtrl',
                  reloadOnSearch : false,
                  resolve        : {
-                     user: ['$route', 'Userp', function($route, Userp) {
+                     user: ['$route', 'User', function($route, User) {
                          var userName = $route.current.params.userName;
-                         return Userp.get(userName);
+                         return User.get(userName);
                      }],
-                     dataset: ['$route', 'Datasetp', function($route, Datasetp) {
+                     dataset: ['$route', 'Dataset', function($route, Dataset) {
                          var datasetId = $route.current.params.datasetId;
-                         return Datasetp.get(datasetId);
+                         return Dataset.get(datasetId);
                      }]
                  }
              })
@@ -45,13 +45,13 @@ judoonApp.config(
                  templateUrl: '/static/html/partials/page.html',
                  controller: 'PageCtrl',
                  resolve: {
-                     user: ['$route', 'Userp', function($route, Userp) {
+                     user: ['$route', 'User', function($route, User) {
                          var userName = $route.current.params.userName;
-                         return Userp.get(userName);
+                         return User.get(userName);
                      }],
-                     page: ['$route', 'Pagesp', function($route, Pagesp) {
+                     page: ['$route', 'Pages', function($route, Pages) {
                          var pageId = $route.current.params.pageId;
-                         return Pagesp.get(pageId);
+                         return Pages.get(pageId);
                      }]
                  }
              })
