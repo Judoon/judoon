@@ -462,8 +462,9 @@ judoonCtrl.controller(
 
              $scope.page.update()
                  .success( function() {
+                     var sortVal = 1;
                      angular.forEach($scope.page.columns, function (value, key) {
-                         value.update();
+                         value.update(sortVal++);
                      });
                      Alerts.alertSuccess('Page saved.');
                  } );
