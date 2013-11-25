@@ -1,8 +1,8 @@
 <div>
 
   <ul class="breadcrumb">
-    <li><a ng-href="/user/{{userName}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
-    <li><a ng-href="/user/{{userName}}/dataset/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}/dataset/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
     <li>View: <span ng-bind-html="page.title"></span></li>
   </ul>
 
@@ -65,7 +65,7 @@
         <form class="column_list">
           <h6>Update an existing view column</h6>
           <div class="input-append">
-            <select ng-model="currentColumn" ng-options="c.title for c in pageColumns">
+            <select ng-model="currentColumn" ng-options="c.title for c in page.columns">
               <option value=""></option>
             </select>
           </div>
@@ -78,7 +78,7 @@
         <form class="column_list">
           <h6 class="text-warning">Delete a view column</h6>
           <div class="input-append">
-            <select ng-model="deleteColumn" ng-options="c.title for c in pageColumns">
+            <select ng-model="deleteColumn" ng-options="c.title for c in page.columns">
               <option value=""></option>
             </select>
             <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
@@ -178,7 +178,7 @@
 
     <judoon-data-table
        jdt-dataset-id="page.dataset_id"
-       jdt-columns="pageColumns"
+       jdt-columns="page.columns"
        jdt-header-key="title"
        jdt-fetch-fn="getServerData"
        highlight-active="columnIsActive(column)"

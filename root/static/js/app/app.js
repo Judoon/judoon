@@ -43,7 +43,17 @@ judoonApp.config(
              })
              .when('/user/:userName/page/:pageId', {
                  templateUrl: '/static/html/partials/page.html',
-                 controller: 'PageCtrl'
+                 controller: 'PageCtrl',
+                 resolve: {
+                     user: ['$route', 'Userp', function($route, Userp) {
+                         var userName = $route.current.params.userName;
+                         return Userp.get(userName);
+                     }],
+                     page: ['$route', 'Pagesp', function($route, Pagesp) {
+                         var pageId = $route.current.params.pageId;
+                         return Pagesp.get(pageId);
+                     }]
+                 }
              })
              .otherwise({redirectTo: '/'});
      }

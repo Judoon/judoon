@@ -405,61 +405,48 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', '$routeParams', '$http',
-     'Page', 'PageColumn', 'Dataset', 'DatasetColumn', 'Alerts',
-     function ($scope, $routeParams, $http, Page, PageColumn, Dataset,
+    ['$scope', 'user', 'page', '$http',
+     'Page', 'PageColumn', 'Datasetp', 'DatasetColumn', 'Alerts',
+     function ($scope, user, page, $http, Page, PageColumn, Datasetp,
                DatasetColumn, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
          $scope.alerter = Alerts;
 
-         $scope.userName = $routeParams.userName;
-         $scope.pageId = $routeParams.pageId;
-         $scope.pageLoaded = 0;
-         Page.get({id: $scope.pageId}, function (page) {
-             $scope.pageOriginal = angular.copy(page);
-             $scope.page = page;
-             $scope.pageLoaded = 1;
-             Dataset.get({id: page.dataset_id}, function (ds) {
-                 $scope.dataset = ds;
-             });
+         $scope.user = user;
+         $scope.page = page;
+         $scope.pageOriginal = angular.copy(page);
+         $scope.pageColumnsOriginal = angular.copy(page.columns);
+         $scope.pageColumnsLoaded = 1;
 
-             DatasetColumn.query({}, {dataset_id: page.dataset_id}, function (columns) {
-                 $scope.dataset.columns = columns;
-                 $scope.dsColumnsLoaded = 1;
-                 $scope.dsColumnsOriginal = angular.copy(columns);
+         Datasetp.get(page.dataset_id).then( function (dataset) {
+             $scope.dataset = dataset;
 
-                 $scope.ds_columns = {accessions: [], dict: {}};
-                 angular.forEach(columns, function(value, key) {
-                     $scope.ds_columns.dict[value.shortname] = value;
-                     if (value.data_type.match(/accession/i)) {
-                         $scope.ds_columns.accessions.push(value);
-                     }
-                 });
-
-                 $scope.siteLinker = {};
-                 $http.get('/api/sitelinker/accession')
-                     .success(function(data) {
-                         angular.forEach(data, function(value) {
-                             $scope.siteLinker[value.name] = value;
-                         });
-                     });
+             $scope.ds_columns = {accessions: [], dict: {}};
+             angular.forEach($scope.dataset.columns, function(value, key) {
+                 $scope.ds_columns.dict[value.shortname] = value;
+                 if (value.data_type.match(/accession/i)) {
+                     $scope.ds_columns.accessions.push(value);
+                 }
              });
          });
+
+
+         $scope.siteLinker = {};
+         $http.get('/api/sitelinker/accession')
+             .success(function(data) {
+                 angular.forEach(data, function(value) {
+                     $scope.siteLinker[value.name] = value;
+                 });
+             });
 
          $scope.$watch('page', function () {
              $scope.pageDirty = !angular.equals($scope.page, $scope.pageOriginal);
          }, true);
 
-
-         PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
-             $scope.pageColumnsOriginal = angular.copy(columns);
-             $scope.pageColumns = columns;
-             $scope.pageColumnsLoaded = 1;
-         });
          $scope.$watch('pageColumns', function () {
-             $scope.pageDirty = !angular.equals($scope.pageColumns, $scope.pageColumnsOriginal);
+             $scope.pageDirty = !angular.equals($scope.page.columns, $scope.pageColumnsOriginal);
          }, true);
 
 
@@ -469,43 +456,28 @@ judoonCtrl.controller(
                  return;
              }
 
-             Page.update({
-                 id:         $scope.pageId,
-                 title:      $scope.page.title,
-                 preamble:   $scope.page.preamble,
-                 postamble:  $scope.page.postamble,
-                 dataset_id: $scope.page.dataset_id,
-                 permission: $scope.page.permission
-             });
-
-             angular.forEach($scope.pageColumns, function (value, key) {
-                 PageColumn.update({
-                     page_id:  value.page_id,
-                     id:       value.id,
-                     title:    value.title,
-                     widgets:  value.widgets,
-                     sort:     key+1
-                 });
-             } );
+             $scope.page.update()
+                 .success( function() {
+                     angular.forEach($scope.page.columns, function (value, key) {
+                         value.update();
+                     });
+                 } );
 
              $scope.pageDirty = 0;
              $scope.pageOriginal = angular.copy($scope.page);
-             $scope.pageColumnsOriginal = angular.copy($scope.pageColumns);
+             $scope.pageColumnsOriginal = angular.copy($scope.page.columns);
 
              Alerts.alertSuccess('Page saved.');
          };
 
          $scope.addColumn = function() {
-             var newColumn = {
-                 title: $scope.newColumnName,
-                 template: '',
-                 page_id: $scope.pageId
-             };
-
-             PageColumn.saveAndFetch(newColumn, function(fullCol) {
-                 $scope.pageColumns.push(fullCol);
-                 $scope.currentColumn = fullCol;
-                 Alerts.alertSuccess('New Column "' + fullCol.title + '" added!');
+             $scope.page.createColumn({
+                 title: $scope.newColumnName
+             }).success( function(newColumn) {
+                 $scope.currentColumn = newColumn;
+                 Alerts.alertSuccess('New Column "' + newColumn.title + '" added!');
+             }).error( function() {
+                 Alerts.alertError('Failed to add new column');
              });
          };
 
@@ -516,20 +488,10 @@ judoonCtrl.controller(
 
              var confirmed = window.confirm("Are you sure you want to delete this column?");
              if (confirmed) {
-                 PageColumn.delete(
-                     {}, {page_id: $scope.pageId, id: $scope.deleteColumn.id},
-                     function() {
-                         if (angular.equals($scope.currentColumn, $scope.deleteColumn)) {
-                             $scope.currentColumn = null;
-                         }
-
-                         angular.forEach($scope.pageColumns, function (value, key) {
-                             if ( angular.equals(value, $scope.deleteColumn) ) {
-                                 $scope.pageColumns.splice(key, 1);
-                             }
-                         } );
-                     }
-                 );
+                 $scope.page.deleteColumn($scope.deleteColumn);
+                 // if (angular.equals($scope.currentColumn, $scope.deleteColumn)) {
+                 //     $scope.currentColumn = null;
+                 // }
              }
 
              return;
