@@ -500,20 +500,20 @@ judoonCtrl.controller(
          };
 
          $scope.firstColumn = function() {
-             return $scope.pageColumns && angular.equals($scope.currentColumn, $scope.pageColumns[0]);
+             return $scope.page.columns && angular.equals($scope.currentColumn, $scope.page.columns[0]);
          };
 
          $scope.lastColumn = function() {
-             return $scope.pageColumns && angular.equals(
+             return $scope.page.columns && angular.equals(
                  $scope.currentColumn,
-                 $scope.pageColumns[ $scope.pageColumns.length - 1 ]
+                 $scope.page.columns[ $scope.page.columns.length - 1 ]
              );
          };
 
          $scope.currentIdx = function() {
              var idx;
-             for (idx=0; idx<$scope.pageColumns.length; idx++) {
-                 if (angular.equals($scope.currentColumn, $scope.pageColumns[idx])) {
+             for (idx=0; idx<$scope.page.columns.length; idx++) {
+                 if (angular.equals($scope.currentColumn, $scope.page.columns[idx])) {
                      break;
                  }
              }
@@ -526,8 +526,8 @@ judoonCtrl.controller(
              }
 
              var currentIdx = $scope.currentIdx();
-             $scope.pageColumns[currentIdx] = $scope.pageColumns.splice(
-                 currentIdx-1, 1, $scope.pageColumns[currentIdx]
+             $scope.page.columns[currentIdx] = $scope.page.columns.splice(
+                 currentIdx-1, 1, $scope.page.columns[currentIdx]
              )[0];
          };
 
@@ -537,8 +537,8 @@ judoonCtrl.controller(
              }
 
              var currentIdx = $scope.currentIdx();
-             $scope.pageColumns[currentIdx] = $scope.pageColumns.splice(
-                 currentIdx+1, 1, $scope.pageColumns[currentIdx]
+             $scope.page.columns[currentIdx] = $scope.page.columns.splice(
+                 currentIdx+1, 1, $scope.page.columns[currentIdx]
              )[0];
          };
 
