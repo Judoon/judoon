@@ -140,6 +140,7 @@ judoonSrv.factory('DataType', ['$http', function($http) {
 }]);
 
 
+
 judoonSrv.factory('Lookup', ['$resource', function($resource) {
     var Lookup = $resource(
         '/api/lookup/:group_id/:id/:io/:input_id/:sub_io',
@@ -218,16 +219,28 @@ judoonSrv.factory(
                 _this.selectedDataset = _this.datasets[idx];
             },
             getPages: function() {
-                var future,
-                    _this = this;
-                future = $http.get('/api/user/pages');
-                return future.then(function(response) {
-                    _this.pages = [];
-                    angular.forEach(response.data, function(value) {
-                        _this.pages.push(Pagesp._buildPage(value));
+                var promise,
+                    _this = this,
+                    value = [];
+
+                promise = $http.get('/api/user/pages').then(
+                    function(response) {
+                        var data = response.data,
+                            promise = value.$promise;
+
+                        value.length = 0;
+                        angular.forEach(data, function(page) {
+                            value.push(Pagesp._buildPage(page));
+                        });
+
+                        value.$resolved = true;
+                        response.resource = value;
+                        return response;
                     });
-                    return _this.pages;
-                });
+
+                value.$promise  = promise;
+                value.$resolved = false;
+                return value;
             }
         };
 
@@ -240,25 +253,16 @@ judoonSrv.factory(
                 return future.then(
                     function(response) { return _this._buildUser(response.data); }
                 )
-                    .then(
-                        function(_this) {
-                            _this.getDatasets().then(
-                                function(datasets) {
-                                    angular.forEach(datasets, function(value) {
-                                        value.getColumns();
-                                        value.getPages().then(
-                                            function(pages) {
-                                                angular.forEach(pages, function(value) {
-                                                    value.getColumns();
-                                                });
-                                            }
-                                        );
-                                    });
-                                }
-                            );
-                            return _this;
-                        }
-                    );
+                .then(function(_this) {
+                    _this.getDatasets().then( function(datasets) {
+                        angular.forEach(datasets, function(dsValue) {
+                            dsValue.getColumns();
+                            dsValue.pages = dsValue.getPages();
+                        });
+                    });
+                    _this.pages = _this.getPages();
+                    return _this;
+                });
             },
             _buildUser: function(user) {
                 _.extend(user, wrapper);
@@ -271,24 +275,25 @@ judoonSrv.factory(
 
 judoonSrv.factory(
     'Datasetp',
-    ['$http', 'Pagesp', 'DatasetColumnsp', function($http, Pagesp, DatasetColumnsp) {
-        var apiBase = '/api/datasets/';
+    ['$http', 'Pagesp', 'DatasetColumnsp',
+     function($http, Pagesp, DatasetColumnsp) {
+         var apiBase = '/api/datasets/';
 
-    var wrapper = {
-        url: function() {
-            var _this = this;
-            return apiBase + _this.id;
-        },
-        update: function() {
-            var future,
-                _this = this;
-            future = $http.put(_this.url, {
-                name:        _this.name,
-                description: _this.description,
-                permission:  _this.permission
-            });
-            return future;
-        },
+         var wrapper = {
+             url: function() {
+                 var _this = this;
+                 return apiBase + _this.id;
+             },
+             update: function() {
+                 var future,
+                     _this = this;
+                 future = $http.put(_this.url(), {
+                     name:        _this.name,
+                     description: _this.description,
+                     permission:  _this.permission
+                 });
+                 return future;
+             },
         deleteMe: function() {
             var future,
                 _this = this;
@@ -304,20 +309,34 @@ judoonSrv.factory(
                 angular.forEach(response.data, function(value) {
                     _this.columns.push(DatasetColumnsp._buildDatasetColumn(value));
                 });
+                _this.columnsLoaded = 1;
                 return _this.columns;
             });
         },
         getPages: function() {
-            var future,
-                _this = this;
-            future = $http.get(_this.url() + '/pages');
-            return future.then(function(response) {
-                _this.pages = [];
-                angular.forEach(response.data, function(value) {
-                    _this.pages.push(Pagesp._buildPage(value));
-                });
-                return _this.pages;
-            });
+            var promise,
+                _this = this,
+                value = [];
+
+            promise = $http.get(_this.url() + '/pages').then(
+                function(response) {
+                    var data = response.data,
+                        promise = value.$promise;
+
+                    value.length = 0;
+                    angular.forEach(data, function(page) {
+                        value.push(Pagesp._buildPage(page));
+                    });
+                    
+                    value.$resolved = true;
+                    response.resource = value;
+                    return response;
+                }
+            );
+
+            value.$promise  = promise;
+            value.$resolved = false;
+            return value;
         },
         createPage: function (newPage) {
             var _this = this;
@@ -358,7 +377,7 @@ judoonSrv.factory(
             .then(
                 function(_this) {
                     _this.getColumns();
-                    _this.getPages();
+                    _this.pages = _this.getPages();
                     return _this;
                 }
             );
@@ -375,17 +394,19 @@ judoonSrv.factory(
 judoonSrv.factory(
     'DatasetColumnsp', ['$http', function($http) {
         var wrapper = {
+            url: function() {
+                var _this = this;
+                return '/api/datasets/' + _this.dataset_id + '/columns/' +
+                    _this.id;
+            },
             update: function() {
                 var future,
                     _this = this;
-                future = $http.put(
-                    '/api/datasets/' + _this.dataset_id + '/columns/' +
-                        _this.id,
-                    {data_type:  _this.data_type}
-                );
+                future = $http.put(_this.url(), {data_type: _this.data_type});
                 return future;
             }
         };
+
         return {
             get: function(datasetId, datasetColId) {
                 var future,
