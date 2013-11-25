@@ -316,10 +316,10 @@ judoonSrv.factory(
         createColumn: function (newColumnSpec) {
             var _this = this;
             return $http.post(_this.url() + '/columns', newColumnSpec)
-                .success( function(data, status, getHeader) {
-                    $http.get(getHeader('Location'))
-                        .success( function(columnData) {
-                            var column = DatasetColumnsp._buildDatasetColumn(columnData);
+                .then( function(response) {
+                    return $http.get(response.headers('Location'))
+                        .then( function(response) {
+                            var column = DatasetColumnsp._buildDatasetColumn(response.data);
                             _this.columns.push(column);
                             return column;
                         } );
@@ -360,10 +360,10 @@ judoonSrv.factory(
             }
             newPage.dataset_id = _this.id;
             return $http.post('/api/user/pages', newPage)
-                .success( function(data, status, getHeader) {
-                    $http.get(getHeader('Location'))
-                        .success( function(pageData) {
-                            var page = Pagesp._buildPage(pageData);
+                .then( function(response) {
+                    return $http.get(response.headers('Location'))
+                        .then( function(response) {
+                            var page = Pagesp._buildPage(response.data);
                             _this.pages.push(page);
                             return page;
                         } );
