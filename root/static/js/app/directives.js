@@ -52,27 +52,9 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 dataTable = element.dataTable(tableOptions);
             }
 
-            // datasetId may not be available at link time
-            var unbindDsIdWatch = scope.$watch('datasetId', function() {
-                if (!scope.datasetId) {
-                    return;
-                }
-
-                // this won't change over life of the directive
-                defaultOptions.sAjaxSource = "/api/datasets/" + scope.datasetId +
-                    '/data';
-
-                // just in case this fired after the columns watch
-                if (scope.columns && scope.columns.length) {
-                    $timeout(function() { rebuildTable(); }, 0, false);
-                }
-
-                unbindDsIdWatch();
-            });
-
             // columns may not be available at link time
             scope.$watch('columns', function() {
-                if (!scope.datasetId || !scope.columns || !scope.columns.length) {
+                if (!scope.columns || !scope.columns.length) {
                     return; // too soon.
                 }
 

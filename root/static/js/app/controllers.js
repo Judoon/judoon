@@ -220,7 +220,7 @@ judoonCtrl.controller(
              angular.forEach(aoData, function(val) {
                  params[val.name] = val.value;
              });
-             $http.get(sSource, {params: params})
+             $http.get('/api/datasets/'+$scope.dataset.id+'/data', {params: params})
               .then( function(response) {
                   var data = response.data;
                   var new_data = [];
@@ -576,7 +576,7 @@ judoonCtrl.controller(
              angular.forEach(aoData, function(val) {
                  params[val.name] = val.value;
              });
-             $http.get(sSource, {params: params})
+             $http.get('/api/datasets/'+$scope.page.dataset_id+'/data', {params: params})
                  .then( function(response) {
                      var data = response.data;
                      var templates = [];
