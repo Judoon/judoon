@@ -478,13 +478,13 @@ judoonSrv.factory(
                 var _this = this;
                 newColumn.template = '';
                 return $http.post(_this.url() + '/columns', newColumn)
-                    .success( function(data, status, getHeader) {
-                        $http.get(getHeader('Location'))
-                            .success( function(columnData) {
-                                var column = PageColumnsp._buildPageColumn(columnData);
+                    .then( function(response) {
+                        return $http.get(response.headers('Location'))
+                            .then( function(response) {
+                                var column = PageColumnsp._buildPageColumn(response.data);
                                 _this.columns.push(column);
+                                return column;
                             } );
-                        return;
                     });
             },
             deleteColumn: function(column) {
