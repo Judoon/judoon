@@ -187,6 +187,14 @@ judoonCtrl.controller(
              } );
          };
 
+         $scope.$on('DatasetColumnCtrl::createColumn', function(event, newColumnSpec) {
+             $scope.dataset.createColumn(newColumnSpec).then(
+                 function() { Alerts.alertSuccess("Column '" + newColumnSpec.new_col_name + "' created!"); },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
+
+
 
          // *** Pages ***
          $scope.allPages = $scope.user.pages;
@@ -294,8 +302,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'DatasetColumnCtrl',
-    ['$scope', 'DatasetColumn', 'Lookup', '$window', 'Alerts',
-     function ($scope, DatasetColumn, Lookup, $window, Alerts) {
+    ['$scope', 'Lookup', 'Alerts',
+     function ($scope, Lookup, Alerts) {
 
          Lookup.query({}, function (lookups) {
              var self_idx;
@@ -378,7 +386,7 @@ judoonCtrl.controller(
 
 
          $scope.submitNewColumn = function() {
-             var data = {
+             var newColumnSpec = {
                  dataset_id:        $scope.datasetId,
                  new_col_name:      $scope.newColumnName,
                  this_table_id:     $scope.datasetId,
@@ -387,17 +395,8 @@ judoonCtrl.controller(
                  that_joincol_id:   $scope.thatJoinColumn.id,
                  that_selectcol_id: $scope.thatSelectColumn.id
              };
-
-             DatasetColumn.save(
-                 {}, data,
-                 function() {
-                     Alerts.alertSuccess('Column added!');
-                     $window.location.reload();
-                 },
-                 function() { Alerts.alertError('Something went wrong!'); }
-             );
+             $scope.$emit('DatasetColumnCtrl::createColumn', newColumnSpec);
          };
-
      }
     ]
 );

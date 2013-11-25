@@ -313,6 +313,18 @@ judoonSrv.factory(
                 return _this.columns;
             });
         },
+        createColumn: function (newColumnSpec) {
+            var _this = this;
+            return $http.post(_this.url() + '/columns', newColumnSpec)
+                .success( function(data, status, getHeader) {
+                    $http.get(getHeader('Location'))
+                        .success( function(columnData) {
+                            var column = DatasetColumnsp._buildDatasetColumn(columnData);
+                            _this.columns.push(column);
+                            return column;
+                        } );
+                });
+        },
         getPages: function() {
             var promise,
                 _this = this,
