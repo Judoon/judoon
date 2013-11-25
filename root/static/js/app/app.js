@@ -28,7 +28,17 @@ judoonApp.config(
              })
              .when('/user/:userName/dataset/:datasetId', {
                  templateUrl: '/static/html/partials/dataset.html',
-                 controller: 'DatasetCtrl'
+                 controller: 'DatasetCtrl',
+                 resolve: {
+                     user: ['$route', 'Userp', function($route, Userp) {
+                         var userName = $route.current.params.userName;
+                         return Userp.get(userName);
+                     }],
+                     dataset: ['$route', 'Datasetp', function($route, Datasetp) {
+                         var datasetId = $route.current.params.datasetId;
+                         return Datasetp.get(datasetId);
+                     }]
+                 }
              })
              .when('/user/:userName/page/:pageId', {
                  templateUrl: '/static/html/partials/page.html',

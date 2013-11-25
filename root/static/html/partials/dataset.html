@@ -1,7 +1,7 @@
 <div>
 
   <ul class="breadcrumb">
-    <li><a ng-href="/user/{{userName}}#dataset{{datasetId}}" target="_self">Overview</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}#dataset{{dataset.id}}" target="_self">Overview</a> <span class="divider">/</span></li>
     <li>Dataset: {{dataset.name}}</li>
   </ul>
 
@@ -53,7 +53,7 @@
       <div class="outer-hscroll"><div class="inner-hscroll">
 
           <judoon-data-table
-             jdt-dataset-id="datasetId"
+             jdt-dataset-id="dataset.id"
              jdt-columns="dataset.columns"
              jdt-header-key="name"
              jdt-fetch-fn="getServerData">
@@ -81,7 +81,7 @@
                   <th class="header">Sample Data</th>
                   <td class="sample_data" ng-repeat="column in dataset.columns">
                     <ul class="unstyled">
-                      <li ng-repeat="sample in column.sample_data">{{sample}}</li>
+                      <li ng-repeat="sample in column.sample_data track by $index">{{sample}}</li>
                     </ul>
                   </td>
                 </tr>
@@ -116,7 +116,8 @@
 
       <ul>
         <li ng-repeat="page in dataset.pages">
-          <a href="/user/{{userName}}/page/{{page.id}}" ng-bind-html="page.title"></a>
+          <a href="/user/{{user.username}}/page/{{page.id}}">{{page.title}}</a>
+          <button class="btn btn-danger" ng-click="deletePage(page)">Delete</button>
         </li>
       </ul>
 
