@@ -786,7 +786,7 @@ judoonCtrl.controller(
          else if ($scope.url.active.fromdata) {
              $scope.url.fromdata.prefix   = currentLink.url.text_segments[0];
              $scope.url.fromdata.variable = currentLink.url.variable_segments[0];
-             $scope.url.fromdata.suffix   = currentLink.url.text_segments[1];
+             $scope.url.fromdata.suffix   = currentLink.url.text_segments[1] || '';
          }
          else {
              $scope.url.fixed = currentLink.url.text_segments[0];
@@ -804,7 +804,7 @@ judoonCtrl.controller(
          else {
              $scope.label.fromdata.prefix   = currentLink.label.text_segments[0];
              $scope.label.fromdata.variable = currentLink.label.variable_segments[0];
-             $scope.label.fromdata.suffix   = currentLink.label.text_segments[1];
+             $scope.label.fromdata.suffix   = currentLink.label.text_segments[1] || '';
          }
 
          function getLabelDefault() {
@@ -867,11 +867,21 @@ judoonCtrl.controller(
          }, true);
 
 
-         function getSampleData(colname) { return columns.dict[colname].sample_data[0]; }
-         function getDataType(colname)   { return columns.dict[colname].data_type; }
+         function getSampleData(colname) {
+             if (!colname) {
+                 return '';
+             }
+             return columns.dict[colname].sample_data[0];
+         }
+         function getDataType(colname)   {
+             return columns.dict[colname].data_type;
+         }
 
 
          function getLinkableSites() {
+             if (!$scope.url.accession.source) {
+                 return [];
+             }
              return siteLinker[getDataType($scope.url.accession.source)].sites;
          }
          function getCurrentSite() {
