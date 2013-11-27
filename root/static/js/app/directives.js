@@ -19,10 +19,9 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
         templateUrl : '/static/html/partials/judoon-data-table.html',
         transclude  : false,
         scope       : {
-            datasetId       : '=jdtDatasetId',
             columns         : '=jdtColumns',
-            headerKey       : '@jdtHeaderKey',
-            dataFetchFn     : '=jdtFetchFn',
+            colDefs         : '=jdtColDefs',
+            dataUrl         : '=jdtDataUrl',
             highlightActive : '&highlightActive',
             highlightDelete : '&highlightDelete'
         },
@@ -35,7 +34,8 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 "bProcessing"     : true,
                 "sPaginationType" : "bootstrap",
                 "bDeferRender"    : true,
-                "fnServerData"    : scope.dataFetchFn
+                "sAjaxSource"     : scope.dataUrl,
+                "sAjaxDataProp"   : "tmplData"
             };
 
             function rebuildTable() {
@@ -44,11 +44,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
 
                 var tableOptions = angular.copy(defaultOptions);
-                tableOptions.aoColumns = [];
-                angular.forEach(scope.columns, function (value, key) {
-                    tableOptions.aoColumns[key] = value[scope.headerKey];
-                } );
-
+                tableOptions.aoColumns = scope.colDefs;
                 dataTable = element.dataTable(tableOptions);
             }
 

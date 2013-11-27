@@ -141,8 +141,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'DatasetCtrl',
-    ['$scope', '$http', '$location', 'user', 'dataset', 'DataType', 'Alerts',
-     function ($scope, $http, $location, user, dataset, DataType, Alerts) {
+    ['$scope', '$location', 'user', 'dataset', 'DataType', 'Alerts',
+     function ($scope, $location, user, dataset, DataType, Alerts) {
 
          // *** Alerts ***
          $scope.alerter = Alerts;
@@ -214,27 +214,17 @@ judoonCtrl.controller(
              }
          };
 
-
-         $scope.getServerData = function ( sSource, aoData, fnCallback ) {
-             var params = {};
-             angular.forEach(aoData, function(val) {
-                 params[val.name] = val.value;
+         $scope.dataUrl = '/api/datasets/'+$scope.dataset.id+'/data';
+         $scope.$watch('dataset.columns', function() {
+             $scope.columnDefs = [];
+             angular.forEach($scope.dataset.columns, function(value) {
+                 $scope.columnDefs.push({
+                     sTitle: value.name,
+                     mData:  value.shortname,
+                     sName:  value.shortname
+                 });
              });
-             $http.get('/api/datasets/'+$scope.dataset.id+'/data', {params: params})
-              .then( function(response) {
-                  var data = response.data;
-                  var new_data = [];
-                  for (var i = 0; i < data.tmplData.length; i++) {
-                      new_data[i] = [];
-                      for (var j = 0; j < $scope.dataset.columns.length; j++) {
-                          new_data[i][j] = data.tmplData[i][$scope.dataset.columns[j].shortname];
-                      }
-                  }
-                  data.aaData = new_data;
-                  return data;
-              })
-              .then( fnCallback );
-         };
+         });
 
 
          // *** DataTypes ***
@@ -569,33 +559,39 @@ judoonCtrl.controller(
          }, true);
 
 
-
-
-         $scope.getServerData = function ( sSource, aoData, fnCallback ) {
-             var params = {};
-             angular.forEach(aoData, function(val) {
-                 params[val.name] = val.value;
-             });
-             $http.get('/api/datasets/'+$scope.page.dataset_id+'/data', {params: params})
-                 .then( function(response) {
-                     var data = response.data;
-                     var templates = [];
-                     angular.forEach($scope.page.columns, function (value, key) {
-                         templates.push( Handlebars.compile(value.template) );
-                     } );
-
-                     var new_data = [];
-                     for (var i = 0; i < data.tmplData.length; i++) {
-                         new_data[i] = [];
-                         for (var j = 0; j < templates.length; j++) {
-                             new_data[i][j] = templates[j](data.tmplData[i]);
-                         }
-                     }
-                     data.aaData = new_data;
-                     return data;
-                 })
-                 .then( fnCallback );
+         $scope.curriedRenderTmpl = function(idx) {
+             var renderTmpl = function(dataSource, callType) {
+                 return $scope.compiledTmpls[idx](dataSource);
+             };
+             return renderTmpl;
          };
+
+         $scope.getSortColumn = function(widgets) {
+             var sortVal = '';
+             angular.forEach(widgets, function(widget) {
+                 if (!sortVal) {
+                     if (widget.type === 'variable') {
+                         sortVal = widget.name;
+                     }
+                 }
+             });
+             return sortVal;
+         };
+
+         $scope.dataUrl = '/api/datasets/'+$scope.page.dataset_id+'/data';
+         $scope.$watch('page.columns', function() {
+             $scope.compiledTmpls = [];
+             $scope.columnDefs = [];
+             angular.forEach($scope.page.columns, function(value, key) {
+                 $scope.compiledTmpls.push( Handlebars.compile(value.template) );
+                 $scope.columnDefs.push({
+                     sTitle : value.title,
+                     sName  : $scope.getSortColumn(value.widgets),
+                     mData  : $scope.curriedRenderTmpl(key)
+                 });
+             });
+         });
+
 
      }]);
 
