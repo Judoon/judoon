@@ -19,16 +19,14 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
         templateUrl : '/static/html/partials/judoon-data-table.html',
         transclude  : false,
         scope       : {
-            columns         : '=jdtColumns',
-            colDefs         : '=jdtColDefs',
-            dataUrl         : '=jdtDataUrl',
-            highlightActive : '&highlightActive',
-            highlightDelete : '&highlightDelete'
+            colDefs   : '=jdtColDefs',
+            dataUrl   : '=jdtDataUrl',
+            editCol   : '=jdtEditCol',
+            deleteCol : '=jdtDeleteCol'
         },
         link: function(scope, element, attrs) {
 
-            var dataTable;
-            var defaultOptions = {
+            var dt, defaultOptions = {
                 "bAutoWidth"      : false,
                 "bServerSide"     : true,
                 "bProcessing"     : true,
@@ -38,24 +36,55 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 "sAjaxDataProp"   : "tmplData"
             };
 
-            function rebuildTable() {
-                if (dataTable) {
-                    dataTable.fnDestroy();
+            function rebuildTable(nbrColumnsChanged) {
+                if (dt) {
+                    dt.fnDestroy();
+                    if (nbrColumnsChanged) {
+                        dt.find('tr').remove();
+                    }
                 }
 
                 var tableOptions = angular.copy(defaultOptions);
                 tableOptions.aoColumns = scope.colDefs;
-                dataTable = element.dataTable(tableOptions);
+                dt = element.dataTable(tableOptions);
+                if (nbrColumnsChanged) {
+                    updateHighlights(scope.editCol, 'active_col');
+                    updateHighlights(scope.deleteCol, 'danger_col');
+                }
             }
 
+
+            function updateHighlights(column, highlightClass) {
+                element.find('th').removeClass(highlightClass);
+                if (column) {
+                    var idx;
+                    angular.forEach(scope.colDefs, function(value, key) {
+                        if (value.column.id === column.id) {
+                            idx = key;
+                        }
+                    });
+                    angular.element(element.find('th')[idx]).addClass(highlightClass);
+                }
+            }
+
+            scope.$watch('editCol', function() {
+                updateHighlights(scope.editCol, 'active_col');
+            });
+
+            scope.$watch('deleteCol', function() {
+                updateHighlights(scope.deleteCol, 'danger_col');
+            });
+
+
             // columns may not be available at link time
-            scope.$watch('columns', function() {
-                if (!scope.columns || !scope.columns.length) {
+            scope.$watch('colDefs', function(oldval, newval) {
+                if (!scope.colDefs || !scope.colDefs.length) {
                     return; // too soon.
                 }
-
-                // run rebuild table after digest
-                $timeout(function() { rebuildTable(); }, 0, false);
+                var nbrColumnsChanged = oldval.length !== newval.length;
+                $timeout(
+                    function() {rebuildTable(nbrColumnsChanged);}, 0, false
+                );
             }, true);
         }
     };

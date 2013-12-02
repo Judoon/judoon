@@ -219,12 +219,13 @@ judoonCtrl.controller(
              $scope.columnDefs = [];
              angular.forEach($scope.dataset.columns, function(value) {
                  $scope.columnDefs.push({
-                     sTitle: value.name,
-                     mData:  value.shortname,
-                     sName:  value.shortname
+                     sTitle : value.name,
+                     mData  : value.shortname,
+                     sName  : value.shortname,
+                     column : value
                  });
              });
-         });
+         }, true);
 
 
          // *** DataTypes ***
@@ -542,8 +543,14 @@ judoonCtrl.controller(
              };
          }
 
-         $scope.columnIsActive = function(column) { return $scope.editmode && angular.equals(column, $scope.currentColumn); };
-         $scope.columnIsDelete = function(column) { return $scope.editmode && angular.equals(column, $scope.deleteColumn);  };
+         $scope.columnIsActive = function(column) {
+             return $scope.editmode &&
+                 angular.equals(column, $scope.currentColumn);
+         };
+         $scope.columnIsDelete = function(column) {
+             return $scope.editmode &&
+                 angular.equals(column, $scope.deleteColumn);
+         };
 
          $scope.$watch('currentColumn.widgets', function() {
              if (!$scope.currentColumn) {
@@ -581,16 +588,17 @@ judoonCtrl.controller(
          $scope.dataUrl = '/api/datasets/'+$scope.page.dataset_id+'/data';
          $scope.$watch('page.columns', function() {
              $scope.compiledTmpls = [];
-             $scope.columnDefs = [];
+             $scope.columnDefs    = [];
              angular.forEach($scope.page.columns, function(value, key) {
                  $scope.compiledTmpls.push( Handlebars.compile(value.template) );
                  $scope.columnDefs.push({
                      sTitle : value.title,
                      sName  : $scope.getSortColumn(value.widgets),
-                     mData  : $scope.curriedRenderTmpl(key)
+                     mData  : $scope.curriedRenderTmpl(key),
+                     column : value
                  });
              });
-         });
+         }, true);
 
 
      }]);
