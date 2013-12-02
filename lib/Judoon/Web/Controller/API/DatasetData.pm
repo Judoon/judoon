@@ -119,6 +119,7 @@ sub data  : Chained('/api/wm/ds_data') PathPart('') Args(0) {
         tmplData             => \@tmpl_data,
         iTotalRecords        => $total,
         iTotalDisplayRecords => $filtered,
+        sEcho                => 0+$params->{sEcho},
     };
 }
 
