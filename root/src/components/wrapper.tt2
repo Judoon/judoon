@@ -38,7 +38,7 @@
             </form>
           </li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Browse <b class="caret"></b></a>
+            <a class="dropdown-toggle" data-toggle="dropdown">Browse <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li><a href="[% c.uri_for_action('/dataset/list') %]">Public Datasets</a></li>
               <li><a href="[% c.uri_for_action('/page/list') %]">Public Views</a></li>
@@ -56,7 +56,7 @@
           <li><a href="[% c.uri_for_action('/account/signup') %]">Signup</a></li>
           [% ELSE %][% user_this = user.object || c.user %]
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">
               <i class="icon-user"></i> [%- user_this.username -%] <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
