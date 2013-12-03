@@ -106,6 +106,7 @@ Add <created> and <modified> columns to C<Dataset>.
 =cut
 
 with qw(
+    Judoon::Schema::Role::Result::DoesTabularData
     Judoon::Schema::Role::Result::HasPermissions
     Judoon::Schema::Role::Result::HasTimestamps
 );
@@ -154,7 +155,7 @@ sub delete {
     my ($self) = @_;
     $self->next::method(@_);
     $self->_delete_datastore();
-    return;
+    return $self;
 }
 
 
@@ -290,6 +291,13 @@ EOS
     return $page;
 }
 
+=head2 tabular_name
+
+For C<::DoesTabularData>: name for this table
+
+=cut
+
+sub tabular_name { $_[0]->name }
 
 =head2 long_headers
 
@@ -299,7 +307,7 @@ Return list of the human-readable C<DatasetColumn> names.
 
 sub long_headers {
     my ($self) = @_;
-    return map {$_->name} $self->ds_columns_ordered->all;
+    return [map {$_->name} $self->ds_columns_ordered->all];
 }
 
 
@@ -311,9 +319,8 @@ Return list of the computer-friendly C<DatasetColumn> C<shortnames>.
 
 sub short_headers {
     my ($self) = @_;
-    return map {$_->shortname} $self->ds_columns_ordered->all;
+    return [map {$_->shortname} $self->ds_columns_ordered->all];
 }
-
 
 
 =head1 VIEW METHODS
@@ -323,58 +330,13 @@ different formats.
 
 =head2 data_table( $args )
 
-Returns an arrayref of arrayref of the dataset's data with the header
-columns. If C<< $args->{shortname} >> is true, use the column shortnames
-in the header instead of the original names
+Returns an arrayref of arrayref of the dataset's data.
 
 =cut
 
 sub data_table {
-    my ($self, $args) = @_;
-    return [
-        [map {$args->{shortname} ? $_->shortname : $_->name}
-             $self->ds_columns_ordered->all],
-        @{$self->data},
-    ];
-}
-
-
-=head2 as_raw( $args )
-
-Return data as a tab-delimited string. Passes C<$args> to C<L</data_table>>.
-
-=cut
-
-sub as_raw {
-    my ($self, $args) = @_;
-
-    my $raw_file = q{};
-    for my $row (@{$self->data_table($args)}) {
-        $raw_file .= join "\t", @$row;
-        $raw_file .= "\n";
-    }
-
-    return $raw_file;
-}
-
-
-=head2 as_excel
-
-Return data as an Excel spreadsheet.
-
-=cut
-
-sub as_excel {
     my ($self) = @_;
-
-    my $output;
-    open my $fh, '>', \$output;
-    my $workbook = Spreadsheet::WriteExcel->new($fh);
-    $workbook->compatibility_mode();
-    my $worksheet = $workbook->add_worksheet();
-    $worksheet->write_col('A1', $self->data_table);
-    $workbook->close();
-    return $output;
+    return $self->data;
 }
 
 

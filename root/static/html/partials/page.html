@@ -1,8 +1,8 @@
 <div>
 
   <ul class="breadcrumb">
-    <li><a ng-href="/user/{{userName}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
-    <li><a ng-href="/user/{{userName}}/datasource/{{page.dataset_id}}">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}#dataset{{page.dataset_id}}" target="_self">Overview</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}/dataset/{{page.dataset_id}}#view">Dataset: {{dataset.name}}</a> <span class="divider">/</span></li>
     <li>View: <span ng-bind-html="page.title"></span></li>
   </ul>
 
@@ -12,7 +12,7 @@
     <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
   </ul>
 
-  <alert ng-repeat="alert in alerter.alerts" type="alert.type" close="alerter.closeAlert($index)">{{alert.msg}}</alert>
+  <alert ng-repeat="alert in alerter.alerts" type="alert.type" close="alerter.closeAlert($index)"><span ng-bind-html="alert.msg"></span></alert>
 
   <p ng-show="!editmode" class="muted">This view is <strong>{{page.permission}}</strong>.</p>
   <div id="page_actions" ng-show="editmode">
@@ -25,18 +25,26 @@
       </div>
       <div class="span2 offset8">
         <div class="btn-group affix">
-          <button class="btn btn-danger" ng-disabled="!pageDirty" ng-click="updatePage()">Save</button>
+          <button class="btn btn-success" ng-disabled="!pageDirty" ng-click="updatePage()">Save</button>
         </div>
       </div>
     </div>
   </div>
 
-  <div ng-show="editmode" class="editable_label" style="margin-bottom: -10px;">View Title:</div>
-  <h2 judoon-ckeditor ck-edit-type="inline" ng-class="{edit_outline: editmode}" ng-model="page.title" id="page_title" contenteditable="true" class="editable inline_editable"></h2>
 
-  <div ng-show="editmode" class="editable_label">Preamble:</div>
-  <div judoon-ckeditor ck-edit-type="block" ng-class="{edit_outline: editmode}" id="page_preamble" ng-model="page.preamble" contenteditable="true" class="editable block_editable"></div>
-  <br>
+  <div ng-show="!editmode">
+    <h2  ng-bind-html="page.title"></h2>
+    <div ng-bind-html="page.preamble"></div>
+  </div>
+
+  <div ng-show="editmode">
+    <div class="editable_label" style="margin-bottom: -10px;">View Title:</div>
+    <h2 judoon-ckeditor ck-edit-type="inline" ng-model="page.title" contenteditable="true" strip-br="true" id="page_title" class="edit_outline editable inline_editable"></h2>
+
+    <div class="editable_label">Preamble:</div>
+    <div judoon-ckeditor ck-edit-type="block" ng-model="page.preamble" contenteditable="true" strip-br="true" id="page_preamble" class="edit_outline editable block_editable"></div>
+    <br>
+  </div>
 
   <div ng-show="editmode" class="table_edit_ctrls well well-small">
 
@@ -57,7 +65,7 @@
         <form class="column_list">
           <h6>Update an existing view column</h6>
           <div class="input-append">
-            <select ng-model="currentColumn" ng-options="c.title for c in pageColumns">
+            <select ng-model="currentColumn" ng-options="c.title for c in page.columns">
               <option value=""></option>
             </select>
           </div>
@@ -70,7 +78,7 @@
         <form class="column_list">
           <h6 class="text-warning">Delete a view column</h6>
           <div class="input-append">
-            <select ng-model="deleteColumn" ng-options="c.title for c in pageColumns">
+            <select ng-model="deleteColumn" ng-options="c.title for c in page.columns">
               <option value=""></option>
             </select>
             <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
@@ -169,17 +177,19 @@
   </div>
 
     <judoon-data-table
-       jdt-dataset-id="page.dataset_id"
-       jdt-columns="pageColumns"
-       jdt-header-key="title"
-       jdt-fetch-fn="getServerData"
-       highlight-active="columnIsActive(column)"
-       highlight-delete="columnIsDelete(column)">
+       jdt-col-defs="columnDefs" jdt-data-url="dataUrl"
+       jdt-edit-col="currentColumn" jdt-delete-col="deleteColumn">
     </judoon-data-table>
 
   <br>
 
-  <div ng-show="editmode" class="editable_label">Postamble:</div>
-  <div judoon-ckeditor ck-edit-type="block" ng-class="{edit_outline: editmode}" ng-model="page.postamble" id="page_postamble" contenteditable="true" class="editable block_editable"></div>
+
+  <div ng-show="!editmode">
+    <div ng-bind-html="page.postamble"></div>
+  </div>
+  <div ng-show="editmode">
+    <div class="editable_label">Postamble:</div>
+    <div judoon-ckeditor ck-edit-type="block" ng-model="page.postamble" contenteditable="true" strip-br="true" id="page_postamble" class="edit_outline editable block_editable"></div>
+  </div>
 
 </div>

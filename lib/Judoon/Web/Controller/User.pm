@@ -8,7 +8,7 @@ package Judoon::Web::Controller::User;
 
 =head1 NAME
 
-Judoon::Web::Controller::User - user-centric actions (signup, settings, etc.)
+Judoon::Web::Controller::User - basic user identity validation
 
 =cut
 
@@ -16,12 +16,6 @@ use Moose;
 use namespace::autoclean;
 
 BEGIN { extends 'Judoon::Web::Controller'; }
-with qw(
-    Judoon::Web::Controller::Role::ExtractParams
-);
-
-use Safe::Isa;
-use Try::Tiny;
 
 
 =head1 ACTIONS
@@ -45,7 +39,7 @@ sub list : Chained('base') PathPart('') Args(0) {
     my ($self, $c) = @_;
 
     if (my $user = $c->user) {
-        $self->go_here($c, '/user/edit', [$user->get('username')]);
+        $self->go_here($c, '/jsapp/user_view', [$user->get('username')]);
     }
     else {
         $self->go_here($c, '/login/login');
@@ -67,104 +61,14 @@ sub id : Chained('base') PathPart('') CaptureArgs(1) {
         $c->detach;
     }
 
-    if ($c->user && $c->user->username eq $user->username) {
-        $c->stash->{user}{is_owner} = 1;
+    unless ($c->user && $c->user->username eq $user->username) {
+        $self->go_here($c, '/page/list', [], {owner => $username});
+        $c->detach();
     }
 
-    $c->stash->{user}{id}     = $username;
-    $c->stash->{user}{object} = $user;
-}
-
-
-=head2 edit
-
-The user overview page that lists all the datasets and pages owned by
-that user.
-
-=cut
-
-sub edit : Chained('id') PathPart('') Args(0) {
-    my ($self, $c) = @_;
-    $c->stash->{template} = 'user/edit.tt2';
-
-    if ($c->stash->{user}{is_owner}) {
-        my @datasets = $c->stash->{user}{object}->datasets_rs
-            ->ordered_with_pages_and_pagecols->hri->all;
-
-        my @url_keys = (
-            [qw(edit_url        /jsapp/dataset_view )],
-            [qw(column_list_url /jsapp/dataset_view )],
-            [qw(page_list_url   /private/page/list  )],
-        );
-
-        for my $dataset (@datasets) {
-
-            $dataset->{ds_columns} = [
-                $c->model('User::DatasetColumn')
-                    ->for_dataset_id($dataset->{id})->hri->all
-            ];
-
-            for my $url_keys (@url_keys) {
-                my ($url_stash_key, $url_action) = @$url_keys;
-                $dataset->{$url_stash_key} = $c->uri_for_action(
-                    $url_action,
-                    [$c->stash->{user}{object}->username, $dataset->{id}],
-                );
-            }
-
-            for my $page (@{$dataset->{pages}}) {
-
-                # give page access to its parent dataset's scalar fields
-                # this is only needed for the separate-lists overview template
-                $page->{dataset} = {
-                    map {$_ => $dataset->{$_}} grep {not ref $dataset->{$_}}
-                        keys %$dataset
-                };
-
-                # not sure how to set this with dbic
-                $page->{nbr_rows}    = $dataset->{nbr_rows};
-                $page->{nbr_columns} = scalar @{$page->{page_columns}};
-
-                $page->{jsapp_url} = $c->uri_for_action(
-                    '/jsapp/page_view',
-                    [$c->stash->{user}{object}->username, $page->{id}],
-                );
-                $page->{edit_url} = $c->uri_for_action(
-                    '/private/page/object',
-                    [$c->stash->{user}{object}->username, $dataset->{id}, $page->{id}],
-                );
-            }
-        }
-
-        $c->stash->{dataset}{list} = \@datasets;
-    }
-    else {
-        my @datasets = $c->stash->{user}{object}->datasets_rs->public
-            ->ordered_with_pages_and_pagecols->hri->all;
-
-        my @pages;
-        for my $ds (@datasets) {
-            $ds->{dataset_url} = $c->uri_for_action(
-                '/private/dataset/object',
-                [$c->stash->{user}{object}->username, $ds->{id}],
-            );
-
-            for my $page (@{ $ds->{pages} }) {
-                next unless $page->{permission} eq 'public';
-                $page->{page_url} = $c->uri_for_action(
-                    '/private/page/object',
-                    [$c->stash->{user}{object}->username, $ds->{id}, $page->{id}]
-                );
-
-                push @pages, $page;
-            }
-
-        }
-
-        $c->stash->{dataset}{list} = \@datasets;
-        $c->stash->{page}{list}    = \@pages;
-    }
-
+    $c->stash->{user}{is_owner} = 1;
+    $c->stash->{user}{id}       = $username;
+    $c->stash->{user}{object}   = $user;
 }
 
 

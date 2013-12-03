@@ -1,0 +1,54 @@
+[% extra_js = BLOCK %]
+<script src="/static/js/vendor/jquery.dataTables.min.js"></script>
+<script src="/static/js/vendor/dataTables.bootstrap.min.js"></script>
+<script src="/static/js/vendor/handlebars.min.js"></script>
+<script>
+  $(document).ready(function() {
+      var column_data = [% column_json %];
+      var aoColumns = [];
+      for (var i=0; i<column_data.length; i++) {
+          aoColumns.push({
+              sTitle : column_data[i].title,
+              sName  : column_data[i].sort_fields,
+              mData  : Handlebars.compile(column_data[i].template)
+          });
+      }
+
+      console.log("WTF?!");
+      $('#demo_page').dataTable({
+          "aoColumns"       : aoColumns,
+          "bAutoWidth"      : false,
+          "bServerSide"     : true,
+          "bProcessing"     : true,
+          "bDeferRender"    : true,
+          "sPaginationType" : "bootstrap",
+          "sAjaxSource"     : "/api/datasets/[% dataset.id %]/data",
+          "sAjaxDataProp"   : "tmplData"
+      });
+  });
+</script>
+[% END %]
+[% WRAPPER components/wrapper.tt2
+  title = "View for &quot;page.object.title&quot;"
+  extra_javascript = extra_js
+%]
+
+[%- INCLUDE 'components/notification.tt2' -%]
+[%- INCLUDE 'components/identification.tt2' -%]
+
+<h2>[% page.object.title %]</h2>
+
+<section id="preamble">
+[% page.object.preamble | html_para %]
+</section>
+
+<table id="demo_page" class="display data_table table table-striped table-condensed table-border">
+  <thead></thead>
+  <tbody> </tbody>
+</table>
+
+<section id="postamble">
+[% page.object.postamble | html_para %]
+</section>
+
+[% END %]

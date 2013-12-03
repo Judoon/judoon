@@ -41,14 +41,16 @@ main: {
         or die "Cannot open datatypes.tab: $!";
     my @data_type = split /\t/, do { local $/ = undef; <$types_fh>; };
     close $types_fh;
+    my %data_type_map;
+    @data_type_map{ @column_names } = @data_type;
 
     # order data
     # iSortingCols: # of columns to sort by
     # sSortDir_#: asc/ desc
     # iSortCol_#: sort column number
+    my @sColumns = map {[split /\|/, $_]}
+        split /,/, ($params->{sColumns} || '');
     my $nbr_sort_cols = +(defined($params->{iSortingCols}) ? $params->{iSortingCols} : 1);
-    my $max_cols      = @column_names;
-    $nbr_sort_cols    = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
     my @sorts = grep {defined($_->[0]) && defined($_->[1])}
         map {[$params->{"iSortCol_${_}"}, $params->{"sSortDir_${_}"}]}
             (0..$nbr_sort_cols-1);
@@ -57,13 +59,18 @@ main: {
             my ($left, $right) = @_;
 
             my $retval;
+          MASTER_SORT:
             for my $sort (@sorts) {
                 my $idx = $sort->[0];
-                $retval = $data_type[$idx] eq 'text'    ? ($left->[$idx]  cmp $right->[$idx])
-                        : $data_type[$idx] eq 'numeric' ? ($left->[$idx]  <=> $right->[$idx])
-                        :                                 die 'Unknown data type: ' . $data_type[$idx];
-                $retval *= -1 if ($sort->[1] eq 'desc');
-                last if ($retval);
+                my $sort_fields = $sColumns[$idx];
+                for my $sort_field (@$sort_fields) {
+                    my $data_type = $data_type_map{$sort_field};
+                    $retval = $data_type eq 'text'    ? ($left->[$idx]  cmp $right->[$idx])
+                            : $data_type eq 'numeric' ? ($left->[$idx]  <=> $right->[$idx])
+                            :                           die 'Unknown data type: ' . $data_type;
+                    $retval *= -1 if ($sort->[1] eq 'desc');
+                    last MASTER_SORT if ($retval);
+                }
             }
             return $retval;
         };

@@ -1,8 +1,11 @@
 [% extra_js = BLOCK %]
+    <script src="/static/js/vendor/underscore-1.5.2.min.js"></script>
     <script src="/static/js/vendor/angular/angular.min.js"></script>
+    <script src="/static/js/vendor/angular/angular-route.min.js"></script>
     <script src="/static/js/vendor/angular/angular-resource.min.js"></script>
     <script src="/static/js/vendor/angular/angular-sanitize.min.js"></script>
-    <script src="/static/js/vendor/angular/ui-bootstrap-tpls-0.6.0.min.js"></script>
+    <script src="/static/js/vendor/angular/angular-contenteditable.min.js"></script>
+    <script src="/static/js/vendor/angular/ui-bootstrap-tpls-0.7.0.min.js"></script>
 
     <script src="/static/js/vendor/ckeditor/ckeditor.js"></script>
     <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
@@ -20,15 +23,8 @@
 %]
 
           <div ng-cloak ng-app="judoon">
-            [% IF welcome_message %]
-            [% welcome_spiel = BLOCK %]
-            <p>
-              <strong>Your dataset has been imported.</strong> Here is the view
-              we've created for you.  Click <strong>Edit</strong> above to make
-              changes, or <strong>Share</strong> to make the view public.
-            </p>
-            [% END %]
-            [%- INCLUDE 'components/notification.tt2' alert.success=welcome_spiel -%]
+            [% IF alert %]
+            [%- INCLUDE 'components/notification.tt2' -%]
             [% END %]
 
             <div ng-view></div>

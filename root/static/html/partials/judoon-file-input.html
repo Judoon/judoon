@@ -1,0 +1,6 @@
+<div style="display: inline-block;">
+  <input type="file" style="display:none;" onchange="angular.element(this).scope().setFile(this)">
+  <input type="text" class="input-large" disabled="disabled" ng-model="filePath">
+  <a class="fake-uploader btn">Browse</a>
+  <button type="submit" class="btn btn-primary"><i class="icon-upload"></i> Upload</button>
+</div>

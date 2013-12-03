@@ -52,6 +52,20 @@ sub decompose {
     return @nodes;
 }
 
+
+=head2 decompose_plaintext()
+
+This turns a C<Link> node's C<label> attribute into a list of C<Text>
+and C<Variable> nodes.
+
+=cut
+
+sub decompose_plaintext {
+    my ($self) = @_;
+    return $self->label->decompose_plaintext;
+}
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;

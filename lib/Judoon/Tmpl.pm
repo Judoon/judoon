@@ -107,6 +107,19 @@ sub get_variables {
 }
 
 
+=head3 get_display_variables
+
+Get a list of variable names used in text components of our template.
+
+=cut
+
+sub get_display_variables {
+    my ($self) = @_;
+    return map {$_->name} grep {$_->type eq 'variable'}
+        map {$_->decompose_plaintext} $self->get_nodes;
+}
+
+
 =head2 data_scrubber / _build_data_scrubber
 
 A C<L<Data::Visitor::Callback>> object responsible for scrubbing

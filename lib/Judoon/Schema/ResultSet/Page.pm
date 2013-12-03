@@ -66,4 +66,44 @@ sub for_user {
     );
 }
 
+
+=head2 with_owner
+
+Prefetch the owner.
+
+=cut
+
+sub with_owner {
+    my ($self) = @_;
+    return $self->prefetch({dataset => 'user'});
+}
+
+
+=head2 with_columns
+
+Prefetch the subordinate columns.
+
+=cut
+
+sub with_columns {
+    my ($self) = @_;
+    return $self->prefetch('page_columns');
+}
+
+
+=head2 owned_by( $username )
+
+Pages for a particular user.
+
+=cut
+
+sub owned_by {
+    my ($self, $username) = @_;
+    return $self->search(
+        {'user.username' => $username},
+        {join => {'dataset' => 'user'}},
+    );
+}
+
+
 1;

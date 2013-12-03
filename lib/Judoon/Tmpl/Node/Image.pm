@@ -46,6 +46,15 @@ sub decompose {
     return @nodes;
 }
 
+
+=head2 decompose_plaintext()
+
+There are no text components to an Image.
+
+=cut
+
+sub decompose_plaintext { () }
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -98,5 +98,59 @@ sub for_user {
 }
 
 
+=head2 get_our_owner
+
+This is a fragile and not-well-tested method that retrieves the owner
+from and C<ResultSet::Dataset> that could be empty and should have
+only one owner.
+
+=cut
+
+# this method is evil.
+sub get_our_owner {
+    my ($self)  = @_;
+    my $schema  = $self->result_source->schema;
+    my $user_id = ${ $self->get_column('user_id')->as_query }->[1][1];
+    return $schema->resultset('User')->find({id => $user_id});
+}
+
+
+=head2 with_owner
+
+Prefetch the owner.
+
+=cut
+
+sub with_owner {
+    my ($self) = @_;
+    return $self->prefetch('user');
+}
+
+
+=head2 with_columns
+
+Prefetch the subordinate columns.
+
+=cut
+
+sub with_columns {
+    my ($self) = @_;
+    return $self->prefetch('ds_columns');
+}
+
+
+=head2 owned_by( $username )
+
+Datasets for a particular user.
+
+=cut
+
+sub owned_by {
+    my ($self, $username) = @_;
+    return $self->search(
+        {'user.username' => $username},
+        {join => 'user'},
+    );
+}
 
 1;

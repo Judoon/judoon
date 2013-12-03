@@ -21,7 +21,6 @@ use namespace::autoclean;
 BEGIN {extends 'Judoon::Web::Controller'; }
 
 use Judoon::API::Machine;
-use Module::Load;
 use HTTP::Response;
 
 
@@ -36,7 +35,6 @@ with the given arguments (C<$machine_args>).
 
 sub wm {
     my ($self, $c, $machine_class, $machine_args) = @_;
-    load $machine_class;
     Judoon::API::Machine->new(
         resource      => $machine_class,
         resource_args => [ %{ $machine_args } ],
@@ -169,8 +167,9 @@ sub authd_user_datasets : Chained('authd_user_base') PathPart('datasets') Args(0
     my ($self, $c) = @_;
     return $self->wm(
         $c, 'Judoon::API::Resource::Datasets', {
-            set      => $c->stash->{authd_user}->datasets_rs,
-            writable => 0,
+            set        => $c->stash->{authd_user}->datasets_rs->ordered,
+            writable   => 0,
+            createable => 1,
         }
     );
 }

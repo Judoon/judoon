@@ -1,7 +1,7 @@
 <div>
 
   <ul class="breadcrumb">
-    <li><a ng-href="/user/{{userName}}#dataset{{datasetId}}" target="_self">Overview</a> <span class="divider">/</span></li>
+    <li><a ng-href="/user/{{user.username}}#dataset{{dataset.id}}" target="_self">Overview</a> <span class="divider">/</span></li>
     <li>Dataset: {{dataset.name}}</li>
   </ul>
 
@@ -9,9 +9,39 @@
 
 
   <tabset>
+ 
+    <!-- ******************** DATA ******************** -->
+    <tab heading="Data" active="activeTab.data" select="updateUrlFromTab()">
+
+      <div class="btn-toolbar" style="margin-bottom: 20px;">
+        <div class="btn-group dropdown">
+          <a class="btn btn-mini dropdown-toggle"
+             tooltip="Download data as an Excel file, csv, or tab-delimited file."
+             tooltip-append-to-body="1">
+            Download data as: <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a download="{{dataset.name}}.tsv"  target="_self" ng-href="{{dataset.url()}}.tsv">tab</a></li>
+            <li><a download="{{dataset.name}}.csv"  target="_self" ng-href="{{dataset.url()}}.csv">csv</a></li>
+            <li><a download="{{dataset.name}}.xls"  target="_self" ng-href="{{dataset.url()}}.xls">Excel 97</a></li>
+            <li><a download="{{dataset.name}}.xlsx" target="_self" ng-href="{{dataset.url()}}.xlsx">Excel 2007</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="outer-hscroll"><div class="inner-hscroll">
+
+          <judoon-data-table
+             jdt-col-defs="columnDefs"
+             jdt-data-url="dataUrl">
+          </judoon-data-table>
+
+      </div></div>
+    </tab>
+
 
     <!-- ******************** PROPERTIES ******************** -->
-    <tab heading="Properties">
+    <tab heading="Properties" active="activeTab.properties" select="updateUrlFromTab()">
 
       <form class="form-horizontal" ng-submit="saveDataset()">
         <fieldset>
@@ -48,23 +78,8 @@
     </tab>
 
 
-    <!-- ******************** DATA ******************** -->
-    <tab heading="Data">
-      <div class="outer-hscroll"><div class="inner-hscroll">
-
-          <judoon-data-table
-             jdt-dataset-id="datasetId"
-             jdt-columns="dataset.columns"
-             jdt-header-key="name"
-             jdt-fetch-fn="getServerData">
-          </judoon-data-table>
-
-      </div></div>
-    </tab>
-
-
     <!-- ******************** COLUMNS ******************** -->
-    <tab heading="Data Columns">
+    <tab heading="Column Properties" active="activeTab.columns" select="updateUrlFromTab()">
       <form ng-submit="saveColumns()">
 
         <div class="outer-hscroll"><div class="inner-hscroll">
@@ -81,7 +96,7 @@
                   <th class="header">Sample Data</th>
                   <td class="sample_data" ng-repeat="column in dataset.columns">
                     <ul class="unstyled">
-                      <li ng-repeat="sample in column.sample_data">{{sample}}</li>
+                      <li ng-repeat="sample in column.sample_data track by $index">{{sample}}</li>
                     </ul>
                   </td>
                 </tr>
@@ -106,19 +121,15 @@
 
 
     <!-- ******************** NEW COLUMNS ******************** -->
-    <tab heading="Add Data Column">
+    <tab heading="Add Data Column" active="activeTab.addColumn" select="updateUrlFromTab()">
       <div ng-include src="'/static/html/partials/dscolumn.html'"></div>
     </tab>
 
 
     <!-- ******************** VIEWS ******************** -->
-    <tab heading="Views">
+    <tab heading="Current Views" active="activeTab.view" select="updateUrlFromTab()">
 
-      <ul>
-        <li ng-repeat="page in dataset.pages">
-          <a href="/user/{{userName}}/page/{{page.id}}" ng-bind-html="page.title"></a>
-        </li>
-      </ul>
+      <div ng-include src="'/static/html/partials/dataset-pages.html'" onload="pages=dataset.pages"></div>
 
       <div class="row-fluid">
         <div class="add-panel span7">

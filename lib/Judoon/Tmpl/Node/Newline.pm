@@ -38,6 +38,18 @@ sub decompose {
 }
 
 
+=head2 decompose_plaintext()
+
+A Newline is a text component.
+
+=cut
+
+sub decompose_plaintext {
+    my ($self) = @_;
+    return $self->make_text_node("\n");
+}
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;

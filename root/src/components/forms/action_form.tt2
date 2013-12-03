@@ -1,4 +1,0 @@
-<form name="[%- form_name -%]" id="[%- form_name -%]" action="[%- url -%]" method="post" enctype="multipart/form-data" class="form-inline action-form">
-  <input type="hidden" name="x-tunneled-method" value="[% method %]" form="[%- form_name -%]">
-  <button type="submit" class="btn btn-mini [% extra_classes %]" form="[%- form_name -%]">[%- label -%]</button>
-</form>

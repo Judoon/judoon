@@ -1,1 +1,0 @@
-<li>[% UNLESS active %]Overview[% ELSE %]<a href="[% c.uri_for_action('/user/edit', [user.id]) %]">Overview</a> [% IF divider %] <span class="divider">/</span>[% END %][% END %]</li>

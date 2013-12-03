@@ -4,54 +4,174 @@
 
 'use strict';
 
-var judoonCtrl = angular.module('judoon.controllers', []);
+var judoonCtrl = angular.module('judoon.controllers', ['ngSanitize']);
+
+judoonCtrl.controller(
+    'UserCtrl',
+    ['$scope', '$location', '$modal', 'user', 'Alerts',
+     function ($scope, $location, $modal, user, Alerts) {
+
+         $scope.alerter = Alerts;
+         $scope.user    = user;
+
+         $scope.$on('UserDatasetCtrl::deleteThisDataset', function(event, dataset) {
+             $scope.user.deleteDataset(dataset).then(
+                 function() { Alerts.alertSuccess("Dataset '" + dataset.name + "' deleted!");     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
+
+         $scope.openHowTo = function() {
+            $modal.open({
+                templateUrl: 'whatnow.html',
+                controller: 'WhatNowCtrl'
+            });
+         };
+
+
+         // support hash-linking of tabs
+         var hashPrefix          = "dataset";
+         var ignoreNextUpdateUrl = 1;
+         var ignoreNextUpdateTab = 0;
+         $scope.$watch('user.datasetsLoaded', function() {
+             if (user.datasetsLoaded) {
+                 updateTabFromUrl();
+             }
+         });
+         $scope.$on('$routeUpdate', function() {
+             updateTabFromUrl();
+         });
+
+         function updateTabFromUrl() {
+             if (ignoreNextUpdateTab) {
+                 ignoreNextUpdateTab = 0;
+                 return;
+             }
+             var hashId = hashToId();
+             if (!hashId) {
+                 return;
+             }
+             angular.forEach($scope.user.datasets, function(value) {
+                 value.tabActive = value.id == hashId ? true : false;
+             });
+             ignoreNextUpdateUrl = 1;
+         }
+
+
+         $scope.updateUrlFromTab = function() {
+             if (ignoreNextUpdateUrl) {
+                 ignoreNextUpdateUrl = 0;
+                 return;
+             }
+             var selectedDs,
+                 hashId = hashToId();
+             angular.forEach($scope.user.datasets, function(value) {
+                 if (value.tabActive && hashId != value.id) {
+                     selectedDs = value;
+                 }
+             });
+             if (selectedDs) {
+                 idToHash( selectedDs.id );
+             }
+             ignoreNextUpdateTab = 1;
+         };
+
+         function hashToId()   { return $location.hash().replace(hashPrefix, ''); }
+         function idToHash(id) { $location.hash( hashPrefix + id ); }
+     }
+    ]
+);
+
+judoonCtrl.controller(
+    'WhatNowCtrl',
+    ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+        $scope.closeWhatNow = function() { $modalInstance.dismiss(); };
+    }]
+);
+
+
+judoonCtrl.controller(
+    'UserDatasetCtrl',
+    ['$scope', 'Alerts',
+     function ($scope, Alerts) {
+
+         $scope.newPage = {type: 'blank', title: 'New Page'};
+         $scope.createPage = function() {
+             $scope.dataset.createPage($scope.newPage).then(
+                 function() { Alerts.alertSuccess('New view added!');     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         };
+
+         $scope.deleteThisDataset = function() {
+             var confirmed = window.confirm("Are you sure you want to delete this dataset?");
+             if (confirmed) {
+                 $scope.$emit('UserDatasetCtrl::deleteThisDataset', $scope.dataset);
+             }
+         };
+
+         $scope.$on('UserPageCtrl::deleteThisPage', function(event, page) {
+             $scope.dataset.deletePage(page).then(
+                 function() { Alerts.alertSuccess("View '" + page.title + "' deleted!");     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
+     }
+    ]
+);
+
+judoonCtrl.controller(
+    'UserPageCtrl',
+    ['$scope', 'Alerts',
+     function ($scope, Alerts) {
+
+         if (!$scope.page.columns) {
+             $scope.page.getColumns();
+         }
+
+         $scope.isActionBlockCollapsed = true;
+         $scope.isInfoBlockCollapsed   = true;
+
+         $scope.deleteThisPage = function() {
+             var confirmed = window.confirm("Are you sure you want to delete this view?");
+             if (confirmed) {
+                 $scope.$emit('UserPageCtrl::deleteThisPage', $scope.page);
+             }
+         };
+     }
+    ]
+);
+
 
 judoonCtrl.controller(
     'DatasetCtrl',
-    ['$scope', '$routeParams', '$http', 'Dataset', 'DatasetColumn',
-     'Page', 'DatasetPage', 'DataType', 'User', 'Alerts',
-     function ($scope, $routeParams, $http, Dataset, DatasetColumn,
-               Page, DatasetPage, DataType, User, Alerts) {
-
+    ['$scope', '$location', 'user', 'dataset', 'DataType', 'Alerts',
+     function ($scope, $location, user, dataset, DataType, Alerts) {
 
          // *** Alerts ***
          $scope.alerter = Alerts;
 
          // *** Dataset ***
-         $scope.userName  = $routeParams.userName;
-         $scope.datasetId = $routeParams.datasetId;
-         Dataset.get({id: $scope.datasetId}, function (dataset) {
-             $scope.datasetOriginal = angular.copy(dataset);
-             $scope.dataset = dataset;
-
-             DatasetColumn.query({}, {dataset_id: $scope.datasetId}, function (columns) {
-                 $scope.dataset.columns = columns;
-                 $scope.dsColumnsLoaded = 1;
-                 $scope.dsColumnsOriginal = angular.copy(columns);
-             });
-
-             DatasetPage.query({}, {dataset_id: $scope.datasetId}, function (pages) {
-                 $scope.dataset.pages = pages;
-             });
+         $scope.user = user;
+         $scope.dataset = dataset;
+         $scope.datasetOriginal = angular.copy(dataset);
+         $scope.$watch('dataset.columnsLoaded', function() {
+             if (!$scope.dataset.columnsLoaded) {
+                 return;
+             }
+             $scope.dsColumnsOriginal = angular.copy($scope.dataset.columns);
          });
 
          $scope.permissions = [
-             {label: 'No', value: 'private'},
+             {label: 'No',  value: 'private'},
              {label: 'Yes', value: 'public'}
          ];
 
          $scope.saveDataset = function() {
-             Dataset.update(
-                 {}, {
-                     id:          $scope.datasetId,
-                     name:        $scope.dataset.name,
-                     description: $scope.dataset.description,
-                     permission:  $scope.dataset.permission
-                 },
-                 function() { Alerts.alertSuccess('Dataset updated!'); },
-                 function() { Alerts.alertError('Something went wrong!'); }
-             );
-             $scope.datasetOriginal = $scope.dataset;
+             $scope.dataset.update()
+                 .success( function() { Alerts.alertSuccess('Dataset updated!');    })
+                 .error(   function() { Alerts.alertError('Something went wrong!'); });
+             $scope.datasetOriginal = angular.copy($scope.dataset);
          };
 
          $scope.resetDataset = function() {
@@ -63,56 +183,110 @@ judoonCtrl.controller(
          $scope.saveColumns = function() {
              angular.forEach($scope.dataset.columns, function (value, key) {
                  if (!angular.equals($scope.dsColumnsOriginal[key], value)) {
-                     DatasetColumn.update({
-                         dataset_id:  value.dataset_id,
-                         id:          value.id,
-                         data_type:   value.data_type
-                     });
+                     value.update()
+                         .success( function() { Alerts.alertSuccess('Dataset column updated!'); })
+                         .error(   function() { Alerts.alertError('Something went wrong!');     });
                      $scope.dsColumnsOriginal[key] = angular.copy(value);
                  }
              } );
          };
 
+         $scope.$on('DatasetColumnCtrl::createColumn', function(event, newColumnSpec) {
+             $scope.dataset.createColumn(newColumnSpec).then(
+                 function() { Alerts.alertSuccess("Column '" + newColumnSpec.new_col_name + "' created!"); },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
+
+
 
          // *** Pages ***
-         User.getPages().success(function(pages) { $scope.allPages = pages; });
-
-         $scope.newPage = {type: 'blank', dataset_id: $scope.datasetId};
+         $scope.allPages = $scope.user.pages;
+         $scope.newPage = {type: 'blank', title: 'New Page'};
          $scope.createPage = function() {
-             User.newPage($scope.newPage, function(page) {
-                 $scope.dataset.pages.push(page);
+             $scope.dataset.createPage($scope.newPage)
+                 .success( function() { Alerts.alertSuccess('New page added!');    })
+                 .error(   function() { Alerts.alertError('Something went wrong!'); });
+         };
+
+         $scope.$on('UserPageCtrl::deleteThisPage', function(event, page) {
+             $scope.dataset.deletePage(page).then(
+                 function() { Alerts.alertSuccess("View '" + page.title + "' deleted!");     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
+
+         $scope.dataUrl = '/api/datasets/'+$scope.dataset.id+'/data';
+         $scope.$watch('dataset.columns', function() {
+             $scope.columnDefs = [];
+             angular.forEach($scope.dataset.columns, function(value) {
+                 $scope.columnDefs.push({
+                     sTitle : value.name,
+                     mData  : value.shortname,
+                     sName  : value.shortname,
+                     column : value
+                 });
              });
-         };
-
-
-         $scope.getServerData = function ( sSource, aoData, fnCallback ) {
-             $.ajax( {
-                 "dataType" : "json",
-                 "type"     : "GET",
-                 "url"      : sSource,
-                 "data"     : aoData,
-                 "success": [
-                     function(data) {
-                         var new_data = [];
-                         for (var i = 0; i < data.tmplData.length; i++) {
-                             new_data[i] = [];
-                             for (var j = 0; j < $scope.dataset.columns.length; j++) {
-                                 new_data[i][j] = data.tmplData[i][$scope.dataset.columns[j].shortname];
-                             }
-                         }
-                         data.aaData = new_data;
-                     },
-                     fnCallback
-                 ],
-             } );
-         };
+         }, true);
 
 
          // *** DataTypes ***
-         DataType.query({}, {}, function (data_types) {
-             $scope.data_types = data_types;
+         $scope.data_types = DataType.query();
+
+
+         // *** Tabs ***
+         $scope.activeTab = {
+             properties : 0,
+             data       : 0,
+             columns    : 0,
+             addColumn  : 0,
+             view       : 0
+         };
+
+         var hashPrefix          = "";
+         var ignoreNextUpdateUrl = 1;
+         var ignoreNextUpdateTab = 0;
+         updateTabFromUrl();
+         $scope.$on('$routeUpdate', function() {
+             updateTabFromUrl();
          });
 
+         function updateTabFromUrl() {
+             if (ignoreNextUpdateTab) {
+                 ignoreNextUpdateTab = 0;
+                 return;
+             }
+             var hashId = hashToId();
+             if (!hashId) {
+                 return;
+             }
+             angular.forEach($scope.activeTab, function(value, key) {
+                 $scope.activeTab[key] = key == hashId ? true : false;
+             });
+             ignoreNextUpdateUrl = 1;
+         }
+
+
+         $scope.updateUrlFromTab = function() {
+             if (ignoreNextUpdateUrl) {
+                 ignoreNextUpdateUrl = 0;
+                 return;
+             }
+             var selectedTab,
+                 hashId = hashToId();
+             angular.forEach($scope.activeTab, function(value, key) {
+                 if (value && hashId != key) {
+                     selectedTab = key;
+                 }
+             });
+             if (selectedTab) {
+                 idToHash( selectedTab );
+             }
+             ignoreNextUpdateTab = 1;
+         };
+
+         function hashToId()   { return $location.hash().replace(hashPrefix, ''); }
+         function idToHash(id) { $location.hash( hashPrefix + id ); }
      }
     ]
 );
@@ -121,8 +295,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'DatasetColumnCtrl',
-    ['$scope', '$routeParams', 'Dataset', 'DatasetColumn', 'Lookup', '$window', 'Alerts',
-     function ($scope, $routeParams, Dataset, DatasetColumn, Lookup, $window, Alerts) {
+    ['$scope', 'Lookup', 'Alerts',
+     function ($scope, Lookup, Alerts) {
 
          Lookup.query({}, function (lookups) {
              var self_idx;
@@ -151,7 +325,11 @@ judoonCtrl.controller(
              }
          });
 
-         $scope.$watch('currentLookup.inputColumnsCanon', function () { filterInputColumns(); }, true);
+         $scope.$watch(
+             'currentLookup.inputColumnsCanon',
+             function () { filterInputColumns(); },
+             true
+         );
 
          $scope.$watch('thatJoinColumn', function vivifyOutputs() {
              $scope.thatSelectColumn = null;
@@ -201,7 +379,7 @@ judoonCtrl.controller(
 
 
          $scope.submitNewColumn = function() {
-             var data = {
+             var newColumnSpec = {
                  dataset_id:        $scope.datasetId,
                  new_col_name:      $scope.newColumnName,
                  this_table_id:     $scope.datasetId,
@@ -210,17 +388,8 @@ judoonCtrl.controller(
                  that_joincol_id:   $scope.thatJoinColumn.id,
                  that_selectcol_id: $scope.thatSelectColumn.id
              };
-
-             DatasetColumn.save(
-                 {}, data,
-                 function() {
-                     Alerts.alertSuccess('Column added!');
-                     $window.location.reload();
-                 },
-                 function() { Alerts.alertError('Something went wrong!'); }
-             );
+             $scope.$emit('DatasetColumnCtrl::createColumn', newColumnSpec);
          };
-
      }
     ]
 );
@@ -229,62 +398,67 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', '$routeParams', '$http',
-     'Page', 'PageColumn', 'Dataset', 'DatasetColumn', 'Alerts',
-     function ($scope, $routeParams, $http, Page, PageColumn, Dataset,
-               DatasetColumn, Alerts) {
+    ['$scope', 'user', 'page', 'welcome', '$http', 'Dataset', 'Alerts',
+     function ($scope, user, page, welcome, $http, Dataset, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
          $scope.alerter = Alerts;
+         if (welcome) {
+             Alerts.alertSuccess(
+                 '<strong>Your dataset has been imported.</strong> ' +
+                 'Here is the view we\'ve created for you. ' +
+                 'Click <strong>Edit</strong> above to make changes.'
+             );
+         }
 
-         $scope.userName = $routeParams.userName;
-         $scope.pageId = $routeParams.pageId;
-         $scope.pageLoaded = 0;
-         Page.get({id: $scope.pageId}, function (page) {
+         $scope.user = user;
+         $scope.page = page;
+
+         $scope.$watch('page.columnsLoaded', function () {
+             if (!$scope.page.columnsLoaded) {
+                 return;
+             }
              $scope.pageOriginal = angular.copy(page);
-             $scope.page = page;
-             $scope.pageLoaded = 1;
-             Dataset.get({id: page.dataset_id}, function (ds) {
-                 $scope.dataset = ds;
-             });
+             $scope.pageColumnsOriginal = angular.copy(page.columns);
+         });
 
-             DatasetColumn.query({}, {dataset_id: page.dataset_id}, function (columns) {
-                 $scope.dataset.columns = columns;
-                 $scope.dsColumnsLoaded = 1;
-                 $scope.dsColumnsOriginal = angular.copy(columns);
+         $scope.$watch('page', function () {
+             if (!$scope.page.columnsLoaded) {
+                 return;
+             }
 
-                 $scope.ds_columns = {accessions: [], dict: {}};
-                 angular.forEach(columns, function(value, key) {
+             $scope.pageDirty = !angular.equals($scope.page, $scope.pageOriginal);
+         }, true);
+
+
+         Dataset.get(page.dataset_id).then( function (dataset) {
+             $scope.dataset = dataset;
+
+             $scope.ds_columns = {accessions: [], dict: {}};
+             $scope.$watch('dataset.columnsLoaded', function() {
+                 if (!$scope.dataset.columnsLoaded) {
+                     return;
+                 }
+
+                 angular.forEach($scope.dataset.columns, function(value, key) {
                      $scope.ds_columns.dict[value.shortname] = value;
                      if (value.data_type.match(/accession/i)) {
                          $scope.ds_columns.accessions.push(value);
                      }
                  });
-
-                 $scope.siteLinker = {};
-                 $http.get('/api/sitelinker/accession')
-                     .success(function(data) {
-                         angular.forEach(data, function(value) {
-                             $scope.siteLinker[value.name] = value;
-                         });
-                     });
              });
          });
 
-         $scope.$watch('page', function () {
-             $scope.pageDirty = !angular.equals($scope.page, $scope.pageOriginal);
-         }, true);
 
+         $scope.siteLinker = {};
+         $http.get('/api/sitelinker/accession')
+             .success(function(data) {
+                 angular.forEach(data, function(value) {
+                     $scope.siteLinker[value.name] = value;
+                 });
+             });
 
-         PageColumn.query({}, {page_id: $scope.pageId}, function (columns) {
-             $scope.pageColumnsOriginal = angular.copy(columns);
-             $scope.pageColumns = columns;
-             $scope.pageColumnsLoaded = 1;
-         });
-         $scope.$watch('pageColumns', function () {
-             $scope.pageDirty = !angular.equals($scope.pageColumns, $scope.pageColumnsOriginal);
-         }, true);
 
 
          // Methods
@@ -293,44 +467,31 @@ judoonCtrl.controller(
                  return;
              }
 
-             Page.update({
-                 id:         $scope.pageId,
-                 title:      $scope.page.title,
-                 preamble:   $scope.page.preamble,
-                 postamble:  $scope.page.postamble,
-                 dataset_id: $scope.page.dataset_id,
-                 permission: $scope.page.permission
-             });
-
-             angular.forEach($scope.pageColumns, function (value, key) {
-                 PageColumn.update({
-                     page_id:  value.page_id,
-                     id:       value.id,
-                     title:    value.title,
-                     widgets:  value.widgets,
-                     sort:     key+1
-                 });
-             } );
+             $scope.page.update()
+                 .success( function() {
+                     var sortVal = 1;
+                     angular.forEach($scope.page.columns, function (value, key) {
+                         value.update(sortVal++);
+                     });
+                     Alerts.alertSuccess('Page saved.');
+                 } );
 
              $scope.pageDirty = 0;
              $scope.pageOriginal = angular.copy($scope.page);
-             $scope.pageColumnsOriginal = angular.copy($scope.pageColumns);
+             $scope.pageColumnsOriginal = angular.copy($scope.page.columns);
 
-             Alerts.alertSuccess('Page saved.');
+
          };
 
          $scope.addColumn = function() {
-             var newColumn = {
-                 title: $scope.newColumnName,
-                 template: '',
-                 page_id: $scope.pageId
-             };
-
-             PageColumn.saveAndFetch(newColumn, function(fullCol) {
-                 $scope.pageColumns.push(fullCol);
-                 $scope.currentColumn = fullCol;
-                 Alerts.alertSuccess('New Column "' + fullCol.title + '" added!');
-             });
+             $scope.page.createColumn({title: $scope.newColumnName})
+                 .then(
+                     function(newColumn) {
+                         $scope.currentColumn = newColumn;
+                         Alerts.alertSuccess('New Column "' + newColumn.title + '" added!');
+                     },
+                     function() { Alerts.alertError('Failed to add new column'); }
+                 );
          };
 
          $scope.removeColumn = function() {
@@ -340,40 +501,27 @@ judoonCtrl.controller(
 
              var confirmed = window.confirm("Are you sure you want to delete this column?");
              if (confirmed) {
-                 PageColumn.delete(
-                     {}, {page_id: $scope.pageId, id: $scope.deleteColumn.id},
-                     function() {
-                         if (angular.equals($scope.currentColumn, $scope.deleteColumn)) {
-                             $scope.currentColumn = null;
-                         }
-
-                         angular.forEach($scope.pageColumns, function (value, key) {
-                             if ( angular.equals(value, $scope.deleteColumn) ) {
-                                 $scope.pageColumns.splice(key, 1);
-                             }
-                         } );
-                     }
-                 );
+                 $scope.page.deleteColumn($scope.deleteColumn);
              }
 
              return;
          };
 
          $scope.firstColumn = function() {
-             return $scope.pageColumns && angular.equals($scope.currentColumn, $scope.pageColumns[0]);
+             return $scope.page.columns && angular.equals($scope.currentColumn, $scope.page.columns[0]);
          };
 
          $scope.lastColumn = function() {
-             return $scope.pageColumns && angular.equals(
+             return $scope.page.columns && angular.equals(
                  $scope.currentColumn,
-                 $scope.pageColumns[ $scope.pageColumns.length - 1 ]
+                 $scope.page.columns[ $scope.page.columns.length - 1 ]
              );
          };
 
          $scope.currentIdx = function() {
              var idx;
-             for (idx=0; idx<$scope.pageColumns.length; idx++) {
-                 if (angular.equals($scope.currentColumn, $scope.pageColumns[idx])) {
+             for (idx=0; idx<$scope.page.columns.length; idx++) {
+                 if (angular.equals($scope.currentColumn, $scope.page.columns[idx])) {
                      break;
                  }
              }
@@ -386,8 +534,8 @@ judoonCtrl.controller(
              }
 
              var currentIdx = $scope.currentIdx();
-             $scope.pageColumns[currentIdx] = $scope.pageColumns.splice(
-                 currentIdx-1, 1, $scope.pageColumns[currentIdx]
+             $scope.page.columns[currentIdx] = $scope.page.columns.splice(
+                 currentIdx-1, 1, $scope.page.columns[currentIdx]
              )[0];
          };
 
@@ -397,8 +545,8 @@ judoonCtrl.controller(
              }
 
              var currentIdx = $scope.currentIdx();
-             $scope.pageColumns[currentIdx] = $scope.pageColumns.splice(
-                 currentIdx+1, 1, $scope.pageColumns[currentIdx]
+             $scope.page.columns[currentIdx] = $scope.page.columns.splice(
+                 currentIdx+1, 1, $scope.page.columns[currentIdx]
              )[0];
          };
 
@@ -411,8 +559,14 @@ judoonCtrl.controller(
              };
          }
 
-         $scope.columnIsActive = function(column) { return $scope.editmode && angular.equals(column, $scope.currentColumn); };
-         $scope.columnIsDelete = function(column) { return $scope.editmode && angular.equals(column, $scope.deleteColumn);  };
+         $scope.columnIsActive = function(column) {
+             return $scope.editmode &&
+                 angular.equals(column, $scope.currentColumn);
+         };
+         $scope.columnIsDelete = function(column) {
+             return $scope.editmode &&
+                 angular.equals(column, $scope.deleteColumn);
+         };
 
          $scope.$watch('currentColumn.widgets', function() {
              if (!$scope.currentColumn) {
@@ -428,34 +582,43 @@ judoonCtrl.controller(
          }, true);
 
 
-
-
-         $scope.getServerData = function ( sSource, aoData, fnCallback ) {
-             $.ajax( {
-                 "dataType": "json",
-                 "type": "GET",
-                 "url": sSource,
-                 "data": aoData,
-                 "success": [
-                     function(data) {
-                         var templates = [];
-                         angular.forEach($scope.pageColumns, function (value, key) {
-                             templates.push( Handlebars.compile(value.template) );
-                         } );
-
-                         var new_data = [];
-                         for (var i = 0; i < data.tmplData.length; i++) {
-                             new_data[i] = [];
-                             for (var j = 0; j < templates.length; j++) {
-                                 new_data[i][j] = templates[j](data.tmplData[i]);
-                             }
-                         }
-                         data.aaData = new_data;
-                     },
-                     fnCallback
-                 ]
-             } );
+         $scope.curriedRenderTmpl = function(idx) {
+             var renderTmpl = function(dataSource, callType) {
+                 return $scope.compiledTmpls[idx](dataSource);
+             };
+             return renderTmpl;
          };
+
+         $scope.getSortColumn = function(widgets) {
+             var sortVal = [];
+             angular.forEach(widgets, function(widget) {
+                 if (widget.type === 'variable') {
+                     sortVal.push(widget.name);
+                 }
+                 else if (widget.type === 'link') {
+                     if (widget.url.variable_segments[0]) {
+                         sortVal.push(widget.label.variable_segments[0]);
+                     }
+                 }
+             });
+             return sortVal.join('|');
+         };
+
+         $scope.dataUrl = '/api/datasets/'+$scope.page.dataset_id+'/data';
+         $scope.$watch('page.columns', function() {
+             $scope.compiledTmpls = [];
+             $scope.columnDefs    = [];
+             angular.forEach($scope.page.columns, function(value, key) {
+                 $scope.compiledTmpls.push( Handlebars.compile(value.template) );
+                 $scope.columnDefs.push({
+                     sTitle : value.title,
+                     sName  : $scope.getSortColumn(value.widgets),
+                     mData  : $scope.curriedRenderTmpl(key),
+                     column : value
+                 });
+             });
+         }, true);
+
 
      }]);
 
@@ -647,7 +810,7 @@ judoonCtrl.controller(
          else if ($scope.url.active.fromdata) {
              $scope.url.fromdata.prefix   = currentLink.url.text_segments[0];
              $scope.url.fromdata.variable = currentLink.url.variable_segments[0];
-             $scope.url.fromdata.suffix   = currentLink.url.text_segments[1];
+             $scope.url.fromdata.suffix   = currentLink.url.text_segments[1] || '';
          }
          else {
              $scope.url.fixed = currentLink.url.text_segments[0];
@@ -665,7 +828,7 @@ judoonCtrl.controller(
          else {
              $scope.label.fromdata.prefix   = currentLink.label.text_segments[0];
              $scope.label.fromdata.variable = currentLink.label.variable_segments[0];
-             $scope.label.fromdata.suffix   = currentLink.label.text_segments[1];
+             $scope.label.fromdata.suffix   = currentLink.label.text_segments[1] || '';
          }
 
          function getLabelDefault() {
@@ -728,11 +891,21 @@ judoonCtrl.controller(
          }, true);
 
 
-         function getSampleData(colname) { return columns.dict[colname].sample_data[0]; }
-         function getDataType(colname)   { return columns.dict[colname].data_type; }
+         function getSampleData(colname) {
+             if (!colname) {
+                 return '';
+             }
+             return columns.dict[colname].sample_data[0];
+         }
+         function getDataType(colname)   {
+             return columns.dict[colname].data_type;
+         }
 
 
          function getLinkableSites() {
+             if (!$scope.url.accession.source) {
+                 return [];
+             }
              return siteLinker[getDataType($scope.url.accession.source)].sites;
          }
          function getCurrentSite() {

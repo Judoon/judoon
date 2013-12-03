@@ -54,6 +54,7 @@ sub data  : Chained('/api/wm/ds_data') PathPart('') Args(0) {
     my $params       = $c->req->params();
     my @ds_cols      = $dataset->ds_columns_ordered->hri->all;
     my @fields       = map {$_->{shortname}} @ds_cols;
+    my %ds_col_map   = map {$_->{shortname} => $_} @ds_cols;
     my $total        = $dataset->nbr_rows;
 
     # filter data
@@ -67,26 +68,25 @@ sub data  : Chained('/api/wm/ds_data') PathPart('') Args(0) {
     #   iSortingCols: # of columns to sort by
     #   sSortDir_#: asc/ desc
     #   iSortCol_#: sort column number
+    my @sColumns = map {[split /\|/, $_]}
+        split /,/, ($params->{sColumns} // '');
     my @order_by;
     my $nbr_sort_cols = +($params->{iSortingCols} // 1);
-    my $max_cols      = @fields;
-    $nbr_sort_cols    = $nbr_sort_cols > $max_cols ? $max_cols : $nbr_sort_cols;
     for my $i (0..$nbr_sort_cols-1) {
         my $colnum    = $params->{"iSortCol_$i"} // 0;
-        die "iSortCol_${i} must be a number between 0 and " . scalar(@fields)
-            if ($colnum !~ m/^\d+$/ || $colnum < 0 || $colnum > @fields);
-
         my $dir_param = $params->{"sSortDir_$i"};
         my $direction = defined($dir_param) && $dir_param eq 'desc' ? 'desc'
                       :                                               'asc';
 
-        my $field     = $fields[$colnum];
-        my $data_type = $ds_cols[$colnum]->{data_type};
-        my $type_obj  = $c->model('TypeRegistry')->simple_lookup($data_type);
-        my $pg_type   = $type_obj->pg_type;
-        my $sort_by   = $pg_type eq 'text' ? $field
-                      :                      \"CAST($field AS $pg_type)";
-        push @order_by, {"-$direction" => $sort_by};
+        my $sort_fields = $sColumns[$colnum];
+        for my $field (@$sort_fields) {
+            my $data_type = $ds_col_map{$field}->{data_type};
+            my $type_obj  = $c->model('TypeRegistry')->simple_lookup($data_type);
+            my $pg_type   = $type_obj->pg_type;
+            my $sort_by   = $pg_type eq 'text' ? $field
+                          :                      \"CAST($field AS $pg_type)";
+            push @order_by, {"-$direction" => $sort_by};
+        }
     }
 
     # build and execute query
@@ -119,6 +119,7 @@ sub data  : Chained('/api/wm/ds_data') PathPart('') Args(0) {
         tmplData             => \@tmpl_data,
         iTotalRecords        => $total,
         iTotalDisplayRecords => $filtered,
+        sEcho                => 0+$params->{sEcho},
     };
 }
 

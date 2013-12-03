@@ -37,12 +37,14 @@ installation as easy as possible for non-technical users.
 use Archive::Builder;
 use File::Temp qw(tempfile);
 use Judoon::Error::Devel::Foreign;
+use Judoon::Table;
 use Judoon::TypeRegistry;
 use Path::Class qw(dir);
 use Template;
 
 use Moo;
 use namespace::clean;
+with 'Judoon::Role::JsonEncoder';
 
 
 =head1 ATTRIBUTES
@@ -161,9 +163,16 @@ sub _build_archive {
     $archive_section->remove_file('js/plugins.js');
 
     # add index
+    my $column_json = $self->encode_json([
+        map {{
+            title       => $_->title,
+            template    => $_->template->to_jstmpl,
+            sort_fields => join("|", $_->template->get_display_variables),
+        }} $self->page->page_columns_ordered->all
+    ]);
     $archive_section->new_file(
         'index.html', 'template', $self->tt, $self->index_tmpl->stringify,
-        {page => $self->page},
+        {page => $self->page, column_json => $column_json},
     ) or Judoon::Error::Devel::Foreign->throw({
         message         => "Can't fill in index Template via Archive",
         module          => 'Template or Archive::Builder',
@@ -172,9 +181,10 @@ sub _build_archive {
 
     # add database
     my $dataset = $self->page->dataset;
-    $archive_section->new_file(
-        $self->standalone_db, 'string', $dataset->as_raw({shortname => 1})
-    );
+    my $raw_data = Judoon::Table->new({
+        data_source => $dataset, header_type => 'short', format => 'tsv',
+    })->render;
+    $archive_section->new_file($self->standalone_db, 'string', $raw_data);
 
     # add datatypes
     $archive_section->new_file(

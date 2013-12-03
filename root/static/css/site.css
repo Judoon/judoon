@@ -61,8 +61,24 @@ body {}
 .form-inline h4.help-inline { margin-top: 0; margin-right: 5px; }
 
 
+/* ========== Page / Dataset previews ========== */
 
-/* ========== PageColumn edit ========= */
+#description, #preamble {
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border-bottom: thin lightgray solid;
+}
+
+#postamble {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    border-top: thin lightgray solid;
+}
 
 #column_canvas { min-height: 8em; }
 
@@ -83,36 +99,6 @@ body {}
 
 .widget-formatting-bold { font-weight: bold; }
 .widget-formatting-italic { font-style: italic; }
-
-.column_container { display: inline-block; border: thin black solid; text-align: center; padding: 4px; }
-.column_container div input { display: block; }
-
-#widget_library { display: none; }
-#modal_title { display: none; }
-
-#link_widget_url_source select.link_site { display: none;  }
-#link_widget_url_source select.link_site.link_site_active  { display: block; }
-
-
-
-/* ========== Page / Dataset previews ========== */
-
-#description, #preamble {
-    padding-left: 1em;
-    padding-right: 1em;
-    margin-top: 2em;
-    margin-bottom: 2em;
-    border-bottom: thin lightgray solid;
-}
-
-#postamble {
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 1em;
-    margin-top: 2em;
-    margin-bottom: 2em;
-    border-top: thin lightgray solid;
-}
 
 
 

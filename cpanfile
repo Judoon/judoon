@@ -7,7 +7,6 @@ requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Action::REST';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
 requires 'Catalyst::Devel';
-requires 'Catalyst::Controller::DBIC::API';
 requires 'Catalyst::Model::Adaptor';
 requires 'Catalyst::Model::DBIC::Schema';
 requires 'Catalyst::Plugin::Authentication';
@@ -62,14 +61,14 @@ requires 'Getopt::Long';
 requires 'HTML::Scrubber';
 requires 'HTML::Selector::XPath::Simple';
 requires 'HTML::TreeBuilder';
+requires 'HTTP::Headers::ActionPack';
 requires 'HTTP::Throwable';
 requires 'IO::All';
 requires 'IO::File';
 requires 'JSON::MaybeXS';
 requires 'List::AllUtils';
 requires 'MIME::Base64';
-requires 'Module::Load';
-requires 'Module::Pluggable';
+requires 'MIME::Types';
 requires 'Module::Versions';
 requires 'Moo' => '1.001000';
 requires 'MooX::Types::MooseLike';
@@ -88,11 +87,13 @@ requires 'Params::Validate';
 requires 'Path::Class';
 requires 'Plack::Middleware::Debug';
 requires 'Plack::Middleware::Debug::DBIC::QueryLog';
+requires 'Plack::Middleware::SetAccept';
 requires 'Pod::Usage';
 requires 'Regexp::Common';
 requires 'Safe::Isa';
 requires 'Scalar::Util';
 requires 'Spreadsheet::ParseExcel';
+requires 'Spreadsheet::ParseXLSX';
 requires 'Spreadsheet::WriteExcel';
 requires 'Sub::Name';
 requires 'Template';
@@ -103,13 +104,7 @@ requires 'Try::Tiny';
 requires 'Type::Registry';
 requires 'Type::Tiny';
 requires 'URI';
-requires 'Web::Machine';
-
-
-# Excel::Reader::XLSX deps
-requires 'Archive::Zip';
-requires 'OLE::Storage_Lite';
-requires 'XML::LibXML';
+requires 'Web::Machine' => '0.13';
 
 
 # deployment deps
@@ -125,6 +120,7 @@ test_requires 'CGI::Compile';
 test_requires 'CGI::Emulate::PSGI';
 test_requires 'HTML::Selector::XPath::Simple';
 test_requires 'HTTP::Request::Common';
+test_requires 'Module::Pluggable';
 test_requires 'Plack';
 test_requires 'Pod::Coverage';
 test_requires 'Pod::Coverage::TrustPod';

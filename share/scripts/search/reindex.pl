@@ -92,7 +92,7 @@ main: {
                 description => $dataset->description,
                 content     => $dataset->description,
                 url         => Judoon::Web->uri_for_action(
-                    '/private/dataset/object',
+                    '/dataset/view',
                     [$dataset->user->username, $dataset->id]
                 ),
 
@@ -100,7 +100,7 @@ main: {
 
                 owner       => $user_map{$dataset->user->username},
                 data        => join("\n", map { join("\t", map {$_ // q()} @$_) } @{$dataset->data}),
-                headers     => join("\t", $dataset->long_headers),
+                headers     => join("\t", @{$dataset->long_headers}),
                 nbr_rows    => $dataset->nbr_rows,
                 nbr_columns => $dataset->nbr_columns,
                 created     => $dataset->created,
@@ -125,16 +125,15 @@ main: {
                         ($page->preamble, $page->postamble)
                 ),
                 url         => Judoon::Web->uri_for_action(
-                    '/private/page/object',
-                    [$page->dataset->user->username,
-                     $page->dataset->id, $page->id,]
+                    '/page/view',
+                    [$page->dataset->user->username, $page->id,]
                 ),
 
                 private     => $page->is_private,
 
                 owner       => $user_map{$page->dataset->user->username},
                 data        => join("\n", map { join("\t", map {$_ // q()} @$_) } @{$page->data_table}),
-                headers     => join("\t", map {$_ // q()} @{$page->headers}),
+                headers     => join("\t", map {$_ // q()} @{$page->long_headers}),
                 nbr_rows    => $page->nbr_rows,
                 nbr_columns => $page->nbr_columns,
                 created     => $page->created,

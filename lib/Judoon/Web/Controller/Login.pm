@@ -62,7 +62,7 @@ their overview.
 sub login :Chained('not_required') :PathPart('login') :Args(0) ActionClass('REST') {
     my ($self, $c) = @_;
     if ($c->user) {
-        $self->go_here($c, '/user/edit', [$c->user->username]);
+        $self->go_here($c, '/jsapp/user_view', [$c->user->username]);
         $c->detach;
     }
     $c->stash->{template} = 'login/login.tt2';
@@ -146,7 +146,7 @@ sub redirect_after_login_uri {
     my ($self, $c) = @_;
     return $c->session->{redirect_to_after_login}
         ? delete $c->session->{redirect_to_after_login}
-        : $c->uri_for_action('/user/edit', [$c->user->username]);
+        : $c->uri_for_action('/jsapp/user_view', [$c->user->username]);
 }
 
 

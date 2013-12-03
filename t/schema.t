@@ -5,6 +5,7 @@ use utf8;
 use Data::Printer;
 use DateTime;
 use Judoon::Spreadsheet;
+use Judoon::Table;
 use Judoon::Tmpl;
 use Judoon::Types::Core qw(CoreType_Text);
 use Spreadsheet::ParseExcel;
@@ -144,13 +145,24 @@ test 'Result::Dataset' => sub {
 
     is_deeply $mutable_ds->data, $xls_ds_data,
         'Data is as expected';
-    is_deeply $mutable_ds->data_table, [["Name", "Age", "Gender"], @$xls_ds_data],
+
+    my $raw_data = Judoon::Table->new({
+        data_source => $mutable_ds, header_type => 'long', format => 'tsv',
+    })->table;
+    is_deeply $raw_data, [["Name", "Age", "Gender"], @$xls_ds_data],
         'Data table is as expected';
-    is $mutable_ds->as_raw, "Name\tAge\tGender\nVa Bene\t14\tfemale\nChloe\t2\tfemale\nGrover\t8\tmale\nChewie\t5\tmale\nGoochie\t1\tfemale\n", 'Got as Raw';
+
+    my $tsv_data = Judoon::Table->new({
+        data_source => $mutable_ds, header_type => 'long', format => 'tsv',
+    })->render;
+    is $tsv_data, "Name\tAge\tGender\nVa Bene\t14\tfemale\nChloe\t2\tfemale\nGrover\t8\tmale\nChewie\t5\tmale\nGoochie\t1\tfemale\n", 'Got as Raw';
     is_deeply $mutable_ds->id_data, [map {[$_]} 1..5],
         'Id data is as expected';
 
-    ok my $excel = $mutable_ds->as_excel, 'can get excel object';
+
+    my $excel = Judoon::Table->new({
+        data_source => $mutable_ds, header_type => 'long', format => 'xls',
+    })->render;
     open my $XLS, '<', \$excel;
     my $generated_xls;
     ok !exception {

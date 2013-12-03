@@ -60,5 +60,15 @@ only of C<Text> and C<Variable> nodes.
 requires 'decompose';
 
 
+=head2 C<decompose_plaintext>
+
+This method returns a the plaintext (i.e. non-HTML) components of a
+node. By default, just return the result of C<decompose>.  More
+elaborate Nodes an override this.
+
+=cut
+
+sub decompose_plaintext { shift->decompose }
+
 1;
 __END__

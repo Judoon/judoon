@@ -1,9 +1,0 @@
-          <a class="btn btn-mini dropdown-toggle [% extra_classes %]" data-toggle="dropdown" href="#">
-            [% label %]
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            [% FOREACH link_pair IN dropdown_links %]
-            <li><a href="[% link_pair.url %]">[% link_pair.label %]</a></li>
-            [% END %]
-          </ul>

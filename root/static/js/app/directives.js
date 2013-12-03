@@ -13,79 +13,78 @@ var judoonDir = angular.module('judoon.directives', []);
 **/
 
 judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
-    var dataTableTemplate = '<table class="table table-striped table-condensed table-bordered">' +
-        '<thead><tr>' +
-        '<th ng-class="{highlight: highlightActive({column: column}), \'highlight-danger\': highlightDelete({column: column})}"' +
-           ' ng-repeat="column in columns">{{ column[headerKey] }}</th>' +
-        '</tr></thead>' +
-        '<tbody></tbody>' +
-        '</table>';
-
-
     return {
-        restrict: 'E',
-        replace: true,
-        template: dataTableTemplate,
-        scope: {
-            datasetId       : '=jdtDatasetId',
-            columns         : '=jdtColumns',
-            headerKey       : '@jdtHeaderKey',
-            dataFetchFn     : '=jdtFetchFn',
-            highlightActive : '&highlightActive',
-            highlightDelete : '&highlightDelete'
+        restrict    : 'E',
+        replace     : true,
+        templateUrl : '/static/html/partials/judoon-data-table.html',
+        transclude  : false,
+        scope       : {
+            colDefs   : '=jdtColDefs',
+            dataUrl   : '=jdtDataUrl',
+            editCol   : '=jdtEditCol',
+            deleteCol : '=jdtDeleteCol'
         },
         link: function(scope, element, attrs) {
 
-            var dataTable;
-            var defaultOptions = {
+            var dt, defaultOptions = {
                 "bAutoWidth"      : false,
                 "bServerSide"     : true,
                 "bProcessing"     : true,
                 "sPaginationType" : "bootstrap",
                 "bDeferRender"    : true,
-                "fnServerData"    : scope.dataFetchFn
+                "sAjaxSource"     : scope.dataUrl,
+                "sAjaxDataProp"   : "tmplData"
             };
 
-            function rebuildTable() {
-                if (dataTable) {
-                    dataTable.fnDestroy();
+            function rebuildTable(nbrColumnsChanged) {
+                if (dt) {
+                    dt.fnDestroy();
+                    if (nbrColumnsChanged) {
+                        dt.find('tr').remove();
+                    }
                 }
 
                 var tableOptions = angular.copy(defaultOptions);
-                tableOptions.aoColumns = [];
-                angular.forEach(scope.columns, function (value, key) {
-                    tableOptions.aoColumns[key] = value[scope.headerKey];
-                } );
-
-                dataTable = element.dataTable(tableOptions);
+                tableOptions.aoColumns = scope.colDefs;
+                dt = element.dataTable(tableOptions);
+                if (nbrColumnsChanged) {
+                    updateHighlights(scope.editCol, 'active_col');
+                    updateHighlights(scope.deleteCol, 'danger_col');
+                }
             }
 
-            // datasetId may not be available at link time
-            var unbindDsIdWatch = scope.$watch('datasetId', function() {
-                if (!scope.datasetId) {
-                    return;
+
+            function updateHighlights(column, highlightClass) {
+                element.find('th').removeClass(highlightClass);
+                if (column) {
+                    var idx;
+                    angular.forEach(scope.colDefs, function(value, key) {
+                        if (value.column.id === column.id) {
+                            idx = key;
+                        }
+                    });
+                    angular.element(element.find('th')[idx]).addClass(highlightClass);
                 }
+            }
 
-                // this won't change over life of the directive
-                defaultOptions.sAjaxSource = "/api/datasets/" + scope.datasetId +
-                    '/data';
-
-                // just in case this fired after the columns watch
-                if (scope.columns && scope.columns.length) {
-                    $timeout(function() { rebuildTable(); }, 0, false);
-                }
-
-                unbindDsIdWatch();
+            scope.$watch('editCol', function() {
+                updateHighlights(scope.editCol, 'active_col');
             });
 
+            scope.$watch('deleteCol', function() {
+                updateHighlights(scope.deleteCol, 'danger_col');
+            });
+
+
             // columns may not be available at link time
-            scope.$watch('columns', function() {
-                if (!scope.datasetId || !scope.columns || !scope.columns.length) {
+            scope.$watch('colDefs', function(oldval, newval) {
+                if (!scope.colDefs || !scope.colDefs.length) {
                     return; // too soon.
                 }
-
-                // run rebuild table after digest
-                $timeout(function() { rebuildTable(); }, 0, false);
+                var nbrColumnsChanged = oldval.length !== newval.length;
+                $timeout(
+                    function() {rebuildTable(nbrColumnsChanged);}, 0, false
+                );
             }, true);
         }
     };
@@ -125,7 +124,6 @@ judoonDir.directive('judoonCkeditor', [function() {
             scope.$watch('editmode', function() {
                 var ck;
                 if (scope.editmode == 1) {
-                    elm.attr('contenteditable', 'true');
                     ck = CKEDITOR.inline(elm[0], ckConfig);
                     elm.data('editor', ck);
                 }
@@ -134,7 +132,6 @@ judoonDir.directive('judoonCkeditor', [function() {
                     if (ck) {
                         ck.destroy();
                     }
-                    elm.attr('contenteditable', 'false');
                 }
             });
 
@@ -143,32 +140,29 @@ judoonDir.directive('judoonCkeditor', [function() {
 }]);
 
 
-judoonDir.directive('contenteditable', [function() {
-    return {
-        restrict: 'A', // only activate on element attribute
-        require: '?ngModel', // get a hold of NgModelController
-        link: function(scope, element, attrs, ngModel) {
-            if(!ngModel) return; // do nothing if no ng-model
-
-            // Specify how UI should be updated
-            ngModel.$render = function() {
-                element.html(ngModel.$viewValue || '');
-            };
-
-            // Listen for change events to enable binding
-            element.bind('blur keyup change', function() {
-                scope.$apply(read);
-            });
-            read(); // initialize
-
-            // Write data to the model
-            function read() {
-                ngModel.$setViewValue(element.html());
-            }
-        }
-    };
-}]);
-
+judoonDir.directive(
+    'judoonFileInput',
+    ['$timeout', function($timeout) {
+        return {
+            restrict    : 'E',
+            replace     : true,
+            templateUrl : '/static/html/partials/judoon-file-input.html',
+            scope       : { inputName : '@' },
+            link        : function(scope, elem, attrs) {
+                elem.find('input[type="file"]').attr('name', attrs.inputName);
+                elem.find('.fake-uploader').click(function() {
+                    elem.find('input[type="file"]').click();
+                });
+            },
+            controller: ['$scope', function ($scope) {
+                $scope.setFile = function (elem) {
+                    $scope.filePath = elem.files[0].name;
+                    $scope.$apply();
+                };
+            }]
+        };
+    }]
+);
 
 judoonDir.directive(
     'judoonWidgetFactory',
