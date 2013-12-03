@@ -71,6 +71,8 @@ sub query_result {
     $args ||= {};
 
     my %params = (
+        sEcho          => 1,
+        sColumns       => 'name,age,gender',
         sSearch        => $args->{search} || q{},
         iDisplayLength => $args->{count}  || 10,
         iDisplayStart  => $args->{start}  || 0,
