@@ -28,6 +28,7 @@ sub call {
         my $new_loc   = $env->{HTTP_REFERER} . "/page/$page_id";
         my $host      = $env->{HTTP_HOST};
         $new_loc      =~ s{^http.?://$host}{};
+        $new_loc      .= '?welcome=1';
         $h->set('Location', $new_loc);
         $res->[0] = 302;
 

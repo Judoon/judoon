@@ -12,7 +12,7 @@
     <li ng-class="{active:  editmode}"><a ng-click="editmode = 1" id="edit_mode" href="#">Edit</a></li>
   </ul>
 
-  <alert ng-repeat="alert in alerter.alerts" type="alert.type" close="alerter.closeAlert($index)">{{alert.msg}}</alert>
+  <alert ng-repeat="alert in alerter.alerts" type="alert.type" close="alerter.closeAlert($index)"><span ng-bind-html="alert.msg"></span></alert>
 
   <p ng-show="!editmode" class="muted">This view is <strong>{{page.permission}}</strong>.</p>
   <div id="page_actions" ng-show="editmode">
@@ -191,8 +191,5 @@
     <div class="editable_label">Postamble:</div>
     <div judoon-ckeditor ck-edit-type="block" ng-model="page.postamble" contenteditable="true" strip-br="true" id="page_postamble" class="edit_outline editable block_editable"></div>
   </div>
-
-
-
 
 </div>

@@ -52,6 +52,9 @@ judoonApp.config(
                      page: ['$route', 'Pages', function($route, Pages) {
                          var pageId = $route.current.params.pageId;
                          return Pages.get(pageId);
+                     }],
+                     welcome: ['$route', function($route) {
+                         return !!$route.current.params.welcome;
                      }]
                  }
              })

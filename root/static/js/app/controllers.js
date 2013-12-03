@@ -398,12 +398,19 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', 'user', 'page', '$http', 'Dataset', 'Alerts',
-     function ($scope, user, page, $http, Dataset, Alerts) {
+    ['$scope', 'user', 'page', 'welcome', '$http', 'Dataset', 'Alerts',
+     function ($scope, user, page, welcome, $http, Dataset, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
          $scope.alerter = Alerts;
+         if (welcome) {
+             Alerts.alertSuccess(
+                 '<strong>Your dataset has been imported.</strong> ' +
+                 'Here is the view we\'ve created for you. ' +
+                 'Click <strong>Edit</strong> above to make changes.'
+             );
+         }
 
          $scope.user = user;
          $scope.page = page;
