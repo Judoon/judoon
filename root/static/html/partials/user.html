@@ -1,8 +1,5 @@
 <div>
 
-  <style type="text/css">
-  </style>
-
   <ul class="breadcrumb">
     <li>Overview</li>
   </ul>
@@ -36,119 +33,120 @@
     </div>
   </div>
 
-
+  <!-- "What Now?" modal -->
   <script type="text/ng-template" id="whatnow.html">
-  <div>
-    <div class="modal-header">
-      <h3>How this works.</h3>
+    <div>
+      <div class="modal-header">
+        <h3>How this works.</h3>
+      </div>
+      <div class="modal-body">
+        <p>New to Judoon?  Here are the steps to get started:</p>
+        <ol>
+          <li>
+            <h5>Upload a spreadsheet</h5>
+            <p>
+              In the box labeled &quot;<strong>Add dataset</strong>&quot;
+              click the <span class="text-info">Browse</span> button, select
+              an Excel file for upload, then click <span class="text-info">Upload</span>.
+            </p>
+            <p>
+              If all goes well, a new dataset named after your worksheet
+              will appear in the list titled <strong>Datasets</strong>.
+              You will also see a new entry in the <strong>Views</strong>
+              list.  When you upload a spreadsheet, we automatically build
+              a view that looks exactly like it.  If you're happy with the
+              formatting, then you're done!.
+            </p>
+          </li>
+
+          <li>
+            <h5>Annotate your dataset</h5>
+            <p>
+              When you annotate your dataset, that tells us what kind of
+              data is in each column of your spreadsheet.  It is not
+              necessary to do this, but can help us to provide more
+              intelligent sorting or even preconstructed links to external
+              databases.  Click on the <span class="text-info">Annotate
+                dataset</span> button to do this.
+            </p>
+          </li>
+
+          <li>
+            <h5>Build a custom view</h5>
+            <p>
+              You can create a new view here by clicking
+              the <span class="text-info">Create a Custom View</span> button
+              below the dataset's name.  This will take you your new
+              View's overview, where you can set your new View's title,
+              opening text, and afterword.
+            </p>
+            <p>
+              Below that will be a section called <strong>View
+                Columns</strong>, where you will see a list (initially empty)
+              of all the columns in your view.  To add a new column, type
+              a title into the <span class="text-info">Column Title</span>
+              and click &quot;<span class="text-info">Add column</span>&quot;.
+            </p>
+          </li>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" ng-click="closeWhatNow()" aria-hidden="true">Close</button>
+      </div>
     </div>
-    <div class="modal-body">
-      <p>New to Judoon?  Here are the steps to get started:</p>
-      <ol>
-        <li>
-          <h5>Upload a spreadsheet</h5>
-          <p>
-            In the box labeled &quot;<strong>Add dataset</strong>&quot;
-            click the <span class="text-info">Browse</span> button, select
-            an Excel file for upload, then click <span class="text-info">Upload</span>.
-          </p>
-          <p>
-            If all goes well, a new dataset named after your worksheet
-            will appear in the list titled <strong>Datasets</strong>.
-            You will also see a new entry in the <strong>Views</strong>
-            list.  When you upload a spreadsheet, we automatically build
-            a view that looks exactly like it.  If you're happy with the
-            formatting, then you're done!.
-          </p>
-        </li>
+  </script>
 
-        <li>
-          <h5>Annotate your dataset</h5>
-          <p>
-            When you annotate your dataset, that tells us what kind of
-            data is in each column of your spreadsheet.  It is not
-            necessary to do this, but can help us to provide more
-            intelligent sorting or even preconstructed links to external
-            databases.  Click on the <span class="text-info">Annotate
-              dataset</span> button to do this.
-          </p>
-        </li>
-
-        <li>
-          <h5>Build a custom view</h5>
-          <p>
-            You can create a new view here by clicking
-            the <span class="text-info">Create a Custom View</span> button
-            below the dataset's name.  This will take you your new
-            View's overview, where you can set your new View's title,
-            opening text, and afterword.
-          </p>
-          <p>
-            Below that will be a section called <strong>View
-              Columns</strong>, where you will see a list (initially empty)
-            of all the columns in your view.  To add a new column, type
-            a title into the <span class="text-info">Column Title</span>
-            and click &quot;<span class="text-info">Add column</span>&quot;.
-          </p>
-        </li>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" ng-click="closeWhatNow()" aria-hidden="true">Close</button>
-    </div>
-  </div>
-</script>
+  <div ng-show="user.datasets.length">
+    <h2>Datasets</h2>
+    <tabset direction="'left'">
+      <tab ng-repeat="dataset in user.datasets" heading="{{dataset.name}}" active="dataset.tabActive" select="updateUrlFromTab()">
+        <div ng-controller="UserDatasetCtrl" style="padding-left: 5px;">
+          <h3>{{dataset.name}}</h3>
 
 
-  <h2>Datasets</h2>
-  <tabset direction="'left'">
-    <tab ng-repeat="dataset in user.datasets" heading="{{dataset.name}}" active="dataset.tabActive" select="updateUrlFromTab()">
-      <div ng-controller="UserDatasetCtrl" style="padding-left: 5px;">
-      <h3>{{dataset.name}}</h3>
+          <h4>Actions</h4>
+          <div class="btn-toolbar" style="margin-bottom: 20px;">
+            <div class="btn-group">
+              <a class="btn btn-mini action_edit_dataset" ng-href="/user/{{user.username}}/dataset/{{dataset.id}}">Edit Dataset</a>
+            </div>
+            <div class="btn-group">
+              <a class="btn btn-mini action_annotate_cols" ng-href="/user/{{user.username}}/dataset/{{dataset.id}}#columns">Annotate Columns</a>
+            </div>
+            <div class="btn-group">
+              <a class="btn btn-mini action_custom_page" ng-click="createPage()">Create A Custom View</a>
+            </div>
+            <div class="btn-group">
+              <a class="btn btn-mini action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
+            </div>
+            <div class="btn-group dropdown">
+              <a class="btn btn-mini dropdown-toggle action_download_tabular">
+                Download as: <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a download="{{dataset.name}}.tsv"  target="_self" ng-href="{{dataset.url()}}.tsv">tab</a></li>
+                <li><a download="{{dataset.name}}.csv"  target="_self" ng-href="{{dataset.url()}}.csv">csv</a></li>
+                <li><a download="{{dataset.name}}.xls"  target="_self" ng-href="{{dataset.url()}}.xls">Excel 97</a></li>
+                <li><a download="{{dataset.name}}.xlsx" target="_self" ng-href="{{dataset.url()}}.xlsx">Excel 2007</a></li>
+              </ul>
+            </div>
+          </div>
 
+          <h4>Views</h4>
+          <div ng-include src="'/static/html/partials/dataset-pages.html'" onload="pages=dataset.pages"></div>
 
-      <h4>Actions</h4>
-      <div class="btn-toolbar" style="margin-bottom: 20px;">
-        <div class="btn-group">
-          <a class="btn btn-mini action_edit_dataset" ng-href="/user/{{user.username}}/dataset/{{dataset.id}}">Edit Dataset</a>
-        </div>
-        <div class="btn-group">
-          <a class="btn btn-mini action_annotate_cols" ng-href="/user/{{user.username}}/dataset/{{dataset.id}}#columns">Annotate Columns</a>
-        </div>
-        <div class="btn-group">
-          <a class="btn btn-mini action_custom_page" ng-click="createPage()">Create A Custom View</a>
-        </div>
-        <div class="btn-group">
-          <a class="btn btn-mini action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
-        </div>
-        <div class="btn-group dropdown">
-          <a class="btn btn-mini dropdown-toggle action_download_tabular">
-            Download as: <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li><a download="{{dataset.name}}.tsv"  target="_self" ng-href="{{dataset.url()}}.tsv">tab</a></li>
-            <li><a download="{{dataset.name}}.csv"  target="_self" ng-href="{{dataset.url()}}.csv">csv</a></li>
-            <li><a download="{{dataset.name}}.xls"  target="_self" ng-href="{{dataset.url()}}.xls">Excel 97</a></li>
-            <li><a download="{{dataset.name}}.xlsx" target="_self" ng-href="{{dataset.url()}}.xlsx">Excel 2007</a></li>
+          <h4>About this dataset</h4>
+          <ul>
+            <li>{{dataset.nbr_columns}} columns, {{dataset.nbr_rows}} rows</li>
+            <li><strong>Created on:</strong> {{dataset.created}}</li>
+            <li><strong>Description:</strong> <span ng-show="dataset.description">{{dataset.description}}</span><span ng-show="!dataset.description">-</span></li>
+            <li>This dataset is <strong>{{dataset.permission}}</strong>.</li>
+            <li><strong>Columns:</strong> <span ng-repeat="ds_col in dataset.columns">{{ds_col.name}}, </span></li>
           </ul>
+
         </div>
-      </div>
+      </tab>
+    </tabset>
+  </div>
 
-      <h4>Views</h4>
-      <div ng-include src="'/static/html/partials/dataset-pages.html'" onload="pages=dataset.pages"></div>
-
-      <h4>About this dataset</h4>
-      <ul>
-        <li>{{dataset.nbr_columns}} columns, {{dataset.nbr_rows}} rows</li>
-        <li><strong>Created on:</strong> {{dataset.created}}</li>
-        <li><strong>Description:</strong> <span ng-show="dataset.description">{{dataset.description}}</span><span ng-show="!dataset.description">-</span></li>
-        <li>This dataset is <strong>{{dataset.permission}}</strong>.</li>
-        <li><strong>Columns:</strong> <span ng-repeat="ds_col in dataset.columns">{{ds_col.name}}, </span></li>
-      </ul>
-
-      </div>
-    </tab>
-  </tabset>
-
-  <p ng-show="!user.datasets">You haven't uploaded any datasets yet.</p>
+  <p ng-show="!user.datasets.length">You haven't uploaded any datasets yet.</p>
 
 </div>
