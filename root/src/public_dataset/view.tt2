@@ -4,34 +4,24 @@
 <script>
   $(document).ready(function() {
 
-      var columnNames = [% column_names_json %];
-
+      var column_data = [% column_json %];
+      var aoColumns = [];
+      for (var i=0; i<column_data.length; i++) {
+          aoColumns.push({
+              sTitle : column_data[i].name,
+              mData  : column_data[i].shortname,
+              sName  : column_data[i].shortname
+          });
+      }
       $('#demo_dataset').dataTable({
-          "sAjaxSource" : "/api/datasets/[% dataset.object.id %]/data",
-          "fnServerData" : function ( sSource, aoData, fnCallback ) {
-            $.ajax( {
-                "dataType": "json",
-                "type": "GET",
-                "url": sSource,
-                "data": aoData,
-                "success": [
-                     function(data) {
-                        var new_data = [];
-                        for (var i = 0; i < data.tmplData.length; i++) {
-                            new_data.push([]);
-                            for (var j = 0; j < columnNames.length; j++) {
-                                new_data[i].push(data.tmplData[i][columnNames[j]]);
-                            }
-                        }
-                        data.aaData = new_data;
-                     },
-                     fnCallback
-                ],
-            } );
-          },
-          "bAutoWidth": false,
-          "bServerSide": true,
-          "bProcessing" : true
+          "aoColumns"       : aoColumns,
+          "bAutoWidth"      : false,
+          "bServerSide"     : true,
+          "bProcessing"     : true,
+          "bDeferRender"    : true,
+          "sPaginationType" : "bootstrap",
+          "sAjaxSource"     : "/api/datasets/[% dataset.object.id %]/data",
+          "sAjaxDataProp"   : "tmplData"
       });
   });
 </script>
@@ -51,13 +41,8 @@
 </section>
 
 <table id="demo_dataset" class="display data_table table table-striped table-condensed table-border">
-  <thead>
-    [% FOREACH d_column IN dataset_column.list %]
-    <th>[% d_column.name %]</th>
-    [% END %]
-  </thead>
-  <tbody>
-  </tbody>
+  <thead></thead>
+  <tbody></tbody>
 </table>
 
 [% END %]

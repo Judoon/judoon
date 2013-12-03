@@ -44,8 +44,8 @@ sub populate_stash {
     my ($self, $c, $dataset) = @_;
     my @ds_columns = $dataset->ds_columns_ordered->hri->all;
     $c->stash->{dataset_column}{list} = \@ds_columns;
-    $c->stash->{column_names_json} = $self->encode_json(
-        [map {$_->{shortname}} @ds_columns]
+    $c->stash->{column_json} = $self->encode_json(
+        [map {{name => $_->{name}, shortname => $_->{shortname}}} @ds_columns]
     );
     return;
 }

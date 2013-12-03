@@ -1,48 +1,29 @@
 [% extra_js = BLOCK %]
-[% FOREACH template IN page_column.templates %]
-<script id="column_tmpl_[% loop.count %]" type="text/x-handlebars-template">
-[% template %]
-</script>
-[% END %]
-
-
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
 <script src="/static/js/vendor/dataTables.bootstrap.min.js"></script>
 <script src="/static/js/vendor/handlebars.min.js"></script>
 <script>
   $(document).ready(function() {
+      var column_data = [% column_json %];
+      var aoColumns = [];
+      for (var i=0; i<column_data.length; i++) {
+          aoColumns.push({
+              sTitle : column_data[i].title,
+              sName  : column_data[i].sort_fields,
+              mData  : Handlebars.compile(column_data[i].template)
+          });
+      }
 
-      var compiled_templates = [];
-      $('script[type="text/x-handlebars-template"]').each( function( idx ) {
-          compiled_templates[idx] = Handlebars.compile($(this).html());
-      });
-
+      console.log("WTF?!");
       $('#demo_page').dataTable({
-          "sAjaxSource" : "/api/datasets/[% dataset.id %]/data",
-          "fnServerData" : function ( sSource, aoData, fnCallback ) {
-            $.ajax( {
-                "dataType": "json",
-                "type": "GET",
-                "url": sSource,
-                "data": aoData,
-                "success": [
-                     function(data) {
-                        var new_data = [];
-                        for (var i = 0; i < data.tmplData.length; i++) {
-                            new_data[i] = [];
-                            for (var j = 0; j < compiled_templates.length; j++) {
-                                new_data[i][j] = compiled_templates[j](data.tmplData[i]);
-                            }
-                        }
-                        data.aaData = new_data;
-                     },
-                     fnCallback
-                ],
-            } );
-          },
-          "bAutoWidth": false,
-          "bServerSide": true,
-          "bProcessing" : true
+          "aoColumns"       : aoColumns,
+          "bAutoWidth"      : false,
+          "bServerSide"     : true,
+          "bProcessing"     : true,
+          "bDeferRender"    : true,
+          "sPaginationType" : "bootstrap",
+          "sAjaxSource"     : "/api/datasets/[% dataset.id %]/data",
+          "sAjaxDataProp"   : "tmplData"
       });
   });
 </script>
@@ -62,13 +43,8 @@
 </section>
 
 <table id="demo_page" class="display data_table table table-striped table-condensed table-border">
-  <thead>
-    [% FOREACH p_column IN page_column.list %]
-    <th>[% p_column.title %]</th>
-    [% END %]
-  </thead>
-  <tbody>
-  </tbody>
+  <thead></thead>
+  <tbody> </tbody>
 </table>
 
 <section id="postamble">
