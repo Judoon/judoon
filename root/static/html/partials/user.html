@@ -106,16 +106,26 @@
           <h4>Actions</h4>
           <div class="btn-toolbar" style="margin-bottom: 20px;">
             <div class="btn-group">
-              <a class="btn btn-mini action_edit_dataset" ng-href="/user/{{user.username}}/dataset/{{dataset.id}}">Edit Dataset</a>
+              <a class="btn btn-mini"
+                 ng-href="/user/{{user.username}}/dataset/{{dataset.id}}"
+                 tooltip="Update the name, permissions, or other properties of this dataset."
+                 tooltip-append-to-body="1">Edit Dataset</a>
             </div>
             <div class="btn-group">
-              <a class="btn btn-mini action_annotate_cols" ng-href="/user/{{user.username}}/dataset/{{dataset.id}}#columns">Annotate Columns</a>
+              <a class="btn btn-mini"
+                 ng-href="/user/{{user.username}}/dataset/{{dataset.id}}#columns"
+                 tooltip="Mark columns as having a specific data type or role"
+                 tooltip-append-to-body="1">Annotate Columns</a>
             </div>
             <div class="btn-group">
-              <a class="btn btn-mini action_custom_page" ng-click="createPage()">Create A Custom View</a>
+              <a class="btn btn-mini" ng-click="createPage()"
+                 tooltip="Create a custom view of your dataset"
+                 tooltip-append-to-body="1">Create A Custom View</a>
             </div>
             <div class="btn-group dropdown">
-              <a class="btn btn-mini dropdown-toggle action_download_tabular">
+              <a class="btn btn-mini dropdown-toggle"
+                 tooltip="Download data as an Excel file, csv, or tab-delimited file."
+                 tooltip-append-to-body="1">
                 Download as: <span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
@@ -126,7 +136,10 @@
               </ul>
             </div>
             <div class="btn-group">
-              <a class="btn btn-mini btn-danger action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
+              <a class="btn btn-mini btn-danger action_delete_dataset"
+                 ng-click="deleteThisDataset()"
+                 tooltip="Delete this dataset.  *This will delete all of its views as well!*"
+                 tooltip-append-to-body="1">Delete Dataset</a>
             </div>
           </div>
 

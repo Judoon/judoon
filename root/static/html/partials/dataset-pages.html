@@ -4,7 +4,9 @@
             <td>{{$index + 1}}<a name="page_{{page.id}}"></a></td>
             <td>
               <p style="display: inline-block;">
-                <a href="/user/{{user.username}}/page/{{page.id}}">{{page.title}}</a>
+                <a tooltip="Update the title, surrounding text, and other properties of this view"
+                   tooltip-append-to-body="1"
+                   href="/user/{{user.username}}/page/{{page.id}}">{{page.title}}</a>
                 - {{page.nbr_columns}} columns, {{page.nbr_rows}} rows
               </p>
               <div class="btn-toolbar pull-right">
@@ -16,11 +18,10 @@
               <div id="page_actions_{{page.id}}" class="page_actions" ng-class="{in: !isActionBlockCollapsed}" collapse="isActionBlockCollapsed">
                 <h5>Actions</h5>
                 <div class="btn-toolbar" style="margin-bottom: 20px;">
-                  <div class="btn-group">
-                    <a class="btn btn-mini btn-danger action_delete_page" ng-click="deleteThisPage()">Delete View</a>
-                  </div>
                   <div class="btn-group dropdown">
-                    <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
+                    <a class="btn btn-mini dropdown-toggle"
+                       tooltip="Download the view's data table as an Excel file, csv, or tab-delimited file."
+                       tooltip-append-to-body="1">
                       Download as: <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -31,13 +32,21 @@
                     </ul>
                   </div>
                   <div class="btn-group dropdown">
-                    <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
+                    <a class="btn btn-mini dropdown-toggle"
+                       tooltip="Download an archive of the view that you can host on your own."
+                       tooltip-append-to-body="1">
                       Download standalone app: <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
                       <li><a download="{{page.title}}.zip" target="_self" ng-href="{{page.url()}}.zip">zip</a></li>
                       <li><a download="{{page.title}}.tgz" target="_self" ng-href="{{page.url()}}.tgz">tar.gz</a></li>
                     </ul>
+                  </div>
+                  <div class="btn-group">
+                    <a class="btn btn-mini btn-danger"
+                       ng-click="deleteThisPage()"
+                       tooltip="Delete this view"
+                       tooltip-append-to-body="1">Delete View</a>
                   </div>
                 </div>
               </div>
