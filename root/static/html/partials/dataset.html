@@ -9,6 +9,19 @@
 
 
   <tabset>
+ 
+    <!-- ******************** DATA ******************** -->
+    <tab heading="Data" active="activeTab.data" select="updateUrlFromTab()">
+      <div class="outer-hscroll"><div class="inner-hscroll">
+
+          <judoon-data-table
+             jdt-col-defs="columnDefs"
+             jdt-data-url="dataUrl">
+          </judoon-data-table>
+
+      </div></div>
+    </tab>
+
 
     <!-- ******************** PROPERTIES ******************** -->
     <tab heading="Properties" active="activeTab.properties" select="updateUrlFromTab()">
@@ -45,19 +58,6 @@
 
         </fieldset>
       </form>
-    </tab>
-
-
-    <!-- ******************** DATA ******************** -->
-    <tab heading="Data" active="activeTab.data" select="updateUrlFromTab()">
-      <div class="outer-hscroll"><div class="inner-hscroll">
-
-          <judoon-data-table
-             jdt-col-defs="columnDefs"
-             jdt-data-url="dataUrl">
-          </judoon-data-table>
-
-      </div></div>
     </tab>
 
 
