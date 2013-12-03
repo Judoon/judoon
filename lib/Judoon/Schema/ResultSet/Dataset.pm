@@ -138,4 +138,19 @@ sub with_columns {
     return $self->prefetch('ds_columns');
 }
 
+
+=head2 owned_by( $username )
+
+Datasets for a particular user.
+
+=cut
+
+sub owned_by {
+    my ($self, $username) = @_;
+    return $self->search(
+        {'user.username' => $username},
+        {join => 'user'},
+    );
+}
+
 1;

@@ -90,4 +90,20 @@ sub with_columns {
     return $self->prefetch('page_columns');
 }
 
+
+=head2 owned_by( $username )
+
+Pages for a particular user.
+
+=cut
+
+sub owned_by {
+    my ($self, $username) = @_;
+    return $self->search(
+        {'user.username' => $username},
+        {join => {'dataset' => 'user'}},
+    );
+}
+
+
 1;
