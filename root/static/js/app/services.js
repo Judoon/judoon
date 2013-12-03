@@ -394,6 +394,7 @@ judoonSrv.factory(
                     angular.forEach(response.data, function(value) {
                         _this.columns.push(PageColumns._buildPageColumn(value));
                     });
+                    _this.columnsLoaded = 1;
                     return _this.columns;
                 });
             },

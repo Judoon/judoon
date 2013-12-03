@@ -414,8 +414,23 @@ judoonCtrl.controller(
 
          $scope.user = user;
          $scope.page = page;
-         $scope.pageOriginal = angular.copy(page);
-         $scope.pageColumnsOriginal = angular.copy(page.columns);
+
+         $scope.$watch('page.columnsLoaded', function () {
+             if (!$scope.page.columnsLoaded) {
+                 return;
+             }
+             $scope.pageOriginal = angular.copy(page);
+             $scope.pageColumnsOriginal = angular.copy(page.columns);
+         });
+
+         $scope.$watch('page', function () {
+             if (!$scope.page.columnsLoaded) {
+                 return;
+             }
+
+             $scope.pageDirty = !angular.equals($scope.page, $scope.pageOriginal);
+         }, true);
+
 
          Dataset.get(page.dataset_id).then( function (dataset) {
              $scope.dataset = dataset;
@@ -444,9 +459,6 @@ judoonCtrl.controller(
                  });
              });
 
-         $scope.$watch('page', function () {
-             $scope.pageDirty = !angular.equals($scope.page, $scope.pageOriginal);
-         }, true);
 
 
          // Methods
