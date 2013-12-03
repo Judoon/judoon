@@ -12,6 +12,21 @@
  
     <!-- ******************** DATA ******************** -->
     <tab heading="Data" active="activeTab.data" select="updateUrlFromTab()">
+
+      <div class="btn-toolbar" style="margin-bottom: 20px;">
+        <div class="btn-group dropdown">
+          <a class="btn btn-mini dropdown-toggle action_download_tabular">
+            Download data as: <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a download="{{dataset.name}}.tsv"  target="_self" ng-href="{{dataset.url()}}.tsv">tab</a></li>
+            <li><a download="{{dataset.name}}.csv"  target="_self" ng-href="{{dataset.url()}}.csv">csv</a></li>
+            <li><a download="{{dataset.name}}.xls"  target="_self" ng-href="{{dataset.url()}}.xls">Excel 97</a></li>
+            <li><a download="{{dataset.name}}.xlsx" target="_self" ng-href="{{dataset.url()}}.xlsx">Excel 2007</a></li>
+          </ul>
+        </div>
+      </div>
+
       <div class="outer-hscroll"><div class="inner-hscroll">
 
           <judoon-data-table
