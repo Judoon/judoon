@@ -89,3 +89,4 @@ DBIC
 serializable
 sitelinker
 updatable
+plaintext
