@@ -569,15 +569,18 @@ judoonCtrl.controller(
          };
 
          $scope.getSortColumn = function(widgets) {
-             var sortVal = '';
+             var sortVal = [];
              angular.forEach(widgets, function(widget) {
-                 if (!sortVal) {
-                     if (widget.type === 'variable') {
-                         sortVal = widget.name;
+                 if (widget.type === 'variable') {
+                     sortVal.push(widget.name);
+                 }
+                 else if (widget.type === 'link') {
+                     if (widget.url.variable_segments[0]) {
+                         sortVal.push(widget.label.variable_segments[0]);
                      }
                  }
              });
-             return sortVal;
+             return sortVal.join('|');
          };
 
          $scope.dataUrl = '/api/datasets/'+$scope.page.dataset_id+'/data';
