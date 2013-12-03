@@ -61,12 +61,14 @@ sub id : Chained('base') PathPart('') CaptureArgs(1) {
         $c->detach;
     }
 
-    if ($c->user && $c->user->username eq $user->username) {
-        $c->stash->{user}{is_owner} = 1;
+    unless ($c->user && $c->user->username eq $user->username) {
+        $self->go_here($c, '/page/list', [], {owner => $username});
+        $c->detach();
     }
 
-    $c->stash->{user}{id}     = $username;
-    $c->stash->{user}{object} = $user;
+    $c->stash->{user}{is_owner} = 1;
+    $c->stash->{user}{id}       = $username;
+    $c->stash->{user}{object}   = $user;
 }
 
 

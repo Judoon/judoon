@@ -97,7 +97,14 @@ List all public entities and entities owned by the logged-in user.
 
 sub private_list {
     my ($self, $c) = @_;
-    my @public_objects = $c->stash->{public_rs}->with_columns->with_owner->hri->all;
+
+    my $public_rs = $c->stash->{public_rs}->with_columns->with_owner;
+    my $params    = $c->req->params;
+    if (my $owner = $params->{owner}) {
+        $public_rs = $public_rs->owned_by($owner);
+    }
+
+    my @public_objects = $public_rs->hri->all;
     for my $obj  (@public_objects) {
         $obj->{view_url} = $c->uri_for_action(
             $c->controller->action_for('view'), $obj->{id}
