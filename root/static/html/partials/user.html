@@ -114,9 +114,6 @@
             <div class="btn-group">
               <a class="btn btn-mini action_custom_page" ng-click="createPage()">Create A Custom View</a>
             </div>
-            <div class="btn-group">
-              <a class="btn btn-mini action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
-            </div>
             <div class="btn-group dropdown">
               <a class="btn btn-mini dropdown-toggle action_download_tabular">
                 Download as: <span class="caret"></span>
@@ -127,6 +124,9 @@
                 <li><a download="{{dataset.name}}.xls"  target="_self" ng-href="{{dataset.url()}}.xls">Excel 97</a></li>
                 <li><a download="{{dataset.name}}.xlsx" target="_self" ng-href="{{dataset.url()}}.xlsx">Excel 2007</a></li>
               </ul>
+            </div>
+            <div class="btn-group">
+              <a class="btn btn-mini btn-danger action_delete_dataset" ng-click="deleteThisDataset()">Delete Dataset</a>
             </div>
           </div>
 
