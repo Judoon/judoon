@@ -1,0 +1,59 @@
+      <table ng-show="pages.length" class="table table-striped table-condensed page_list">
+        <tbody>
+          <tr ng-controller="UserPageCtrl" ng-repeat="page in pages">
+            <td>{{$index + 1}}<a name="page_{{page.id}}"></a></td>
+            <td>
+              <p style="display: inline-block;">
+                <a href="/user/{{user.username}}/page/{{page.id}}">{{page.title}}</a>
+                - {{page.nbr_columns}} columns, {{page.nbr_rows}} rows
+              </p>
+              <div class="btn-toolbar pull-right">
+                <div class="btn-group"><button class="btn btn-mini" ng-click="isActionBlockCollapsed = !isActionBlockCollapsed">More Actions</button></div>
+                <div class="btn-group"><button class="btn btn-mini" ng-click="isInfoBlockCollapsed = !isInfoBlockCollapsed">More Info</button></div>
+              </div>
+
+
+              <div id="page_actions_{{page.id}}" class="page_actions" ng-class="{in: !isActionBlockCollapsed}" collapse="isActionBlockCollapsed">
+                <h5>Actions</h5>
+                <div class="btn-toolbar" style="margin-bottom: 20px;">
+                  <div class="btn-group">
+                    <a class="btn btn-mini btn-danger action_delete_page" ng-click="deleteThisPage()">Delete View</a>
+                  </div>
+                  <div class="btn-group dropdown">
+                    <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
+                      Download as: <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a download="{{page.title}}.tsv"  target="_self" ng-href="{{page.url()}}.tsv">tab</a></li>
+                      <li><a download="{{page.title}}.csv"  target="_self" ng-href="{{page.url()}}.csv">csv</a></li>
+                      <li><a download="{{page.title}}.xls"  target="_self" ng-href="{{page.url()}}.xls">Excel 97</a></li>
+                      <li><a download="{{page.title}}.xlsx" target="_self" ng-href="{{page.url()}}.xlsx">Excel 2007</a></li>
+                    </ul>
+                  </div>
+                  <div class="btn-group dropdown">
+                    <a class="btn btn-mini dropdown-toggle action_download_tabular_page">
+                      Download standalone app: <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a download="{{page.title}}.zip" target="_self" ng-href="{{page.url()}}.zip">zip</a></li>
+                      <li><a download="{{page.title}}.tgz" target="_self" ng-href="{{page.url()}}.tgz">tar.gz</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div id="page_info_{{page.id}}" class="page_info" ng-class="{in: !isInfoBlockCollapsed}" collapse="isInfoBlockCollapsed">
+                <h5>About this view</h5>
+                <ul>
+                  <li><strong>Created on:</strong> {{page.created}}</li>
+                  <li>This view is <strong>{{page.permission}}</strong>.</li>
+                  <li><strong>Columns:</strong> <span ng-repeat="page_col in page.columns">{{page_col.title}}<span ng-hide="$last">, </span></span></li>
+                </ul>
+              </div>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p ng-show="!pages.length">No views created yet.</p>

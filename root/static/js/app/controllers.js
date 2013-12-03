@@ -125,6 +125,10 @@ judoonCtrl.controller(
     ['$scope', 'Alerts',
      function ($scope, Alerts) {
 
+         if (!$scope.page.columns) {
+             $scope.page.getColumns();
+         }
+
          $scope.isActionBlockCollapsed = true;
          $scope.isInfoBlockCollapsed   = true;
 
@@ -204,15 +208,13 @@ judoonCtrl.controller(
                  .success( function() { Alerts.alertSuccess('New page added!');    })
                  .error(   function() { Alerts.alertError('Something went wrong!'); });
          };
-         $scope.deletePage = function(page) {
-             var confirmed = window.confirm("Are you sure you want to delete this page?");
-             if (confirmed) {
-                 $scope.dataset.deletePage(page).then(
-                     function() { Alerts.alertSuccess('Page deleted!');       },
-                     function() { Alerts.alertError('Something went wrong!'); }
-                 );
-             }
-         };
+
+         $scope.$on('UserPageCtrl::deleteThisPage', function(event, page) {
+             $scope.dataset.deletePage(page).then(
+                 function() { Alerts.alertSuccess("View '" + page.title + "' deleted!");     },
+                 function() { Alerts.alertError('Something went wrong!'); }
+             );
+         });
 
          $scope.dataUrl = '/api/datasets/'+$scope.dataset.id+'/data';
          $scope.$watch('dataset.columns', function() {

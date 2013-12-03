@@ -110,14 +110,9 @@
 
 
     <!-- ******************** VIEWS ******************** -->
-    <tab heading="Views" active="activeTab.view" select="updateUrlFromTab()">
+    <tab heading="Current Views" active="activeTab.view" select="updateUrlFromTab()">
 
-      <ul>
-        <li ng-repeat="page in dataset.pages">
-          <a href="/user/{{user.username}}/page/{{page.id}}">{{page.title}}</a>
-          <button class="btn btn-danger" ng-click="deletePage(page)">Delete</button>
-        </li>
-      </ul>
+      <div ng-include src="'/static/html/partials/dataset-pages.html'" onload="pages=dataset.pages"></div>
 
       <div class="row-fluid">
         <div class="add-panel span7">
