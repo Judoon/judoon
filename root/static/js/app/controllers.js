@@ -467,6 +467,19 @@ judoonCtrl.controller(
                  return;
              }
 
+             if ($scope.page.permission === "public" &&
+                 $scope.page.permission !== $scope.pageOriginal.permission) {
+                 var confirmed = window.confirm(
+                     "Making your page public will make the underlying dataset " +
+                         "public, too! Are you sure you want to continue?"
+                 );
+                 if (!confirmed) {
+                     Alerts.alertWarning('Save cancelled.');
+                     return;
+                 }
+
+             }
+
              $scope.page.update()
                  .success( function() {
                      var sortVal = 1;

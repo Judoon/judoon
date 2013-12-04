@@ -14,6 +14,20 @@ sub update_valid  { return {permission => qr/^(?:public|private)$/}; }
 with 'Judoon::API::Resource::Role::ValidateParams';
 
 
+around 'update_resource' => sub {
+    my $orig   = shift;
+    my $self   = shift;
+    my $params = shift;
+
+    my $publish_dataset
+        = !!($params->{permission} eq 'public' && $self->item->is_private);
+    if ($publish_dataset && $self->item->dataset->is_private) {
+        $self->item->dataset->update({permission => 'public'});
+    }
+
+    return $orig->($self, $params);
+};
+
 1;
 __END__
 
