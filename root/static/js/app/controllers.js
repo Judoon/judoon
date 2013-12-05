@@ -412,6 +412,30 @@ judoonCtrl.controller(
              );
          }
 
+         // TinyMCE
+         $scope.tinymce = {
+             config: {
+                 inline: {
+                     inline  :  true,
+                     menubar : false,
+                     plugins : "",
+                     toolbar : "bold italic underline strikethrough subscript superscript removeformat | undo redo"
+                 },
+                 block: {
+                     inline   : true,
+                     menubar  : false,
+                     plugins  : "hr link image charmap paste anchor spellchecker searchreplace table textcolor",
+                     toolbar1 : "cut copy pastetext | undo redo | search replace spellchecker | link unlink anchor | image table hr charmap | numlist bulllist outdent indent blockquote",
+                     toolbar2 : "bold italic underline strikethrough subscript superscript removeformat | alignleft aligncenter alignright alignjustify | formatselect fontselect fontsizeselect forecolor backcolor"
+                     // forced_root_block                  : "p",
+                     // entity_encoding                    : "raw",
+                     // valid_elements                     : "a[href|target],strong/b,em/i,p,sub,sup",
+                     // convert_urls                       : false
+                 }
+             }
+         };
+
+
          $scope.user = user;
          $scope.page = page;
 

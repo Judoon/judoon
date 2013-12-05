@@ -39,10 +39,10 @@
 
   <div ng-show="editmode">
     <div class="editable_label" style="margin-bottom: -10px;">View Title:</div>
-    <h2 judoon-ckeditor ck-edit-type="inline" ng-model="page.title" contenteditable="true" strip-br="true" id="page_title" class="edit_outline editable inline_editable"></h2>
+    <h2 ui-tinymce-inline="tinymce.config.inline" ng-model="page.title" id="page_title" class="edit_outline editable inline_editable"></h2>
 
     <div class="editable_label">Preamble:</div>
-    <div judoon-ckeditor ck-edit-type="block" ng-model="page.preamble" contenteditable="true" strip-br="true" id="page_preamble" class="edit_outline editable block_editable"></div>
+    <div ui-tinymce-inline="tinymce.config.block" ng-model="page.preamble" id="page_preamble" class="edit_outline editable block_editable"></div>
     <br>
   </div>
 
@@ -189,7 +189,7 @@
   </div>
   <div ng-show="editmode">
     <div class="editable_label">Postamble:</div>
-    <div judoon-ckeditor ck-edit-type="block" ng-model="page.postamble" contenteditable="true" strip-br="true" id="page_postamble" class="edit_outline editable block_editable"></div>
+    <div ui-tinymce-inline="tinymce.config.block" ng-model="page.postamble" id="page_postamble" class="edit_outline editable block_editable"></div>
   </div>
 
 </div>
