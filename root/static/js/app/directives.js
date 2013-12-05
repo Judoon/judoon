@@ -1,5 +1,5 @@
 /*jshint globalstrict: true */
-/*global angular, CKEDITOR */
+/*global angular */
 
 'use strict';
 
@@ -86,55 +86,6 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                     function() {rebuildTable(nbrColumnsChanged);}, 0, false
                 );
             }, true);
-        }
-    };
-}]);
-
-
-judoonDir.directive('judoonCkeditor', [function() {
-    return {
-        link: function(scope, elm, attr) {
-            var ckConfig;
-            if (attr.ckEditType === "inline") {
-                ckConfig = {
-                    toolbar: [
-                        { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat",'-','Undo','Redo'] }
-                    ]
-                };
-            }
-            else {
-                ckConfig = {
-                    toolbar: [
-                        { name: 'clipboard', items: ['Cut','Copy','Paste','PasteText','PasteWord','-','Undo','Redo'] },
-                        { name: 'editing',   items: ['Find','Replace','-','SelectAll','-','Scayt'] },
-                        { name: 'links',     items: ['Link','Unlink','Anchor'] },
-                        { name: 'insert',    items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
-                        { name: 'groups',    items: ["NumberedList", "BulletedList", "DefinitionList", "Outdent", "Indent", "Blockquote"] },
-                        '/',
-                        { name: 'formatting', items: ["Bold", "Italic", "Underline", "Strike", "Subscript", "Superscript", "RemoveFormat"] },
-                        { name: 'paragraph',  items: ["JustifyLeft", "JustifyCenter", "JustifyRight", "JustifyBlock" ] },
-                        { name: 'styles',     items: ["Format", "Font", "FontSize", "TextColor", "BGColor" ] },
-                        { name: 'about',      items: ["About"] }
-                    ],
-                    removePlugins: 'smiley,flash,iframe,pagebreak',
-                    extraAllowedContent: 'h5 h6 ul ol li dl dd dt'
-                };
-            }
-
-            scope.$watch('editmode', function() {
-                var ck;
-                if (scope.editmode == 1) {
-                    ck = CKEDITOR.inline(elm[0], ckConfig);
-                    elm.data('editor', ck);
-                }
-                else {
-                    ck = elm.data('editor');
-                    if (ck) {
-                        ck.destroy();
-                    }
-                }
-            });
-
         }
     };
 }]);
