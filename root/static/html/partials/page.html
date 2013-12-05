@@ -33,8 +33,8 @@
 
 
   <div ng-show="!editmode">
-    <h2  ng-bind-html="page.title"></h2>
-    <div ng-bind-html="page.preamble"></div>
+    <h2  ng-bind-html="trustTitle()")></h2>
+    <div ng-bind-html="trustPreamble()"></div>
   </div>
 
   <div ng-show="editmode">
@@ -185,7 +185,7 @@
 
 
   <div ng-show="!editmode">
-    <div ng-bind-html="page.postamble"></div>
+    <div ng-bind-html="trustPostamble()"></div>
   </div>
   <div ng-show="editmode">
     <div class="editable_label">Postamble:</div>

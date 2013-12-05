@@ -398,8 +398,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', 'user', 'page', 'welcome', '$http', 'Dataset', 'Alerts',
-     function ($scope, user, page, welcome, $http, Dataset, Alerts) {
+    ['$scope', '$sce', 'user', 'page', 'welcome', '$http', 'Dataset', 'Alerts',
+     function ($scope, $sce, user, page, welcome, $http, Dataset, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
@@ -437,9 +437,14 @@ judoonCtrl.controller(
              }
          };
 
-
          $scope.user = user;
          $scope.page = page;
+
+
+         $scope.trustTitle     = function() { return $sce.trustAsHtml($scope.page.title);     };
+         $scope.trustPreamble  = function() { return $sce.trustAsHtml($scope.page.preamble);  };
+         $scope.trustPostamble = function() { return $sce.trustAsHtml($scope.page.postamble); };
+
 
          $scope.$watch('page.columnsLoaded', function () {
              if (!$scope.page.columnsLoaded) {
