@@ -9,45 +9,22 @@ with 'Judoon::Role::ScrubHTML';
 binmode STDOUT, ':utf8';
 binmode STDERR, ':utf8';
 
-test '_trim' => sub {
-    my ($self) = @_;
-
-    is $self->_trim(' hey'), 'hey', 'left trim works';
-    is $self->_trim('hey '), 'hey', 'right trim works';
-    is $self->_trim(' hey '), 'hey', 'left & right trim works';
-};
-
-test '_fix_misc_html' => sub {
-    my ($self) = @_;
-    fail("not yet implemented");
-};
-
 test 'scrub_html_string' => sub {
     my ($self) = @_;
-    fail("not yet implemented");
-};
 
-test 'clean_html_string' => sub {
-    my ($self) = @_;
-
-    is $self->clean_html_string('hey'), 'hey', 'basic test';
-    is $self->clean_html_string('hey &amp; hi'), 'hey &amp; hi', 'html entities not decoded';
-    is $self->clean_html_string('<em>hey</em>'), '<em>hey</em>', 'some html allowed';
-    is $self->clean_html_string('<script>hey</script>'), '', 'scary html rejected';
-    is $self->clean_html_string('<p>hey</p>'), 'hey', 'less scary html munged';
-    is $self->clean_html_string('&lt;script&gt;hey&lt;/script&gt;'), '&lt;script&gt;hey&lt;/script&gt;', 'entities => tags not converted';
-    is $self->clean_html_string("<p><strong>Mogilner A</strong> , Edelstein-Keshet L. Regulation of actin dynamics in rapidly moving cells: a quantitative analysis. Biophys J. 2002;83(3):1237-58.</p>"),
+    is $self->scrub_html_string('hey'), 'hey', 'basic test';
+    is $self->scrub_html_string('hey &amp; hi'), 'hey &amp; hi', 'html entities not decoded';
+    is $self->scrub_html_string('<em>hey</em>'), '<em>hey</em>', 'some html allowed';
+    is $self->scrub_html_string('<script>hey</script>'), '', 'scary html rejected';
+    is $self->scrub_html_string('<p>hey</p>'), 'hey', 'less scary html munged';
+    is $self->scrub_html_string('&lt;script&gt;hey&lt;/script&gt;'), '&lt;script&gt;hey&lt;/script&gt;', 'entities => tags not converted';
+    is $self->scrub_html_string("<p><strong>Mogilner A</strong> , Edelstein-Keshet L. Regulation of actin dynamics in rapidly moving cells: a quantitative analysis. Biophys J. 2002;83(3):1237-58.</p>"),
         "<strong>Mogilner A</strong> , Edelstein-Keshet L. Regulation of actin dynamics in rapidly moving cells: a quantitative analysis. Biophys J. 2002;83(3):1237-58.",
             'html_string strips <p> tags';
 
 };
 
 test 'scrub_html_block' => sub {
-    my ($self) = @_;
-    fail("not yet implemented");
-};
-
-test 'clean_html_block' => sub {
     my ($self) = @_;
     fail("not yet implemented");
 };

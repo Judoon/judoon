@@ -123,10 +123,6 @@ sub _build_html_string_scrubber {
 Scrub untrusted HTML from C<$string>. Most regular block-level HTML
 elements are permitted.
 
-=head2 clean_html_block( $string )
-
-Filter, scrub, and trim untrusted HTML in C<$string>.
-
 =cut
 
 sub scrub_html_block {
@@ -134,23 +130,10 @@ sub scrub_html_block {
     return defined($str) ? $self->html_block_scrubber->scrub($str) : q{};
 }
 
-sub clean_html_block {
-    my ($self, $str) = @_;
-    return $self->_trim(
-        $self->scrub_html_block(
-            $self->_fix_misc_html($str)
-        )
-    );
-}
-
 
 =head2 scrub_html_string( $string )
 
 Remove all block-level HTML elements from C<$string>.
-
-=head2 clean_html_string( $string )
-
-Filter, scrub, and trim block-level HTML elements in C<$string>.
 
 =cut
 
@@ -159,56 +142,6 @@ sub scrub_html_string {
     return defined($str) ? $self->html_string_scrubber->scrub($str) : q{};
 }
 
-sub clean_html_string {
-    my ($self, $str) = @_;
-    return $self->_trim(
-        $self->scrub_html_string(
-            $self->_fix_misc_html($str)
-        )
-    );
-}
-
-
-
-=head2 Private Methods
-
-=head3 _trim( $string )
-
-Remove whitespace from beginning and end of C<$string>.
-
-=cut
-
-sub _trim {
-    my ($self, $str) = @_;
-    return q{} unless (defined $str);
-    $str =~ s/^\s*//s;
-    $str =~ s/\s*$//s;
-    return $str;
-}
-
-
-=head3 _fix_misc_html( $string )
-
-Fix common problems with HTML. Currently includes:
-
- 1.) fixes for bogus Microsoft greek character encodings
- 2.) removing \r characters from input
-
-=cut
-
-sub _fix_misc_html {
-    my ($self, $str) = @_;
-    return q{} unless ($str);
-
-    # handle bogus Microsoft greek character encoding
-    $str =~ s/\x{f061}/\N{U+03B1}/g;
-    $str =~ s/\x{f062}/\N{U+03B2}/g;
-
-    # fix common errors:
-    $str =~ s/\r//g;
-
-    return $str;
-}
 
 
 1;
