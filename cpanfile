@@ -103,6 +103,7 @@ requires 'Throwable::Error' => '0.200003';
 requires 'Try::Tiny';
 requires 'Type::Registry';
 requires 'Type::Tiny';
+requires 'Types::Standard';
 requires 'URI';
 requires 'Web::Machine' => '0.13';
 

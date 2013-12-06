@@ -27,7 +27,7 @@ requires 'decode_json';
 
 =head2 tmpl_fixtures / _build_tmpl_fixtures
 
-A for useful tmpl fixture sets.
+Useful template fixture sets.
 
 =cut
 
@@ -72,7 +72,7 @@ sub add_tmpl_fixture {
     my ($self, $key, $type, $fixture) = @_;
     die "Bad type **$type** passed to add_tmpl_fixtures"
         unless ($type =~ m/^(?:jstmpl|native|widgets)$/);
-    $self->fixtures->{$key}{$type} = $fixture;
+    $self->tmpl_fixtures->{$key}{$type} = $fixture;
 }
 
 

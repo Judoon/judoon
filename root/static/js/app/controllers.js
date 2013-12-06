@@ -398,8 +398,8 @@ judoonCtrl.controller(
 
 judoonCtrl.controller(
     'PageCtrl',
-    ['$scope', 'user', 'page', 'welcome', '$http', 'Dataset', 'Alerts',
-     function ($scope, user, page, welcome, $http, Dataset, Alerts) {
+    ['$scope', '$sce', 'user', 'page', 'welcome', '$http', 'Dataset', 'Alerts',
+     function ($scope, $sce, user, page, welcome, $http, Dataset, Alerts) {
 
          // Attributes
          $scope.editmode = 0;
@@ -431,15 +431,20 @@ judoonCtrl.controller(
                      entity_encoding   : "raw",
                      convert_urls      : false,
                      plugins  : "hr link image charmap paste anchor searchreplace table textcolor",
-                     toolbar1 : "cut copy pastetext | undo redo | search replace | link unlink anchor | image table hr charmap | numlist bulllist outdent indent blockquote",
+                     toolbar1 : "cut copy pastetext | undo redo | search replace | link unlink anchor | image table hr charmap | numlist bullist outdent indent blockquote",
                      toolbar2 : "bold italic underline strikethrough subscript superscript removeformat | alignleft aligncenter alignright alignjustify | formatselect fontselect fontsizeselect forecolor backcolor"
                  }
              }
          };
 
-
          $scope.user = user;
          $scope.page = page;
+
+
+         $scope.trustTitle     = function() { return $sce.trustAsHtml($scope.page.title);     };
+         $scope.trustPreamble  = function() { return $sce.trustAsHtml($scope.page.preamble);  };
+         $scope.trustPostamble = function() { return $sce.trustAsHtml($scope.page.postamble); };
+
 
          $scope.$watch('page.columnsLoaded', function () {
              if (!$scope.page.columnsLoaded) {

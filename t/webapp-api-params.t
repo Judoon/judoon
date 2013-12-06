@@ -11,7 +11,8 @@ use MooX::Types::MooseLike::Base qw(ArrayRef HashRef);
 use Test::Roo;
 use lib 't/lib';
 with 't::Role::Schema', 't::Role::Mech', 't::Role::WebApp', 't::Role::API',
-    'Judoon::Role::JsonEncoder', 't::Role::TmplFixtures';
+    'Judoon::Role::JsonEncoder', 't::Role::TmplFixtures',
+    't::Role::HtmlFixtures';
 
 has param_debug => (is => 'rw', default => 0);
 
@@ -483,6 +484,20 @@ test '/pages' => sub {
             ],
         );
 
+
+        subtest 'HTML Scrubbing' => sub {
+
+            my @scrub_tests;
+            for my $set (values %{$self->html_fixtures}) {
+                push @scrub_tests, (
+                    ['pass', 'title',     @{$set}{qw(tainted scrubbed_string)}],
+                    ['pass', 'preamble',  @{$set}{qw(tainted scrubbed_block)}],
+                    ['pass', 'postamble', @{$set}{qw(tainted scrubbed_block)}],
+                );
+            }
+            $self->run_update_tests($page_url, $page, \@scrub_tests);
+
+        };
     };
 
 
