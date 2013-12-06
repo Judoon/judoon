@@ -431,7 +431,7 @@ judoonCtrl.controller(
                      entity_encoding   : "raw",
                      convert_urls      : false,
                      plugins  : "hr link image charmap paste anchor searchreplace table textcolor",
-                     toolbar1 : "cut copy pastetext | undo redo | search replace | link unlink anchor | image table hr charmap | numlist bulllist outdent indent blockquote",
+                     toolbar1 : "cut copy pastetext | undo redo | search replace | link unlink anchor | image table hr charmap | numlist bullist outdent indent blockquote",
                      toolbar2 : "bold italic underline strikethrough subscript superscript removeformat | alignleft aligncenter alignright alignjustify | formatselect fontselect fontsizeselect forecolor backcolor"
                  }
              }
