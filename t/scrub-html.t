@@ -20,44 +20,78 @@ test '_trim' => sub {
 };
 
 
-test '_fix_encoding' => sub {
+test '_decode_to_plain_text' => sub {
     my ($self) = @_;
 
-    is $self->_fix_encoding('&lt;&amp;&gt;'), '<&>', 'decode entities';
-    is $self->_fix_encoding('hey'), 'hey', 'boring input works';
+    is $self->_decode_to_plain_text('&lt;&amp;&gt;'), '<&>', 'decode entities';
+    is $self->_decode_to_plain_text('hey'), 'hey', 'boring input works';
 
     # my $enc_str = 'boo, cp1252™';
     # my $enc_oct = encode_utf8($enc_str);
-    # is   $self->_fix_encoding($enc_str),                                $enc_str, 'raw utf8 works';
-    # isnt $self->_fix_encoding($enc_oct),                              $enc_str, 'encoded utf8 fails';
-    # is   $self->_fix_encoding("boo, cp1252\x{99}"),                     $enc_str, 'raw cp1252 works';
-    # isnt $self->_fix_encoding(encode('cp1252', "boo, cp1252\x{99}")), $enc_str, 'encoded cp1252 fails';
+    # is   $self->_decode_to_plain_text($enc_str),                                $enc_str, 'raw utf8 works';
+    # isnt $self->_decode_to_plain_text($enc_oct),                              $enc_str, 'encoded utf8 fails';
+    # is   $self->_decode_to_plain_text("boo, cp1252\x{99}"),                     $enc_str, 'raw cp1252 works';
+    # isnt $self->_decode_to_plain_text(encode('cp1252', "boo, cp1252\x{99}")), $enc_str, 'encoded cp1252 fails';
 };
 
 
-test 'plain_text' => sub {
+test '_fix_misc_html' => sub {
     my ($self) = @_;
-
-    is $self->scrub_plain_text('hey'), 'hey', 'simple test';
-    is $self->scrub_plain_text('hey &amp; hi'), 'hey & hi', 'html entities decoded';
-    is $self->scrub_plain_text('<em>hey</em>'), 'hey', 'html stripped';
-    is $self->scrub_plain_text('&lt;em&gt;hey&lt;/em&gt;'), 'hey', 'html entities decode & html stripped';
+    fail();
 };
 
 
-test 'html_string' => sub {
+test '_clean_msword_html' => sub {
+    my ($self) = @_;
+    fail();
+};
+
+
+test 'scrub_plain_text' => sub {
+    my ($self) = @_;
+    fail();
+};
+
+test 'clean_plain_text' => sub {
     my ($self) = @_;
 
-    is $self->scrub_html_string('hey'), 'hey', 'basic test';
-    is $self->scrub_html_string('hey &amp; hi'), 'hey &amp; hi', 'html entities not decoded';
-    is $self->scrub_html_string('<em>hey</em>'), '<em>hey</em>', 'some html allowed';
-    is $self->scrub_html_string('<script>hey</script>'), '', 'scary html rejected';
-    is $self->scrub_html_string('<p>hey</p>'), 'hey', 'less scary html munged';
-    is $self->scrub_html_string('&lt;script&gt;hey&lt;/script&gt;'), '&lt;script&gt;hey&lt;/script&gt;', 'entities => tags not converted';
-    is $self->scrub_html_string("<p><strong>Mogilner A</strong> , Edelstein-Keshet L. Regulation of actin dynamics in rapidly moving cells: a quantitative analysis. Biophys J. 2002;83(3):1237-58.</p>"),
+    is $self->clean_plain_text('hey'), 'hey', 'simple test';
+    is $self->clean_plain_text('hey &amp; hi'), 'hey & hi', 'html entities decoded';
+    is $self->clean_plain_text('<em>hey</em>'), 'hey', 'html stripped';
+    is $self->clean_plain_text('&lt;em&gt;hey&lt;/em&gt;'), 'hey', 'html entities decode & html stripped';
+};
+
+
+test 'scrub_html_string' => sub {
+    my ($self) = @_;
+    fail();
+};
+
+test 'clean_html_string' => sub {
+    my ($self) = @_;
+
+    is $self->clean_html_string('hey'), 'hey', 'basic test';
+    is $self->clean_html_string('hey &amp; hi'), 'hey &amp; hi', 'html entities not decoded';
+    is $self->clean_html_string('<em>hey</em>'), '<em>hey</em>', 'some html allowed';
+    is $self->clean_html_string('<script>hey</script>'), '', 'scary html rejected';
+    is $self->clean_html_string('<p>hey</p>'), 'hey', 'less scary html munged';
+    is $self->clean_html_string('&lt;script&gt;hey&lt;/script&gt;'), '&lt;script&gt;hey&lt;/script&gt;', 'entities => tags not converted';
+    is $self->clean_html_string("<p><strong>Mogilner A</strong> , Edelstein-Keshet L. Regulation of actin dynamics in rapidly moving cells: a quantitative analysis. Biophys J. 2002;83(3):1237-58.</p>"),
         "<strong>Mogilner A</strong> , Edelstein-Keshet L. Regulation of actin dynamics in rapidly moving cells: a quantitative analysis. Biophys J. 2002;83(3):1237-58.",
             'html_string strips <p> tags';
 
+};
+
+
+test 'scrub_html_block' => sub {
+    my ($self) = @_;
+    fail();
+};
+
+
+test 'clean_html_block' => sub {
+    my ($self) = @_;
+    fail();
 };
 
 

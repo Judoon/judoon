@@ -31,9 +31,8 @@ subset of HTML is allowed, but not everything.
 
 =cut
 
-use Encode::Guess qw(ascii utf-8 latin1);#cp1252);
-use Encode::ZapCP1252 qw(zap_cp1252 fix_cp1252);
-use HTML::Entities qw(decode_entities _decode_entities);
+use Encode::ZapCP1252 ();
+use HTML::Entities ();
 use HTML::Scrubber;
 use HTML::TreeBuilder;
 use Types::Standard qw(InstanceOf);
@@ -143,27 +142,46 @@ sub _build_plain_scrubber {
 Scrub untrusted HTML from C<$string>. Most regular block-level HTML
 elements are permitted.
 
+=head2 clean_html_block( $string )
+
+Filter, scrub, and trim untrusted HTML in C<$string>.
+
 =cut
 
 sub scrub_html_block {
     my ($self, $str) = @_;
+    return defined($str) ? $self->html_block_scrubber->scrub($str) : q{};
+}
+
+sub clean_html_block {
+    my ($self, $str) = @_;
     return $self->_trim(
-        $self->_scrub_html_block(
+        $self->scrub_html_block(
             $self->_fix_misc_html($str)
         )
     );
 }
 
+
 =head2 scrub_html_string( $string )
 
 Remove all block-level HTML elements from C<$string>.
+
+=head2 clean_html_string( $string )
+
+Filter, scrub, and trim block-level HTML elements in C<$string>.
 
 =cut
 
 sub scrub_html_string {
     my ($self, $str) = @_;
+    return defined($str) ? $self->html_string_scrubber->scrub($str) : q{};
+}
+
+sub clean_html_string {
+    my ($self, $str) = @_;
     return $self->_trim(
-        $self->_scrub_html_string(
+        $self->scrub_html_string(
             $self->_fix_misc_html($str)
         )
     );
@@ -174,16 +192,26 @@ sub scrub_html_string {
 
 Remove all HTML from C<$string>.
 
+=head2 clean_plain_text( $string )
+
+Scrub all HTML, then filter and trim C<$string>.
+
 =cut
 
 sub scrub_plain_text {
     my ($self, $str) = @_;
+    return defined($str) ? $self->plain_scrubber->scrub($str) : q{};
+}
+
+sub clean_plain_text {
+    my ($self, $str) = @_;
     return $self->_trim(
-        $self->_no_html(
-            $self->_fix_encoding($str)
+        $self->scrub_plain_text(
+            $self->_decode_to_plain_text($str)
         )
     );
 }
+
 
 
 =head2 Private Methods
@@ -203,28 +231,21 @@ sub _trim {
 }
 
 
-=head3 _fix_encoding( $string )
+=head3 _decode_to_plain_text( $string )
 
-This function does any necessary {en,de}coding.
-
-Currently it just decodes HTML::Entities into characters.
-
-At one point in time it tried to fix C<cp1252> encoded characters, but
-I'm not sure this is appropriate anymore.
-L<Catalyst::Plugin::Unicode::Encoding> has already decoded these,
-assuming everything is utf-8.  This may not be a reasonable
-assumption.
+This function turns a possibly HTML string into plain text.  It uses
+L<HTML::Entities> to decode HTML-escaped strings into plain text
+characters.  It also replaces C<cp1252> (a Microsoft Word encoding)
+characters into their standard utf-8 counterparts.
 
 =cut
 
-sub _fix_encoding {
+sub _decode_to_plain_text {
     my ($self, $str) = @_;
-    return q{} unless ($str);
+    return q{} unless (defined $str);
 
     HTML::Entities::decode_entities($str);
-
-    # I may need this later
-    # zap_cp1252($str);
+    Encode::ZapCP1252::zap_cp1252($str);
 
     return $str;
 }
@@ -254,91 +275,51 @@ sub _fix_misc_html {
 }
 
 
-=head3 _decode_apos
+=head3 _clean_msword_html( $string )
 
-HTML::Element->as_XML() encodes ' as &apos; which IE7 doesn't like.
+Microsoft Word produces some really weird HTML when a document's
+contents are copied and pasted into a web browser.  This code removes
+superfluous span and p tags.
 
 =cut
 
-sub _decode_apos {
+sub _clean_msword_html {
     my ($self, $str) = @_;
-    $str //= q{};
-    _decode_entities($str, {apos => '&#39;'});
+
+    return q{} unless (defined $str);
+
+
+    my $root = HTML::TreeBuilder->new;
+    $root->implicit_tags(0);
+    $root->parse($str);
+    $root->eof;
+
+    # MS Office adds lots of empty span tags
+    my @spans = $root->find_by_tag_name('span');
+    for my $span (@spans) {
+        if (not $span->all_external_attr) {
+            $span->replace_with_content->delete;
+        }
+    }
+
+    # MS Office add lots of empty <p>s
+    my @ps = $root->find_by_tag_name('p');
+    for my $p (@ps) {
+        my @content = $p->content_list;
+        if ($p->is_empty ||
+                (@content == 1 && !ref($content[0])
+                     && $content[0] =~ m/^(?:\s*(?:&nbsp;\s*)?)$/) ) {
+            $p->delete;
+        }
+    }
+
+    # HTML::TreeBuilder adds <html>
+    $str = $root->as_XML;
+    $str =~ s{^<html>}{};
+    $str =~ s{</html>$}{}s;
+    $root->delete;
+
     return $str;
-}
-
-
-=head3 _scrub_html_block( $string )
-
-Scrub untrusted HTML from C<$string>. Most regular block-level HTML
-elements are permitted.
-
-=cut
-
-sub _scrub_html_block {
-    my ($self, $str) = @_;
-
-    $str //= q{};
-
-    # sanitize HTML
-    my $scrubbed = $self->html_block_scrubber->scrub($str);
-
-    # my $root = HTML::TreeBuilder->new;
-    # $root->implicit_tags(0);
-    # $root->parse($scrubbed);
-    # $root->eof;
-
-    # # MS Office adds lots of empty span tags
-    # my @spans = $root->find_by_tag_name('span');
-    # for my $span (@spans) {
-    #     if (not $span->all_external_attr) {
-    #         $span->replace_with_content->delete;
-    #     }
-    # }
-
-    # # MS Office add lots of empty <p>s
-    # my @ps = $root->find_by_tag_name('p');
-    # for my $p (@ps) {
-    #     my @content = $p->content_list;
-    #     if ($p->is_empty ||
-    #             (@content == 1 && !ref($content[0])
-    #                  && $content[0] =~ m/^(?:\s*(?:&nbsp;\s*)?)$/) ) {
-    #         $p->delete;
-    #     }
-    # }
-
-    # # HTML::TreeBuilder adds <html>
-    # $scrubbed = $root->as_XML;
-    # $scrubbed =~ s{^<html>}{};
-    # $scrubbed =~ s{</html>$}{}s;
-    # $root->delete;
-
-    return $scrubbed;
-}
-
-
-=head3 _scrub_html_string( $string )
-
-Remove all block-level HTML elements from C<$string>.
-
-=cut
-
-sub _scrub_html_string {
-    my ($self, $str) = @_;
-    return defined($str) ? $self->html_string_scrubber->scrub($str) : q{};
-}
-
-
-
-=head3 _no_html( $string )
-
-Remove all HTML from C<$string>.
-
-=cut
-
-sub _no_html {
-    my ($self, $str) = @_;
-    return defined($str) ? $self->plain_scrubber->scrub($str) : q{};
 }
 
 
