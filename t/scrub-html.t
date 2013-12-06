@@ -2,8 +2,6 @@
 
 use utf8;
 
-#use Encode qw(encode decode);
-
 use Test::Roo;
 use lib 't/lib';
 with 'Judoon::Role::ScrubHTML';
@@ -19,52 +17,14 @@ test '_trim' => sub {
     is $self->_trim(' hey '), 'hey', 'left & right trim works';
 };
 
-
-test '_decode_to_plain_text' => sub {
-    my ($self) = @_;
-
-    is $self->_decode_to_plain_text('&lt;&amp;&gt;'), '<&>', 'decode entities';
-    is $self->_decode_to_plain_text('hey'), 'hey', 'boring input works';
-
-    # my $enc_str = 'boo, cp1252™';
-    # my $enc_oct = encode_utf8($enc_str);
-    # is   $self->_decode_to_plain_text($enc_str),                                $enc_str, 'raw utf8 works';
-    # isnt $self->_decode_to_plain_text($enc_oct),                              $enc_str, 'encoded utf8 fails';
-    # is   $self->_decode_to_plain_text("boo, cp1252\x{99}"),                     $enc_str, 'raw cp1252 works';
-    # isnt $self->_decode_to_plain_text(encode('cp1252', "boo, cp1252\x{99}")), $enc_str, 'encoded cp1252 fails';
-};
-
-
 test '_fix_misc_html' => sub {
     my ($self) = @_;
-    fail();
+    fail("not yet implemented");
 };
-
-
-test '_clean_msword_html' => sub {
-    my ($self) = @_;
-    fail();
-};
-
-
-test 'scrub_plain_text' => sub {
-    my ($self) = @_;
-    fail();
-};
-
-test 'clean_plain_text' => sub {
-    my ($self) = @_;
-
-    is $self->clean_plain_text('hey'), 'hey', 'simple test';
-    is $self->clean_plain_text('hey &amp; hi'), 'hey & hi', 'html entities decoded';
-    is $self->clean_plain_text('<em>hey</em>'), 'hey', 'html stripped';
-    is $self->clean_plain_text('&lt;em&gt;hey&lt;/em&gt;'), 'hey', 'html entities decode & html stripped';
-};
-
 
 test 'scrub_html_string' => sub {
     my ($self) = @_;
-    fail();
+    fail("not yet implemented");
 };
 
 test 'clean_html_string' => sub {
@@ -82,16 +42,14 @@ test 'clean_html_string' => sub {
 
 };
 
-
 test 'scrub_html_block' => sub {
     my ($self) = @_;
-    fail();
+    fail("not yet implemented");
 };
-
 
 test 'clean_html_block' => sub {
     my ($self) = @_;
-    fail();
+    fail("not yet implemented");
 };
 
 
