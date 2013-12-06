@@ -35,7 +35,7 @@ requires 'DBD::Pg';
 requires 'DBD::SQLite' => '1.27'; # DBIx::Class::Fixtures needs this
 requires 'DBIx::Class';
 requires 'DBIx::Class::Candy';
-requires 'DBIx::Class::Helpers';
+requires 'DBIx::Class::Helpers' => '2.018000';
 requires 'DBIx::Class::Migration';
 requires 'DBIx::Class::Migration::RunScript::Trait::AuthenPassphrase';
 requires 'DBIx::Class::PassphraseColumn';
