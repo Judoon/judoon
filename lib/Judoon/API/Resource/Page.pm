@@ -5,6 +5,7 @@ use namespace::clean;
 
 extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
+with 'Judoon::Role::ScrubHTML';
 with 'Judoon::API::Resource::Role::Item';
 with 'Judoon::API::Resource::Role::Tabular';
 with 'Judoon::API::Resource::Role::Application';
@@ -19,6 +20,16 @@ around 'update_resource' => sub {
     my $self   = shift;
     my $params = shift;
 
+    if (exists $params->{title}) {
+        $params->{title} = $self->scrub_html_string($params->{title});
+    }
+
+    for my $field (qw(preamble postamble)) {
+        next unless (exists  $params->{$field});
+        next unless (defined $params->{$field});
+        $params->{$field} = $self->scrub_html_block($params->{$field});
+    }
+
     my $publish_dataset
         = !!($params->{permission} eq 'public' && $self->item->is_private);
     if ($publish_dataset && $self->item->dataset->is_private) {
@@ -27,6 +38,7 @@ around 'update_resource' => sub {
 
     return $orig->($self, $params);
 };
+
 
 1;
 __END__
