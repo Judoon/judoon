@@ -408,60 +408,6 @@ sub no_redirect_ok {
 }
 
 
-sub puts_ok {
-    my ($self, $object, $edit_uri, $form_name, $put_args) = @_;
-
-    $self->mech->form_name($form_name);
-    $self->mech->get_ok($edit_uri, "can get $object edit page");
-    # PUT dataset/object
-    $self->mech->post_ok(
-        $self->mech->uri,
-        { %$put_args, 'x-tunneled-method' => 'PUT', },
-        "can update $object",
-    );
-    $self->mech->get($edit_uri);
-    $self->mech->form_name($form_name);
-    while (my ($k, $v) = each %$put_args) {
-        my ($ds_input) = $self->mech->grep_inputs({name => qr/^$k$/});
-        is $ds_input->value, $v, "$k has been updated";
-    }
-}
-
-
-sub get_link_like_ok {
-    my ($self, $object_descr, $uri_qr) = @_;
-    my @links = $self->mech->find_all_links(url_regex => $uri_qr);
-    ok @links, "found links to $object_descr lists";
-    $self->mech->get_ok($links[0], "can get $object_descr page");
-    return $links[0]->url;
-}
-
-
-sub delete_ok {
-    my ($self, $args) = @_;
-    $self->mech->get($args->{list_uri});
-    $self->mech->content_like(qr{$args->{object_uri}}, "$args->{object} exists");
-    $self->mech->submit_form_ok({
-        form_name => $args->{form_prefix} . $args->{object_id},
-    }, "delete the $args->{object}");
-    $self->mech->content_unlike(qr{$args->{object_uri}}, "$args->{object} no longer exists");
-}
-
-
-sub add_new_object_ok {
-    my ($self, $args) = @_;
-    $self->mech->get($args->{list_uri});
-    $self->mech->submit_form_ok({
-        form_name => $args->{form_name},
-        fields    => $args->{form_args},
-    }, "add new $args->{object}");
-    my $new_uri = $self->mech->uri;
-    like $new_uri, qr{$args->{page_uri_re}},
-        qq{got new $args->{object}'s edit page};
-    return $new_uri;
-}
-
-
 # These methods test the user feedback messages after submitting a
 # form.  $self->user_feedback_like() is the generic method, tests should use
 # one of the other $self->user_*_like methods instead.
