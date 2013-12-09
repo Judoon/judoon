@@ -34,10 +34,6 @@ extends 'Catalyst';
 
 use Safe::Isa;
 
-__PACKAGE__->apply_request_class_roles(qw[
-    Catalyst::TraitFor::Request::REST::ForBrowsers
-]);
-
 our $VERSION = '0.01';
 
 __PACKAGE__->config(
