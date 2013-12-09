@@ -17,8 +17,7 @@ body {}
 #footer p { color: #00a876; }
 #footer a { text-decoration: underline; color: #207e62; }
 
-
-
+.small { font-size: 90%; color: #999; }
 
 
 /* ========== Boostrap fixes ========== */

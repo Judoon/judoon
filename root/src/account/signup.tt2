@@ -4,10 +4,6 @@
 
 [%- INCLUDE 'components/notification.tt2' -%]
 
-<style type="text/css">
-.small { font-size: 90%; color: #999; }
-</style>
-
 <form name="signup_form" id="signup_form" action="[% c.uri_for_action('/account/signup') %]" method="post" class="">
 
   <label>
