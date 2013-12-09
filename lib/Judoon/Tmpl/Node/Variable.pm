@@ -19,11 +19,6 @@ with qw(
 );
 
 
-# workaround for a bug in Package::Stash::XS
-# see https://rt.cpan.org/Public/Bug/Display.html?id=80497
-our $AUTHORITY = '';
-
-
 =head1 ATTRIBUTES
 
 =head2 name

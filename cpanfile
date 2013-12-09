@@ -83,6 +83,7 @@ requires 'MooseX::Types::DateTime';
 requires 'MooseX::Types::URI';
 requires 'namespace::autoclean';
 requires 'namespace::clean';
+requires 'Package::Stash::XS' => '0.27';
 requires 'Params::Validate';
 requires 'Path::Class';
 requires 'Plack::Middleware::Debug';
