@@ -17,7 +17,8 @@ body {}
 #footer p { color: #00a876; }
 #footer a { text-decoration: underline; color: #207e62; }
 
-.small { font-size: 90%; color: #999; }
+
+fieldset { min-width: auto; }
 
 
 /* ========== Boostrap fixes ========== */
@@ -35,32 +36,21 @@ body {}
 
 
 /* ========== Utility classes ========== */
-/*
-  Action forms are used to enable button-like controls for
-  POST/PUT/DELETEs.
-*/
-.action-form {
-    display: inline-block;
-    margin-bottom: 0;  /* override the default bootstrap form styling */
-}
+
+.small { font-size: 90%; color: #999; }
+
+/* for btn-toolbars that contain multiple groups of buttons */
+.action-buttons { margin-bottom: 20px; }
 
 
 
 /* ========== Frontpage ========== */
+
 #getstarted a.btn:visited { color: #fff; }
 
 
 
-/* ========== Overview ========== */
-
-/*
-  make "Add Dataset" label on user overview page align w/ form
-  controls
-*/
-.form-inline h4.help-inline { margin-top: 0; margin-right: 5px; }
-
-
-/* ========== Page / Dataset previews ========== */
+/* ========== Public Page / Dataset ========== */
 
 #description, #preamble {
     padding-left: 1em;
@@ -79,23 +69,156 @@ body {}
     border-top: thin lightgray solid;
 }
 
-#column_canvas { min-height: 8em; }
 
-#canvas_cursor {
-    border: thin #aaa solid;
-    height: 1em;
-    width: 0.5em;
-    display: inline-block;
+/* ========== Overview ========== */
+
+/*
+  make "Add Dataset" label on user overview page align w/ form
+  controls
+*/
+.form-inline h4.help-inline { margin-top: 0; margin-right: 5px; }
+
+
+
+/* ========== Dataset ========== */
+
+/* give wide datatables a horizontal scrollbar */
+.outer-hscroll {}
+.inner-hscroll { overflow-x: scroll; }
+
+
+#ds_columns td {
+    vertical-align: top;
+    text-align: center;
+}
+#ds_columns th, #ds_columns td { border-top: none; }
+#ds_columns th { white-space: nowrap; }
+
+.add-panel {
+    border: 1px lightgray solid;
+    border-radius: 3px;
+    padding: 5px;
+    margin-top: 5px; }
+.add-panel form { margin-bottom: 5px; }
+.add-panel .form-actions {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+.add-panel-banner { font-weight: bold; }
+
+#computed_columns h5 { margin-bottom: 0px; }
+
+
+
+/* ========== Page ========== */
+
+/*
+ Handy colors:
+ #006d4c - brand color
+ #0064dc - aint bad
+*/
+
+.edit_outline {
+    border: 2px #0064dc dashed;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    min-height: 1em;
 }
 
-.widget-object { margin-right: 3px; margin-top: 3px; }
-.widget-type-text { display: inline-block; }
-.widget-type-data { display: inline-block; }
-.widget-type-link { display: inline-block; }
-.widget-type-newline { display: block; }
-.widget-type-newline-icon { display: inline-block; }
+.editable_label {
+    font-size: 90%;
+    color: #fff;
+    background-color: #0064dc;
+    padding-left: 0.5em;
+    margin-top: 1em;
+    max-width: 15em;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
 
 
-.widget-formatting-bold { font-weight: bold; }
-.widget-formatting-italic { font-style: italic; }
+.fullwidth { width: 100%; min-height: 8em; }
 
+th.active_col {
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+
+    border-color: rgba(82, 168, 236, 0.8);
+    outline: 0;
+    outline: thin dotted 9;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+}
+
+th.danger_col {
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+
+    border-color: #da4f49;
+    outline: 0;
+    outline: thin dotted 9;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #da4f49;
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #da4f49;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #da4f49;
+}
+
+
+.navbar .nav > li > a.save-ready    { color: #468847; }
+.navbar .nav > li > a.save-disabled { color: #b94a48; }
+
+
+#column_canvas {
+    min-height: 8em;
+    margin-bottom: 0;
+}
+
+.table_edit_ctrls .column_list {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.table_edit_ctrls .listsep {
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+
+ul.template_widget_list {
+    list-style-type: none;
+    margin-left: 5px;
+}
+ul.template_widget_list li {
+    display: inline-block;
+    float: left;
+    margin-right: 3px;
+    margin-left: 3px;
+}
+ul.template_widget_list li.list-top {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+ul.template_widget_list li.newline + li {
+    clear: left;
+}
+
+.cursor:after {
+    content: "";
+    border: 1px #999 solid;
+    color: transparent;
+    vertical-align: bottom;
+    padding: 0 0.4em;
+}
+
+.boldit   .widget-format-target { font-weight: bold; }
+.italicit .widget-format-target { font-style: italic }
+
+
+#page_actions .affix { top:   160px; }
