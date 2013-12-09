@@ -10,21 +10,15 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
 
-        <link rel="stylesheet" href="css/bootstrap.min.css">
         <style>
             body {
                 padding-top: 60px;
                 padding-bottom: 40px;
             }
-
-            table.table thead .sorting { background: url('img/sort_both.png') no-repeat center right; }
-            table.table thead .sorting_asc { background: url('img/sort_asc.png') no-repeat center right; }
-            table.table thead .sorting_desc { background: url('img/sort_desc.png') no-repeat center right; }
-
-            table.table thead .sorting_asc_disabled { background: url('img/sort_asc_disabled.png') no-repeat center right; }
-            table.table thead .sorting_desc_disabled { background: url('img/sort_desc_disabled.png') no-repeat center right; }
         </style>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="css/dataTables.bootstrap.css">
 
         <script src="js/vendor/modernizr-2.6.1-respond-1.1.0.min.js"></script>
     </head>
