@@ -58,7 +58,7 @@ requires 'File::Temp';
 requires 'FindBin';
 requires 'FileHandle';
 requires 'Getopt::Long';
-requires 'HTML::Scrubber';
+requires 'HTML::Restrict';
 requires 'HTML::Selector::XPath::Simple';
 requires 'HTML::TreeBuilder';
 requires 'HTTP::Headers::ActionPack';

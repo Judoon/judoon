@@ -27,6 +27,7 @@ my @fixture_sets  = qw(
     basic basic_entity simple_html scary_html simple_block
     encoded_scary long_block
     allinlinetags allblocktags badtags
+    evilhref
 );
 
 
@@ -278,7 +279,6 @@ fieldsetforminput
 labellegendoptgroup
 optionoutputselect
 textarea
-
 @@ badtags-scrubbed_block
 quack
 <p>invalid</p>
@@ -306,7 +306,12 @@ fieldsetforminput
 labellegendoptgroup
 optionoutputselect
 textarea
-
+@@ evilhref-tainted
+<a href="javascript:alert(document.cookie)">weak</a>
+@@ evilhref-scrubbed_string
+<a>weak</a>
+@@ evilhref-scrubbed_block
+<a>weak</a>
 @@ placeholder-tainted
 @@ placeholder-scrubbed_string
 @@ placeholder-scrubbed_block

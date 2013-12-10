@@ -31,7 +31,7 @@ subset of HTML is allowed, but not everything.
 
 =cut
 
-use HTML::Scrubber;
+use HTML::Restrict;
 use Types::Standard qw(InstanceOf);
 
 
@@ -84,27 +84,28 @@ my @obsolete_tags  = qw(
 
 has html_block_scrubber => (
     is  => 'lazy',
-    isa => InstanceOf['HTML::Scrubber'],
+    isa => InstanceOf['HTML::Restrict'],
 );
 sub _build_html_block_scrubber {
     my ($self) = @_;
-    my $scrubber = HTML::Scrubber->new;
-    $scrubber->{_p}->closing_plaintext(1);
-    $scrubber->rules(
-        (map {$_ => 1} @inline_tags, @block_tags),
-        p          => {style => 1,},
-        span       => {style => 1,},
-        a          => {href => 1, target => 1,},
-        table      => {style => 1,},
-        thead      => {style => 1,},
-        tbody      => {style => 1,},
-        tfoot      => {style => 1,},
-        tr         => {style => 1,},
-        th         => {style => 1, colspan => 1, rowspan => 1,},
-        td         => {style => 1, colspan => 1, rowspan => 1,},
-        (map {$_ => 0} @structure_tags, @head_tags, @invalid_tags,
-         @obsolete_tags, @advanced_tags, @form_tags),
-    );
+    my $scrubber = HTML::Restrict->new({
+        rules => {
+            (map {$_ => []} @inline_tags, @block_tags),
+            a          => [qw(href target          )],
+            p          => [qw(style                )],
+            span       => [qw(style                )],
+            table      => [qw(style                )],
+            thead      => [qw(style                )],
+            tbody      => [qw(style                )],
+            tfoot      => [qw(style                )],
+            tr         => [qw(style                )],
+            th         => [qw(style colspan rowspan)],
+            td         => [qw(style colspan rowspan)],
+            # (map {$_ => 0} @structure_tags, @head_tags, @invalid_tags,
+            #  @obsolete_tags, @advanced_tags, @form_tags),
+        },
+    });
+    $scrubber->parser->closing_plaintext(1);
     return $scrubber;
 }
 
@@ -118,21 +119,21 @@ elements.
 
 has html_string_scrubber => (
     is  => 'lazy',
-    isa => InstanceOf['HTML::Scrubber'],
+    isa => InstanceOf['HTML::Restrict'],
 );
 
 sub _build_html_string_scrubber {
     my ($self) = @_;
-    my $scrubber = HTML::Scrubber->new;
-    $scrubber->{_p}->closing_plaintext(1);
-    $scrubber->rules(
-        (map {$_ => 1} @inline_tags),
-        span   => {style => 1,},
-        a      => {href => 1, target => 1,},
-        (map {$_ => 0} @structure_tags, @head_tags, @invalid_tags,
-         @obsolete_tags, @advanced_tags, @form_tags, @block_tags),
-
-    );
+    my $scrubber = HTML::Restrict->new({
+        rules => {
+            (map {$_ => []} @inline_tags),
+            span   => [qw(style      )],
+            a      => [qw(href target)],
+            # (map {$_ => 0} @structure_tags, @head_tags, @invalid_tags,
+            #  @obsolete_tags, @advanced_tags, @form_tags, @block_tags),
+        },
+    });
+    $scrubber->parser->closing_plaintext(1);
     return $scrubber;
 }
 
@@ -149,7 +150,7 @@ elements are permitted.
 
 sub scrub_html_block {
     my ($self, $str) = @_;
-    return defined($str) ? $self->html_block_scrubber->scrub($str) : q{};
+    return $self->html_block_scrubber->process($str) // q{};
 }
 
 
@@ -161,7 +162,7 @@ Remove all block-level HTML elements from C<$string>.
 
 sub scrub_html_string {
     my ($self, $str) = @_;
-    return defined($str) ? $self->html_string_scrubber->scrub($str) : q{};
+    return $self->html_string_scrubber->process($str) // q{};
 }
 
 

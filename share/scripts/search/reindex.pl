@@ -16,7 +16,7 @@ use lib "$Bin/../../../t/lib";
 
 use Data::Printer;
 use Getopt::Long;
-use HTML::Scrubber;
+use HTML::Restrict;
 use HTML::Selector::XPath::Simple;
 use Judoon::Schema;
 use Judoon::Search;
@@ -111,7 +111,7 @@ main: {
     print " Done!\n";
 
 
-    my $html_scrubber = HTML::Scrubber->new(allow => []);
+    my $html_scrubber = HTML::Restrict->new();
 
     my $page_rs = $schema->resultset('Page');
     print "  pages...";
@@ -119,9 +119,9 @@ main: {
         my $page_doc = $domain->create(
             page => {
                 title       => $page->title,
-                description => $html_scrubber->scrub($page->preamble),
+                description => $html_scrubber->process($page->preamble),
                 content     => join(' ',
-                    map { $html_scrubber->scrub($_) }
+                    map { $html_scrubber->process($_) }
                         ($page->preamble, $page->postamble)
                 ),
                 url         => Judoon::Web->uri_for_action(
