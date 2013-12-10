@@ -12,7 +12,7 @@ test 'scrubbing' => sub {
     my ($self) = @_;
 
     my $fixtures = $self->html_fixtures;
-    for my $test (keys $fixtures) {
+    for my $test (keys %{$fixtures}) {
         is $self->scrub_html_string($fixtures->{$test}{tainted}),
             $fixtures->{$test}{scrubbed_string},
             "got expected scrubbed string for ${test}";
