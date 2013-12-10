@@ -1,3 +1,5 @@
+requires 'perl' => '5.010';
+
 requires 'Archive::Builder';
 requires 'Archive::Extract';
 requires 'Authen::Passphrase::BlowfishCrypt';
@@ -6,6 +8,7 @@ requires 'Catalyst::Action::FromPSGI' => '0.001004';
 requires 'Catalyst::Action::RenderView';
 requires 'Catalyst::Action::REST';
 requires 'Catalyst::Authentication::Store::DBIx::Class';
+requires 'Catalyst::Controller::ActionRole';
 requires 'Catalyst::Devel';
 requires 'Catalyst::Model::Adaptor';
 requires 'Catalyst::Model::DBIC::Schema';
