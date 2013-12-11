@@ -53,6 +53,9 @@ builder {
         );
     }
 
+    enable "Plack::Middleware::Static",
+        path => qr{^/static/}, root => './root/';
+
     my $mimetypes = MIME::Types->new;
     my %mapping = map {$_ => $mimetypes->mimeTypeOf($_)->type()}
         qw(tsv csv xls xlsx zip tgz);

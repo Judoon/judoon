@@ -98,7 +98,6 @@ __PACKAGE__->config(
     'Plugin::Session' => {
         flash_to_stash => 1,
     },
-    'Plugin::Static::Simple' => { dirs => ['static',], },
     'Plugin::ErrorCatcher' => {
         enable             => 0,
         context            => 5,
