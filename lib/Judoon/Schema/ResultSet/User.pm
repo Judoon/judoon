@@ -64,15 +64,21 @@ sub create_user {
 
     Judoon::Error::Input->throw({message => $errmsg}) if ($errmsg);
 
-    my $new_user = $self->create(\%valid);
 
-    # create new schema for user on Pg
-    $self->result_source->storage->dbh_do(
+    my $new_user;
+    $self->result_source->schema->txn_do(
         sub {
-            my ($storage, $dbh) = @_;
-            my $schema_name = $new_user->schema_name;
-            $dbh->do("CREATE SCHEMA $schema_name");
-        },
+            $new_user = $self->create(\%valid);
+
+            # create new schema for user on Pg
+            $self->result_source->storage->dbh_do(
+                sub {
+                    my ($storage, $dbh) = @_;
+                    my $schema_name = $new_user->schema_name;
+                    $dbh->do("CREATE SCHEMA $schema_name");
+                },
+            );
+        }
     );
 
     return $new_user;
