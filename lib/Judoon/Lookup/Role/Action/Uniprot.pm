@@ -137,7 +137,7 @@ sub lookup {
     my @accs = split /\n/, $accs;
     shift @accs;
 
-    my %result = map {split /\t/, $_} @accs;
+    my %result = map {split /\t/, $_} reverse @accs;
     my @transformed = map {$result{$_} // ''} @$col_data;
     return \@transformed;
 }
