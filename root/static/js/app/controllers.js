@@ -421,7 +421,18 @@ judoonCtrl.controller(
                      menubar         : false,
                      plugins         : "",
                      entity_encoding : "raw",
-                     toolbar         : "bold italic underline strikethrough subscript superscript removeformat | undo redo"
+                     toolbar         : "bold italic underline strikethrough subscript superscript removeformat | undo redo",
+                     invalid_elements : 'area,audio,canvas,content,data,decorator,element,embed,keygen,main,map,' +
+                         'menu,menuitem,object,param,progress,rp,rt,ruby,shadow,source,template,' +
+                         'track,video,button,datalist,fieldset,form,input,label,legend,optgroup,' +
+                         'option,output,select,textarea,base,link,meta,title,iframe,noscript,script,style,' +
+                         'acronym applet basefont bgsound,big,blink,center,dir,font,frame,' +
+                         'frameset,hgroup,isindex,listing,marquee,nobr,noframes,plaintext,spacer,' +
+                         'strike,tt,xmp,body,head,html,' +
+
+                         'address,article,aside,blockquote,br,caption,col,colgroup,dd,details,' +
+                         'div,dl,dt,figcaption,figure,footer,h1,h2,h3,h4,h5,h6,header,hr,img,li,' +
+                         'nav,ol,p,pre,section,summary,table,tbody,td,tfoot,th,thead,tr,ul'
                  },
                  block: {
                      inline            : true,
@@ -432,7 +443,14 @@ judoonCtrl.controller(
                      convert_urls      : false,
                      plugins  : "hr link image charmap paste anchor searchreplace table textcolor",
                      toolbar1 : "cut copy pastetext | undo redo | search replace | link unlink anchor | image table hr charmap | numlist bullist outdent indent blockquote",
-                     toolbar2 : "bold italic underline strikethrough subscript superscript removeformat | alignleft aligncenter alignright alignjustify | formatselect fontselect fontsizeselect forecolor backcolor"
+                     toolbar2 : "bold italic underline strikethrough subscript superscript removeformat | alignleft aligncenter alignright alignjustify | formatselect fontselect fontsizeselect forecolor backcolor",
+                     invalid_elements : 'area,audio,canvas,content,data,decorator,element,embed,keygen,main,map,' +
+                         'menu,menuitem,object,param,progress,rp,rt,ruby,shadow,source,template,' +
+                         'track,video,button,datalist,fieldset,form,input,label,legend,optgroup,' +
+                         'option,output,select,textarea,base,link,meta,title,iframe,noscript,script,style,' +
+                         'acronym applet basefont bgsound,big,blink,center,dir,font,frame,' +
+                         'frameset,hgroup,isindex,listing,marquee,nobr,noframes,plaintext,spacer,' +
+                         'strike,tt,xmp,body,head,html'
                  }
              }
          };
