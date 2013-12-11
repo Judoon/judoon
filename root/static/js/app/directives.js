@@ -47,10 +47,6 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 var tableOptions = angular.copy(defaultOptions);
                 tableOptions.aoColumns = scope.colDefs;
                 dt = element.dataTable(tableOptions);
-                if (nbrColumnsChanged) {
-                    updateHighlights(scope.editCol, 'active_col');
-                    updateHighlights(scope.deleteCol, 'danger_col');
-                }
             }
 
 
@@ -83,7 +79,11 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
                 }
                 var nbrColumnsChanged = oldval.length !== newval.length;
                 $timeout(
-                    function() {rebuildTable(nbrColumnsChanged);}, 0, false
+                    function() {
+                        rebuildTable(nbrColumnsChanged);
+                        updateHighlights(scope.editCol, 'active_col');
+                        updateHighlights(scope.deleteCol, 'danger_col');
+                    }, 0, false
                 );
             }, true);
         }
