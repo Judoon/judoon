@@ -43,6 +43,19 @@ sub index :Path :Args(0) {
 }
 
 
+=head2 error
+
+Standard 500 error page
+
+=cut
+
+sub error : Path('error') {
+    my ( $self, $c ) = @_;
+    $c->response->status(500);
+    $c->serve_static_file('root/static/html/500.html');
+}
+
+
 =head2 default
 
 Standard 404 error page
