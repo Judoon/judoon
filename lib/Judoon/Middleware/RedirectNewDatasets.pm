@@ -12,14 +12,21 @@ sub call {
     $self->response_cb($self->app->($env), sub {
         my $res = shift;
 
-        # only return is response is 201 and there's a Link header
-        my $h = Plack::Util::headers($res->[1]);
-        my $link_header = $h->get('Link');
-        return unless ($res->[0] == 201 && $link_header);
-
         # JSON requests (i.e. data) requests pass through just fine
         return if ($env->{HTTP_ACCEPT} =~ m{application/json});
 
+        my $h = Plack::Util::headers($res->[1]);
+
+        # redirect 500s to a better-looking error page
+        if ($res->[0] == 500) {
+            $h->set('Location', '/error');
+            $res->[0] = 302;
+            return;
+        }
+
+        # only modify the repsonse if status is 201 and there's a Link header
+        my $link_header = $h->get('Link');
+        return unless ($res->[0] == 201 && $link_header);
         my $link = HTTP::Headers::ActionPack::LinkHeader->new_from_string(
             $link_header
         );
