@@ -176,10 +176,14 @@
     <p ng-show="!currentColumn" class="text-center muted">No view column selected.</p>
   </div>
 
+  <div ng-class="{editmode: editmode}">
+
     <judoon-data-table
        jdt-col-defs="columnDefs" jdt-data-url="dataUrl"
        jdt-edit-col="currentColumn" jdt-delete-col="deleteColumn">
     </judoon-data-table>
+
+  </div>
 
   <br>
 
