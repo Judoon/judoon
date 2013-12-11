@@ -269,6 +269,13 @@ test 'Result::Dataset' => sub {
         [qw(id_01 id_02 id_03 _id)], 'reserved name "id" not used';
     is_deeply $id_ds->id_data, [[1],[2],[3]], 'id col has correct data';
 
+
+    # table name beginning with numbers
+    ok !exception {
+        $user->import_data_by_filename("$DATA_DIR/numbername.xlsx");
+    }, 'can import dataset whose name begins with numbers';
+
+
 };
 
 test 'Result::DatasetColumn' => sub {

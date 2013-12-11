@@ -585,6 +585,7 @@ sub _gen_table_name {
 
     $table_name = lc($table_name);
     $table_name =~ s/[^a-z_0-9]+/_/gi;
+    $table_name =~ s/^([0-9])/_$1/; # table can't begin with a number
     return $table_name unless ($self->_table_exists($table_name));
 
     my $new_name = List::AllUtils::first {not $self->_table_exists($_)}
