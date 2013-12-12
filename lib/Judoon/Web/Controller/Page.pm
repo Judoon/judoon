@@ -43,17 +43,10 @@ Fill in the stash with the necessary data.
 
 sub populate_stash {
     my ($self, $c, $page) = @_;
-
-    $c->stash->{dataset}{id} = $page->dataset_id;
-    my @page_columns = $page->page_columns_ordered->all;
-    $c->stash->{column_json} = $self->encode_json([
-        map {{
-            title       => $_->title,
-            template    => $_->template->to_jstmpl,
-            sort_fields => join("|", $_->template->get_display_variables),
-        }} @page_columns
-    ]);
-
+    $c->stash( datatable => {
+        data_url    => $c->uri_for_action('/api/datasetdata/data', [$page->dataset_id]),
+        columns_url => $c->uri_for_action('/api/wm/pagecols', [$page->id]),
+    });
     return;
 }
 

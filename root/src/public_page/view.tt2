@@ -1,29 +1,14 @@
 [% extra_js = BLOCK %]
 <script src="/static/js/vendor/jquery.dataTables.min.js"></script>
 <script src="/static/js/vendor/dataTables.bootstrap.min.js"></script>
-<script src="/static/js/vendor/handlebars.min.js"></script>
+<script src="/static/js/vendor/handlebars-1.1.2.js"></script>
+<script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
-      var column_data = [% column_json | no_escape %];
-      var aoColumns = [];
-      for (var i=0; i<column_data.length; i++) {
-          aoColumns.push({
-              sTitle : column_data[i].title,
-              sName  : column_data[i].sort_fields,
-              mData  : Handlebars.compile(column_data[i].template)
-          });
-      }
-
-      $('#datatable').dataTable({
-          "aoColumns"       : aoColumns,
-          "bAutoWidth"      : false,
-          "bServerSide"     : true,
-          "bProcessing"     : true,
-          "bDeferRender"    : true,
-          "sPaginationType" : "bootstrap",
-          "sAjaxSource"     : "/api/datasets/[% dataset.id %]/data",
-          "sAjaxDataProp"   : "tmplData"
-      });
+      initDataTable(
+         '#datatable', '[% datatable.data_url %]',
+         '[% datatable.columns_url %]', getPageCols
+      );
   });
 </script>
 [% END %]
