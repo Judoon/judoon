@@ -4,7 +4,7 @@
 <script>
   $(document).ready(function() {
 
-      var column_data = [% column_json %];
+      var column_data = [% column_json | no_escape %];
       var aoColumns = [];
       for (var i=0; i<column_data.length; i++) {
           aoColumns.push({
@@ -27,7 +27,7 @@
 </script>
 [% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "View Dataset for &quot;$dataset.object.name&quot;"
+  title = "View Dataset for &quot;" _ dataset.object.name _ "&quot;"
   extra_javascript = extra_js
 %]
 
@@ -37,7 +37,7 @@
 <h2>[% dataset.object.name %]</h2>
 
 <section id="description">
-[% dataset.object.description | html_para %]
+[% dataset.object.description %]
 </section>
 
 <table id="demo_dataset" class="display data_table table table-striped table-condensed table-border">

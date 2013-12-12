@@ -4,7 +4,7 @@
 <script src="/static/js/vendor/handlebars.min.js"></script>
 <script>
   $(document).ready(function() {
-      var column_data = [% column_json %];
+      var column_data = [% column_json | no_escape %];
       var aoColumns = [];
       for (var i=0; i<column_data.length; i++) {
           aoColumns.push({
@@ -14,7 +14,6 @@
           });
       }
 
-      console.log("WTF?!");
       $('#demo_page').dataTable({
           "aoColumns"       : aoColumns,
           "bAutoWidth"      : false,
@@ -29,17 +28,17 @@
 </script>
 [% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "View for &quot;page.object.title&quot;"
+  title = "View for &quot;" _ strip_html(page.object.title) _ "&quot;"
   extra_javascript = extra_js
 %]
 
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<h2>[% page.object.title %]</h2>
+<h2>[% page.object.title | no_escape %]</h2>
 
 <section id="preamble">
-[% page.object.preamble | html_para %]
+[% page.object.preamble | no_escape %]
 </section>
 
 <table id="demo_page" class="display data_table table table-striped table-condensed table-border">
@@ -48,7 +47,7 @@
 </table>
 
 <section id="postamble">
-[% page.object.postamble | html_para %]
+[% page.object.postamble | no_escape %]
 </section>
 
 [% END %]

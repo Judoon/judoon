@@ -14,15 +14,21 @@ Template Toolkit View for Judoon::Web.
 
 =cut
 
+BEGIN {use HTML::String::TT;}
+
 use Moose;
 use namespace::autoclean;
 
 extends 'Catalyst::View::TT';
 
+use HTML::Restrict;
+
+
 __PACKAGE__->config(
+    CLASS              => 'HTML::String::TT',
     TEMPLATE_EXTENSION => '.tt',
-    render_die => 1,
-    expose_methods     => [qw(uri_for_action)],
+    render_die         => 1,
+    expose_methods     => [qw(strip_html uri_for_action)],
 );
 
 
@@ -39,6 +45,18 @@ sub uri_for_action {
     my $c      = shift;
     my $action = shift;
     return $c->uri_for_action("$action", @_);
+}
+
+
+=head2 strip_html
+
+Remove all HTML from the input string.
+
+=cut
+
+sub strip_html {
+    my ($self, $c, $input) = @_;
+    return HTML::Restrict->new->process($input);
 }
 
 
