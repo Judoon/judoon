@@ -39,7 +39,7 @@ use File::Temp qw(tempfile);
 use Judoon::Error::Devel::Foreign;
 use Judoon::Table;
 use Judoon::TypeRegistry;
-use Path::Class qw(dir);
+use Path::Tiny qw(path);
 use Template;
 
 use Moo;
@@ -87,15 +87,15 @@ project root. Default: C<cgi-bin/datatypes.tab>.
 
 =head3 template_dir
 
-L<Path::Class::Dir> object where the templates are kept.
+L<Path::Tiny> object where the templates are kept.
 
 =head3 skeleton_dir
 
-L<Path::Class::Dir> object where the static files are kept.
+L<Path::Tiny> object where the static files are kept.
 
 =head3 index_tmpl
 
-L<Path::Class::File> object for the index.html template.
+L<Path::Tiny> object for the index.html template.
 
 =head3 tt
 
@@ -120,11 +120,11 @@ has standalone_types => (is => 'lazy',);
 sub _build_standalone_types { return 'cgi-bin/datatypes.tab'; }
 
 has template_dir => (is => 'lazy',);
-sub _build_template_dir { return dir('root/src/standalone'); }
+sub _build_template_dir { return path('root/src/standalone'); }
 has skeleton_dir => (is => 'lazy',);
-sub _build_skeleton_dir { return $_[0]->template_dir->subdir('skeleton'); }
+sub _build_skeleton_dir { return $_[0]->template_dir->child('skeleton'); }
 has index_tmpl => (is => 'lazy',);
-sub _build_index_tmpl { return $_[0]->template_dir->file('index.tt2'); }
+sub _build_index_tmpl { return $_[0]->template_dir->child('index.tt2'); }
 
 has tt => (is => 'lazy',);
 sub _build_tt { return Template->new; }
@@ -142,8 +142,8 @@ sub _build_archive {
     my $archive_section = $archive->new_section($self->archive_name);
 
     # add static files
-    $self->skeleton_dir->recurse( callback => sub {
-        my ($child) = @_;
+    my $iter = $self->skeleton_dir->iterator({recurse => 1});
+    while (my $child = $iter->()) {
         if (not $child->is_dir) {
             my $child_path = $child->relative($self->skeleton_dir);
             $archive_section->new_file(
@@ -154,7 +154,7 @@ sub _build_archive {
                 foreign_message => $archive->errstr,
             });
         }
-    } );
+    }
 
     # mark data.cgi as executable, so permissions work
     $archive_section->file('cgi-bin/data.cgi')->executable;

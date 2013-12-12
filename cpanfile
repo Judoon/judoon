@@ -88,7 +88,7 @@ requires 'namespace::autoclean';
 requires 'namespace::clean';
 requires 'Package::Stash::XS' => '0.27';
 requires 'Params::Validate';
-requires 'Path::Class';
+requires 'Path::Tiny';
 requires 'Plack::Middleware::Debug';
 requires 'Plack::Middleware::Debug::DBIC::QueryLog';
 requires 'Plack::Middleware::SetAccept';
