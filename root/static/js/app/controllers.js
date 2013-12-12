@@ -221,8 +221,8 @@ judoonCtrl.controller(
              $scope.columnDefs = [];
              angular.forEach($scope.dataset.columns, function(value) {
                  $scope.columnDefs.push({
-                     sTitle : value.name,
-                     mData  : value.shortname,
+                     sTitle : Handlebars.Utils.escapeExpression(value.name),
+                     mData  : Handlebars.compile('{{'+value.shortname+'}}'),
                      sName  : value.shortname,
                      column : value
                  });
