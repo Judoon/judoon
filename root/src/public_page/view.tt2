@@ -14,7 +14,7 @@
           });
       }
 
-      $('#demo_page').dataTable({
+      $('#datatable').dataTable({
           "aoColumns"       : aoColumns,
           "bAutoWidth"      : false,
           "bServerSide"     : true,
@@ -41,9 +41,9 @@
 [% page.object.preamble | no_escape %]
 </section>
 
-<table id="demo_page" class="display data_table table table-striped table-condensed table-border">
+<table id="datatable" class="table table-striped table-condensed">
   <thead></thead>
-  <tbody> </tbody>
+  <tbody></tbody>
 </table>
 
 <section id="postamble">

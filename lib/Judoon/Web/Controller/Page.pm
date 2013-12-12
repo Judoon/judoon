@@ -46,8 +46,6 @@ sub populate_stash {
 
     $c->stash->{dataset}{id} = $page->dataset_id;
     my @page_columns = $page->page_columns_ordered->all;
-    $c->stash->{page_column}{list} = [map {$_->TO_JSON} @page_columns];
-
     $c->stash->{column_json} = $self->encode_json([
         map {{
             title       => $_->title,

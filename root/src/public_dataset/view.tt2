@@ -13,7 +13,7 @@
               sName  : column_data[i].shortname
           });
       }
-      $('#demo_dataset').dataTable({
+      $('#datatable').dataTable({
           "aoColumns"       : aoColumns,
           "bAutoWidth"      : false,
           "bServerSide"     : true,
@@ -40,7 +40,7 @@
 [% dataset.object.description %]
 </section>
 
-<table id="demo_dataset" class="display data_table table table-striped table-condensed table-border">
+<table id="datatable" class="table table-striped table-condensed">
   <thead></thead>
   <tbody></tbody>
 </table>
