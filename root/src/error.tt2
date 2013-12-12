@@ -10,6 +10,6 @@
   please try again shortly.
 </p>
 
-<p>Lacking alternatives, why not try our <a href="[% c.uri_for_action('/index') %]">front page</a>?</p>
+<p>Lacking alternatives, why not try our <a href="[% uri_for_action('/index') %]">front page</a>?</p>
 
 [% END %]

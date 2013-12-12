@@ -4,7 +4,7 @@
 
 [%- INCLUDE 'components/notification.tt2' -%]
 
-<form name="signup_form" id="signup_form" action="[% c.uri_for_action('/account/signup') %]" method="post" class="">
+<form name="signup_form" id="signup_form" action="[% uri_for_action('/account/signup') %]" method="post" class="">
 
   <label>
     Username <span class="small">(required)</span>
