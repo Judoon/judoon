@@ -15,7 +15,7 @@
     <label>Name</label>
     <input type="text" form="profile_form" class="span3" name="user.name" value="[% user.object.name %]">
 
-    [% INCLUDE 'components/forms/form_submit.tt2'
+    [% INCLUDE 'components/form_submit.tt2'
        submit_type = 'update'
        form_name   = 'profile_form'
     %]
