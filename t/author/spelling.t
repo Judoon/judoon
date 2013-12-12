@@ -90,3 +90,4 @@ serializable
 sitelinker
 updatable
 plaintext
+shortnames
