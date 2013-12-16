@@ -8,6 +8,7 @@ use namespace::clean;
 
 extends 'Judoon::API::Resource';
 with 'Judoon::Role::JsonEncoder';
+with 'Judoon::Role::ScrubHTML';
 with 'Judoon::API::Resource::Role::Item';
 
 sub update_allows { return qw(title sort widgets) }
@@ -31,6 +32,10 @@ around update_resource => sub {
     my $orig = shift;
     my $self = shift;
     my $data = shift;
+
+    if (exists $data->{title}) {
+        $data->{title} = $self->scrub_html_string($data->{title});
+    }
 
     # if (my $jstmpl = delete $data->{template}) {
     #     my $tmpl   = Judoon::Tmpl->new_from_jstmpl($jstmpl);

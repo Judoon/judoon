@@ -115,11 +115,31 @@ sub get_cloneable_columns {
 }
 
 
+=head2 sort_fields
+
+Get the list of C<DatasetColumn> shortnames that we should use for
+sorting our templates.  This is the list of variables found in the
+plain text representation of the template. e.g. if the template is a
+link node, it will return any variable used in the label portion of
+the link, and ignore anything in the url portion.
+
+=cut
+
+sub sort_fields { shift->template->get_display_variables }
+
+
+=head2 TO_JSON
+
+A JSON representation of our page column.
+
+=cut
+
 sub TO_JSON {
     my ($self) = @_;
     return {
-        template => $self->template->to_jstmpl,
-        widgets  => $self->template->to_data,
+        template    => $self->template->to_jstmpl,
+        widgets     => $self->template->to_data,
+        sort_fields => join('|', $self->sort_fields),
         %{ $self->next::method },
     };
 }

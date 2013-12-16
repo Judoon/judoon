@@ -63,6 +63,7 @@ requires 'FileHandle';
 requires 'Getopt::Long';
 requires 'HTML::Restrict';
 requires 'HTML::Selector::XPath::Simple';
+requires 'HTML::String::TT';
 requires 'HTML::TreeBuilder';
 requires 'HTTP::Headers::ActionPack';
 requires 'HTTP::Throwable';

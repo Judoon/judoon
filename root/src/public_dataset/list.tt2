@@ -25,7 +25,7 @@
         <td>[%- loop.count -%]<a name="dataset_[%- dataset_obj.id -%]"></a></td>
         <td><a href="[%- dataset_obj.view_url -%]">[%- dataset_obj.name -%]</a></td>
         <td>[%- dataset_obj.nbr_columns -%] / [%- dataset_obj.nbr_rows -%]</td>
-        <td>[%- dataset_obj.notes || '-' | truncate(30) -%]</td>
+        <td>[%- dataset_obj.description || '-' | truncate(30) -%]</td>
         <td>[%- dataset_owner.name -%]</td>
       </tr>
       [%- END -%]

@@ -1,33 +1,17 @@
 [% extra_js = BLOCK %]
-<script src="/static/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/static/js/vendor/dataTables.bootstrap.min.js"></script>
+[%- INCLUDE 'components/datatables_js.tt2' -%]
+<script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
-
-      var column_data = [% column_json %];
-      var aoColumns = [];
-      for (var i=0; i<column_data.length; i++) {
-          aoColumns.push({
-              sTitle : column_data[i].name,
-              mData  : column_data[i].shortname,
-              sName  : column_data[i].shortname
-          });
-      }
-      $('#demo_dataset').dataTable({
-          "aoColumns"       : aoColumns,
-          "bAutoWidth"      : false,
-          "bServerSide"     : true,
-          "bProcessing"     : true,
-          "bDeferRender"    : true,
-          "sPaginationType" : "bootstrap",
-          "sAjaxSource"     : "/api/datasets/[% dataset.object.id %]/data",
-          "sAjaxDataProp"   : "tmplData"
-      });
+      initDataTable(
+         '#datatable', '[% datatable.data_url %]',
+         '[% datatable.columns_url %]', getDatasetCols
+      );
   });
 </script>
 [% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "View Dataset for &quot;$dataset.object.name&quot;"
+  title = "View Dataset for &quot;" _ dataset.object.name _ "&quot;"
   extra_javascript = extra_js
 %]
 
@@ -37,10 +21,10 @@
 <h2>[% dataset.object.name %]</h2>
 
 <section id="description">
-[% dataset.object.description | html_para %]
+[% dataset.object.description %]
 </section>
 
-<table id="demo_dataset" class="display data_table table table-striped table-condensed table-border">
+<table id="datatable" class="table table-striped table-condensed">
   <thead></thead>
   <tbody></tbody>
 </table>

@@ -5,7 +5,7 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<form name="profile_form" id="profile_form" method="post" action="[% c.uri_for_action('/account/profile') %]" class="">
+<form name="profile_form" id="profile_form" method="post" action="[% uri_for_action('/account/profile') %]" class="">
   <fieldset>
     <legend>Update your profile</legend>
 
@@ -15,7 +15,7 @@
     <label>Name</label>
     <input type="text" form="profile_form" class="span3" name="user.name" value="[% user.object.name %]">
 
-    [% INCLUDE 'components/forms/form_submit.tt2'
+    [% INCLUDE 'components/form_submit.tt2'
        submit_type = 'update'
        form_name   = 'profile_form'
     %]

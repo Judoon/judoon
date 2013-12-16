@@ -221,8 +221,8 @@ judoonCtrl.controller(
              $scope.columnDefs = [];
              angular.forEach($scope.dataset.columns, function(value) {
                  $scope.columnDefs.push({
-                     sTitle : value.name,
-                     mData  : value.shortname,
+                     sTitle : Handlebars.Utils.escapeExpression(value.name),
+                     mData  : Handlebars.compile('{{'+value.shortname+'}}'),
                      sName  : value.shortname,
                      column : value
                  });
@@ -462,7 +462,9 @@ judoonCtrl.controller(
          $scope.trustTitle     = function() { return $sce.trustAsHtml($scope.page.title);     };
          $scope.trustPreamble  = function() { return $sce.trustAsHtml($scope.page.preamble);  };
          $scope.trustPostamble = function() { return $sce.trustAsHtml($scope.page.postamble); };
-
+         $scope.scrubHtml      = function(text) {
+             return String(text).replace(/<(?:.|\n)*?>/gm, '');
+         };
 
          $scope.$watch('page.columnsLoaded', function () {
              if (!$scope.page.columnsLoaded) {

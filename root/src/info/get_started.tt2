@@ -9,13 +9,13 @@
   <h2>Getting started</h2>
   <p>
     To get started with Judoon, you'll need to first 
-    <a href="[% c.uri_for_action('/account/signup') %]">create
+    <a href="[% uri_for_action('/account/signup') %]">create
     an account</a>.  It's quick, and once you're done you'll
-    be taken to your [% IF c.user_exists %]<a href="[% c.uri_for_action('/jsapp/user_view', [c.user.username]) %]">overview page</a>[% ELSE %]overview page[% END %].
+    be taken to your [% IF c.user_exists %]<a href="[% uri_for_action('/jsapp/user_view', [c.user.username]) %]">overview page</a>[% ELSE %]overview page[% END %].
   </p>
 
   [% IF !c.user_exists %]
-  <p>(Already signed-up?  Then <a href="[% c.uri_for_action('/login/login') %]">log in</a>.)</p>
+  <p>(Already signed-up?  Then <a href="[% uri_for_action('/login/login') %]">log in</a>.)</p>
   [% END %]
 
   <p>
@@ -41,9 +41,9 @@
 
   <p>
     Does that sound interesting?  If so, then please 
-    <a href="[% c.uri_for_action('/account/signup') %]">sign up</a>
+    <a href="[% uri_for_action('/account/signup') %]">sign up</a>
     to get started!  Or check out what other users have done
-    on the <a href="[% c.uri_for_action('/page/list') %]">public view</a> list.
+    on the <a href="[% uri_for_action('/page/list') %]">public view</a> list.
   </p>
   
 </section>

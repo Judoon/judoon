@@ -113,6 +113,8 @@ with qw(
 __PACKAGE__->register_permissions;
 __PACKAGE__->register_timestamps;
 
+with 'Judoon::Role::ScrubHTML';
+
 
 =head1 ATTRIBUTES
 
@@ -272,7 +274,7 @@ EOS
     $DEFAULT_POSTAMBLE .= DateTime->now();
 
     my $page = $self->create_related('pages', {
-        title     => $self->name,
+        title     => $self->scrub_html_string($self->name),
         preamble  => $DEFAULT_PREAMBLE,
         postamble => $DEFAULT_POSTAMBLE,
     });
@@ -280,7 +282,7 @@ EOS
     my $i = 1;
     for my $ds_column ($self->ds_columns_ordered->all) {
         my $page_column = $page->create_related('page_columns', {
-            title    => $ds_column->name,
+            title    => $self->scrub_html_string($ds_column->name),
             template => Judoon::Tmpl->new_from_data([
                 {type => 'variable', name => $ds_column->shortname,}
             ]),

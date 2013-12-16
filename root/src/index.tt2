@@ -36,7 +36,7 @@
 
   <br>
 
-  <p id="getstarted"><a class="btn btn-primary" href="[% c.uri_for_action('/info/get_started') %]">Get started!</a></p>
+  <p id="getstarted"><a class="btn btn-primary" href="[% uri_for_action('/info/get_started') %]">Get started!</a></p>
 
 </div>
 

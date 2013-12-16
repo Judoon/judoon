@@ -1,54 +1,36 @@
 [% extra_js = BLOCK %]
-<script src="/static/js/vendor/jquery.dataTables.min.js"></script>
-<script src="/static/js/vendor/dataTables.bootstrap.min.js"></script>
-<script src="/static/js/vendor/handlebars.min.js"></script>
+[%- INCLUDE 'components/datatables_js.tt2' -%]
+<script src="/static/js/judoon.js"></script>
 <script>
   $(document).ready(function() {
-      var column_data = [% column_json %];
-      var aoColumns = [];
-      for (var i=0; i<column_data.length; i++) {
-          aoColumns.push({
-              sTitle : column_data[i].title,
-              sName  : column_data[i].sort_fields,
-              mData  : Handlebars.compile(column_data[i].template)
-          });
-      }
-
-      console.log("WTF?!");
-      $('#demo_page').dataTable({
-          "aoColumns"       : aoColumns,
-          "bAutoWidth"      : false,
-          "bServerSide"     : true,
-          "bProcessing"     : true,
-          "bDeferRender"    : true,
-          "sPaginationType" : "bootstrap",
-          "sAjaxSource"     : "/api/datasets/[% dataset.id %]/data",
-          "sAjaxDataProp"   : "tmplData"
-      });
+      initDataTable(
+         '#datatable', '[% datatable.data_url %]',
+         '[% datatable.columns_url %]', getPageCols
+      );
   });
 </script>
 [% END %]
 [% WRAPPER components/wrapper.tt2
-  title = "View for &quot;page.object.title&quot;"
+  title = "View for &quot;" _ strip_html(page.object.title) _ "&quot;"
   extra_javascript = extra_js
 %]
 
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
-<h2>[% page.object.title %]</h2>
+<h2>[% page.object.title | no_escape %]</h2>
 
 <section id="preamble">
-[% page.object.preamble | html_para %]
+[% page.object.preamble | no_escape %]
 </section>
 
-<table id="demo_page" class="display data_table table table-striped table-condensed table-border">
+<table id="datatable" class="table table-striped table-condensed">
   <thead></thead>
-  <tbody> </tbody>
+  <tbody></tbody>
 </table>
 
 <section id="postamble">
-[% page.object.postamble | html_para %]
+[% page.object.postamble | no_escape %]
 </section>
 
 [% END %]
