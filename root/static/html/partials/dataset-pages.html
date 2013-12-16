@@ -56,7 +56,7 @@
                 <ul>
                   <li><strong>Created on:</strong> {{page.created}}</li>
                   <li>This view is <strong>{{page.permission}}</strong>.</li>
-                  <li><strong>Columns:</strong> <span ng-repeat="page_col in page.columns">{{page_col.title}}<span ng-hide="$last">, </span></span></li>
+                  <li><strong>Columns:</strong> <span ng-repeat="page_col in page.columns"><span ng-bind-html="page_col.title"></span><span ng-hide="$last">, </span></span></li>
                 </ul>
               </div>
 

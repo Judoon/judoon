@@ -462,7 +462,9 @@ judoonCtrl.controller(
          $scope.trustTitle     = function() { return $sce.trustAsHtml($scope.page.title);     };
          $scope.trustPreamble  = function() { return $sce.trustAsHtml($scope.page.preamble);  };
          $scope.trustPostamble = function() { return $sce.trustAsHtml($scope.page.postamble); };
-
+         $scope.scrubHtml      = function(text) {
+             return String(text).replace(/<(?:.|\n)*?>/gm, '');
+         };
 
          $scope.$watch('page.columnsLoaded', function () {
              if (!$scope.page.columnsLoaded) {
