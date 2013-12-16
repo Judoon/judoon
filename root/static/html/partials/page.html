@@ -91,9 +91,15 @@
 
     <form ng-show="currentColumn" class="form-horizontal">
       <div class="control-group">
-        <label class="control-label" for="page.title">Title: </label>
+        <label class="control-label">Title: </label>
         <div class="controls">
-          <input type="text" class="span6" required name="page.title" id="page.title" ng-model="currentColumn.title">
+          <div ng-repeat="column in page.columns">
+            <div class="span6 uneditable-input faux-input"
+                 ui-tinymce-inline="tinymce.config.inline"
+                 ng-model="column.title"
+                 ng-show="currentColumn==column">
+            </div>
+          </div>
         </div>
       </div>
 
