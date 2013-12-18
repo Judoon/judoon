@@ -5,14 +5,18 @@ use warnings;
 
 use Test::More;
 
+
+# Judoon::Web uses HTML::String::TT, which warns if loaded after
+# Template.  Make sure we load Judoon::Web before any other modules.
 BEGIN {
     my @modules = qw(
+        Judoon::Web
+
         Judoon::Schema
         Judoon::Tmpl
         Judoon::SiteLinker
         Judoon::Spreadsheet
         Judoon::Standalone
-        Judoon::Web
     );
 
 
