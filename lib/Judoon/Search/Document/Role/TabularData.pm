@@ -2,7 +2,7 @@ package Judoon::Search::Document::Role::TabularData;
 
 use Moose::Role;
 
-use MooseX::Types::Common::Numeric qw(PositiveInt);
+use MooseX::Types::Common::Numeric qw(PositiveOrZeroInt);
 use MooseX::Types::DateTime qw(DateTime);
 use MooseX::Types::Moose qw(Str ArrayRef);
 
@@ -29,12 +29,12 @@ has data => (
 has nbr_rows => (
     traits => ['ElasticField'],
     is     => 'ro',
-    isa    => PositiveInt,
+    isa    => PositiveOrZeroInt,
 );
 has nbr_columns => (
     traits => ['ElasticField'],
     is     => 'ro',
-    isa    => PositiveInt,
+    isa    => PositiveOrZeroInt,
 );
 
 has created => (
