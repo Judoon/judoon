@@ -84,9 +84,9 @@ test 'Login / Logout' => sub {
     $self->no_redirect_ok('/settings/profile', 'can get to profile after login');
 
     # can't re-login
-    $self->redirects_to_ok('/login', '/user/testuser');
+    $self->redirects_to_ok('/login', '/users/testuser');
     $self->mech->post('/login', \%credentials,);
-    like $self->mech->uri, qr{/user/testuser$},
+    like $self->mech->uri, qr{/users/testuser$},
         'posting to login redirects to overview';
 
     $self->mech->get_ok('/get_started', 'get get_started page while logged-in');
@@ -104,7 +104,7 @@ test 'Account' => sub {
         $self->logout();
         $self->redirects_to_ok('/account', '/login');
         $self->my_login('testuser');
-        $self->redirects_to_ok('/account', '/user/testuser');
+        $self->redirects_to_ok('/account', '/users/testuser');
     };
 
 
@@ -133,7 +133,7 @@ test 'Account' => sub {
 
         $newuser{'user.username'} = 'newuser';
         $self->mech->post_ok('/account/signup', \%newuser, 'can create new user');
-        like $self->mech->uri, qr{/user/newuser},
+        like $self->mech->uri, qr{/users/newuser},
             '  ...and send new user to their datasets';
     };
 
@@ -269,7 +269,7 @@ test 'Password Reset' => sub {
 
             # make sure we can log in as normal user even after passwd reset
             $self->my_login('testuser');
-            $self->redirects_to_ok($pass_resend_uri, '/user/testuser',);
+            $self->redirects_to_ok($pass_resend_uri, '/users/testuser',);
             $self->logout();
 
             $self->mech->get_ok($reset_uri, 'can get uri reset page');
@@ -309,12 +309,12 @@ test 'Password Reset' => sub {
                 form_name => 'password_form',
                 fields => {qw(new_password newpasswd confirm_new_password newpasswd)},
             }, 'submit password reset okay');
-            like $self->mech->uri, qr{/user/testuser$}, 'sent to testuser overview page';
+            like $self->mech->uri, qr{/users/testuser$}, 'sent to testuser overview page';
 
             $self->logout();
             $self->users->{testuser}{password} = 'newpasswd';
             $self->my_login('testuser');
-            like $self->mech->uri, qr{/user/testuser}, 'Password successfully reset';
+            like $self->mech->uri, qr{/users/testuser}, 'Password successfully reset';
             $self->logout();
 
             $self->mech->get($reset_uri);
@@ -362,9 +362,9 @@ test 'User List' => sub {
     my ($self) = @_;
 
     $self->logout();
-    $self->redirects_to_ok('/user', '/login');
+    $self->redirects_to_ok('/users', '/login');
     $self->my_login('testuser');
-    $self->redirects_to_ok('/user', '/user/testuser');
+    $self->redirects_to_ok('/users', '/users/testuser');
 };
 
 

@@ -32,7 +32,7 @@ sub call {
         );
 
         my ($page_id) = ($link->href =~ m/(\d+)$/);
-        my $new_loc   = $env->{HTTP_REFERER} . "/page/$page_id";
+        my $new_loc   = $env->{HTTP_REFERER} . "/views/$page_id";
         my $host      = $env->{HTTP_HOST};
         $new_loc      =~ s{^http.?://$host}{};
         $new_loc      .= '?welcome=1';

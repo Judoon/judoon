@@ -15,7 +15,7 @@ judoonApp.config(
 
          $locationProvider.html5Mode(true);
          $routeProvider
-             .when('/user/:userName', {
+             .when('/users/:userName', {
                  templateUrl    : '/static/html/partials/user.html',
                  controller     : 'UserCtrl',
                  reloadOnSearch : false,
@@ -26,7 +26,7 @@ judoonApp.config(
                      }]
                  }
              })
-             .when('/user/:userName/dataset/:datasetId', {
+             .when('/users/:userName/datasets/:datasetId', {
                  templateUrl    : '/static/html/partials/dataset.html',
                  controller     : 'DatasetCtrl',
                  reloadOnSearch : false,
@@ -41,7 +41,7 @@ judoonApp.config(
                      }]
                  }
              })
-             .when('/user/:userName/page/:pageId', {
+             .when('/users/:userName/views/:pageId', {
                  templateUrl: '/static/html/partials/page.html',
                  controller: 'PageCtrl',
                  resolve: {

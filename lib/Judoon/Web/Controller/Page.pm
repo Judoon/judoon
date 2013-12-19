@@ -23,7 +23,7 @@ with qw(
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/base', PathPart => 'page', },
+        base => { Chained => '/base', PathPart => 'views', },
     },
 
     resultset_class => 'User::Page',

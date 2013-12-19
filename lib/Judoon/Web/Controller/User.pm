@@ -26,7 +26,7 @@ Base action for managing user pages.  Currently does nothing.
 
 =cut
 
-sub base : Chained('/base') PathPart('user') CaptureArgs(0) {}
+sub base : Chained('/base') PathPart('users') CaptureArgs(0) {}
 
 
 =head2 list

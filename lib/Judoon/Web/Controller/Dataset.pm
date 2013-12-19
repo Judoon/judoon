@@ -23,7 +23,7 @@ with qw(
 
 __PACKAGE__->config(
     action => {
-        base => { Chained => '/base', PathPart => 'dataset', },
+        base => { Chained => '/base', PathPart => 'datasets', },
     },
 
     resultset_class => 'User::Dataset',

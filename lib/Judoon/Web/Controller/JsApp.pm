@@ -14,7 +14,7 @@ sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {
 sub user_view : Chained('base') PathPart('') Args(0) {}
 
 
-sub dataset_view : Chained('base') PathPart('dataset') Args(1) {
+sub dataset_view : Chained('base') PathPart('datasets') Args(1) {
     my ($self, $c, $ds_id) = @_;
 
     my $dataset = $c->stash->{user}{object}->datasets_rs->find({id => $ds_id});
@@ -30,7 +30,7 @@ sub dataset_view : Chained('base') PathPart('dataset') Args(1) {
 }
 
 
-sub page_view : Chained('base') PathPart('page') Args(1) {
+sub page_view : Chained('base') PathPart('views') Args(1) {
     my ($self, $c, $page_id) = @_;
 
     my $page = $c->stash->{user}{object}->my_pages->find({id => $page_id});
