@@ -14,6 +14,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../../../lib";
 use lib "$Bin/../../../t/lib";
 
+use Judoon::Web;
 use Data::Printer;
 use Getopt::Long;
 use HTML::Restrict;
@@ -21,15 +22,13 @@ use HTML::Selector::XPath::Simple;
 use Judoon::Schema;
 use Judoon::Search;
 use Pod::Usage;
-use t::DB;
-
+use Template;
 
 main: {
     my ($help);
     GetOptions('help|h' => \$help) or pod2usage(2);
     pod2usage(1) if ($help);
 
-    my $mech   = t::DB::new_mech();
     my $model  = Judoon::Search->new;
     my $index  = $model->namespace('judoon')->index;
     my $domain = $model->domain('judoon');
@@ -41,13 +40,24 @@ main: {
 
 
     print "Beginning indexing\n";
+
     # index static pages on our website
-    # fixme: this should probably be a crawler
     print "  static pages...";
+    my $html_scrubber = HTML::Restrict->new();
+    my $tt = Template->new({
+        INCLUDE_PATH => "$Bin/../../../root/src/",
+        VARIABLES    => {
+            c => {},
+            uri_for_action => sub { return Judoon::Web->uri_for_action(@_); },
+        },
+    });
     my @static_pages = qw(about news get_started);
     for my $static_page (@static_pages) {
-        $mech->get("/$static_page");
-        my $sel = HTML::Selector::XPath::Simple->new($mech->content);
+
+        my $html;
+        $tt->process("info/${static_page}.tt2", {}, \$html);
+
+        my $sel = HTML::Selector::XPath::Simple->new($html);
         my $content = join ' ', map {ref($_) ? $_->as_text : $_}
             $sel->select('#content p');
 
@@ -59,7 +69,7 @@ main: {
             webpage => {
                 title       => $title,
                 description => $description,
-                content     => $content,
+                content     => $html_scrubber->process($content),
                 url         => Judoon::Web->uri_for("/$static_page"),
             }
         );
@@ -92,8 +102,7 @@ main: {
                 description => $dataset->description,
                 content     => $dataset->description,
                 url         => Judoon::Web->uri_for_action(
-                    '/dataset/view',
-                    [$dataset->user->username, $dataset->id]
+                    '/dataset/view', [$dataset->id]
                 ),
 
                 private     => $dataset->is_private,
@@ -111,22 +120,19 @@ main: {
     print " Done!\n";
 
 
-    my $html_scrubber = HTML::Restrict->new();
-
     my $page_rs = $schema->resultset('Page');
     print "  pages...";
     while ( my $page = $page_rs->next ) {
         my $page_doc = $domain->create(
             page => {
-                title       => $page->title,
+                title       => $html_scrubber->process($page->title),
                 description => $html_scrubber->process($page->preamble),
                 content     => join(' ',
                     map { $html_scrubber->process($_) }
                         ($page->preamble, $page->postamble)
                 ),
                 url         => Judoon::Web->uri_for_action(
-                    '/page/view',
-                    [$page->dataset->user->username, $page->id,]
+                    '/page/view', [$page->id,]
                 ),
 
                 private     => $page->is_private,
@@ -144,11 +150,6 @@ main: {
     print " Done!\n";
 
     $schema->storage->disconnect;
-    done();
-}
-
-sub done {
-    t::DB::get_schema()->storage->disconnect;
     exit;
 }
 
