@@ -20,6 +20,7 @@ with qw(
     Judoon::Web::Controller::Role::ExtractParams
 );
 
+use Email::Address;
 use Safe::Isa;
 use Try::Tiny;
 
@@ -234,14 +235,33 @@ sub profile_GET {}
 sub profile_POST {
     my ($self, $c) = @_;
 
-    my $params = $c->req->params;
+    my $params      = $c->req->params;
     my %user_params = $self->extract_params('user', $params);
+    my ($email)       = Email::Address->parse($user_params{email_address});
+    my $user_rs     = $c->model('User::User');
+    my $error;
+
+    if (!$email) {
+        $error = 'Invalid email address!';
+    }
+    elsif (my $other_user = $user_rs->email_exists($email->address)) {
+        if ($other_user->username ne $c->user->username) {
+            $error = 'This email is already being used by another user!';
+        }
+    }
+
+    if ($error) {
+        $c->stash->{alert}{error} = "Unable to update profile: $error";
+        $c->stash->{user}{object} = \%user_params;
+        $c->detach;
+    }
+
     try {
+        $user_params{email_address} = $email->address;
         $c->user->update(\%user_params);
     }
     catch {
-        $c->stash->{alert}{error} = "Unable to update profile: $@";
-        $c->detach;
+        die $_;
     };
 
     $c->stash->{alert}{success} = 'Your profile has been updated.';
