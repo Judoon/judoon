@@ -136,6 +136,7 @@ sub BUILD {
     my $build_meth  = $parsertype_map{ $self->filetype }->{build};
     my $type_meth   = $parsertype_map{ $self->filetype }->{data_type};
     my ($name, $data) = $self->$build_meth();
+    $self->filehandle->close();
 
     $self->{name} = $name;
     my $headers          = shift @$data;
