@@ -9,14 +9,9 @@ var judoonApp = angular.module(
      'judoon.services', 'judoon.controllers', 'judoon.directives']
 );
 
-judoonApp.constant('_START_REQUEST_', '_START_REQUEST_');
-judoonApp.constant('_END_REQUEST_', '_END_REQUEST_');
-
 judoonApp.config(
     ['$locationProvider', '$routeProvider', '$httpProvider',
-     '_START_REQUEST_', '_END_REQUEST_',
-     function($locationProvider, $routeProvider, $httpProvider,
-              _START_REQUEST_, _END_REQUEST_) {
+     function($locationProvider, $routeProvider, $httpProvider) {
 
          $locationProvider.html5Mode(true);
          $routeProvider
@@ -65,19 +60,21 @@ judoonApp.config(
              })
              .otherwise({redirectTo: '/'});
 
+         // code from:
+         //   https://github.com/lavinjj/angularjs-spinner
          var $http,
              interceptor = ['$q', '$injector', function ($q, $injector) {
-                 var rootScope;
+                 var notificationChannel;
 
                  function success(response) {
                      // get $http via $injector because of circular dependency problem
                      $http = $http || $injector.get('$http');
                      // don't send notification until all requests are complete
                      if ($http.pendingRequests.length < 1) {
-                         // get $rootScope via $injector because of circular dependency problem
-                         rootScope = rootScope || $injector.get('$rootScope');
+                         // get requestNotificationChannel via $injector because of circular dependency problem
+                         notificationChannel = notificationChannel || $injector.get('requestNotificationChannel');
                          // send a notification requests are complete
-                         rootScope.$broadcast(_END_REQUEST_);
+                         notificationChannel.requestEnded();
                      }
                      return response;
                  }
@@ -87,24 +84,25 @@ judoonApp.config(
                      $http = $http || $injector.get('$http');
                      // don't send notification until all requests are complete
                      if ($http.pendingRequests.length < 1) {
-                         // get $rootScope via $injector because of circular dependency problem
-                         rootScope = rootScope || $injector.get('$rootScope');
+                         // get requestNotificationChannel via $injector because of circular dependency problem
+                         notificationChannel = notificationChannel || $injector.get('requestNotificationChannel');
                          // send a notification requests are complete
-                         rootScope.$broadcast(_END_REQUEST_);
+                         notificationChannel.requestEnded();
                      }
                      return $q.reject(response);
                  }
 
                  return function (promise) {
-                     // get $rootScope via $injector because of circular dependency problem
-                     rootScope = rootScope || $injector.get('$rootScope');
-                     // send notification a request has started
-                     rootScope.$broadcast(_START_REQUEST_);
+                     // get requestNotificationChannel via $injector because of circular dependency problem
+                     notificationChannel = notificationChannel || $injector.get('requestNotificationChannel');
+                     // send a notification requests are complete
+                     notificationChannel.requestStarted();
                      return promise.then(success, error);
                  };
              }];
 
          $httpProvider.responseInterceptors.push(interceptor);
+
      }
     ]
 );
