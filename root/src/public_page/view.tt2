@@ -18,6 +18,8 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
+<p><a href="[% uri_for_action('/page/list') %]">Return to public views</a></p>
+
 <h2>[% page.object.title | no_escape %]</h2>
 
 <section id="preamble">
@@ -32,5 +34,7 @@
 <section id="postamble">
 [% page.object.postamble | no_escape %]
 </section>
+
+<p><a href="[% uri_for_action('/page/list') %]">Return to public views</a></p>
 
 [% END %]

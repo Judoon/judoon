@@ -18,6 +18,8 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 [%- INCLUDE 'components/identification.tt2' -%]
 
+<p><a href="[% uri_for_action('/dataset/list') %]">Return to public datasets</a></p>
+
 <h2>[% dataset.object.name %]</h2>
 
 <section id="description">
@@ -28,5 +30,7 @@
   <thead></thead>
   <tbody></tbody>
 </table>
+
+<p><a href="[% uri_for_action('/dataset/list') %]">Return to public datasets</a></p>
 
 [% END %]
