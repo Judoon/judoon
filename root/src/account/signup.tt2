@@ -4,32 +4,32 @@
 
 [%- INCLUDE 'components/notification.tt2' -%]
 
-<form name="signup_form" id="signup_form" action="[% uri_for_action('/account/signup') %]" method="post" class="">
+<form name="signup_form" id="signup_form" action="[% uri_for_action('/account/signup') %]" method="post">
 
   <label>
     Username <span class="small">(required)</span>
   </label>
-  <input type="text" form="signup_form" class="span3" name="user.username">
+  <input type="text" form="signup_form" class="span3" name="user.username" value="[% signup.username %]">
 
   <label>
     Password <span class="small">(required, at least 8 characters)</span>
   </label>
-  <input type="password" form="signup_form" class="span3" name="user.password">
+  <input type="password" form="signup_form" class="span3" name="user.password" value="[% signup.password %]">
 
   <label>
     Confirm Password <span class="small">(required)</span>
   </label>
-  <input type="password" form="signup_form" class="span3" name="user.confirm_password">
+  <input type="password" form="signup_form" class="span3" name="user.confirm_password" value="[% signup.confirm_password %]">
   
   <label>
     Email <span class="small">(required)</span>
   </label>
-  <input type="text" form="signup_form" class="span3" name="user.email_address">
+  <input type="text" form="signup_form" class="span3" name="user.email_address" value="[% signup.email_address %]">
 
   <label>
     Name <span class="small">(required)</span>
   </label>
-  <input type="text" form="signup_form" class="span3" name="user.name">
+  <input type="text" form="signup_form" class="span3" name="user.name" value="[% signup.name %]">
 
   <div class="form-actions">
     <button type="submit" form="signup_form" class="btn btn-primary">Submit</button>

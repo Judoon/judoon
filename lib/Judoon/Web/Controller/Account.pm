@@ -93,6 +93,8 @@ sub signup_POST {
 
     if ($user_params{password} ne $user_params{confirm_password}) {
         $c->stash->{alert}{error} = 'Passwords do not match!';
+        delete @user_params{ qw(password confirm_password) };
+        $c->stash(signup => \%user_params);
         $c->detach;
     }
 
@@ -105,6 +107,7 @@ sub signup_POST {
         $e->$_DOES('Judoon::Error::Input')
             ? do {
                 $self->set_error($c, $e->message);
+                $c->flash(signup => \%user_params);
                 $self->go_here($c, '/account/signup');
             }
             : $c->error($e);
