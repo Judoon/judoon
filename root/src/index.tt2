@@ -5,6 +5,13 @@
 
 [%- INCLUDE 'components/notification.tt2' -%]
 
+<!--[if IE]>
+    <div style="text-align: center;">
+      <h1>Incompatible browser detected!</h1>
+      <p style="color: #f00;">We're sorry, but at this time, Judoon only supports Internet Explorer version 10 or higher.</p>
+    </div>
+<![endif]-->
+
 <div class="hero-unit">
   <h1>Welcome to Judoon.</h1>
 
