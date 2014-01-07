@@ -36,7 +36,16 @@
     we'll automatically create a new view for you that looks just like
     your Excel spreadsheet.  If you want to customize it, for example
     to group some of the column data together or to add links to other
-    websites, you can do that too.
+    websites, you can do that too.  The interface is point-and-click,
+    with no programming experience required.
+  </p>
+
+  <p>
+    Once you're happy with how your webpage looks, you can make it
+    public for the world to see.  You can also download your page as a
+    zip file that contains everything you need to host it yourself.
+    In most cases, you can just unzip the file, copy the directory to
+    your public webspace, and the page will just work.
   </p>
 
   <p>
