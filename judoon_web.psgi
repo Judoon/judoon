@@ -24,7 +24,6 @@ BEGIN {
 }
 
 
-use Judoon::Middleware::RedirectNewDatasets;
 use Judoon::Web;
 use MIME::Types;
 use Moose::Util ();
@@ -62,9 +61,6 @@ builder {
 
     enable_if { $_[0]->{PATH_INFO} =~ m{^/api/}; }
         SetAccept => from => 'suffix', mapping => \%mapping;
-
-    enable_if { $_[0]->{PATH_INFO} =~ m{^/api/user/datasets}; }
-        '+Judoon::Middleware::RedirectNewDatasets';
 
     # mount app
     mount '/' => Judoon::Web->apply_default_middlewares(Judoon::Web->psgi_app);

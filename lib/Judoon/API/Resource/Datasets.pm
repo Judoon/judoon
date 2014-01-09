@@ -1,6 +1,9 @@
 package Judoon::API::Resource::Datasets;
 
 use HTTP::Headers::ActionPack::LinkHeader;
+use HTTP::Throwable::Factory qw(http_throw);
+use Safe::Isa;
+use Try::Tiny;
 
 use Moo;
 use namespace::clean;
@@ -39,16 +42,34 @@ around content_types_accepted => sub {
 sub from_form {
     my ($self) = @_;
 
-    my $req    = $self->request;
-    my $upload = $req->uploads->{'dataset.file'};
+    my $upload = $self->request->uploads->{'dataset.file'};
+    if (not $upload) {
+        http_throw(UnprocessableEntity => {
+            message => 'No spreadsheet provided!',
+        });
+    }
+
     my $owner  = $self->set->get_our_owner();
-    my $new_ds = $owner->import_data_by_filename($upload->tempname);
+
+    my $new_ds;
+    try {
+        $new_ds = $owner->import_data_by_filename($upload->tempname);
+    }
+    catch {
+        my $e = $_;
+        $e->$_DOES('Judoon::Error::Spreadsheet')
+            ? http_throw(UnprocessableEntity => {message => $e->message})
+            : die $e;
+    };
     $self->_set_new_page($new_ds->create_basic_page());
     $self->_set_obj($new_ds);
 }
 
-sub finish_request {
-    my ($self, $metadata) = @_;
+around 'finish_request' => sub {
+    my ($orig, $self, $metadata) = @_;
+
+    $self->$orig($metadata);
+
     if ($self->new_page) {
         my $page_url = '/api/pages/' . $self->new_page->id;
         my $link = HTTP::Headers::ActionPack::LinkHeader->new(
@@ -59,7 +80,7 @@ sub finish_request {
         );
         $self->response->header(Link => $link->as_string);
     }
-}
+};
 
 
 
