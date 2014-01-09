@@ -14,6 +14,11 @@ sub base : Chained('/user/id') PathPart('') CaptureArgs(0) {
 sub user_view : Chained('base') PathPart('') Args(0) {}
 
 
+sub dataset_list : Chained('base') PathPart('datasets') Args(0) {
+    my ($self, $c) = @_;
+    $self->go_here($c, '/jsapp/user_view');
+    $c->detach();
+}
 sub dataset_view : Chained('base') PathPart('datasets') Args(1) {
     my ($self, $c, $ds_id) = @_;
 
@@ -30,6 +35,11 @@ sub dataset_view : Chained('base') PathPart('datasets') Args(1) {
 }
 
 
+sub page_list : Chained('base') PathPart('views') Args(0) {
+    my ($self, $c) = @_;
+    $self->go_here($c, '/jsapp/user_view');
+    $c->detach();
+}
 sub page_view : Chained('base') PathPart('views') Args(1) {
     my ($self, $c, $page_id) = @_;
 
@@ -72,10 +82,18 @@ Sets the template, AngularJS takes care of the rest.
 
 Does nothing right now.
 
+=head2 dataset_list
+
+Redirects user to their overview page.
+
 =head2 dataset_view
 
 Extract the L<Judoon::Schema::Result::Dataset> id and check to make sure
 requesting user has valid permissions to access it.
+
+=head2 page_list
+
+Redirects user to their overview page.
 
 =head2 page_view
 
