@@ -41,7 +41,6 @@ builder {
         )];
     }
 
-
     # turn on heavyweight debugging panels
     if ($ENV{PLACK_ENV} eq 'development-heavy') {
         enable 'Debug::DBIC::QueryLog';
@@ -55,10 +54,10 @@ builder {
     enable "Plack::Middleware::Static",
         path => qr{^/static/}, root => './root/';
 
+    # requests to /api with extensions set the Accept header
     my $mimetypes = MIME::Types->new;
     my %mapping = map {$_ => $mimetypes->mimeTypeOf($_)->type()}
         qw(tsv csv xls xlsx zip tgz);
-
     enable_if { $_[0]->{PATH_INFO} =~ m{^/api/}; }
         SetAccept => from => 'suffix', mapping => \%mapping;
 
