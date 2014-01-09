@@ -58,7 +58,7 @@ column name => {
 unique_column email_address => {
     data_type       => "text",
     is_nullable     => 0,
-    is_serializable => 1,
+    is_serializable => 0,
 };
 column active => {
     data_type       => "boolean",
