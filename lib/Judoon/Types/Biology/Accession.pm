@@ -26,8 +26,8 @@ use Judoon::Types::Core qw(CoreType_Text);
 
 
 my @types = (
-    # type                constraint      sample            display_name
-    ['Entrez_GeneId',     qr/^\d+$/,      '7094',           'Entrez Gene ID',          ],
+    # type                constraint      sample            display_name              other
+    ['Entrez_GeneId',     qr/^\d+$/,      '7094',           'Entrez Gene ID',         ['pg_type' => 'int'] ],
     ['Entrez_GeneSymbol', qr/^\w+$/,      'TLN1',           'Entrez Gene Symbol',      ],
     ['Entrez_RefseqId',   qr/^NM_\d+$/,   'NM_006289',      'RefSeq ID',               ],
     ['Entrez_ProteinId',  qr/^NP_\d+$/,   'NP_006280',      'Entrez Protein ID',       ],
@@ -52,6 +52,7 @@ for my $type (@types) {
             constraint   => sub { $_ =~ $type->[1] },
             sample       => $type->[2],
             library      => 'Biology::Accessions',
+            @{ $type->[4] || [] }
         )
     );
 }
