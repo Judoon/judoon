@@ -107,10 +107,6 @@ around BUILDARGS => sub {
             message => "Couldn't determine file type of $filename from extension (extension seems to be missing?)",
             filename => $filename,
         }) unless ($filetype);
-
-        Judoon::Error::Spreadsheet::Type->throw({
-            message => "Invalid file format: $filetype",
-        }) if ($filetype !~ m/^(?:xlsx?|[ct]sv)$/);
         $args->{filetype} = $filetype;
 
         my $spreadsheet_fh = IO::File->new($filename, 'r')
@@ -126,6 +122,11 @@ around BUILDARGS => sub {
 
 sub BUILD {
     my ($self) = @_;
+
+    Judoon::Error::Spreadsheet::Type->throw({
+        message => 'Invalid file format: ".' . $self->filetype . '".'
+            . ' Must be one of: ".csv",".xls",".xlsx"',
+    }) if ($self->filetype !~ m/^(?:xlsx?|[ct]sv)$/);
 
     my %parsertype_map = (
         xls  => { build => '_build_from_xls',  data_type => '_get_excel_data_type', },
