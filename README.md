@@ -9,8 +9,7 @@ NCBI databases and Google.
 
 New data can be pulled in from other spreadsheets or external
 databases and presented together.  The finished presentation can then
-be downloaded and hosted on the researcher's own website.  To get
-started visit the site at 
+be downloaded and hosted on the researcher's own website.
 
 * Web site: http://www.judoon.org/
 * Tutorial: nope. not yet.
