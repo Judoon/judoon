@@ -124,4 +124,17 @@ L<Judoon::Schema::Result::User>'s C<import_data_by_filename> method.
 If a new page was created, add a Link header to the response that
 points to the page.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut

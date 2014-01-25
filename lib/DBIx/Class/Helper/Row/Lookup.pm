@@ -233,3 +233,19 @@ C<$foo>, and the foreign key field is C<${foo}_id>.
 Installs the lookup accessors into the Row object.
 
 =for Pod::Coverage update register_relationship
+
+
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
+=cut

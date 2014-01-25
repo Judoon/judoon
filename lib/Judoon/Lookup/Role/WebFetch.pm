@@ -59,4 +59,17 @@ providers if needed.  Defaults to Fitz's email address.
 An instance of L<LWP::UserAgent> with the L</agent_contact> added to
 the user-agent and with redirectable POSTs enabled.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut

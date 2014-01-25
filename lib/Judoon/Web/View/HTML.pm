@@ -60,20 +60,20 @@ sub strip_html {
 }
 
 
-=head1 SEE ALSO
-
-L<Judoon::Web>
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+1;
 
 =head1 AUTHOR
 
-Fitz Elliott
+Fitz ELLIOTT <felliott@fiskur.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
-1;

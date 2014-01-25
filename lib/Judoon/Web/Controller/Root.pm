@@ -118,18 +118,21 @@ Attempt to render a view, if needed.
 sub end : ActionClass('RenderView') {}
 
 
-
-=head1 AUTHOR
-
-Fitz Elliott
-
-=head1 LICENSE
-
-This library is free software. You can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=cut
-
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
+=cut

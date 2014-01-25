@@ -34,4 +34,18 @@ section 11.2:
    request body contains well-formed (i.e., syntactically correct), but
    semantically erroneous, XML instructions.
 
+
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut

@@ -100,5 +100,17 @@ Redirects user to their overview page.
 Extract the L<Judoon::Schema::Result::Page> id and check to make sure
 requesting user has valid permissions to access it.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
 
 =cut
