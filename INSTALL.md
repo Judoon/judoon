@@ -27,7 +27,7 @@ Make sure the following services are running:
 
 # Quickstart
 
-    $ git clone $judoon_repo.git judoon
+    $ git clone https://github.com/Judoon/judoon.git judoon
     $ cd judoon
     $ cpanm --installdeps .
     $ cp share/doc/sample_config/*.conf .
