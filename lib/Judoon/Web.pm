@@ -162,11 +162,11 @@ after finalize_error => sub {
 
 =head1 NAME
 
-Judoon::Web - Catalyst based application
+Judoon::Web - Turn spreadsheets into webpages
 
 =head1 SYNOPSIS
 
-    script/judoon_web_server.pl
+ plackup -Ilib judoon_web.psgi
 
 =head1 DESCRIPTION
 
