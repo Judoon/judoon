@@ -160,9 +160,18 @@ after finalize_error => sub {
 
 
 
+1;
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords NCBI sortable
+
 =head1 NAME
 
-Judoon::Web - Turn spreadsheets into webpages
+Judoon::Web - Turn spreadsheets into web pages
 
 =head1 SYNOPSIS
 
@@ -170,16 +179,20 @@ Judoon::Web - Turn spreadsheets into webpages
 
 =head1 DESCRIPTION
 
-[enter your description here]
+Judoon is a web application that converts tabular data in an Excel
+spreadsheet into a searchable and sortable table presented on the
+World Wide Web. After upload to the Judoon website, spreadsheet data
+is immediately displayed; editing commands can be used to reformat the
+data columns and add images or links to other web resources, including
+NCBI databases and Google.
+
+New data can be pulled in from other spreadsheets or external
+databases and presented together.  The finished presentation can then
+be downloaded and hosted on the researcher's own website.
 
 =head1 SEE ALSO
 
 L<Judoon::Web::Controller::Root>, L<Catalyst>
-
-=cut
-
-
-1;
 
 =head1 AUTHOR
 
