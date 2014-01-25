@@ -42,4 +42,17 @@ A L</MIME::Types> object.
 Returns the MIME type for a file with the given C<$extension> e.g.
 C<mime_type_for('csv')> returns C<'text/comma-separated-values'>.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut

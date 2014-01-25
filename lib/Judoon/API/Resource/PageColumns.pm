@@ -96,4 +96,17 @@ List of columns permitted in a C<create_resource> payload.
 Translate the C<template> parameter into a L<Judoon::Tmpl> object
 suitable for insertion into the database.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut

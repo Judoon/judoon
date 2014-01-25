@@ -30,4 +30,17 @@ L<Judoon::Lookup::Role::Actor> role composed into them, along with an
 action role that supplies the C<lookup()> and C<result_data_type()>
 methods required by C<::Role::Actor>.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut

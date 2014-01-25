@@ -1,3 +1,13 @@
+/*
+ * Judoon
+ * https://judoon.org/
+ * https://github.com/Judoon/judoon.git
+ *
+ * Author:    Fitz ELLIOTT <felliott@fiskur.org>
+ * Copyright: 2014 by the Rector and Visitors of the University of Virginia.
+ * License:   Artistic License 2.0 (GPL Compatible)
+ */
+
 /*jshint globalstrict: true */
 /*global angular */
 

@@ -105,4 +105,17 @@ For each entry in C<@col_data>, find a matching entry in
 C<join_dataset>.C<that_joincol_id>, and return the related data in
 C<join_dataset>.C<that_selectcol_id>.
 
+=head1 AUTHOR
+
+Fitz ELLIOTT <felliott@fiskur.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by the Rector and Visitors of the
+University of Virginia.
+
+This is free software, licensed under:
+
+ The Artistic License 2.0 (GPL Compatible)
+
 =cut
