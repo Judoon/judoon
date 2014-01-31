@@ -49,6 +49,7 @@ __PACKAGE__->config(
 __PACKAGE__->config(
     'View::HTML' => {
         CATALYST_VAR => 'c',
+        ENCODING     => 'utf-8',
         INCLUDE_PATH => [
             Judoon::Web->path_to('root', 'src'),
         ],
