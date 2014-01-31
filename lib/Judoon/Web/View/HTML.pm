@@ -32,6 +32,14 @@ __PACKAGE__->config(
 );
 
 
+around 'render' => sub {
+    my $orig = shift;
+    my $self = shift;
+    my $res = $self->$orig(@_);
+    return "$res";
+};
+
+
 =head1 METHODS
 
 =head2 uri_for_action
