@@ -43,7 +43,6 @@
               <li><a href="[% uri_for_action('/page/list') %]">Public Views</a></li>
               <li class="divider"></li>
               <li><a href="[% uri_for_action('/info/get_started') %]">Get Started</a></li>
-              <li><a href="[% uri_for_action('/info/news') %]">News</a></li>
               <li><a href="[% uri_for_action('/info/about') %]">About</a></li>
             </ul>
           </li>
