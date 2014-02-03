@@ -429,9 +429,10 @@ judoonCtrl.controller(
                      inline          : true,
                      schema          : "html5",
                      menubar         : false,
-                     plugins         : "",
+                     plugins         : "paste",
+                     paste_as_text   : true,
                      entity_encoding : "raw",
-                     toolbar         : "bold italic underline strikethrough subscript superscript removeformat | undo redo",
+                     toolbar         : "bold italic underline strikethrough subscript superscript removeformat | cut copy pastetext | undo redo",
                      invalid_elements : 'area,audio,canvas,content,data,decorator,element,embed,keygen,main,map,' +
                          'menu,menuitem,object,param,progress,rp,rt,ruby,shadow,source,template,' +
                          'track,video,button,datalist,fieldset,form,input,label,legend,optgroup,' +
