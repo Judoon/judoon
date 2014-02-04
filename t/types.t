@@ -39,8 +39,6 @@ subtest 'Registry' => sub {
     ok $text_type->check("moo"), ' ..and type can validate';
 
     ok my @keys = $reg->all_types(), 'can get list of types';
-    use Data::Printer;
-    p(@keys);
 };
 
 done_testing;
