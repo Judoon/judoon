@@ -266,7 +266,7 @@ test '/datasets' => sub {
             that_joincol_id   => $lookup_joincol->shortname,
             that_selectcol_id => $lookup_selcol->shortname,
         );
-        my @default_data = sort (qw(co00002365 co00001638 co00002364), '', 'co00999999');
+        my @default_data = sort (qw(co00002365 co00001638 co00001603), '', 'co00999999');
 
         my %ext_lookup = (
             that_table_id     => 'external_uniprot',
@@ -274,7 +274,7 @@ test '/datasets' => sub {
             that_joincol_id   => 'P_ENTREZGENEID',
             that_selectcol_id => 'ID',
         );
-        my @uniprot_ids = sort (qw(TLN1_HUMAN AKT3_HUMAN VINC_HUMAN CALC_CANFA), '');
+        my @uniprot_ids = sort (qw(TLN1_HUMAN AKT3_HUMAN ACTN1_HUMAN A1BG_HUMAN), '');
 
         my $registry    = Judoon::LookupRegistry->new({user => $me});
         my $lookup      = $registry->find_by_full_id($good_lookup_id);
