@@ -25,7 +25,7 @@
 
             <div loading-widget id="loadingWidget" class="row-fluid ui-corner-all" style="padding: 0.7em; display: none;">
               <div class="loadingContent">
-                <p><img alt="Loading Content" src="/static/images/spinner.gif" style="vertical-align: middle; padding-right: 1em;"> Loading</p>
+                <p><img alt="Loading Content" src="/static/img/spinner.gif" style="vertical-align: middle; padding-right: 1em;"> Loading</p>
               </div>
             </div>
 
