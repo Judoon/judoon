@@ -76,14 +76,7 @@ Empty method, just here to be overridden.
 
 sub private_base {
     my ($self, $c) = @_;
-
-    my $rs = $c->model($self->resultset_class);
-    my @searches = ($rs->public);
-    if ($c->user) {
-        push @searches, $rs->for_user($c->user->get_object);
-    }
-    $c->stash->{public_rs} = $rs->search_or(\@searches);
-
+    $c->stash->{public_rs} = $c->model($self->resultset_class)->public;
     return;
 
 }
@@ -105,7 +98,7 @@ sub private_list {
     }
 
     my @public_objects = $public_rs->hri->all;
-    for my $obj  (@public_objects) {
+    for my $obj (@public_objects) {
         $obj->{view_url} = $c->uri_for_action(
             $c->controller->action_for('view'), $obj->{id}
         );
