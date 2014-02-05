@@ -116,6 +116,20 @@ __PACKAGE__->register_timestamps;
 
 =head1 METHODS
 
+=head2 delete()
+
+Delete user's schema table after deleting user
+
+=cut
+
+sub delete {
+    my ($self) = @_;
+    $self->next::method(@_);
+    $self->_delete_schema();
+    return $self;
+}
+
+
 =head2 schema_name()
 
 Get the name of the PostgreSQL schema for this user.
@@ -124,6 +138,23 @@ Get the name of the PostgreSQL schema for this user.
 
 sub schema_name {
     return SCHEMA_PREFIX . $_[0]->username;
+}
+
+
+=head2 _delete_schema()
+
+Delete the user's schema.
+
+=cut
+
+sub _delete_schema {
+    my ($self) = @_;
+    $self->result_source->storage->dbh_do(
+        sub {
+            my ($storage, $dbh, $schema_name) = @_;
+            $dbh->do("DROP SCHEMA $schema_name CASCADE");
+        }, $self->schema_name,
+    );
 }
 
 
