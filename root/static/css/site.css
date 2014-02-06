@@ -5,7 +5,7 @@ body {}
 #top {}
 #top a.brand { color: #006D4C; }
 
-#middle {
+#content {
     padding-top: 1em;
     padding-bottom: 2em;
 }

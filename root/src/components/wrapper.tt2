@@ -71,12 +71,8 @@
     </div>
   </div> <!-- end navbar -->
 
-  <div id="middle" class="container-fluid">
-    <div class="row-fluid">
-      <div class="span10 offset1" id="content">
-        [% content %]
-      </div>
-    </div>
+  <div id="content" class="container">
+    [% content %]
   </div>
 
   <div id="footer-wrapper">
