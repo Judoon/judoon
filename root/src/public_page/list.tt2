@@ -7,7 +7,7 @@
 [%- INCLUDE 'components/identification.tt2' -%]
 
 <section id="pages">
-  <h4>Publicly Available Views</h4>
+  <h3>Publicly Available Views</h3>
   [% IF page.list.size %]
   <table class="table table-striped table-condensed" id="page_list">
     <thead>

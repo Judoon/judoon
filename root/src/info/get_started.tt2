@@ -6,7 +6,7 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 
 <section>
-  <h2>Getting started</h2>
+  <h3>Getting Started</h3>
   <p>
     To get started with Judoon, you'll need to first 
     <a href="[% uri_for_action('/account/signup') %]">create

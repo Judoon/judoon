@@ -6,7 +6,7 @@
 [%- INCLUDE 'components/notification.tt2' -%]
 
 <section>
-  <h2>About Judoon</h2>
+  <h3>About Judoon</h3>
   <p>
     Judoon began as a project of
     the <a href="http://www.cellmigration.org">Cell Migration
