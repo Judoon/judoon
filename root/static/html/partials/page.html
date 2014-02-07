@@ -53,7 +53,7 @@
         <form ng-submit="addColumn()" class="column_list">
           <h6>Add a new view column</h6>
           <div class="input-append">
-            <input type="text" placeholder="View column name" required ng-model="newColumnName">
+            <input  class="input-medium" type="text" placeholder="View column name" required ng-model="newColumnName">
             <button type="submit" class="btn">Add</button>
           </div>
         </form>
@@ -63,7 +63,7 @@
         <form class="column_list">
           <h6>Update an existing view column</h6>
           <div class="input-append">
-            <select ng-model="currentColumn" ng-options="scrubHtml(c.title) for c in page.columns">
+            <select class="input-medium" ng-model="currentColumn" ng-options="scrubHtml(c.title) for c in page.columns">
               <option value=""></option>
             </select>
           </div>
@@ -74,7 +74,7 @@
         <form class="column_list">
           <h6 class="text-warning">Delete a view column</h6>
           <div class="input-append">
-            <select ng-model="deleteColumn" ng-options="scrubHtml(c.title) for c in page.columns">
+            <select class="input-medium" ng-model="deleteColumn" ng-options="scrubHtml(c.title) for c in page.columns">
               <option value=""></option>
             </select>
             <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
