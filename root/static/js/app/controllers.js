@@ -811,6 +811,9 @@ judoonCtrl.controller(
 
         $scope.removeNode = function(widget) {
             var index = $scope.currentColumn.widgets.indexOf(widget);
+            if (widget === $scope.cursorWidget) {
+                $scope.cursorBack();
+            }
             $scope.currentColumn.widgets.splice(index, 1);
             return;
         };
