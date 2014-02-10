@@ -212,7 +212,7 @@ judoonCtrl.controller(
 
          // *** Pages ***
          $scope.allPages = $scope.user.pages;
-         $scope.newPage = {type: 'blank', title: 'New Page'};
+         $scope.newPage = {type: 'blank', title: 'New View'};
          $scope.createPage = function() {
              $scope.dataset.createPage($scope.newPage)
                  .success( function() { Alerts.alertSuccess('New page added!');    })
