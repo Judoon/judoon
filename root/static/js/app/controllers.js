@@ -577,6 +577,9 @@ judoonCtrl.controller(
              var confirmed = window.confirm("Are you sure you want to delete this column?");
              if (confirmed) {
                  $scope.page.deleteColumn($scope.deleteColumn);
+                 if ($scope.deleteColumn === $scope.currentColumn) {
+                     $scope.currentColumn = null;
+                 }
              }
 
              return;
