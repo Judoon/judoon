@@ -36,7 +36,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
         },
         link: function(scope, element, attrs) {
 
-            var dt, defaultOptions = {
+            var defaultOptions = {
                 "bAutoWidth"      : false,
                 "bServerSide"     : true,
                 "bProcessing"     : true,
@@ -47,10 +47,10 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
             };
 
             function rebuildTable(nbrColumnsChanged) {
-                if (dt && jQuery.fn.DataTable.fnIsDataTable(dt[0])) {
-                    dt.fnDestroy();
+                if (element && jQuery.fn.DataTable.fnIsDataTable(element[0])) {
+                    element.fnDestroy();
                     if (nbrColumnsChanged) {
-                        dt.find('tr').remove();
+                        element.find('tr').remove();
                     }
                 }
                 if (!scope.colDefs.length) {
@@ -59,7 +59,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
 
                 var tableOptions = angular.copy(defaultOptions);
                 tableOptions.aoColumns = scope.colDefs;
-                dt = element.dataTable(tableOptions);
+                element.dataTable(tableOptions);
             }
 
 
