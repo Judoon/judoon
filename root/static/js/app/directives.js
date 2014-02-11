@@ -9,7 +9,7 @@
  */
 
 /*jshint globalstrict: true */
-/*global angular */
+/*global angular,jQuery */
 
 'use strict';
 
@@ -47,11 +47,14 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
             };
 
             function rebuildTable(nbrColumnsChanged) {
-                if (dt) {
+                if (dt && jQuery.fn.DataTable.fnIsDataTable(dt[0])) {
                     dt.fnDestroy();
                     if (nbrColumnsChanged) {
                         dt.find('tr').remove();
                     }
+                }
+                if (!scope.colDefs.length) {
+                    return;
                 }
 
                 var tableOptions = angular.copy(defaultOptions);
@@ -84,7 +87,7 @@ judoonDir.directive('judoonDataTable', ['$timeout', function($timeout) {
 
             // columns may not be available at link time
             scope.$watch('colDefs', function(oldval, newval) {
-                if (!scope.colDefs || !scope.colDefs.length) {
+                if (!scope.colDefs) {
                     return; // too soon.
                 }
                 var nbrColumnsChanged = oldval.length !== newval.length;
