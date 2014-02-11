@@ -6,7 +6,7 @@
               <p style="display: inline-block;">
                 <a tooltip="Update the title, surrounding text, and other properties of this view"
                    tooltip-append-to-body="1"
-                   href="/users/{{user.username}}/views/{{page.id}}"><span ng-bind-html="page.title"></span></a>
+                   href="/users/{{user.username}}/views/{{page.id}}"><span ng-bind-html="page.title"></span><span ng-show="!page.title" class="no-title">Untitled View</span></a>
                 - {{page.nbr_columns}} columns, {{page.nbr_rows}} rows
               </p>
               <div class="btn-toolbar pull-right">

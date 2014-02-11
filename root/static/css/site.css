@@ -236,3 +236,9 @@ ul.template_widget_list li.newline + li {
 
 
 #page_actions .affix { top:   160px; }
+
+
+.no-title {
+    font-size: 90%;
+    font-style: italic;
+}
