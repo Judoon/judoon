@@ -531,6 +531,7 @@ test '/pages' => sub {
             [{title => 'hello', template => $good_tmpl,   }, ],
             [{title => 'hello', widgets  => $good_widgets,}, ],
             [{title => '',      template => $good_tmpl,   }, ],
+            [{title => 'hello', template => $good_tmpl, widgets => $good_widgets},],
         );
         for my $test (@tests_ok) {
             my ($new_pagecol) = @$test;
@@ -586,13 +587,76 @@ test '/pages' => sub {
             [{sort  => 'moo'}, \422],
             [{template => $bad_tmpl}, \422],
             [{widgets => $bad_widgets}, \422],
-            [{widgets => $bad_widgets}, \422],
-            [{template => $good_tmpl, widgets => $good_widgets}, \422],
         );
         for my $test (@tests_fail) {
             my ($new_page, $error_code) = @$test;
             $self->add_route_test(
                 $pagecols_url, 'me', 'POST', $new_page, $error_code
+            );
+        }
+    };
+
+    subtest 'PUT /pages/$page_id/columns' => sub {
+
+        # replace entire collection on PUT
+
+        my $pagecols_url = "${page_url}/columns";
+        my ($good_tmpl, $good_widgets)
+            = @{ $self->get_tmpl_fixture('basic_equiv') }{ qw(jstmpl widgets) };
+        my $basic_pagecol = {
+            page_id  => $page_id,
+            template => $good_tmpl,
+            widgets  => $good_widgets,
+        };
+
+        my $replace_cols = [
+            {title => "Replacer1", template => "foo"},
+            {title => "Replacer2", template => "boo"},
+        ];
+        for my $colset ( $replace_cols, [] ) {
+            $self->add_route_test($pagecols_url, 'me', 'PUT', $colset, [
+                \204,
+                sub {
+                    my ($self, $msg) = @_;
+
+                    my $i = 1;
+                    $_->{sort} = $i++ for (@$colset);
+                    my @fields = keys %{$colset->[0] || {}};
+
+                    my @new_cols;
+                    for my $pc ($page->page_columns->all) {
+                        my $j = $pc->TO_JSON;
+                        push @new_cols, {map {$_ => $j->{$_}} @fields};
+                    };
+                    is_deeply \@new_cols, $colset,
+                        "$msg: page columns replaced";
+                }
+            ]);
+        }
+        $self->reset_fixtures();
+        $self->load_fixtures(qw(init api));
+
+        my @orig_cols = map {$_->TO_JSON} $page->page_columns->all;
+        my ($bad_tmpl, $bad_widgets)
+            = @{ $self->get_tmpl_fixture('invalid') }{ qw(jstmpl widgets) };
+        my @tests_fail = (
+            {},
+            {sort  => 'moo'},
+            [{title => 'badtmpl',   template => $bad_tmpl}  ],
+            [{title => 'badwidget', widgets => $bad_widgets}],
+        );
+        for my $new_page (@tests_fail) {
+            $self->add_route_test(
+                $pagecols_url, 'me', 'PUT', $new_page, [
+                    \422,
+                    sub {
+                        my ($self, $msg) = @_;
+                        is_deeply
+                            [map {$_->TO_JSON} $page->page_columns->all],
+                            \@orig_cols,
+                            "$msg: originals page columns untouched after error";
+                    }
+                ]
             );
         }
     };

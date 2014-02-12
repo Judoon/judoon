@@ -14,32 +14,36 @@ with 'Judoon::API::Resource::Role::Set';
 sub create_allows { qw(template widgets title) };
 
 before create_resource => sub {
-    my ($self, $params) = @_;
+    my ($self, $data) = @_;
 
-    # get updatable params, empty original param list, copy back valid params
-    my %valid_params = map {$_ => $params->{$_}} grep {exists $params->{$_}}
-        $self->create_allows();
-    delete @{$params}{ keys %$params };
-    @{$params}{keys %valid_params} = (values %valid_params);
+    my $all_params = ref $data eq 'ARRAY' ? $data : [$data];
+    for my $params (@$all_params) {
 
-    my @errors;
-    push @errors, map {['invalid_null', $_]} grep {
-        (not defined $valid_params{$_})
-            &&
-        (not $self->set->result_source->column_info($_)->{is_nullable})
-    } keys %valid_params;
+        # get updatable params, empty original param list, copy back valid params
+        my %valid_params = map {$_ => $params->{$_}} grep {exists $params->{$_}}
+            $self->create_allows();
+        delete @{$params}{ keys %$params };
+        @{$params}{keys %valid_params} = (values %valid_params);
 
-    if (@errors) {
-        my @messages;
+        my @errors;
+        push @errors, map {['invalid_null', $_]} grep {
+            (not defined $valid_params{$_})
+                &&
+                (not $self->set->result_source->column_info($_)->{is_nullable})
+            } keys %valid_params;
 
-        if (my @invalid_null = grep {$_[0] eq 'invalid_null'} @errors) {
-            push @messages,
-                "Null not allowed for : " . join(', ', @invalid_null);
+        if (@errors) {
+            my @messages;
+
+            if (my @invalid_null = grep {$_[0] eq 'invalid_null'} @errors) {
+                push @messages,
+                    "Null not allowed for : " . join(', ', @invalid_null);
+            }
+
+            http_throw(UnprocessableEntity => {
+                message => join("\n", @messages),
+            });
         }
-
-        http_throw(UnprocessableEntity => {
-            message => join("\n", @messages),
-        });
     }
 };
 
@@ -48,11 +52,54 @@ around create_resource => sub {
     my $self = shift;
     my $data = shift;
 
-    if (not (exists($data->{template}) xor exists($data->{widgets}))) {
-        http_throw(UnprocessableEntity => {
-            message => "Must provide exactly one of 'template' xor 'widgets'",
-        });
+
+    if ($self->request->method eq 'PUT') {
+        if (ref $data ne 'ARRAY') {
+            http_throw(UnprocessableEntity => {
+                message => 'this PUT request expects a collection (array)',
+            });
+        }
+
+        $self->set->result_source->schema->txn_do(
+            sub {
+                $self->set->delete;
+                foreach my $newobj (@$data) {
+                    $self->construct_template($newobj);
+                    $self->set->create($newobj);
+                }
+            }
+        );
+
+        return;
     }
+    elsif ($self->request->method eq 'POST') {
+        if (ref $data ne 'HASH') {
+            http_throw(UnprocessableEntity => {
+                message => 'this POST request expects an object (hash)',
+            });
+        }
+
+        $self->construct_template($data);
+        return $self->$orig($data);
+    }
+};
+
+
+around allowed_methods => sub {
+    my $orig = shift;
+    my $self = shift;
+
+    my $allowed = $self->$orig;
+    if ($self->writable) {
+        push @$allowed, 'PUT';
+    }
+
+    return $allowed;
+};
+
+
+sub construct_template {
+    my ($self, $data) = @_;
 
     eval {
         $data->{template}
@@ -66,8 +113,10 @@ around create_resource => sub {
         });
     }
 
-    return $self->$orig($data);
-};
+    return;
+}
+
+
 
 
 1;
@@ -85,16 +134,29 @@ Judoon::API::Resource::PageColumns - An set of PageColumns
 
 See L</Web::Machine::Resource>.
 
+=head1 MODIFIED METHODS
+
+=head2 allowed_methods
+
+Permit C<PUT> requests if resource is writable.
+
+=head2 create_resource
+
+Validates the incoming data and handles both C<PUT> and C<POST>
+methods.
+
+
 =head1 METHODS
 
 =head2 create_allows
 
 List of columns permitted in a C<create_resource> payload.
 
-=head2 create_resource
+=head2 construct_template( \%data )
 
-Translate the C<template> parameter into a L<Judoon::Tmpl> object
-suitable for insertion into the database.
+Turn either C<<$data->{widgets}>> or C<<$data->{template}>> into a
+L<Judoon::Tmpl> object that we can insert into the database.  Throws
+error if template construction fails.
 
 =head1 AUTHOR
 

@@ -519,7 +519,7 @@ test '/pages/1/columns' => sub {
         $self->add_route_test($cols_url, 'me', 'GET', {}, {want => \@page_cols});
         my $new_col = {title => "I'm new!", template => ""};
         $self->add_route_created($cols_url, 'me', 'POST', $new_col);
-        $self->add_route_bad_method($cols_url, 'me', 'PUT', {});
+        $self->add_route_test($cols_url, 'me', 'PUT', [$new_col, $new_col], \204);
         $self->add_route_test($cols_url, 'me', 'DELETE', {},
             sub {
                 my ($self, $msg) = @_;
