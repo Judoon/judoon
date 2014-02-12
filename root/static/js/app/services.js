@@ -408,6 +408,10 @@ judoonSrv.factory(
                     return _this.columns;
                 });
             },
+            updateColumns: function() {
+                var _this = this;
+                return $http.put(_this.url() + '/columns', _this.columns);
+            },
             createColumn: function (newColumn) {
                 var _this = this;
                 newColumn.template = '';

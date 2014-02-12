@@ -532,7 +532,7 @@ judoonCtrl.controller(
              if ($scope.page.permission === "public" &&
                  $scope.page.permission !== $scope.pageOriginal.permission) {
                  var confirmed = window.confirm(
-                     "Making your page public will make the underlying dataset " +
+                     "Making your view public will make the underlying dataset " +
                          "public, too! Are you sure you want to continue?"
                  );
                  if (!confirmed) {
@@ -542,15 +542,12 @@ judoonCtrl.controller(
 
              }
 
-             $scope.page.update()
-                 .success( function() {
-                     var sortVal = 1;
-                     angular.forEach($scope.page.columns, function (value, key) {
-                         value.update(sortVal++);
-                     });
-                     Alerts.alertSuccess('Page saved.');
-                 } );
-
+             $scope.page.update().success( function() {
+                 Alerts.alertSuccess('View saved.');
+             });
+             $scope.page.updateColumns().success( function() {
+                 Alerts.alertSuccess('View columns saved.');
+             });
              $scope.pageDirty = 0;
              $scope.pageOriginal = angular.copy($scope.page);
              $scope.pageColumnsOriginal = angular.copy($scope.page.columns);
@@ -559,14 +556,9 @@ judoonCtrl.controller(
          };
 
          $scope.addColumn = function() {
-             $scope.page.createColumn({title: $scope.newColumnName})
-                 .then(
-                     function(newColumn) {
-                         $scope.currentColumn = newColumn;
-                         Alerts.alertSuccess('New Column "' + newColumn.title + '" added!');
-                     },
-                     function() { Alerts.alertError('Failed to add new column'); }
-                 );
+             var newColumn = {title: $scope.newColumnName, template: '', widgets: []};
+             $scope.page.columns.push(newColumn);
+             $scope.currentColumn = newColumn;
          };
 
          $scope.removeColumn = function() {
@@ -576,10 +568,11 @@ judoonCtrl.controller(
 
              var confirmed = window.confirm("Are you sure you want to delete this column?");
              if (confirmed) {
-                 $scope.page.deleteColumn($scope.deleteColumn);
                  if ($scope.deleteColumn === $scope.currentColumn) {
                      $scope.currentColumn = null;
                  }
+                 var index = $scope.page.columns.indexOf( $scope.deleteColumn );
+                 $scope.page.columns.splice(index, 1);
              }
 
              return;
