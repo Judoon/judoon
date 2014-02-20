@@ -146,6 +146,7 @@ test_requires 'Text::Table';
 
 
 on 'develop' => sub {
+   requires 'App::forkprove';
    requires 'Devel::NYTProf';
    requires 'Devel::Cover';
 };
