@@ -46,7 +46,7 @@ requires 'DBIx::Class::Schema::Config';
 requires 'DBIx::Class::TimeStamp';
 requires 'DBIx::Class::DynamicDefault';
 requires 'DBIx::RunSQL';
-requires 'Elastic::Model';
+requires 'Elastic::Model' => '0.28';
 requires 'Email::Address';
 requires 'Email::MIME::Kit';
 requires 'Email::MIME::Kit::Renderer::TT';
