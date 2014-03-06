@@ -6,16 +6,14 @@
 
 use strict;
 use warnings;
-use autodie;
-use open qw( :encoding(UTF-8) :std );
-use feature ':5.14';
 
-use FindBin qw($Bin);
-use lib "$Bin/../../../lib";
-use lib "$Bin/../../../t/lib";
+BEGIN {
+    use FindBin qw($Bin);
+    use lib "$Bin/../../../lib";
+    $ENV{DBIX_CONFIG_DIR} = "$Bin/../../../";
+}
 
 use Judoon::Web;
-use Data::Printer;
 use Getopt::Long;
 use HTML::Restrict;
 use HTML::Selector::XPath::Simple;
