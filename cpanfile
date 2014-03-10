@@ -149,4 +149,5 @@ on 'develop' => sub {
    requires 'App::forkprove';
    requires 'Devel::NYTProf';
    requires 'Devel::Cover';
+   requires 'Eval::WithLexicals';
 };
