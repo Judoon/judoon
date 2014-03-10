@@ -190,9 +190,12 @@ fieldset { min-width: auto; }
 
 
 #column_canvas {
-    min-height: 8em;
-    margin-bottom: 0;
 }
+
+#actions {
+    border-top: thin #ccc solid;
+}
+
 
 .table_edit_ctrls .column_list {
     display: inline-block;

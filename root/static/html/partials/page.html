@@ -49,36 +49,32 @@
   <div ng-show="editmode" class="table_edit_ctrls well well-small">
 
     <div class="row-fluid">
-      <div class="span3">
+      <div class="span4">
         <form ng-submit="addColumn()" class="column_list">
           <h6>Add a new view column</h6>
           <div class="input-append">
-            <input type="text" placeholder="View column name" required ng-model="newColumnName">
+            <input  class="input-medium" type="text" placeholder="View column name" required ng-model="newColumnName">
             <button type="submit" class="btn">Add</button>
           </div>
         </form>
       </div>
 
-      <div class="span1"></div>
-
-      <div class="span3">
+      <div class="span4">
         <form class="column_list">
           <h6>Update an existing view column</h6>
           <div class="input-append">
-            <select ng-model="currentColumn" ng-options="scrubHtml(c.title) for c in page.columns">
+            <select class="input-medium" ng-model="currentColumn" ng-options="scrubHtml(c.title) for c in page.columns">
               <option value=""></option>
             </select>
           </div>
         </form>
       </div>
 
-      <div class="span1"></div>
-
-      <div class="span3">
+      <div class="span4">
         <form class="column_list">
           <h6 class="text-warning">Delete a view column</h6>
           <div class="input-append">
-            <select ng-model="deleteColumn" ng-options="scrubHtml(c.title) for c in page.columns">
+            <select class="input-medium" ng-model="deleteColumn" ng-options="scrubHtml(c.title) for c in page.columns">
               <option value=""></option>
             </select>
             <button type="submit" ng-click="removeColumn()" class="btn btn-danger">Delete</button>
@@ -89,7 +85,7 @@
 
     <hr>
 
-    <form ng-show="currentColumn" class="form-horizontal">
+    <form ng-show="currentColumn">
       <div class="control-group">
         <label class="control-label">Title: </label>
         <div class="controls">
@@ -108,64 +104,61 @@
 
         <div class="controls" ng-controller="PageColumnTemplateCtrl">
           <div id="column_canvas" class="well well-small">
-            <ul class="template_widget_list">
+
+            <ul class="template_widget_list clearfix">
               <li class="list-top" ng-class="{cursor: !cursorWidget}" id="widget_list_top"><div></div></li>
               <li ng-class="{boldit: isBold(widget), italicit: isItalic(widget), cursor: cursorWidget==widget, newline: widget.type=='newline'}" ng-repeat="widget in currentColumn.widgets">
                 <judoon-widget-factory widget="widget">
               </li>
             </ul>
+
+            <div id="actions" class="row-fluid">
+              <div class="span5">
+                <h6>Add Elements <small> - <a ng-click="openElementGuide()">What is this?</a></small></h6>
+                <div class="btn-group">
+                  <a class="btn" ng-click="addTextNode()">Text</a>
+                  <a class="btn" ng-click="addDataNode()">Data</a>
+                  <a class="btn" ng-click="addLinkNode()">Link</a>
+                  <a class="btn" ng-click="addImageNode()">Image</a>
+                  <a class="btn" ng-click="addNewlineNode()">Newline</a>
+                </div>
+              </div>
+
+              <div class="span3 offset1">
+                <h6>Move Cursor</h6>
+                <div class="btn-group">
+                  <a class="btn" ng-click="cursorBack()"><i class="icon-arrow-left"></i> Back</a>
+                  <a class="btn" ng-click="cursorForward()"><i class="icon-arrow-right"></i> Forward</a>
+                </div>
+              </div>
+
+              <div class="span2 offset1">
+                <h6>Actions</h6>
+                <div class="btn-group">
+                  <a class="btn" ng-click="removeNodeAtCursor()"><i class="icon-remove"></i> Delete</a>
+                </div>
+              </div>
+            </div>
+
+            <script type="text/ng-template" id="elementGuide.html">
+              <div>
+                <div class="modal-header">
+                  <h3>How this works.</h3>
+                </div>
+                <div class="modal-body">
+                  <p>
+                    These buttons add elements to the canvas that let you control
+                    how your data is displayed.
+                  </p>
+                  <h5>Element Guide</h5>
+                  <img src="/static/img/pagecolumn_components_labeled.png">
+                </div>
+                <div class="modal-footer">
+                  <button class="btn" ng-click="closeElementGuide()">Close</button>
+                </div>
+              </div>
+            </script>
           </div>
-
-          <div id="actions" class="row-fluid">
-            <div class="span4">
-              <h6>Add Elements <small> - <a ng-click="openElementGuide()">What is this?</a></small></h6>
-              <div class="btn-group">
-                <a class="btn" ng-click="addTextNode()">Text</a>
-                <a class="btn" ng-click="addDataNode()">Data</a>
-                <a class="btn" ng-click="addLinkNode()">Link</a>
-                <a class="btn" ng-click="addImageNode()">Image</a>
-                <a class="btn" ng-click="addNewlineNode()">Newline</a>
-              </div>
-            </div>
-
-            <div class="span3">
-              <h6>Move Cursor</h6>
-              <div class="btn-group">
-                <a class="btn" ng-click="cursorBack()"><i class="icon-arrow-left"></i> Back</a>
-                <a class="btn" ng-click="cursorForward()"><i class="icon-arrow-right"></i> Forward</a>
-              </div>
-            </div>
-
-            <div class="span2">
-              <h6>Actions</h6>
-              <div class="btn-group">
-                <a class="btn" ng-click="removeNodeAtCursor()"><i class="icon-remove"></i> Delete</a>
-              </div>
-            </div>
-
-            <div class="span3">
-              <h6>&nbsp;</h6>
-            </div>
-          </div>
-
-          <script type="text/ng-template" id="elementGuide.html">
-            <div>
-              <div class="modal-header">
-                <h3>How this works.</h3>
-              </div>
-              <div class="modal-body">
-                <p>
-                  These buttons add elements to the canvas that let you control
-                  how your data is displayed.
-                </p>
-                <h5>Element Guide</h5>
-                <img src="/static/img/pagecolumn_components_labeled.png">
-              </div>
-              <div class="modal-footer">
-                <button class="btn" ng-click="closeElementGuide()">Close</button>
-              </div>
-            </div>
-          </script>
 
         </div>
       </div>
