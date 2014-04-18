@@ -41,7 +41,7 @@ The prefix to our VERP from address. Default: 'judoon'
 
 =head2 verp_domain / _build_verp_domain
 
-The domain for our VERP from address. Default: 'cellmigration.org'
+The domain for our VERP from address. Default: 'judoon.org'
 
 =head2 verp_regex / _build_verp_regex
 
@@ -59,7 +59,7 @@ has verp_domain => (
     is => 'lazy',
     isa => Str,
 );
-sub _build_verp_domain { return 'cellmigration.org'; }
+sub _build_verp_domain { return 'judoon.org'; }
 
 has verp_regex => (
     is => 'lazy',
