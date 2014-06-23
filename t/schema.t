@@ -309,17 +309,6 @@ test 'Result::DatasetColumn' => sub {
     my $user = $self->ResultSet('User')->first;
     my $mutable_ds = $user->import_data_by_filename('t/etc/data/basic.xls');
 
-
-    # test data_type lookup column
-    # is $ds_col3->data_type(), 'text', 'can proxy to lookup';
-    # ok !exception { $ds_col3->data_type("numeric"); $ds_col3->update; },
-    #     ' lookup_proxy lives w/ good lookup';
-    # is $ds_col3->data_type(), 'numeric', 'proxy to lookup produce correct value';
-    # is $ds_col4->data_type(), 'text', "similar column doesn\'t get same value";
-    # ok exception { $ds_col3->data_type("moo"); },
-    #     ' lookup_proxy dies on bad lookup';
-
-
     # make sure we can import datasets w/ duplicate column names
     $user = $self->ResultSet('User')->first;
     is_result my $dupe_cols_ds
