@@ -22,7 +22,6 @@ use 5.10.1;
 use base 'DBIx::Class::Core';
 
 __PACKAGE__->load_components(qw{
-   Helper::Row::Lookup
    InflateColumn::DateTime
    TimeStamp
    DynamicDefault

@@ -15,8 +15,6 @@ use namespace::clean;
 
 extends 'Judoon::Schema::ResultSet';
 
-__PACKAGE__->load_components('+DBIx::Class::Helper::ResultSet::Lookup');
-
 
 =head1 METHODS
 
