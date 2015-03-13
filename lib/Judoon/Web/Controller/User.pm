@@ -88,7 +88,7 @@ sub new_dataset : Chained('/base') PathPart('user/datasets') Args(0) {
     my $user = $c->user;
     if (not $user) {
         $self->go_here($c, '/login/login');
-        $c->deatch();
+        $c->detach();
     }
 
     $c->stash->{authd_user} = $user->get_object;
